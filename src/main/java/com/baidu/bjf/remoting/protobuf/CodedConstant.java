@@ -179,9 +179,9 @@ public class CodedConstant {
     public static String getMappedWriteCode(String prefix, int order, FieldType type,
             boolean isList) {
         String fieldName = getFieldName(order);
-        fieldName = fieldName + type.getToPrimitiveType();
         StringBuilder ret = new StringBuilder();
         ret.append("if (").append(fieldName).append("!=null){");
+        fieldName = fieldName + type.getToPrimitiveType();
         
         if (isList) {
             String typeString = type.getType().toUpperCase();
