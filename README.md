@@ -2,26 +2,26 @@ jprotobuf
 =========
 
 A very useful utility library for java programmer using google protobuf<br>
-jprotobufÊÇÕë¶ÔJava³ÌĞò¿ª·¢Ò»Ì×¼òÒ×Àà¿â£¬Ä¿µÄÊÇ¼ò»¯javaÓïÑÔ¶ÔprotobufÀà¿âµÄÊ¹ÓÃ<br>
-Ê¹ÓÃjprotobuf¿ÉÒÔÎŞĞèÔÙÈ¥ÁË½â.protoÎÄ¼ş²Ù×÷ÓëÓï·¨£¬Ö±½ÓÊ¹ÓÃjava×¢½â¶¨Òå×Ö¶ÎÀàĞÍ¼´¿É¡£
+jprotobufæ˜¯é’ˆå¯¹Javaç¨‹åºå¼€å‘ä¸€å¥—ç®€æ˜“ç±»åº“ï¼Œç›®çš„æ˜¯ç®€åŒ–javaè¯­è¨€å¯¹protobufç±»åº“çš„ä½¿ç”¨<br>
+ä½¿ç”¨jprotobufå¯ä»¥æ— éœ€å†å»äº†è§£.protoæ–‡ä»¶æ“ä½œä¸è¯­æ³•ï¼Œç›´æ¥ä½¿ç”¨javaæ³¨è§£å®šä¹‰å­—æ®µç±»å‹å³å¯ã€‚
 
-## »·¾³ÒªÇó ##
-JDK 6 »òÒÔÉÏ°æ±¾
+## ç¯å¢ƒè¦æ±‚ ##
+JDK 6 æˆ–ä»¥ä¸Šç‰ˆæœ¬
 
-## APIÊ¹ÓÃËµÃ÷ ##
+## APIä½¿ç”¨è¯´æ˜ ##
 
-Ê¾Àı£º¼ÙÈçĞèÒª¶¨Òåprotobuf¶¨ÒåÒ»¸öÊı¾İ½Ó¿Ú£¬°üº¬Á½¸öÊôĞÔ£¬Ò»¸öÊÇstring£¬Ò»¸öÊÇint32
+ç¤ºä¾‹ï¼šå‡å¦‚éœ€è¦å®šä¹‰protobufå®šä¹‰ä¸€ä¸ªæ•°æ®æ¥å£ï¼ŒåŒ…å«ä¸¤ä¸ªå±æ€§ï¼Œä¸€ä¸ªæ˜¯stringï¼Œä¸€ä¸ªæ˜¯int32
 
-### ´«Í³protobufÊ¹ÓÃ¹ı³Ì ###
+### ä¼ ç»Ÿprotobufä½¿ç”¨è¿‡ç¨‹ ###
 
-a ¶¨Òå.protoËµÃ÷ÎÄ¼ş. test.proto
+a å®šä¹‰.protoè¯´æ˜æ–‡ä»¶. test.proto
 
 ```property
 package pkg;  
 
 option java_package = "com.baidu.bjf.remoting.protobuf";
   
-//ÕâÀïÉùÃ÷Êä³öµÄjavaµÄÀàÃû  
+//è¿™é‡Œå£°æ˜è¾“å‡ºçš„javaçš„ç±»å  
 option java_outer_classname = "SimpleTypeTest";  
   
 message InterClassName {  
@@ -31,13 +31,13 @@ message InterClassName {
   
 ```
 
-b Ê¹ÓÃprotoc.exe ±àÒë.protoÎÄ¼ş
+b ä½¿ç”¨protoc.exe ç¼–è¯‘.protoæ–‡ä»¶
 ```cmd
  protoc --java_out=src  test.proto
 ``` 
 
-c ±àÒëÉú³ÉµÄJavaÎÄ¼ş£¬ÀûÓÃprotobuf API½øĞĞĞòÁĞ»¯Óë·´Ğò»¯²Ù×÷<br>
-ĞòÁĞ»¯²Ù×÷£º
+c ç¼–è¯‘ç”Ÿæˆçš„Javaæ–‡ä»¶ï¼Œåˆ©ç”¨protobuf APIè¿›è¡Œåºåˆ—åŒ–ä¸ååºåŒ–æ“ä½œ<br>
+åºåˆ—åŒ–æ“ä½œï¼š
 ```java
 InterClassName icn = InterClassName.newBuilder().setName("abc")
 		.setValue(100).build();
@@ -45,15 +45,15 @@ InterClassName icn = InterClassName.newBuilder().setName("abc")
 		byte[] bb = icn.toByteArray();
 ``` 
 
-·´Ğò»¯²Ù×÷<br>
+ååºåŒ–æ“ä½œ<br>
 ```java
 byte[] bb = ...;
 InterClassName icn = InterClassName.parseFrom(bb);
 ``` 
 
 
-### Ê¹ÓÃjprotobuf API ¼ò»¯¿ª·¢ ###
-a Ê¹ÓÃ×¢½âÖ±½ÓÊ¹ÓÃpojo¶ÔÏó
+### ä½¿ç”¨jprotobuf API ç®€åŒ–å¼€å‘ ###
+a ä½¿ç”¨æ³¨è§£ç›´æ¥ä½¿ç”¨pojoå¯¹è±¡
 
 ```java
 import com.baidu.bjf.remoting.protobuf.FieldType;
@@ -85,7 +85,7 @@ public class SimpleTypeTest {
 }
 ``` 
 
-b Ê¹ÓÃjprotobuf API½øĞĞĞòÁĞ»¯Óë·´ĞòÁĞ»¯²Ù×÷
+b ä½¿ç”¨jprotobuf APIè¿›è¡Œåºåˆ—åŒ–ä¸ååºåˆ—åŒ–æ“ä½œ
 ```java
         Codec<SimpleTypeTest> simpleTypeCodec = ProtobufProxy
                 .create(SimpleTypeTest.class);
@@ -94,17 +94,20 @@ b Ê¹ÓÃjprotobuf API½øĞĞĞòÁĞ»¯Óë·´ĞòÁĞ»¯²Ù×÷
         stt.name = "abc";
         stt.setValue(100);
         try {
-            // ĞòÁĞ»¯
+            // åºåˆ—åŒ–
             byte[] bb = simpleTypeCodec.encode(stt);
-            // ·´ĞòÁĞ»¯
+            // ååºåˆ—åŒ–
             SimpleTypeTest newStt = simpleTypeCodec.decode(bb);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 ``` 
-## ÁªÏµÎÒÃÇ ##
 
-email: [rigelarch_sh@baidu.com](mailto://email:rigelarch_sh@baidu.com "·¢ÓÊ¼ş¸øjprotobuf¿ª·¢×é")
+æ›´å¤šä½¿ç”¨ç¤ºä¾‹è¯·å‚è§testcaseä»£ç ã€‚
+
+## è”ç³»æˆ‘ä»¬ ##
+
+email: [rigelarch_sh@baidu.com](mailto://email:rigelarch_sh@baidu.com "å‘é‚®ä»¶ç»™jprotobufå¼€å‘ç»„")
 
 
