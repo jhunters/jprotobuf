@@ -1,0 +1,12 @@
+package pkg;  
+
+option java_package = "com.baidu.bjf.remoting.protobuf";
+  
+//这里声明输出的java的类名  
+option java_outer_classname = "SingleDoubleType";  
+  
+message InterClassName {  
+  optional double doubleF = 1;  
+
+}  
+  
