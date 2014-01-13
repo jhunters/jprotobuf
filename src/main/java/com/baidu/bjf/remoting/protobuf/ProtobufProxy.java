@@ -52,6 +52,7 @@ public final class ProtobufProxy {
         CodeGenerator cg = new CodeGenerator(fields, cls);
 
         String code = cg.getCode();
+        System.out.println(code);
         Compiler compiler = new JdkCompiler();
         Class<?> newClass = compiler.compile(code, cg.getClass()
                 .getClassLoader());
@@ -66,22 +67,29 @@ public final class ProtobufProxy {
         }
     }
 
+    /**
+     * find matched field.
+     * 
+     * @param targetClass target class
+     * @return found field list
+     */
     private static List<Field> findMatchedFields(Class targetClass) {
 
+        Class cls = targetClass;
         List<Field> ret = new ArrayList<Field>();
         // Keep backing up the inheritance hierarchy.
         do {
             // Copy each field declared on this class unless it's static or
             // file.
-            Field[] fields = targetClass.getDeclaredFields();
+            Field[] fields = cls.getDeclaredFields();
             for (int i = 0; i < fields.length; i++) {
                 Protobuf protobuf = fields[i].getAnnotation(Protobuf.class);
                 if (protobuf != null) {
                     ret.add(fields[i]);
                 }
             }
-            targetClass = targetClass.getSuperclass();
-        } while (targetClass != null && targetClass != Object.class);
+            cls = targetClass.getSuperclass();
+        } while (cls != null && cls != Object.class);
 
         return ret;
     }

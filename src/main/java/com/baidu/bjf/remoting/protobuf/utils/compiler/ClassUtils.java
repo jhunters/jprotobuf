@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * ClassUtils. (Tool, Static, ThreadSafe)
  * 
@@ -35,6 +36,11 @@ import java.util.Map;
  * @since 1.0.0
  */
 public class ClassUtils {
+
+    /**
+     * empty code
+     */
+    private static final String EMPTY_CODE = "()";
 
     /**
      * class file extension
@@ -74,12 +80,12 @@ public class ClassUtils {
      */
     public static Class<?> forName(String[] packages, String className) {
         try {
-            return _forName(className);
+            return forname(className);
         } catch (ClassNotFoundException e) {
             if (packages != null && packages.length > 0) {
                 for (String pkg : packages) {
                     try {
-                        return _forName(pkg + "." + className);
+                        return forname(pkg + "." + className);
                     } catch (ClassNotFoundException e2) {
                     }
                 }
@@ -97,7 +103,7 @@ public class ClassUtils {
      */
     public static Class<?> forName(String className) {
         try {
-            return _forName(className);
+            return forname(className);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -112,40 +118,56 @@ public class ClassUtils {
      * @throws ClassNotFoundException
      *             if class not found
      */
-    public static Class<?> _forName(String className)
-            throws ClassNotFoundException {
-        if ("boolean".equals(className))
+    public static Class<?> forname(String className)
+        throws ClassNotFoundException {
+        if ("boolean".equals(className)) {
             return boolean.class;
-        if ("byte".equals(className))
+        }
+        if ("byte".equals(className)) {
             return byte.class;
-        if ("char".equals(className))
+        }
+        if ("char".equals(className)) {
             return char.class;
-        if ("short".equals(className))
+        }
+        if ("short".equals(className)) {
             return short.class;
-        if ("int".equals(className))
+        }
+        if ("int".equals(className)) {
             return int.class;
-        if ("long".equals(className))
+        }
+        if ("long".equals(className)) {
             return long.class;
-        if ("float".equals(className))
+        }
+        if ("float".equals(className)) {
             return float.class;
-        if ("double".equals(className))
+        }
+        if ("double".equals(className)) {
             return double.class;
-        if ("boolean[]".equals(className))
+        }
+        if ("boolean[]".equals(className)) {
             return boolean[].class;
-        if ("byte[]".equals(className))
+        }
+        if ("byte[]".equals(className)) {
             return byte[].class;
-        if ("char[]".equals(className))
+        }
+        if ("char[]".equals(className)) {
             return char[].class;
-        if ("short[]".equals(className))
+        }
+        if ("short[]".equals(className)) {
             return short[].class;
-        if ("int[]".equals(className))
+        }
+        if ("int[]".equals(className)) {
             return int[].class;
-        if ("long[]".equals(className))
+        }
+        if ("long[]".equals(className)) {
             return long[].class;
-        if ("float[]".equals(className))
+        }
+        if ("float[]".equals(className)) {
             return float[].class;
-        if ("double[]".equals(className))
+        }
+        if ("double[]".equals(className)) {
             return double[].class;
+        }
         try {
             return arrayForName(className);
         } catch (ClassNotFoundException e) {
@@ -160,8 +182,15 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * array object class name
+     * 
+     * @param className class name
+     * @return loaded class
+     * @throws ClassNotFoundException if class not found
+     */
     private static Class<?> arrayForName(String className)
-            throws ClassNotFoundException {
+        throws ClassNotFoundException {
         return Class.forName(
                 className.endsWith("[]") ? "[L"
                         + className.substring(0, className.length() - 2) + ";"
@@ -242,66 +271,149 @@ public class ClassUtils {
         return Short.valueOf(v);
     }
 
+    /**
+     * do intbox of Integer
+     * 
+     * @param v int value
+     * @return int value
+     */
     public static Integer boxed(int v) {
         return Integer.valueOf(v);
     }
-
+    /**
+     * do intbox of Long
+     * 
+     * @param v long value
+     * @return long value
+     */
     public static Long boxed(long v) {
         return Long.valueOf(v);
     }
-
+    /**
+     * do intbox of Float
+     * 
+     * @param v float value
+     * @return float value
+     */
     public static Float boxed(float v) {
         return Float.valueOf(v);
     }
-
+    /**
+     * do intbox of Double
+     * 
+     * @param v double value
+     * @return double value
+     */
     public static Double boxed(double v) {
         return Double.valueOf(v);
     }
-
+    /**
+     * do intbox of Object
+     * 
+     * @param v Object value
+     * @return Object value
+     */
     public static Object boxed(Object v) {
         return v;
     }
-
+    /**
+     * do unbox of Boolean
+     * 
+     * @param v Boolean value
+     * @return boolean value
+     */
     public static boolean unboxed(Boolean v) {
         return v == null ? false : v.booleanValue();
     }
-
+    /**
+     * do unbox of Character
+     * 
+     * @param v Character value
+     * @return char value
+     */
     public static char unboxed(Character v) {
         return v == null ? '\0' : v.charValue();
     }
-
+    /**
+     * do unbox of Byte
+     * 
+     * @param v Byte value
+     * @return byte value
+     */
     public static byte unboxed(Byte v) {
         return v == null ? 0 : v.byteValue();
     }
-
+    /**
+     * do unbox of Short
+     * 
+     * @param v Short value
+     * @return short value
+     */
     public static short unboxed(Short v) {
         return v == null ? 0 : v.shortValue();
     }
-
+    /**
+     * do unbox of Integer
+     * 
+     * @param v Integer value
+     * @return int value
+     */
     public static int unboxed(Integer v) {
         return v == null ? 0 : v.intValue();
     }
-
+    /**
+     * do unbox of Long v
+     * 
+     * @param v Long v value
+     * @return long value
+     */
     public static long unboxed(Long v) {
         return v == null ? 0 : v.longValue();
     }
-
+    /**
+     * do unbox of Float v
+     * 
+     * @param v Float v value
+     * @return float value
+     */
     public static float unboxed(Float v) {
         return v == null ? 0 : v.floatValue();
     }
-
+    /**
+     * do unbox of Double v
+     * 
+     * @param v Double v value
+     * @return double value
+     */
     public static double unboxed(Double v) {
         return v == null ? 0 : v.doubleValue();
     }
-
+    /**
+     * do unbox of Object v
+     * 
+     * @param v Object v value
+     * @return Object value
+     */
     public static Object unboxed(Object v) {
         return v;
     }
 
+    /**
+     * test if not empty 
+     * @param object to check
+     * @return true if not empty
+     */
     public static boolean isNotEmpty(Object object) {
         return getSize(object) > 0;
     }
 
+    /**
+     * get size of object. real size is instance of {@link Collection}<br>
+     * {@link Map} and {@link Array}
+     * 
+     * @param object to check
+     * @return real size
+     */
     public static int getSize(Object object) {
         if (object == null) {
             return 0;
@@ -317,6 +429,12 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * to convert {@link Uri}
+     * 
+     * @param name uri in string
+     * @return {@link URI} object
+     */
     public static URI toURI(String name) {
         try {
             return new URI(name);
@@ -325,10 +443,22 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * get generic class from target class
+     * 
+     * @param cls target class
+     * @return founded generic class
+     */
     public static Class<?> getGenericClass(Class<?> cls) {
         return getGenericClass(cls, 0);
     }
 
+    /**
+     * get generic class from target class
+     * @param cls target class
+     * @param i order size
+     * @return founded generic class
+     */
     public static Class<?> getGenericClass(Class<?> cls, int i) {
         try {
             ParameterizedType parameterizedType = ((ParameterizedType) cls
@@ -353,6 +483,11 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * test if before java 5
+     * @param javaVersion jdk version
+     * @return true if before java 5
+     */
     public static boolean isBeforeJava5(String javaVersion) {
         return (javaVersion == null || javaVersion.length() == 0
                 || "1.0".equals(javaVersion) || "1.1".equals(javaVersion)
@@ -360,10 +495,20 @@ public class ClassUtils {
                 .equals(javaVersion));
     }
 
+    /**
+     * test if before java 6
+     * @param javaVersion jdk version
+     * @return true if before java 6
+     */
     public static boolean isBeforeJava6(String javaVersion) {
         return isBeforeJava5(javaVersion) || "1.5".equals(javaVersion);
     }
 
+    /**
+     * convert throwable to string
+     * @param e error instance
+     * @return to string value
+     */
     public static String toString(Throwable e) {
         StringWriter w = new StringWriter();
         PrintWriter p = new PrintWriter(w);
@@ -380,8 +525,17 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * JIT limit size
+     */
     private static final int JIT_LIMIT = 5 * 1024;
 
+    /**
+     * check byte encode
+     * 
+     * @param name value to check
+     * @param bytecode byte code array
+     */
     public static void checkBytecode(String name, byte[] bytecode) {
         if (bytecode.length > JIT_LIMIT) {
             System.err
@@ -390,21 +544,27 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * get method of size action
+     * 
+     * @param cls class 
+     * @return relative method name
+     */
     public static String getSizeMethod(Class<?> cls) {
         try {
-            return cls.getMethod("size", new Class<?>[0]).getName() + "()";
+            return cls.getMethod("size", new Class<?>[0]).getName() + EMPTY_CODE;
         } catch (NoSuchMethodException e) {
             try {
                 return cls.getMethod("length", new Class<?>[0]).getName()
-                        + "()";
+                        + EMPTY_CODE;
             } catch (NoSuchMethodException e2) {
                 try {
                     return cls.getMethod("getSize", new Class<?>[0]).getName()
-                            + "()";
+                            + EMPTY_CODE;
                 } catch (NoSuchMethodException e3) {
                     try {
                         return cls.getMethod("getLength", new Class<?>[0])
-                                .getName() + "()";
+                                .getName() + EMPTY_CODE;
                     } catch (NoSuchMethodException e4) {
                         return null;
                     }
@@ -413,6 +573,14 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * get method name
+     * 
+     * @param method method object
+     * @param parameterClasses parameter types
+     * @param rightCode code to join with
+     * @return method name
+     */
     public static String getMethodName(Method method,
             Class<?>[] parameterClasses, String rightCode) {
         if (method.getParameterTypes().length > parameterClasses.length) {
@@ -441,6 +609,15 @@ public class ClassUtils {
         return method.getName() + "(" + rightCode + ")";
     }
 
+    /**
+     * find matched method
+     * 
+     * @param currentClass class to search
+     * @param name method name
+     * @param parameterTypes method parameter types
+     * @return found method
+     * @throws NoSuchMethodException if not such method found
+     */
     public static Method searchMethod(Class<?> currentClass, String name,
             Class<?>[] parameterTypes) throws NoSuchMethodException {
         if (currentClass == null) {
@@ -473,6 +650,11 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * get initial code by class
+     * @param type class
+     * @return get initial code
+     */
     public static String getInitCode(Class<?> type) {
         if (byte.class.equals(type) || short.class.equals(type)
                 || int.class.equals(type) || long.class.equals(type)
@@ -487,6 +669,13 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * to map convert
+     * @param <K> key 
+     * @param <V> value
+     * @param entries map entries
+     * @return map
+     */
     public static <K, V> Map<K, V> toMap(Map.Entry<K, V>[] entries) {
         Map<K, V> map = new HashMap<K, V>();
         if (entries != null && entries.length > 0) {
@@ -497,6 +686,9 @@ public class ClassUtils {
         return map;
     }
 
+    /**
+     * private constructor
+     */
     private ClassUtils() {
     }
 

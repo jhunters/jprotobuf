@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
+ * code generator utility class
+ * 
  * @author xiemalin
  * @since 1.0.0
  */
@@ -35,7 +37,13 @@ public class CodeGenerator {
      */
     private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class);
 
+    /**
+     * all related field list
+     */
     private List<Field> fields;
+    /**
+     * wrapped class
+     */
     private Class<?> cls;
 
     /**
@@ -81,6 +89,10 @@ public class CodeGenerator {
         return code.toString();
     }
 
+    /**
+     * get decode method source code
+     * @return decode method source code
+     */
     private String getDecodeMethodCode() {
         StringBuilder code = new StringBuilder();
 
@@ -142,6 +154,11 @@ public class CodeGenerator {
         return code.toString();
     }
     
+    /**
+     * check if field type is a list
+     * @param field field to check
+     * @return true if is a list
+     */
     private boolean isListType(Field field) {
         Class<?> cls = field.getType();
         if (List.class.isAssignableFrom(cls)) {
@@ -151,13 +168,19 @@ public class CodeGenerator {
         return false;
     }
 
+    /**
+     * check field type is illegal with field class
+     * 
+     * @param type field type
+     * @param field field instance
+     */
     private void checkType(FieldType type, Field field) {
         Class<?> cls = field.getType();
         
         String javaType = type.getJavaType();
         if ("Integer".equals(javaType)) {
-            if (cls.getSimpleName().equals("int")
-                    || cls.getSigners().equals("Integer")) {
+            if (cls.getSimpleName().equals("int") || 
+                    cls.getSigners().equals("Integer")) {
                 return;
             }
             throw new IllegalArgumentException(getErroMessage(type, field));
@@ -167,12 +190,24 @@ public class CodeGenerator {
         }
     }
 
+    /**
+     * get error message
+     *  
+     * @param type field type
+     * @param field field instance
+     * @return error message
+     */
     private String getErroMessage(FieldType type, Field field) {
         return "Type mismatch. @Protobuf required type '" + type.getJavaType()
                 + "' but field type is '" + field.getType().getSimpleName()
                 + "'";
     }
 
+    /**
+     * get encode method source code
+     * 
+     * @return encode method source code
+     */
     private String getEncodeMethodCode() {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();

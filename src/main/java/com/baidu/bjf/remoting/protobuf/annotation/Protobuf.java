@@ -43,19 +43,17 @@ public @interface Protobuf {
      * Note: repeated is not supported now.
      * </pre>
      * 
-     * @return Specifying Field Rules
      */
     boolean required() default false;
 
     /**
      * Set field order. It starts at 1;
      * 
-     * @return field order.
      */
     int order() default 1;
 
     /**
-     * @return field type
+     * get field type
      */
     FieldType fieldType();
 

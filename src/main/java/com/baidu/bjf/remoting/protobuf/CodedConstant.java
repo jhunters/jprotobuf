@@ -32,6 +32,10 @@ import com.google.protobuf.CodedOutputStream;
 public class CodedConstant {
 
     /**
+     * code split string
+     */
+    private static final String CODE_SPLIT = ",";
+    /**
      * get field name
      * 
      * @param order field order
@@ -66,7 +70,7 @@ public class CodedConstant {
             }
             
             code += fieldName + 
-            " = com.google.protobuf.ByteString." + method + "(" + express + ");\n";
+                " = com.google.protobuf.ByteString." + method + "(" + express + ");\n";
             code += "}";
             return code;
         }
@@ -97,7 +101,7 @@ public class CodedConstant {
         String fieldName = getFieldName(order);
         if (isList) {
             String typeString = type.getType().toUpperCase();
-            return "CodedConstant.computeListSize(" + order + "," + fieldName
+            return "CodedConstant.computeListSize(" + order + CODE_SPLIT + fieldName
                     + ", FieldType." + typeString + ");\n";
         }
         
@@ -109,7 +113,7 @@ public class CodedConstant {
         
         fieldName = fieldName + type.getToPrimitiveType();
         return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" +
-        order + "," + fieldName + ");\n";
+            order + CODE_SPLIT + fieldName + ");\n";
     }
     
     /**
@@ -134,9 +138,10 @@ public class CodedConstant {
     }
     
     /**
-     * @param o
-     * @param type
-     * @return
+     * compute object size
+     * @param o target object
+     * @param type field type
+     * @return object size
      */
     private static int computeSize(Object o, FieldType type) {
         int size = 0;
@@ -171,9 +176,10 @@ public class CodedConstant {
     
     /**
      * get mapped object byte write java expression
-     * 
+     * @param prefix prefix code
      * @param order field order
      * @param type field type
+     * @param isList if list set true
      * @return full java expression
      */
     public static String getMappedWriteCode(String prefix, int order, FieldType type,
@@ -185,9 +191,9 @@ public class CodedConstant {
         
         if (isList) {
             String typeString = type.getType().toUpperCase();
-            ret.append("CodedConstant.writeToList(").append(prefix).append(",");
-            ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(");\n}");
+            ret.append("CodedConstant.writeToList(").append(prefix).append(CODE_SPLIT);
+            ret.append(order).append(CODE_SPLIT).append("FieldType.").append(typeString);
+            ret.append(CODE_SPLIT).append(fieldName).append(");\n}");
             return ret.toString();
         }
         
@@ -210,6 +216,7 @@ public class CodedConstant {
      * @param order field order
      * @param type field type
      * @param list target list object to be serialized
+     * @throws IOException io related excpetion
      */
     public static void writeToList(CodedOutputStream out, int order, 
             FieldType type, List list) throws IOException {
@@ -222,6 +229,15 @@ public class CodedConstant {
         
     }
     
+    /**
+     * write object to {@link CodedOutputStream}
+     * 
+     * @param out CodedOutputStream instance
+     * @param order write order
+     * @param type field type
+     * @param o target object
+     * @throws IOException io related excpetion
+     */
     private static void writeObject(CodedOutputStream out, int order,
             FieldType type, Object o) throws IOException {
         if (o == null) {
@@ -288,7 +304,7 @@ public class CodedConstant {
     public static String getRetRequiredCheck(String express, Field field) {
         String code = "if (CodedConstant.isNull(" + express + ")) {\n";
         code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() +
-        "\"));\n";
+            "\"));\n";
         code += "}\n";
         
         return code;
@@ -374,6 +390,11 @@ public class CodedConstant {
         return false;
     }
     
+    /**
+     * convert to list
+     * @param value target string
+     * @return list
+     */
     public static List asList(String value) {
         return Arrays.asList(value);
     }
@@ -395,6 +416,9 @@ public class CodedConstant {
             .toString();
     }
     
+    /**
+     * tag type bit value
+     */
     static final int TAG_TYPE_BITS = 3;
     /**
      * make protobuf tag

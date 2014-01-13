@@ -19,7 +19,7 @@ import java.io.IOException;
 
 /**
  * Codec interface include encode and decode support.
- * 
+ * @param <T> target object
  * @author xiemalin
  * @since 1.0.0
  */
