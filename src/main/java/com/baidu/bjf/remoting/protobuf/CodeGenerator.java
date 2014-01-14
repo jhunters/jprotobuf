@@ -33,6 +33,11 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class CodeGenerator {
     /**
+     * method invoke action mark
+     */
+    private static final String METHOD_INVOKE_MARK = ".";
+
+    /**
      * Logger for this class
      */
     private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class);
@@ -179,8 +184,8 @@ public class CodeGenerator {
         
         String javaType = type.getJavaType();
         if ("Integer".equals(javaType)) {
-            if (cls.getSimpleName().equals("int") || 
-                    cls.getSigners().equals("Integer")) {
+            if ("int".equals(cls.getSimpleName()) || 
+                    "Integer".equals(cls.getSigners())) {
                 return;
             }
             throw new IllegalArgumentException(getErroMessage(type, field));
@@ -275,7 +280,7 @@ public class CodeGenerator {
      */
     protected String getAccessByField(String target, Field field, Class<?> cls) {
         if (field.getModifiers() == Modifier.PUBLIC) {
-            return target + "." + field.getName();
+            return target + METHOD_INVOKE_MARK + field.getName();
         }
         // check if has getter method
         String getter;
@@ -287,7 +292,7 @@ public class CodeGenerator {
         // check method exist
         try {
             cls.getMethod(getter, new Class<?>[0]);
-            return target + "." + getter + "()";
+            return target + METHOD_INVOKE_MARK + getter + "()";
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(e.getMessage(), e);
@@ -301,6 +306,16 @@ public class CodeGenerator {
         return code;
     }
 
+    /**
+     * get set to field method source code
+     * 
+     * @param target target object name
+     * @param field field object
+     * @param cls target class
+     * @param express java express
+     * @param isList true if field is type of {@link List}
+     * @return source code
+     */
     protected String getSetToField(String target, Field field, Class<?> cls,
             String express, boolean isList) {
         String ret = "";
@@ -309,11 +324,11 @@ public class CodeGenerator {
         }
         if (field.getModifiers() == Modifier.PUBLIC) {
             if (isList) {
-                ret += target + "." + field.getName() + "= new ArrayList();\n}";  
-                ret +=  target + "." + field.getName() + ".add(" + express + ")";
+                ret += target + METHOD_INVOKE_MARK + field.getName() + "= new ArrayList();\n}";  
+                ret +=  target + METHOD_INVOKE_MARK + field.getName() + ".add(" + express + ")";
                 return ret;
             }
-            return target + "." + field.getName() + "=" + express + "\n";
+            return target + METHOD_INVOKE_MARK + field.getName() + "=" + express + "\n";
         }
         String setter = "set" + CodedConstant.capitalize(field.getName());
         // check method exist
@@ -321,13 +336,13 @@ public class CodeGenerator {
             cls.getMethod(setter, new Class<?>[]{field.getType()});
             if (isList) {
                 ret += "List __list = new ArrayList();\n";
-                ret += target + "." + setter + "(__list);\n}";
+                ret += target + METHOD_INVOKE_MARK + setter + "(__list);\n}";
                 
                 ret += "(" + getAccessByField(target, field, cls) + ").add(" + express + ")";
                 return ret;
             }
             
-            return target + "." + setter + "(" + express + ")\n";
+            return target + METHOD_INVOKE_MARK + setter + "(" + express + ")\n";
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(e.getMessage(), e);

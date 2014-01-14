@@ -52,7 +52,7 @@ public final class ProtobufProxy {
         CodeGenerator cg = new CodeGenerator(fields, cls);
 
         String code = cg.getCode();
-        System.out.println(code);
+
         Compiler compiler = new JdkCompiler();
         Class<?> newClass = compiler.compile(code, cg.getClass()
                 .getClassLoader());
