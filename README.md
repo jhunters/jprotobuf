@@ -104,10 +104,49 @@ b 使用jprotobuf API进行序列化与反序列化操作
 
 ``` 
 
+
+
+### 嵌套对象的开发示例 ###
+```java
+public class AddressBookProtosPOJO {
+
+    @Protobuf(fieldType = FieldType.OBJECT, order=1, required = false)
+    public PersonPOJO list;
+
+}
+
+public class PersonPOJO {
+
+    @Protobuf(fieldType = FieldType.STRING, order=1, required = true)
+    public String name;
+    @Protobuf(fieldType = FieldType.INT32, order=2, required = true)
+    public int id;
+    @Protobuf(fieldType = FieldType.STRING, order=3, required = false)
+    public String email;
+    
+    @Protobuf(fieldType = FieldType.DOUBLE, order=4, required = false)
+    public Double doubleF;
+    
+    
+    @Protobuf(fieldType = FieldType.FLOAT, order=5, required = false)
+    public Float floatF;
+    
+    @Protobuf(fieldType = FieldType.BYTES, order=6, required = false)
+    public byte[] bytesF;
+    
+    @Protobuf(fieldType=FieldType.BOOL, order=7, required=false)
+    public Boolean boolF;    
+}
+
+
+``` 
+
+
 更多使用示例请参见testcase代码。
+
 
 ## 联系我们 ##
 
-email: [rigelarch_sh@baidu.com](mailto://email:rigelarch_sh@baidu.com "发邮件给jprotobuf开发组")
+email: [rigel-opensource@baidu.com](mailto://rigel-opensource@baidu.com "发邮件给jprotobuf开发组")
 
 
