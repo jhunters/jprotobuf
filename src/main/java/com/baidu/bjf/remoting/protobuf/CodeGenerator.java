@@ -32,12 +32,25 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  * @since 1.0.0
  */
 public class CodeGenerator {
+    
+    /**
+     * auto proxied suffix class name
+     */
+    private static final String DEFAULT_SUFFIX_CLASSNAME = "$$BJFProtoBufClass";
+
     /**
      * Logger for this class
      */
     private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class);
 
+    /**
+     * target fields which marked <code> @Protofuf </code> annotation
+     */
     private List<Field> fields;
+    
+    /**
+     * target class
+     */
     private Class<?> cls;
 
     /**
@@ -54,10 +67,18 @@ public class CodeGenerator {
         this.cls = cls;
     }
     
+    /**
+     * get new class name
+     * @return class name
+     */
     public String getClassName() {
-        return cls.getSimpleName() + "$$BJFProtoBufClass";
+        return cls.getSimpleName() + DEFAULT_SUFFIX_CLASSNAME;
     }
     
+    /**
+     * get new class name with full package
+     * @return class name
+     */
     public String getFullClassName() {
         return cls.getPackage().getName() + "." + getClassName();
     }
