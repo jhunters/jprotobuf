@@ -177,17 +177,17 @@ public class CodedConstant {
             byte[] bb = (byte[]) o;
             size = CodedOutputStream.computeBytesSizeNoTag(ByteString.copyFrom(bb));
         } else if (type == FieldType.DOUBLE) {
-            size = CodedOutputStream.LITTLE_ENDIAN_64_SIZE;
+            size = CodedOutputStream.computeInt64SizeNoTag(Integer.valueOf(o.toString()));
         } else if (type == FieldType.FIXED32 || type == FieldType.INT32 || 
                 type == FieldType.SFIXED32 || type == FieldType.SINT32 || 
                 type == FieldType.UINT32) {
-            size = CodedOutputStream.LITTLE_ENDIAN_32_SIZE;
+            size = CodedOutputStream.computeInt32SizeNoTag(Integer.valueOf(o.toString()));
         } else if (type == FieldType.FIXED64 || type == FieldType.INT64 || 
                 type == FieldType.SFIXED64 || type == FieldType.SINT64 || 
                 type == FieldType.UINT64) {
-            size = CodedOutputStream.LITTLE_ENDIAN_64_SIZE;
+            size = CodedOutputStream.computeInt64SizeNoTag(Integer.valueOf(o.toString()));
         }  else if (type == FieldType.FLOAT) {
-            size = CodedOutputStream.LITTLE_ENDIAN_32_SIZE;
+            size = CodedOutputStream.computeInt32SizeNoTag(Integer.valueOf(o.toString()));
         }
         
         return size;
@@ -206,7 +206,6 @@ public class CodedConstant {
         String fieldName = getFieldName(order);
         StringBuilder ret = new StringBuilder();
         ret.append("if (").append(fieldName).append("!=null){");
-        fieldName = fieldName + type.getToPrimitiveType();
         
         if (isList) {
             String typeString = type.getType().toUpperCase();
@@ -214,6 +213,9 @@ public class CodedConstant {
             ret.append(order).append(",").append("FieldType.").append(typeString);
             ret.append(",").append(fieldName).append(");\n}");
             return ret.toString();
+        } else {
+            // not list so should add convert to primitive type
+            fieldName = fieldName + type.getToPrimitiveType();
         }
         
         if (type == FieldType.OBJECT) {

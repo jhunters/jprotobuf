@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.bjf.remoting.protobuf.complex;
+package com.baidu.bjf.remoting.protobuf.simplerepeat;
 
 import java.util.List;
 
@@ -17,9 +17,8 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  * @author xiemalin
  *
  */
-public class AddressBookProtosPOJO {
+public class RequrieRepeatedNumberTypePOJOClass2 {
 
-    @Protobuf(fieldType = FieldType.OBJECT, order=1, required = false)
-    public PersonPOJO list;
-
+    @Protobuf(fieldType = FieldType.INT32, order = 1, required = false)
+    public List<Integer> list1;
 }

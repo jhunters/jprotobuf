@@ -17,13 +17,6 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class PersonPOJO {
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "PersonPOJO [name=" + name + ", id=" + id + ", email=" + email + "]";
-    }
     @Protobuf(fieldType = FieldType.STRING, order=1, required = true)
     public String name;
     @Protobuf(fieldType = FieldType.INT32, order=2, required = true)
