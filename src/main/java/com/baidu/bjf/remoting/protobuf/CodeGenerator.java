@@ -17,6 +17,8 @@ package com.baidu.bjf.remoting.protobuf;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,29 +28,16 @@ import org.apache.log4j.Logger;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * code generator utility class
- * 
  * @author xiemalin
  * @since 1.0.0
  */
 public class CodeGenerator {
     /**
-     * method invoke action mark
-     */
-    private static final String METHOD_INVOKE_MARK = ".";
-
-    /**
      * Logger for this class
      */
     private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class);
 
-    /**
-     * all related field list
-     */
     private List<Field> fields;
-    /**
-     * wrapped class
-     */
     private Class<?> cls;
 
     /**
@@ -64,6 +53,14 @@ public class CodeGenerator {
         this.fields = fields;
         this.cls = cls;
     }
+    
+    public String getClassName() {
+        return cls.getSimpleName() + "$$BJFProtoBufClass";
+    }
+    
+    public String getFullClassName() {
+        return cls.getPackage().getName() + "." + getClassName();
+    }
 
     /**
      * get full java class code.
@@ -73,7 +70,7 @@ public class CodeGenerator {
     public String getCode() {
         StringBuilder code = new StringBuilder();
 
-        String className = cls.getSimpleName() + "$$BJFProtoBufClass";
+        String className = getClassName();
 
         code.append("package " + cls.getPackage().getName() + ";\n");
         code.append("import com.google.protobuf.*;\n");
@@ -89,15 +86,14 @@ public class CodeGenerator {
 
         code.append(getEncodeMethodCode());
         code.append(getDecodeMethodCode());
+        code.append(getSizeMethodCode());
+        code.append(getWriteToMethodCode());
+        code.append(getReadFromMethodCode());
         code.append("}");
 
         return code.toString();
     }
 
-    /**
-     * get decode method source code
-     * @return decode method source code
-     */
     private String getDecodeMethodCode() {
         StringBuilder code = new StringBuilder();
 
@@ -108,6 +104,7 @@ public class CodeGenerator {
         code.append("CodedInputStream input = CodedInputStream.newInstance(bb, 0, bb.length);\n");
         code.append("try {\n");
         code.append("boolean done = false;\n");
+        code.append("Codec codec = null;\n");
         code.append("while (!done) {\n");
         code.append("int tag = input.readTag();\n");
         code.append("if (tag == 0) { break;}\n");
@@ -123,13 +120,151 @@ public class CodeGenerator {
                     .append(")) {\n");
             String t = protobuf.fieldType().getType();
             t = CodedConstant.capitalize(t);
+            
+            boolean listTypeCheck = false;
+            String express = "input.read" + t + "()";
+            if (isList && protobuf.fieldType() == FieldType.OBJECT) {
+                Type type = field.getGenericType();
+                if (type instanceof ParameterizedType) {
+                    ParameterizedType ptype = (ParameterizedType) type;
+                    
+                    Type[] actualTypeArguments = ptype.getActualTypeArguments();
+                    
+                    if (actualTypeArguments != null && actualTypeArguments.length > 0) {
+                        Type targetType = actualTypeArguments[0];
+                        if (targetType instanceof Class) {
+                            Class cls = (Class) targetType;
+                            code.append("codec = ProtobufProxy.create(").append(cls.getName()).append(".class);\n");
+                            code.append("int length = input.readRawVarint32();\n");
+                            code.append("final int oldLimit = input.pushLimit(length);\n");
+                            listTypeCheck = true;
+                            express = "(" + cls.getSimpleName() + ") codec.readFrom(input)";
+                        }
+                    }
+                    
+                }
+            } else if (protobuf.fieldType() == FieldType.OBJECT) {
+                Class cls = field.getType();
+                code.append("codec = ProtobufProxy.create(").append(cls.getName()).append(".class);\n");
+                code.append("int length = input.readRawVarint32();\n");
+                code.append("final int oldLimit = input.pushLimit(length);\n");
+                listTypeCheck = true;
+                express = "(" + cls.getSimpleName() + ") codec.readFrom(input)";
+            }
+            
+            
             code.append(
-                    getSetToField("ret", field, cls, "input.read" + t + "()", isList));
+                    getSetToField("ret", field, cls, express, isList));
             if (protobuf.fieldType() == FieldType.BYTES) {
                 code.append(".toByteArray()");
             }
                     
             code.append(";\n");
+            
+            if (listTypeCheck) {
+                code.append("input.checkLastTagWas(0);\n");
+                code.append("input.popLimit(oldLimit);\n");
+            }
+            
+            code.append("continue;\n");
+            code.append("}");
+
+        }
+
+        code.append("input.skipField(tag);\n");
+        code.append("}");
+        code.append("} catch (com.google.protobuf.InvalidProtocolBufferException e) {");
+        code.append("throw e;");
+        code.append("} catch (java.io.IOException e) {");
+        code.append("throw e;");
+        code.append("}");
+
+        for (Field field : fields) {
+            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+            if (protobuf.required()) {
+                code.append(CodedConstant.getRetRequiredCheck(
+                        getAccessByField("ret", field, cls), field));
+            }
+
+        }
+
+        code.append("return ret;\n");
+
+        code.append("}\n");
+
+        return code.toString();
+    }
+ 
+    private String getReadFromMethodCode() {
+        StringBuilder code = new StringBuilder();
+
+        code.append("public ").append(cls.getSimpleName())
+                .append(" readFrom(CodedInputStream input) throws IOException {\n");
+        code.append(cls.getName()).append(" ret = new ")
+                .append(cls.getName()).append("();");
+        code.append("try {\n");
+        code.append("boolean done = false;\n");
+        code.append("Codec codec = null;\n");
+        code.append("while (!done) {\n");
+        code.append("int tag = input.readTag();\n");
+        code.append("if (tag == 0) { break;}\n");
+
+        for (Field field : fields) {
+            boolean isList = isListType(field);
+            
+            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+            code.append("if (tag == CodedConstant.makeTag(").append(
+                    protobuf.order());
+            code.append(",WireFormat.")
+                    .append(protobuf.fieldType().getWireFormat())
+                    .append(")) {\n");
+            String t = protobuf.fieldType().getType();
+            t = CodedConstant.capitalize(t);
+            
+            boolean listTypeCheck = false;
+            String express = "input.read" + t + "()";
+            if (isList && protobuf.fieldType() == FieldType.OBJECT) {
+                Type type = field.getGenericType();
+                if (type instanceof ParameterizedType) {
+                    ParameterizedType ptype = (ParameterizedType) type;
+                    
+                    Type[] actualTypeArguments = ptype.getActualTypeArguments();
+                    
+                    if (actualTypeArguments != null && actualTypeArguments.length > 0) {
+                        Type targetType = actualTypeArguments[0];
+                        if (targetType instanceof Class) {
+                            Class cls = (Class) targetType;
+                            code.append("codec = ProtobufProxy.create(").append(cls.getSimpleName()).append(".class);\n");
+                            code.append("int length = input.readRawVarint32();\n");
+                            code.append("final int oldLimit = input.pushLimit(length);\n");
+                            listTypeCheck = true;
+                            express = "(" + cls.getSimpleName() + ") codec.readFrom(input)";
+                        }
+                    }
+                    
+                }
+            } else if (protobuf.fieldType() == FieldType.OBJECT) {
+                Class cls = field.getType();
+                code.append("codec = ProtobufProxy.create(").append(cls.getName()).append(".class);\n");
+                code.append("int length = input.readRawVarint32();\n");
+                code.append("final int oldLimit = input.pushLimit(length);\n");
+                listTypeCheck = true;
+                express = "(" + cls.getSimpleName() + ") codec.readFrom(input)";
+            }
+            
+            code.append(
+                    getSetToField("ret", field, cls, express, isList));
+            if (protobuf.fieldType() == FieldType.BYTES) {
+                code.append(".toByteArray()");
+            }
+                    
+            code.append(";\n");
+            
+            if (listTypeCheck) {
+                code.append("input.checkLastTagWas(0);\n");
+                code.append("input.popLimit(oldLimit);\n");
+            }
+            
             code.append("continue;\n");
             code.append("}");
 
@@ -159,11 +294,6 @@ public class CodeGenerator {
         return code.toString();
     }
     
-    /**
-     * check if field type is a list
-     * @param field field to check
-     * @return true if is a list
-     */
     private boolean isListType(Field field) {
         Class<?> cls = field.getType();
         if (List.class.isAssignableFrom(cls)) {
@@ -173,19 +303,17 @@ public class CodeGenerator {
         return false;
     }
 
-    /**
-     * check field type is illegal with field class
-     * 
-     * @param type field type
-     * @param field field instance
-     */
     private void checkType(FieldType type, Field field) {
         Class<?> cls = field.getType();
         
+        if (type == FieldType.OBJECT) {
+            return;
+        }
+        
         String javaType = type.getJavaType();
         if ("Integer".equals(javaType)) {
-            if ("int".equals(cls.getSimpleName()) || 
-                    "Integer".equals(cls.getSigners())) {
+            if (cls.getSimpleName().equals("int")
+                    || "Integer".equals(cls.getSimpleName())) {
                 return;
             }
             throw new IllegalArgumentException(getErroMessage(type, field));
@@ -195,24 +323,12 @@ public class CodeGenerator {
         }
     }
 
-    /**
-     * get error message
-     *  
-     * @param type field type
-     * @param field field instance
-     * @return error message
-     */
     private String getErroMessage(FieldType type, Field field) {
         return "Type mismatch. @Protobuf required type '" + type.getJavaType()
                 + "' but field type is '" + field.getType().getSimpleName()
                 + "'";
     }
 
-    /**
-     * get encode method source code
-     * 
-     * @return encode method source code
-     */
     private String getEncodeMethodCode() {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
@@ -266,7 +382,97 @@ public class CodeGenerator {
 
         return code.toString();
     }
+    
+    
+    
+    private String getWriteToMethodCode() {
+        StringBuilder code = new StringBuilder();
+        Set<Integer> orders = new HashSet<Integer>();
+        // encode method
+        code.append("public void writeTo(").append(cls.getName())
+                .append(" t, CodedOutputStream output) throws IOException {\n");
+        code.append("int size = 0;");
+        for (Field field : fields) {
+            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+            
+            boolean isList = isListType(field);
+            
+            // check type
+            if (!isList) {
+                checkType(protobuf.fieldType(), field);
+            }
 
+            if (orders.contains(protobuf.order())) {
+                throw new IllegalArgumentException("Field order '"
+                        + protobuf.order() + "' on field" + field.getName()
+                        + " already exsit.");
+            }
+            // define field
+            code.append(CodedConstant.getMappedTypeDefined(protobuf.order(),
+                    protobuf.fieldType(), getAccessByField("t", field, cls), isList));
+            if (protobuf.required()) {
+                code.append(CodedConstant.getRequiredCheck(protobuf.order(),
+                        field));
+            }
+        }
+
+        for (Field field : fields) {
+            boolean isList = isListType(field);
+            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+            // set write to byte
+            code.append(CodedConstant.getMappedWriteCode("output", protobuf.order(),
+                    protobuf.fieldType(), isList));
+        }
+
+        code.append("}\n");
+
+        return code.toString();
+    }
+
+    private String getSizeMethodCode() {
+        StringBuilder code = new StringBuilder();
+        Set<Integer> orders = new HashSet<Integer>();
+        // encode method
+        code.append("public int size(").append(cls.getName())
+                .append(" t) throws IOException {\n");
+        code.append("int size = 0;");
+        for (Field field : fields) {
+            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+            
+            boolean isList = isListType(field);
+            
+            // check type
+            if (!isList) {
+                checkType(protobuf.fieldType(), field);
+            }
+
+            if (orders.contains(protobuf.order())) {
+                throw new IllegalArgumentException("Field order '"
+                        + protobuf.order() + "' on field" + field.getName()
+                        + " already exsit.");
+            }
+            // define field
+            code.append(CodedConstant.getMappedTypeDefined(protobuf.order(),
+                    protobuf.fieldType(), getAccessByField("t", field, cls), isList));
+            // compute size
+            code.append("if (!CodedConstant.isNull(")
+                    .append(getAccessByField("t", field, cls)).append("))\n");
+            code.append("{\nsize+=");
+            code.append(CodedConstant.getMappedTypeSize(protobuf.order(),
+                    protobuf.fieldType(), isList));
+            code.append("}\n");
+            if (protobuf.required()) {
+                code.append(CodedConstant.getRequiredCheck(protobuf.order(),
+                        field));
+            }
+        }
+
+        code.append("return size;\n");
+        code.append("}\n");
+
+        return code.toString();
+    }
+    
     /**
      * get field access code
      * 
@@ -280,7 +486,7 @@ public class CodeGenerator {
      */
     protected String getAccessByField(String target, Field field, Class<?> cls) {
         if (field.getModifiers() == Modifier.PUBLIC) {
-            return target + METHOD_INVOKE_MARK + field.getName();
+            return target + "." + field.getName();
         }
         // check if has getter method
         String getter;
@@ -292,7 +498,7 @@ public class CodeGenerator {
         // check method exist
         try {
             cls.getMethod(getter, new Class<?>[0]);
-            return target + METHOD_INVOKE_MARK + getter + "()";
+            return target + "." + getter + "()";
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(e.getMessage(), e);
@@ -306,16 +512,6 @@ public class CodeGenerator {
         return code;
     }
 
-    /**
-     * get set to field method source code
-     * 
-     * @param target target object name
-     * @param field field object
-     * @param cls target class
-     * @param express java express
-     * @param isList true if field is type of {@link List}
-     * @return source code
-     */
     protected String getSetToField(String target, Field field, Class<?> cls,
             String express, boolean isList) {
         String ret = "";
@@ -324,11 +520,11 @@ public class CodeGenerator {
         }
         if (field.getModifiers() == Modifier.PUBLIC) {
             if (isList) {
-                ret += target + METHOD_INVOKE_MARK + field.getName() + "= new ArrayList();\n}";  
-                ret +=  target + METHOD_INVOKE_MARK + field.getName() + ".add(" + express + ")";
+                ret += target + "." + field.getName() + "= new ArrayList();\n}";  
+                ret +=  target + "." + field.getName() + ".add(" + express + ")";
                 return ret;
             }
-            return target + METHOD_INVOKE_MARK + field.getName() + "=" + express + "\n";
+            return target + "." + field.getName() + "=" + express + "\n";
         }
         String setter = "set" + CodedConstant.capitalize(field.getName());
         // check method exist
@@ -336,13 +532,13 @@ public class CodeGenerator {
             cls.getMethod(setter, new Class<?>[]{field.getType()});
             if (isList) {
                 ret += "List __list = new ArrayList();\n";
-                ret += target + METHOD_INVOKE_MARK + setter + "(__list);\n}";
+                ret += target + "." + setter + "(__list);\n}";
                 
                 ret += "(" + getAccessByField(target, field, cls) + ").add(" + express + ")";
                 return ret;
             }
             
-            return target + METHOD_INVOKE_MARK + setter + "(" + express + ")\n";
+            return target + "." + setter + "(" + express + ")\n";
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(e.getMessage(), e);

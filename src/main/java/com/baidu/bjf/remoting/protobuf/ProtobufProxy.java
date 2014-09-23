@@ -50,9 +50,29 @@ public final class ProtobufProxy {
         }
 
         CodeGenerator cg = new CodeGenerator(fields, cls);
+        
+        //try to load first
+        String className = cg.getFullClassName();
+        Class<?> c = null;
+        try {
+            c = Class.forName(className);
+        } catch (ClassNotFoundException e1) {
+            c = null;
+        }
+        
+        if (c != null) {
+            try {
+                Codec<T> newInstance = (Codec<T>) c.newInstance();
+                return newInstance;
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
 
         String code = cg.getCode();
-
+        //System.out.println(code);
         Compiler compiler = new JdkCompiler();
         Class<?> newClass = compiler.compile(code, cg.getClass()
                 .getClassLoader());
@@ -67,29 +87,22 @@ public final class ProtobufProxy {
         }
     }
 
-    /**
-     * find matched field.
-     * 
-     * @param targetClass target class
-     * @return found field list
-     */
     private static List<Field> findMatchedFields(Class targetClass) {
 
-        Class cls = targetClass;
         List<Field> ret = new ArrayList<Field>();
         // Keep backing up the inheritance hierarchy.
         do {
             // Copy each field declared on this class unless it's static or
             // file.
-            Field[] fields = cls.getDeclaredFields();
+            Field[] fields = targetClass.getDeclaredFields();
             for (int i = 0; i < fields.length; i++) {
                 Protobuf protobuf = fields[i].getAnnotation(Protobuf.class);
                 if (protobuf != null) {
                     ret.add(fields[i]);
                 }
             }
-            cls = targetClass.getSuperclass();
-        } while (cls != null && cls != Object.class);
+            targetClass = targetClass.getSuperclass();
+        } while (targetClass != null && targetClass != Object.class);
 
         return ret;
     }

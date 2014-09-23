@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.simplerepeat;
 
 import java.util.List;
 
+import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
-public class RequrieRepeatedDojoClass2 {
+public class RequrieRepeatedDojoClass3 {
 
     @Protobuf(fieldType = FieldType.STRING, order=1, required=false)
     private List<String> list;
 
-    public void setList(List<String> list) {
-        this.list = list;
+    protected List<String> getList() {
+        return list;
     }
 
-    public List<String> getList() {
-        return list;
+    protected void setList(List<String> list) {
+        this.list = list;
     }
     
     

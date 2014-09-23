@@ -1,8 +1,7 @@
 package pkg;  
 
-option java_package = "com.baidu.bjf.remoting.protobuf";
+option java_package = "com.baidu.bjf.remoting.protobuf.simplerepeat";
   
-//这里声明输出的java的类名  
 option java_outer_classname = "RequrieRepeatedType";  
   
 message InterClassName {  

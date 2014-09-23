@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.simpletypes;
 
 import java.io.IOException;
 
@@ -21,7 +21,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.baidu.bjf.remoting.protobuf.AllTypes.InterClassName;
+import com.baidu.bjf.remoting.protobuf.Codec;
+import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.google.protobuf.ByteString;
 
 
@@ -105,19 +107,19 @@ public class AllTypesTest {
         Assert.assertEquals(1, decode.bytesF[0]);
         Assert.assertEquals(2, decode.bytesF[1]);
         Assert.assertEquals(202D, decode.doubleF);
-        Assert.assertEquals(1, decode.fixed32F);
-        Assert.assertEquals(2L, decode.fixed64F);
+        Assert.assertEquals(1, decode.fixed32F.intValue());
+        Assert.assertEquals(2L, decode.fixed64F.longValue());
         Assert.assertEquals(303F, decode.floatF);
-        Assert.assertEquals(4, decode.int32F);
-        Assert.assertEquals(5L, decode.int64F);
-        Assert.assertEquals(6, decode.sfixed32F);
-        Assert.assertEquals(7L, decode.sfixed64F);
-        Assert.assertEquals(8, decode.sint32F);
-        Assert.assertEquals(9L, decode.sint64F);
+        Assert.assertEquals(4, decode.int32F.intValue());
+        Assert.assertEquals(5L, decode.int64F.intValue());
+        Assert.assertEquals(6, decode.sfixed32F.longValue());
+        Assert.assertEquals(7L, decode.sfixed64F.longValue());
+        Assert.assertEquals(8, decode.sint32F.intValue());
+        Assert.assertEquals(9L, decode.sint64F.longValue());
         Assert.assertEquals("world", decode.stringF);
-        Assert.assertEquals(true, decode.boolF);
-        Assert.assertEquals(10, decode.uint32F);
-        Assert.assertEquals(11L, decode.uint64F);
+        Assert.assertEquals(true, decode.boolF.booleanValue());
+        Assert.assertEquals(10, decode.uint32F.intValue());
+        Assert.assertEquals(11L, decode.uint64F.longValue());
 		
 	}
 	

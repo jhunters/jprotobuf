@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.simpletypes;
 
+import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
@@ -24,31 +25,31 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class AllTypesDojoClass {
 
 	@Protobuf(fieldType = FieldType.DOUBLE, order=1, required=false)
-	public double doubleF;
+	public Double doubleF;
 	@Protobuf(fieldType = FieldType.FLOAT, order=2, required=false)
-	public float floatF;
+	public Float floatF;
 	@Protobuf(fieldType=FieldType.INT32, order=3, required=false)
-	public int int32F;
+	public Integer int32F;
     @Protobuf(fieldType=FieldType.INT64, order=4, required=false)
-    public long int64F;
+    public Long int64F;
     @Protobuf(fieldType=FieldType.UINT32, order=5, required=false)
-    public int uint32F;
+    public Integer uint32F;
     @Protobuf(fieldType=FieldType.UINT64, order=6, required=false)
-    public long uint64F;  
+    public Long uint64F;  
     @Protobuf(fieldType=FieldType.SINT32, order=7, required=false)
-    public int sint32F;
+    public Integer sint32F;
     @Protobuf(fieldType=FieldType.SINT64, order=8, required=false)
-    public long sint64F;  
+    public Long sint64F;  
     @Protobuf(fieldType=FieldType.FIXED32, order=9, required=false)
-    public int fixed32F;
+    public Integer fixed32F;
     @Protobuf(fieldType=FieldType.FIXED64, order=10, required=false)
-    public long fixed64F;   
+    public Long fixed64F;   
     @Protobuf(fieldType=FieldType.SFIXED32, order=11, required=false)
-    public int sfixed32F;
+    public Integer sfixed32F;
     @Protobuf(fieldType=FieldType.SFIXED64, order=12, required=false)
-    public long sfixed64F; 
+    public Long sfixed64F; 
     @Protobuf(fieldType=FieldType.BOOL, order=13, required=false)
-    public boolean boolF;    
+    public Boolean boolF;    
     @Protobuf(fieldType=FieldType.STRING, order=14, required=false)
     public String stringF;      
     @Protobuf(fieldType=FieldType.BYTES, order=15, required=false)

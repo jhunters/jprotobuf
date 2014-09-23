@@ -17,9 +17,12 @@ package com.baidu.bjf.remoting.protobuf;
 
 import java.io.IOException;
 
+import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.CodedOutputStream;
+
 /**
  * Codec interface include encode and decode support.
- * @param <T> target object
+ * 
  * @author xiemalin
  * @since 1.0.0
  */
@@ -42,5 +45,32 @@ public interface Codec<T> {
      * @throws IOException if byte array is invalid
      */
     T decode(byte[] bytes) throws IOException;
+    
+    /**
+     * Calculate size of target object
+     * 
+     * @param t target object
+     * @return size of 
+     * @throws IOException if target object is invalid
+     */
+    int size(T t) throws IOException;
+    
+    /**
+     * Write target object to byte array
+     * 
+     * @param t target object
+     * @param out target {@link CodedOutputStream} 
+     * @throws IOException if target object is invalid
+     */
+    void writeTo(T t, CodedOutputStream out) throws IOException;
+    
+    /**
+     * Read object from target byte array input stream
+     * 
+     * @param intput target input stream object
+     * @return unserialize object
+     * @throws IOException if byte array is invalid
+     */
+    T readFrom(CodedInputStream intput) throws IOException;
     
 }

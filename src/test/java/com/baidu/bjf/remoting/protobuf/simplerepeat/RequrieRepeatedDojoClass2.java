@@ -13,35 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.simplerepeat;
 
+import java.util.List;
+
+import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
-/**
- * @author xiemalin
- *
- */
-public class RequriedMultiDojoClass {
+public class RequrieRepeatedDojoClass2 {
 
-	@Protobuf(fieldType = FieldType.DOUBLE, order=1, required=false)
-	public double doubleF;
-	
-	@Protobuf(fieldType = FieldType.STRING, order=2, required=true)
-	private String stringF;
-	@Protobuf(fieldType=FieldType.BOOL, order=3, required=true)
-	private boolean sex;
-	public boolean isSex() {
-		return sex;
-	}
-	public void setStringF(String stringF) {
-		this.stringF = stringF;
-	}
-	protected String getStringF() {
-		return stringF;
-	}
-	protected void setSex(boolean sex) {
-		this.sex = sex;
-	}
-	
-	
+    @Protobuf(fieldType = FieldType.STRING, order=1, required=false)
+    private List<String> list;
+
+    public void setList(List<String> list) {
+        this.list = list;
+    }
+
+    public List<String> getList() {
+        return list;
+    }
+    
+    
 }
