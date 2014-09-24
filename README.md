@@ -111,11 +111,13 @@ b 使用jprotobuf API进行序列化与反序列化操作
 public class AddressBookProtosPOJO {
 
     @Protobuf(fieldType = FieldType.OBJECT, order=1, required = false)
-    public PersonPOJO list;
+    public Person person;
 
+    @Protobuf(fieldType = FieldType.OBJECT, order=2, required = false)
+    public List<Person> person;
 }
 
-public class PersonPOJO {
+public class Person {
 
     @Protobuf(fieldType = FieldType.STRING, order=1, required = true)
     public String name;
