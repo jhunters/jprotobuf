@@ -5,6 +5,8 @@ A very useful utility library for java programmer using google protobuf<br>
 jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言对protobuf类库的使用<br>
 使用jprotobuf可以无需再去了解.proto文件操作与语法，直接使用java注解定义字段类型即可。
 
+#####目前已支持普通类型，嵌套对象以及对象数组的Protobuf协议的序列化与反序列化实现。#####
+
 ## 环境要求 ##
 JDK 6 或以上版本
 
