@@ -82,6 +82,14 @@ public class CodeGenerator {
     public String getFullClassName() {
         return cls.getPackage().getName() + "." + getClassName();
     }
+    
+    /**
+     * generate package code
+     * @param code
+     */
+    private void genPackageCode(StringBuilder code) {
+        code.append("package " + cls.getPackage().getName() + ";\n");
+    }
 
     /**
      * get full java class code.
@@ -92,14 +100,8 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
 
         String className = getClassName();
-
-        code.append("package " + cls.getPackage().getName() + ";\n");
-        code.append("import com.google.protobuf.*;\n");
-        code.append("import java.io.IOException;\n");
-        code.append("import com.baidu.bjf.remoting.protobuf.utils.*;\n");
-        code.append("import java.lang.reflect.*;\n");
-        code.append("import com.baidu.bjf.remoting.protobuf.*;\n");
-        code.append("import java.util.*;\n");
+        genPackageCode(code);
+        genImportCode(code);
 
         code.append("public class " + className
                 + " implements com.baidu.bjf.remoting.protobuf.Codec");
@@ -115,6 +117,23 @@ public class CodeGenerator {
         return code.toString();
     }
 
+    /**
+     * generate import code
+     * @param code
+     */
+    private void genImportCode(StringBuilder code) {
+        code.append("import com.google.protobuf.*;\n");
+        code.append("import java.io.IOException;\n");
+        code.append("import com.baidu.bjf.remoting.protobuf.utils.*;\n");
+        code.append("import java.lang.reflect.*;\n");
+        code.append("import com.baidu.bjf.remoting.protobuf.*;\n");
+        code.append("import java.util.*;\n");
+    }
+
+    /**
+     * generate <code>decode</code> method source code
+     * @return
+     */
     private String getDecodeMethodCode() {
         StringBuilder code = new StringBuilder();
 
@@ -216,6 +235,10 @@ public class CodeGenerator {
         return code.toString();
     }
  
+    /**
+     * generate <code>readFrom</code> method source code
+     * @return
+     */
     private String getReadFromMethodCode() {
         StringBuilder code = new StringBuilder();
 
@@ -315,6 +338,12 @@ public class CodeGenerator {
         return code.toString();
     }
     
+    /**
+     * To check if type of {@link Field} is assignable from {@link List}
+     * 
+     * @param field
+     * @return true if is assignable from {@link List}
+     */
     private boolean isListType(Field field) {
         Class<?> cls = field.getType();
         if (List.class.isAssignableFrom(cls)) {
@@ -324,6 +353,12 @@ public class CodeGenerator {
         return false;
     }
 
+    /**
+     * Check {@link FieldType} is validate to class type of {@link Field}
+     * 
+     * @param type
+     * @param field
+     */
     private void checkType(FieldType type, Field field) {
         Class<?> cls = field.getType();
         
@@ -337,19 +372,30 @@ public class CodeGenerator {
                     || "Integer".equals(cls.getSimpleName())) {
                 return;
             }
-            throw new IllegalArgumentException(getErroMessage(type, field));
+            throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
         }
         if (!javaType.equalsIgnoreCase(cls.getSimpleName())) {
-            throw new IllegalArgumentException(getErroMessage(type, field));
+            throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
         }
     }
 
-    private String getErroMessage(FieldType type, Field field) {
+    /**
+     * get error message info by type not matched
+     * 
+     * @param type
+     * @param field
+     * @return
+     */
+    private String getMismatchTypeErroMessage(FieldType type, Field field) {
         return "Type mismatch. @Protobuf required type '" + type.getJavaType()
                 + "' but field type is '" + field.getType().getSimpleName()
                 + "'";
     }
 
+    /**
+     * generate <code>encode</code> method source code
+     * @return
+     */   
     private String getEncodeMethodCode() {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
@@ -405,7 +451,10 @@ public class CodeGenerator {
     }
     
     
-    
+    /**
+     * generate <code>writeTo</code> method source code
+     * @return
+     */ 
     private String getWriteToMethodCode() {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
@@ -450,6 +499,10 @@ public class CodeGenerator {
         return code.toString();
     }
 
+    /**
+     * generate <code>size</code> method source code
+     * @return
+     */ 
     private String getSizeMethodCode() {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
@@ -533,6 +586,17 @@ public class CodeGenerator {
         return code;
     }
 
+    /**
+     * generate access {@link Field} value source code.
+     * support public field access, getter method access and reflection access.
+     * 
+     * @param target
+     * @param field
+     * @param cls
+     * @param express
+     * @param isList
+     * @return
+     */
     protected String getSetToField(String target, Field field, Class<?> cls,
             String express, boolean isList) {
         String ret = "";

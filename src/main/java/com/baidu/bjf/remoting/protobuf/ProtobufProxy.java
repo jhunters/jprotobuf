@@ -87,6 +87,12 @@ public final class ProtobufProxy {
         }
     }
 
+    /**
+     * To find out matched {@link Field} marked as {@link Protobuf} annotation
+     * 
+     * @param targetClass taget class
+     * @return found {@link Field} list
+     */
     private static List<Field> findMatchedFields(Class targetClass) {
 
         List<Field> ret = new ArrayList<Field>();

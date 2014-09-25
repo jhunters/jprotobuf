@@ -64,6 +64,10 @@ public enum FieldType {
 	 */
 	private final String toPrimitiveType;
 
+	/**
+	 * get primitive type in string
+	 * @return primitive type in string
+	 */
 	protected String getToPrimitiveType() {
         return toPrimitiveType;
     }

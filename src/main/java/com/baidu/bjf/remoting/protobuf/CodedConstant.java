@@ -140,11 +140,20 @@ public class CodedConstant {
         return size;
     }
     
+    /**
+     * get object size by {@link FieldType}
+     * 
+     * @param order
+     * @param o
+     * @param type
+     * @return
+     */
     public static int computeSize(int order, Object o, FieldType type) {
         return computeSize(order, o, type, false);
     }
     
     /**
+     * get object size by {@link FieldType}
      * @param o
      * @param type
      * @return
@@ -257,6 +266,15 @@ public class CodedConstant {
         
     }
     
+    /**
+     * Write object to byte array by {@link FieldType}
+     * 
+     * @param out
+     * @param order
+     * @param type
+     * @param o
+     * @throws IOException
+     */
     public static void writeObject(CodedOutputStream out, int order,
             FieldType type, Object o) throws IOException {
         if (o == null) {
@@ -443,7 +461,11 @@ public class CodedConstant {
             .toString();
     }
     
+    /**
+     * bit type tag value
+     */
     static final int TAG_TYPE_BITS = 3;
+    
     /**
      * make protobuf tag
      * 
