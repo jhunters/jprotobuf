@@ -344,7 +344,7 @@ public class CodeGenerator {
      * @param field
      * @return true if is assignable from {@link List}
      */
-    private boolean isListType(Field field) {
+    public static boolean isListType(Field field) {
         Class<?> cls = field.getType();
         if (List.class.isAssignableFrom(cls)) {
             //if check is list ignore check

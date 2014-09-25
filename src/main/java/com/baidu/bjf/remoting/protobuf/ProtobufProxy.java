@@ -16,10 +16,10 @@
 package com.baidu.bjf.remoting.protobuf;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 
@@ -42,7 +42,7 @@ public final class ProtobufProxy {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
-        List<Field> fields = findMatchedFields(cls);
+        List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
         if (fields.isEmpty()) {
             throw new IllegalArgumentException("Invalid class ["
                     + cls.getName() + "] no field use annotation @"
@@ -85,32 +85,6 @@ public final class ProtobufProxy {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    /**
-     * To find out matched {@link Field} marked as {@link Protobuf} annotation
-     * 
-     * @param targetClass taget class
-     * @return found {@link Field} list
-     */
-    private static List<Field> findMatchedFields(Class targetClass) {
-
-        List<Field> ret = new ArrayList<Field>();
-        // Keep backing up the inheritance hierarchy.
-        do {
-            // Copy each field declared on this class unless it's static or
-            // file.
-            Field[] fields = targetClass.getDeclaredFields();
-            for (int i = 0; i < fields.length; i++) {
-                Protobuf protobuf = fields[i].getAnnotation(Protobuf.class);
-                if (protobuf != null) {
-                    ret.add(fields[i]);
-                }
-            }
-            targetClass = targetClass.getSuperclass();
-        } while (targetClass != null && targetClass != Object.class);
-
-        return ret;
     }
 
 }

@@ -17,7 +17,12 @@ package com.baidu.bjf.remoting.protobuf.utils;
 
 import org.apache.log4j.Logger;
 
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Field utility class.
@@ -145,5 +150,35 @@ public final class FieldUtils {
             searchType = searchType.getSuperclass();
         }
         return null;
+    }
+    
+    /**
+     * To find out matched {@link Field} marked as {@link Protobuf} annotation
+     * 
+     * @param targetClass taget class
+     * @return found {@link Field} list
+     */
+    public static List<Field> findMatchedFields(Class targetClass, Class ann) {
+
+        List<Field> ret = new ArrayList<Field>();
+        if (targetClass == null) {
+            return ret;
+        }
+        
+        // Keep backing up the inheritance hierarchy.
+        do {
+            // Copy each field declared on this class unless it's static or
+            // file.
+            Field[] fields = targetClass.getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                Annotation protobuf = fields[i].getAnnotation(ann);
+                if (protobuf != null) {
+                    ret.add(fields[i]);
+                }
+            }
+            targetClass = targetClass.getSuperclass();
+        } while (targetClass != null && targetClass != Object.class);
+
+        return ret;
     }
 }
