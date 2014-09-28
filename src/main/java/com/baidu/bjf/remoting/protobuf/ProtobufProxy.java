@@ -57,6 +57,7 @@ public final class ProtobufProxy {
         try {
             c = Class.forName(className);
         } catch (ClassNotFoundException e1) {
+            // if class not found so should generate a new java source class.
             c = null;
         }
         

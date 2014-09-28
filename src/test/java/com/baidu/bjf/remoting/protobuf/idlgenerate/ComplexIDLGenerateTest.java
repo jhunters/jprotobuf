@@ -15,14 +15,23 @@
  */
 package com.baidu.bjf.remoting.protobuf.idlgenerate;
 
+import java.util.List;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
+import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.squareup.protoparser.MessageType;
+import com.squareup.protoparser.MessageType.Field;
+import com.squareup.protoparser.MessageType.Label;
+import com.squareup.protoparser.ProtoFile;
+import com.squareup.protoparser.ProtoSchemaParser;
+import com.squareup.protoparser.Type;
 
 /**
  * Test IDL script generate tool
@@ -31,13 +40,50 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * @since 1.0.1
  */
 public class ComplexIDLGenerateTest {
+    
+    protected Type getByName(String name, List<Type> types) {
+        for (Type type : types) {
+            String typeName = type.getName();
+            if (typeName.equals(name)) {
+                return type;
+            }
+        }
+        return null;
+    }
 
     @Test
     public void TestGenerateIDLComplexList() throws InvalidProtocolBufferException {
         
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
         Assert.assertNotNull(code);
+        ProtoFile protoFile = ProtoSchemaParser.parse("autogenerate", code);
+        Assert.assertNotNull(protoFile);
         
+        Assert.assertEquals(AddressBookProtosPOJO.class.getPackage().getName(), 
+                protoFile.getPackageName());
+        
+        Assert.assertEquals(2, protoFile.getTypes().size());
+        
+        List<Type> types = protoFile.getTypes();
+        Type type = getByName(AddressBookProtosPOJO.class.getSimpleName(), types);
+        Assert.assertNotNull(type);
+        
+        MessageType messageType = (MessageType) type;
+        
+        List<Field> fields = messageType.getFields();
+        Assert.assertEquals(1, fields.size());
+        
+        Assert.assertEquals("list", fields.get(0).getName());
+        Assert.assertEquals(PersonPOJO.class.getSimpleName(), fields.get(0).getType());
+        Assert.assertEquals(Label.OPTIONAL, fields.get(0).getLabel());
+        
+        type = getByName(PersonPOJO.class.getSimpleName(), types);
+        Assert.assertNotNull(type);
+        
+        messageType = (MessageType) type;
+        
+        fields = messageType.getFields();
+        Assert.assertEquals(7, fields.size());
     }
     
     @Test

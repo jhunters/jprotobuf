@@ -38,8 +38,8 @@ public class ProtobufIDLGenerator {
     /**
      * get IDL content from class.
      * 
-     * @param cls
-     * @return
+     * @param cls target protobuf class to parse
+     * @return protobuf IDL content in string
      */
     public static String getIDL(Class<?> cls) {
         StringBuilder code = new StringBuilder();
@@ -96,7 +96,7 @@ public class ProtobufIDLGenerator {
                                  }
                                  
                                  code.append("repeated ").append(c.getSimpleName()).append(" ").
-                                         append(c.getSimpleName().toLowerCase()).append("=").
+                                         append(field.getName()).append("=").
                                          append(protobuf.order()).append(";\n");
                              }
                          }
@@ -104,7 +104,7 @@ public class ProtobufIDLGenerator {
                  } else {
                      Class c = field.getType();
                      code.append(getFieldRequired(protobuf)).append(" ").append(c.getSimpleName()).append(" ").
-                         append(c.getSimpleName().toLowerCase()).append("=").append(protobuf.order()).append(";\n");
+                         append(field.getName()).append("=").append(protobuf.order()).append(";\n");
                      if (!cachedTypes.contains(c)) {
                          cachedTypes.add(c);
                          subTypes.add(c);

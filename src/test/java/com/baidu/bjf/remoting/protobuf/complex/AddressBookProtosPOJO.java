@@ -7,8 +7,6 @@
  */
 package com.baidu.bjf.remoting.protobuf.complex;
 
-import java.util.List;
-
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
