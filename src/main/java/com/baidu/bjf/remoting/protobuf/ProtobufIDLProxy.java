@@ -27,6 +27,7 @@ import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.squareup.protoparser.MessageType;
 import com.squareup.protoparser.MessageType.Field;
 import com.squareup.protoparser.MessageType.Label;
+import com.squareup.protoparser.Option;
 import com.squareup.protoparser.ProtoFile;
 import com.squareup.protoparser.ProtoSchemaParser;
 import com.squareup.protoparser.Type;
@@ -40,15 +41,24 @@ import com.squareup.protoparser.Type;
 public class ProtobufIDLProxy {
     
     /**
-     * 
+     * code line end wrap
      */
     private static final String CODE_END = ";\n";
 
+    /**
+     * default proto file name
+     */
     private static final String DEFAULT_FILE_NAME = "jprotobuf_autogenerate";
     
     
+    /**
+     * type mapping of field type
+     */
     private static final Map<String, FieldType> typeMapping;
     
+    /**
+     * type mapping of field type in string
+     */
     private static final Map<String, String> fieldTypeMapping;
     
     static {
@@ -140,8 +150,21 @@ public class ProtobufIDLProxy {
         }
         Type type = types.get(0);
         String packageName = protoFile.getPackageName();
+        String defaultClsName = type.getName();
+        // to check if has "java_package" option and "java_outer_classname"
+        List<Option> options = protoFile.getOptions();
+        if (options != null) {
+            for (Option option : options) {
+                if (option.getName().equals("java_package")) {
+                    packageName = option.getValue().toString();
+                } else if (option.getName().equals("java_outer_classname")) {
+                    defaultClsName = option.getValue().toString();
+                }
+            }
+        }
         
-        String simpleName = type.getName() + DEFAULT_SUFFIX_CLASSNAME;
+        
+        String simpleName = defaultClsName + DEFAULT_SUFFIX_CLASSNAME;
         String className = packageName + "." + simpleName;
         
         Class<?> c = null;
@@ -188,13 +211,9 @@ public class ProtobufIDLProxy {
             code.append("public ").append(typeMapping.get(field.getType()).getJavaType());
             code.append(" ").append(field.getName()).append(CODE_END);
         }
-        
-        // define field
-        
         code.append("}\n");
         
         //System.out.println(code);
-        
         Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code.toString(), 
                 ProtobufIDLProxy.class.getClassLoader());
         return newClass;
