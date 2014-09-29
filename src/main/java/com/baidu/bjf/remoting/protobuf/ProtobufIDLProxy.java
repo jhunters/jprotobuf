@@ -146,7 +146,7 @@ public class ProtobufIDLProxy {
         
         List<Type> types = protoFile.getTypes();
         if (types == null || types.size() != 1) {
-            throw new RuntimeException("Only support one message in .proto file");
+            throw new RuntimeException("Only support one message defined in '.proto' IDL");
         }
         Type type = types.get(0);
         String packageName = protoFile.getPackageName();

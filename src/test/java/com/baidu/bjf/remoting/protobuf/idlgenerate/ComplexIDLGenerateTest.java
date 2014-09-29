@@ -55,6 +55,7 @@ public class ComplexIDLGenerateTest {
     public void TestGenerateIDLComplexList() throws InvalidProtocolBufferException {
         
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
+
         Assert.assertNotNull(code);
         ProtoFile protoFile = ProtoSchemaParser.parse("autogenerate", code);
         Assert.assertNotNull(protoFile);
@@ -66,9 +67,12 @@ public class ComplexIDLGenerateTest {
         
         List<Type> types = protoFile.getTypes();
         Type type = getByName(AddressBookProtosPOJO.class.getSimpleName(), types);
+        
+        
         Assert.assertNotNull(type);
         
         MessageType messageType = (MessageType) type;
+        System.out.println(messageType.getExtensions());
         
         List<Field> fields = messageType.getFields();
         Assert.assertEquals(1, fields.size());
@@ -81,7 +85,6 @@ public class ComplexIDLGenerateTest {
         Assert.assertNotNull(type);
         
         messageType = (MessageType) type;
-        
         fields = messageType.getFields();
         Assert.assertEquals(7, fields.size());
         
