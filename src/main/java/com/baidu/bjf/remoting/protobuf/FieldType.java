@@ -36,7 +36,7 @@ public enum FieldType {
     FIXED32 ("Integer", "fixed32"        , "WIRETYPE_FIXED32"   ,    ".intValue()"      ),
     BOOL    ("Boolean", "bool"     , "WIRETYPE_VARINT"      , ".booleanValue()"    ),
     STRING  ("String", "string"     , "WIRETYPE_LENGTH_DELIMITED", ""),
-    BYTES   ("Byte[]", "bytes", "WIRETYPE_LENGTH_DELIMITED", ""),
+    BYTES   ("byte[]", "bytes", "WIRETYPE_LENGTH_DELIMITED", ""),
     UINT32  ("Integer", "uInt32"        , "WIRETYPE_VARINT"    ,    ".intValue()"      ),
     SFIXED32("Integer", "sFixed32"       , "WIRETYPE_FIXED32"   ,    ".intValue()"      ),
     SFIXED64("Long", "sFixed64"      , "WIRETYPE_FIXED64"   ,    ".longValue()"      ),
