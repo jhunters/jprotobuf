@@ -84,6 +84,10 @@ public class ComplexIDLGenerateTest {
         
         fields = messageType.getFields();
         Assert.assertEquals(7, fields.size());
+        
+        for (Field field : fields) {
+            System.out.println(field.getTag());
+        }
     }
     
     @Test
