@@ -17,9 +17,6 @@ package com.baidu.bjf.remoting.protobuf;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * IDL parsed proxy object
@@ -48,12 +45,31 @@ public class IDLProxyObject {
         this.target = target;
     }
     
-    public IDLProxyObject put(String field, Object value) {
+    private IDLProxyObject put(String field, Object value, Object object) {
+        int index = field.indexOf('.');
+        if (index != -1) {
+            String parent = field.substring(0, index);
+            String sub = field.substring(index + 1);
+            
+            try {
+                Field f = object.getClass().getField(parent);
+                Class<?> type = f.getType();
+                f.setAccessible(true);
+                Object o = f.get(object);
+                if (o == null) {
+                    o = type.newInstance();
+                    f.set(object, o);
+                }
+                return put(sub, value, o);
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
         
         try {
-            Field f = target.getClass().getField(field);
+            Field f = object.getClass().getField(field);
             f.setAccessible(true);
-            f.set(target, value);
+            f.set(object, value);
         } catch (SecurityException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (NoSuchFieldException e) {
@@ -65,32 +81,66 @@ public class IDLProxyObject {
         return this;
     }
     
-    public byte[] encode() throws IOException {
-        return codec.encode(target);
+    public IDLProxyObject put(String field, Object value) {
+        return put(field, value, target);
     }
     
-    public Map<String, Object> decode(byte[] bb) throws IOException {
-        if (bb == null) {
-            throw new IllegalArgumentException("param 'bb' is null");
+    public Object get(String field) {
+        if (target == null) {
+            return null;
         }
-        Object object = codec.decode(bb);
-        Field[] fields = object.getClass().getFields();
-        if (fields == null) {
-            return Collections.emptyMap();
-        }
-        Map<String, Object> ret = new HashMap<String, Object>();
-        for (Field field : fields) {
-            field.setAccessible(true);
+        
+        return get(field, target);
+        
+    }
+    
+    /**
+     * @param field
+     * @param target2
+     * @return
+     */
+    private Object get(String field, Object object) {
+        
+        int index = field.indexOf('.');
+        if (index != -1) {
+            String parent = field.substring(0, index);
+            String sub = field.substring(index + 1);
+            
             try {
-                ret.put(field.getName(), field.get(object));
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            } catch (IllegalAccessException e) {
+                Field f = object.getClass().getField(parent);
+                Class<?> type = f.getType();
+                f.setAccessible(true);
+                Object o = f.get(object);
+                if (o == null) {
+                    return null;
+                }
+                return get(sub, o);
+            } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
         
-        return ret;
+        try {
+            Field f = object.getClass().getField(field);
+            f.setAccessible(true);
+            return f.get(object);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        
+    }
+
+    public byte[] encode() throws IOException {
+        return codec.encode(target);
+    }
+    
+    public IDLProxyObject decode(byte[] bb) throws IOException {
+        if (bb == null) {
+            throw new IllegalArgumentException("param 'bb' is null");
+        }
+        Object object = codec.decode(bb);
+        return new IDLProxyObject(codec, object);
+
     }
     
 }

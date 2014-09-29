@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.idlproxy;
 
+import java.io.IOException;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -24,6 +25,7 @@ import org.junit.Test;
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
+import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
 
@@ -43,8 +45,7 @@ public class ProtobufIDLProxyTest {
                 "option java_outer_classname = \"StringTypeClass\";  " +
                 "message StringMessage { " +
                 "  required string message = 1; }" ;
-        
-        IDLProxyObject object = ProtobufIDLProxy.create(protoCotent);
+        IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
         
         // 动态设置字段值
         object.put("message", "hello你好");
@@ -52,8 +53,8 @@ public class ProtobufIDLProxyTest {
         byte[] bb = object.encode();
         
         // protobuf 反序列化
-        Map<String, Object> result = object.decode(bb);
-        Assert.assertEquals("hello你好", result.get("message"));
+        IDLProxyObject newObject = object.decode(bb);
+        Assert.assertEquals("hello你好", newObject.get("message"));
     }
     
     
@@ -61,7 +62,7 @@ public class ProtobufIDLProxyTest {
     @Test
     public void testDecodeComplex() throws Exception {
         String code = ProtobufIDLGenerator.getIDL(AllTypesDojoClass.class);
-        IDLProxyObject object = ProtobufIDLProxy.create(code);
+        IDLProxyObject object = ProtobufIDLProxy.create(code).entrySet().iterator().next().getValue();
         
         object.put("boolF", false);
         object.put("bytesF", new byte[] {1,2});
@@ -98,5 +99,23 @@ public class ProtobufIDLProxyTest {
         Assert.assertEquals("hello", icn.getStringF());
         Assert.assertEquals(9, icn.getUint32F());
         Assert.assertEquals(10L, icn.getUint64F());
+    }
+    
+    @Test
+    public void testMultiDecode() throws IOException {
+        String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code);
+        
+        IDLProxyObject idlProxyObject = idlProxyObjects.get(AddressBookProtosPOJO.class.getSimpleName());
+        
+        idlProxyObject.put("name", "hello");
+        idlProxyObject.put("list.name", "yes");
+        idlProxyObject.put("list.id", 10);
+        byte[] bb = idlProxyObject.encode();
+        
+        IDLProxyObject newObject = idlProxyObject.decode(bb);
+        System.out.println(newObject.get("name"));
+        System.out.println(newObject.get("list.name"));
+        
     }
 }

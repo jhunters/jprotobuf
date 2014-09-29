@@ -20,4 +20,6 @@ public class AddressBookProtosPOJO {
     @Protobuf(fieldType = FieldType.OBJECT, order=1, required = false)
     public PersonPOJO list;
 
+    @Protobuf(fieldType = FieldType.STRING, order=2, required = false)
+    public String name;
 }

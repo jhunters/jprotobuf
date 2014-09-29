@@ -8,7 +8,7 @@ jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言
 #####1.0.0 支持普通类型，嵌套对象以及对象数组的Protobuf协议的序列化与反序列化实现。#####
 #####1.0.1 由注解对象动态生成Protobuf的IDL描述文件内容。#####
 
-#####1.0.2 增加由.proto 描述文件动态生成Protobuf操作对象的支持，详见下面使用说明。#####
+#####1.0.3 增加由.proto 描述文件动态生成Protobuf操作对象的支持，详见下面使用说明。#####
 
 ## 环境要求 ##
 JDK 6 或以上版本
@@ -194,16 +194,21 @@ public void testDecode() throws Exception {
             "message StringMessage { " +
             "  required string message = 1; }" ;
     
-    IDLProxyObject object = ProtobufIDLProxy.create(protoCotent);
-    
+    IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
+    //if .proto IDL defines multiple messages use as follow
+	//Map<String, IDLProxyObject> objects = ProtobufIDLProxy.create(protoCotent);
     // 动态设置字段值
     object.put("message", "hello你好");
+	//propogation object set
+	//object.put("sub.field", "hello world");
     // protobuf 序列化
     byte[] bb = object.encode();
     
     // protobuf 反序列化
-    Map<String, Object> result = object.decode(bb);
+    IDLProxyObject result = object.decode(bb);
     Assert.assertEquals("hello你好", result.get("message"));
+	//propogation object get
+	//result.get("sub.field")
 }
 
 

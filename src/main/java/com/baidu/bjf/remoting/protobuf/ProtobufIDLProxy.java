@@ -18,9 +18,13 @@ package com.baidu.bjf.remoting.protobuf;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
@@ -107,48 +111,213 @@ public class ProtobufIDLProxy {
      */
     private static final String DEFAULT_SUFFIX_CLASSNAME = "JProtoBufProtoClass";
     
-    public static IDLProxyObject create(String data) {
+    public static IDLProxyObject createSingle(String data) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
-        return doCreate(protoFile);
+        
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false);
+        return map.entrySet().iterator().next().getValue();
     }
     
-    public static IDLProxyObject create(InputStream is) throws IOException {
+    public static IDLProxyObject createSingle(InputStream is) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
-        return doCreate(protoFile);  
+        
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false);
+        return map.entrySet().iterator().next().getValue();
     }
     
-    public static IDLProxyObject create(Reader reader) throws IOException {
+    public static IDLProxyObject createSingle(Reader reader) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
-        return doCreate(protoFile);   
+        
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false);
+        return map.entrySet().iterator().next().getValue();
     }
     
-    private static IDLProxyObject doCreate(ProtoFile protoFile) {
+    
+    public static Map<String, IDLProxyObject> create(String data) {
+        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
+        return doCreate(protoFile, true);
+    }
+    
+    public static Map<String, IDLProxyObject> create(InputStream is) throws IOException {
+        ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
+        return doCreate(protoFile, true);  
+    }
+    
+    public static Map<String, IDLProxyObject> create(Reader reader) throws IOException {
+        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
+        return doCreate(protoFile, true);   
+    }
+    
+    private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi) {
         
-        Class cls = createClass(protoFile);
-        
-        Object newInstance;
-        try {
-            newInstance = cls.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+        List<Class> list = createClass(protoFile, multi);
+        Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
+        for (Class cls : list) {
+            Object newInstance;
+            try {
+                newInstance = cls.newInstance();
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            
+            Codec codec = ProtobufProxy.create(cls);
+            IDLProxyObject idlProxyObject = new IDLProxyObject(codec, newInstance);
+            
+            String name = cls.getSimpleName();
+            if (name.endsWith(DEFAULT_SUFFIX_CLASSNAME)) {
+                name = name.substring(0, name.length() - DEFAULT_SUFFIX_CLASSNAME.length());
+            }
+            ret.put(name, idlProxyObject);
         }
         
-        Codec codec = ProtobufProxy.create(cls);
-        IDLProxyObject idlProxyObject = new IDLProxyObject(codec, newInstance);
-        return idlProxyObject;
+        return ret;
     }
 
     /**
      * @param protoFile
      * @return
      */
-    private static Class createClass(ProtoFile protoFile) {
+    private static List<Class> createClass(ProtoFile protoFile, boolean multi) {
         
         List<Type> types = protoFile.getTypes();
-        if (types == null || types.size() != 1) {
-            throw new RuntimeException("Only support one message defined in '.proto' IDL");
+        if (types == null || types.isEmpty()) {
+            throw new RuntimeException("No message defined in '.proto' IDL");
         }
-        Type type = types.get(0);
+        
+        if (!multi && types.size() > 1) {
+            throw new RuntimeException("Only one message defined allowed in '.proto' IDL");
+        }
+        
+        
+        List<Class> ret = new ArrayList<Class>(types.size());
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        for (Type type : types) {
+            Class checkClass = checkClass(protoFile, type);
+            if (checkClass != null) {
+                ret.add(checkClass);
+                continue;
+            }
+            
+            CodeDependent cd = createCodeByType(protoFile, type);
+            if (cd.isDepndency()) {
+                cds.add(cd);
+            } else {
+                cds.add(0, cd);
+            }
+        }
+        
+        Set<String> compiledClass = new HashSet<String>(); 
+        
+        CodeDependent codeDependent;
+        
+        while ((codeDependent = hasDependency(cds, compiledClass)) != null) {
+            Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code, 
+                    ProtobufIDLProxy.class.getClassLoader());
+            ret.add(newClass);
+        }
+        
+        return ret;
+    }
+    
+    private static CodeDependent hasDependency(List<CodeDependent> cds, Set<String> compiledClass) {
+        if (cds.isEmpty()) {
+            return null;
+        }
+        
+        Iterator<CodeDependent> iterator = cds.iterator();
+        while (iterator.hasNext()) {
+            CodeDependent next = iterator.next();
+            if (!next.isDepndency()) {
+                compiledClass.add(next.name);
+                iterator.remove();
+                return next;
+            } else {
+                Set<String> dependencies = next.dependencies;
+                if (compiledClass.containsAll(dependencies)) {
+                    compiledClass.add(next.name);
+                    iterator.remove();
+                    return next;
+                }
+            }
+        }
+        return null;
+    }
+    
+    private static CodeDependent createCodeByType(ProtoFile protoFile, Type type) {
+        
+        CodeDependent cd = new CodeDependent();
+        
+        String packageName = protoFile.getPackageName();
+        String defaultClsName = type.getName();
+        // to check if has "java_package" option and "java_outer_classname"
+        List<Option> options = protoFile.getOptions();
+        if (options != null) {
+            for (Option option : options) {
+                if (option.getName().equals("java_package")) {
+                    packageName = option.getValue().toString();
+                }
+            }
+        }
+        
+        String simpleName = defaultClsName + DEFAULT_SUFFIX_CLASSNAME;
+        
+        // To generate class
+        StringBuilder code = new StringBuilder();
+        // define pack
+        code.append("package ").append(packageName).append(CODE_END);
+        code.append("\n");
+        // add import;
+        code.append("import com.baidu.bjf.remoting.protobuf.FieldType;\n");
+        code.append("import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;\n");
+        
+        // define class
+        code.append("public class ").append(simpleName).append(" {\n");
+        
+        MessageType messageType = (MessageType) type;
+        
+        List<Field> fields = messageType.getFields();
+        
+        for (Field field : fields) {
+            // define annotation
+            code.append("@").append(Protobuf.class.getSimpleName()).append("(");
+            
+            String fieldType = fieldTypeMapping.get(field.getType());
+            if (fieldType == null) {
+                fieldType = "FieldType.OBJECT";
+            }
+            
+            code.append("fieldType=").append(fieldType);
+            code.append(", order=").append(field.getTag());
+            if (Label.OPTIONAL == field.getLabel()) {
+                code.append(", required=false");
+            } else if (Label.REQUIRED == field.getLabel())  {
+                code.append(", required=true");
+            }
+            code.append(")\n");
+            
+            FieldType fType = typeMapping.get(field.getType());
+            String javaType;
+            if (fType == null) {
+                javaType = field.getType() + DEFAULT_SUFFIX_CLASSNAME;
+                cd.addDependency(javaType);
+            } else {
+                javaType = fType.getJavaType();
+            }
+            
+            // define field
+            code.append("public ").append(javaType);
+            code.append(" ").append(field.getName()).append(CODE_END);
+        }
+        code.append("}\n");
+        
+        
+        cd.name = simpleName;
+        cd.code = code.toString();
+        
+        return cd;
+    }
+    
+    private static Class checkClass(ProtoFile protoFile, Type type) {
         String packageName = protoFile.getPackageName();
         String defaultClsName = type.getName();
         // to check if has "java_package" option and "java_outer_classname"
@@ -175,47 +344,21 @@ public class ProtobufIDLProxy {
             c = null;
         }
         
-        if (c != null) {
-            return c;
+        return c;
+    }
+    
+    
+    private static class CodeDependent {
+        private String name;
+        private Set<String> dependencies = new HashSet<String>();
+        private String code;
+        
+        private boolean isDepndency() {
+            return !dependencies.isEmpty();
         }
         
-        // To generate class
-        StringBuilder code = new StringBuilder();
-        // define pack
-        code.append("package ").append(packageName).append(CODE_END);
-        code.append("\n");
-        // add import;
-        code.append("import com.baidu.bjf.remoting.protobuf.FieldType;\n");
-        code.append("import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;\n");
-        
-        // define class
-        code.append("public class ").append(simpleName).append(" {\n");
-        
-        MessageType messageType = (MessageType) type;
-        
-        List<Field> fields = messageType.getFields();
-        
-        for (Field field : fields) {
-            // define annotation
-            code.append("@").append(Protobuf.class.getSimpleName()).append("(");
-            code.append("fieldType=").append(fieldTypeMapping.get(field.getType()));
-            code.append(", order=").append(field.getTag());
-            if (Label.OPTIONAL == field.getLabel()) {
-                code.append(", required=false");
-            } else if (Label.REQUIRED == field.getLabel())  {
-                code.append(", required=true");
-            }
-            code.append(")\n");
-            
-            // define field
-            code.append("public ").append(typeMapping.get(field.getType()).getJavaType());
-            code.append(" ").append(field.getName()).append(CODE_END);
+        private void addDependency(String name) {
+            dependencies.add(name);
         }
-        code.append("}\n");
-        
-        //System.out.println(code);
-        Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code.toString(), 
-                ProtobufIDLProxy.class.getClassLoader());
-        return newClass;
     }
 }
