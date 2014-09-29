@@ -20,7 +20,6 @@ import java.util.List;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
-import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 
@@ -74,7 +73,10 @@ public final class ProtobufProxy {
         }
 
         String code = cg.getCode();
-        Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader());
+        //System.out.println(code);
+        Compiler compiler = new JdkCompiler();
+        Class<?> newClass = compiler.compile(code, cg.getClass()
+                .getClassLoader());
 
         try {
             Codec<T> newInstance = (Codec<T>) newClass.newInstance();

@@ -36,7 +36,7 @@ public class CodeGenerator {
     /**
      * auto proxied suffix class name
      */
-    private static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
+    private static final String DEFAULT_SUFFIX_CLASSNAME = "$$BJFProtoBufClass";
 
     /**
      * Logger for this class
@@ -80,22 +80,7 @@ public class CodeGenerator {
      * @return class name
      */
     public String getFullClassName() {
-        return getPackage() + "." + getClassName();
-    }
-    
-    public String getPackage() {
-        Package pkg = cls.getPackage();
-        // maybe null if package is blank or dynamic load class
-        if (pkg == null) {
-            String fullName = cls.getName();
-            int index = fullName.lastIndexOf('.');
-            if (index != -1) {
-                return fullName.substring(0, index);
-            }
-            return "";
-        }
-        
-        return pkg.getName();
+        return cls.getPackage().getName() + "." + getClassName();
     }
     
     /**
@@ -103,7 +88,7 @@ public class CodeGenerator {
      * @param code
      */
     private void genPackageCode(StringBuilder code) {
-        code.append("package " + getPackage() + ";\n");
+        code.append("package " + cls.getPackage().getName() + ";\n");
     }
 
     /**
@@ -143,8 +128,6 @@ public class CodeGenerator {
         code.append("import java.lang.reflect.*;\n");
         code.append("import com.baidu.bjf.remoting.protobuf.*;\n");
         code.append("import java.util.*;\n");
-        
-        code.append("import ").append(cls.getName()).append(";\n");
     }
 
     /**
@@ -417,7 +400,7 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public byte[] encode(").append(cls.getSimpleName())
+        code.append("public byte[] encode(").append(cls.getName())
                 .append(" t) throws IOException {\n");
         code.append("int size = 0;");
         for (Field field : fields) {
@@ -476,7 +459,7 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public void writeTo(").append(cls.getSimpleName())
+        code.append("public void writeTo(").append(cls.getName())
                 .append(" t, CodedOutputStream output) throws IOException {\n");
         code.append("int size = 0;");
         for (Field field : fields) {
@@ -524,7 +507,7 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public int size(").append(cls.getSimpleName())
+        code.append("public int size(").append(cls.getName())
                 .append(" t) throws IOException {\n");
         code.append("int size = 0;");
         for (Field field : fields) {
