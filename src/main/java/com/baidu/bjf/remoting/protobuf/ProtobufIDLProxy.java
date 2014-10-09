@@ -161,7 +161,7 @@ public class ProtobufIDLProxy {
             }
             
             Codec codec = ProtobufProxy.create(cls);
-            IDLProxyObject idlProxyObject = new IDLProxyObject(codec, newInstance);
+            IDLProxyObject idlProxyObject = new IDLProxyObject(codec, newInstance, cls);
             
             String name = cls.getSimpleName();
             if (name.endsWith(DEFAULT_SUFFIX_CLASSNAME)) {

@@ -29,11 +29,13 @@ public class IDLProxyObject {
     private Codec codec;
     
     private Object target;
+    
+    private Class<?> cls;
 
     /**
      * default construtor to set {@link Codec} target
      */
-    protected IDLProxyObject(Codec codec, Object target) {
+    protected IDLProxyObject(Codec codec, Object target, Class<?> cls) {
         super();
         if (codec == null) {
             throw new IllegalArgumentException("param 'codec' is null.");
@@ -41,8 +43,21 @@ public class IDLProxyObject {
         if (target == null) {
             throw new IllegalArgumentException("param 'target' is null.");
         }
+        if (cls == null) {
+            throw new IllegalArgumentException("param 'cls' is null.");
+        }
         this.codec = codec;
         this.target = target;
+        this.cls = cls;
+    }
+    
+    public IDLProxyObject newInstnace() {
+        try {
+            Object object = cls.newInstance();
+            return new IDLProxyObject(codec, object, cls);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
     
     private IDLProxyObject put(String field, Object value, Object object) {
@@ -139,7 +154,7 @@ public class IDLProxyObject {
             throw new IllegalArgumentException("param 'bb' is null");
         }
         Object object = codec.decode(bb);
-        return new IDLProxyObject(codec, object);
+        return new IDLProxyObject(codec, object, cls);
 
     }
     

@@ -111,6 +111,13 @@ public class ProtobufIDLProxyTest {
         idlProxyObject.put("name", "hello");
         idlProxyObject.put("list.name", "yes");
         idlProxyObject.put("list.id", 10);
+        
+        try {
+            idlProxyObject.put("notexitfield", null);
+            Assert.fail();
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
         byte[] bb = idlProxyObject.encode();
         
         IDLProxyObject newObject = idlProxyObject.decode(bb);

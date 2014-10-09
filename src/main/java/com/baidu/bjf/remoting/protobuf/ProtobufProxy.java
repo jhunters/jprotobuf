@@ -21,8 +21,6 @@ import java.util.List;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
-import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
-import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 
 /**
  * Proxy tools for protobuf.
