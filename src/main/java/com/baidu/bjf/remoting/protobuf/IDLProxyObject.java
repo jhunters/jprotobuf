@@ -35,7 +35,7 @@ public class IDLProxyObject {
     /**
      * default construtor to set {@link Codec} target
      */
-    protected IDLProxyObject(Codec codec, Object target, Class<?> cls) {
+    public IDLProxyObject(Codec codec, Object target, Class<?> cls) {
         super();
         if (codec == null) {
             throw new IllegalArgumentException("param 'codec' is null.");
@@ -156,6 +156,14 @@ public class IDLProxyObject {
         Object object = codec.decode(bb);
         return new IDLProxyObject(codec, object, cls);
 
+    }
+
+    /**
+     * get the target
+     * @return the target
+     */
+    public Object getTarget() {
+        return target;
     }
     
 }
