@@ -45,7 +45,7 @@
 
 	<target name="clean">
 		<echo message="Delete classes: ${classes.dir}" />
-		<delete dir="${build.src.dir}" />
+		<delete dir="${classes.dir}" />
 	</target>
 
 </project>

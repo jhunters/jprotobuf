@@ -10,11 +10,10 @@ jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言
 
 #####1.0.3 增加由.proto 描述文件动态生成Protobuf操作对象的支持，详见下面使用说明。#####
 
-<pre>
-关联项目：
-JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本发布RPC服务
+
+#####关联项目：#####
+JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本发布RPC服务<br>
 访问地址： [https://github.com/jhunters/JProtobuf-rpc-http](https://github.com/jhunters/JProtobuf-rpc-http)
-</pre>
 ## 环境要求 ##
 JDK 6 或以上版本
 
