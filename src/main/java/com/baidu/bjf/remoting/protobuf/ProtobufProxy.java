@@ -19,8 +19,10 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
+import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 
 /**
  * Proxy tools for protobuf.
@@ -48,7 +50,8 @@ public final class ProtobufProxy {
                     + Protobuf.class.getName());
         }
 
-        CodeGenerator cg = new CodeGenerator(fields, cls);
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
+        CodeGenerator cg = new CodeGenerator(fieldInfos, cls);
         
         //try to load first
         String className = cg.getFullClassName();

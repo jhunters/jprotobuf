@@ -23,7 +23,9 @@ import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
+import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
+import com.baidu.bjf.remoting.protobuf.complex.PersonPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.squareup.protoparser.MessageType;
@@ -75,7 +77,7 @@ public class ComplexIDLGenerateTest {
         System.out.println(messageType.getExtensions());
         
         List<Field> fields = messageType.getFields();
-        Assert.assertEquals(1, fields.size());
+        Assert.assertEquals(2, fields.size());
         
         Assert.assertEquals("list", fields.get(0).getName());
         Assert.assertEquals(PersonPOJO.class.getSimpleName(), fields.get(0).getType());
@@ -92,6 +94,49 @@ public class ComplexIDLGenerateTest {
             System.out.println(field.getTag());
         }
     }
+  
+    @Test
+    public void TestGenerateIDLComplexListWithDefalut() throws InvalidProtocolBufferException {
+        
+        String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJOWithDefault.class);
+
+        Assert.assertNotNull(code);
+        ProtoFile protoFile = ProtoSchemaParser.parse("autogenerate", code);
+        Assert.assertNotNull(protoFile);
+        
+        Assert.assertEquals(AddressBookProtosPOJOWithDefault.class.getPackage().getName(), 
+                protoFile.getPackageName());
+        
+        Assert.assertEquals(2, protoFile.getTypes().size());
+        
+        List<Type> types = protoFile.getTypes();
+        Type type = getByName(AddressBookProtosPOJOWithDefault.class.getSimpleName(), types);
+        
+        
+        Assert.assertNotNull(type);
+        
+        MessageType messageType = (MessageType) type;
+        System.out.println(messageType.getExtensions());
+        
+        List<Field> fields = messageType.getFields();
+        Assert.assertEquals(2, fields.size());
+        
+        Assert.assertEquals("list", fields.get(0).getName());
+        Assert.assertEquals(PersonPOJOWithDefault.class.getSimpleName(), fields.get(0).getType());
+        Assert.assertEquals(Label.OPTIONAL, fields.get(0).getLabel());
+        
+        type = getByName(PersonPOJOWithDefault.class.getSimpleName(), types);
+        Assert.assertNotNull(type);
+        
+        messageType = (MessageType) type;
+        fields = messageType.getFields();
+        Assert.assertEquals(7, fields.size());
+        
+        for (Field field : fields) {
+            System.out.println(field.getTag());
+        }
+    }
+    
     
     @Test
     public void TestGenerateIDLSimpleType() throws InvalidProtocolBufferException {

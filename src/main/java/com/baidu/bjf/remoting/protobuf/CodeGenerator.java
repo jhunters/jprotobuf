@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 
 /**
  * @author xiemalin
@@ -46,7 +47,7 @@ public class CodeGenerator {
     /**
      * target fields which marked <code> @Protofuf </code> annotation
      */
-    private List<Field> fields;
+    private List<FieldInfo> fields;
     
     /**
      * target class
@@ -61,7 +62,7 @@ public class CodeGenerator {
      * @param cls
      *            protobuf mapped class
      */
-    public CodeGenerator(List<Field> fields, Class<?> cls) {
+    public CodeGenerator(List<FieldInfo> fields, Class<?> cls) {
         super();
         this.fields = fields;
         this.cls = cls;
@@ -166,22 +167,21 @@ public class CodeGenerator {
         code.append("int tag = input.readTag();\n");
         code.append("if (tag == 0) { break;}\n");
 
-        for (Field field : fields) {
-            boolean isList = isListType(field);
+        for (FieldInfo field : fields) {
+            boolean isList = isListType(field.getField());
             
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
             code.append("if (tag == CodedConstant.makeTag(").append(
-                    protobuf.order());
+                    field.getOrder());
             code.append(",WireFormat.")
-                    .append(protobuf.fieldType().getWireFormat())
+                    .append(field.getFieldType().getWireFormat())
                     .append(")) {\n");
-            String t = protobuf.fieldType().getType();
+            String t = field.getFieldType().getType();
             t = CodedConstant.capitalize(t);
             
             boolean listTypeCheck = false;
             String express = "input.read" + t + "()";
-            if (isList && protobuf.fieldType() == FieldType.OBJECT) {
-                Type type = field.getGenericType();
+            if (isList && field.getFieldType() == FieldType.OBJECT) {
+                Type type = field.getField().getGenericType();
                 if (type instanceof ParameterizedType) {
                     ParameterizedType ptype = (ParameterizedType) type;
                     
@@ -200,8 +200,8 @@ public class CodeGenerator {
                     }
                     
                 }
-            } else if (protobuf.fieldType() == FieldType.OBJECT) {
-                Class cls = field.getType();
+            } else if (field.getFieldType() == FieldType.OBJECT) {
+                Class cls = field.getField().getType();
                 code.append("codec = ProtobufProxy.create(").append(cls.getName()).append(".class);\n");
                 code.append("int length = input.readRawVarint32();\n");
                 code.append("final int oldLimit = input.pushLimit(length);\n");
@@ -211,8 +211,8 @@ public class CodeGenerator {
             
             
             code.append(
-                    getSetToField("ret", field, cls, express, isList));
-            if (protobuf.fieldType() == FieldType.BYTES) {
+                    getSetToField("ret", field.getField(), cls, express, isList));
+            if (field.getFieldType() == FieldType.BYTES) {
                 code.append(".toByteArray()");
             }
                     
@@ -236,11 +236,10 @@ public class CodeGenerator {
         code.append("throw e;");
         code.append("}");
 
-        for (Field field : fields) {
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
-            if (protobuf.required()) {
+        for (FieldInfo field : fields) {
+            if (field.isRequired()) {
                 code.append(CodedConstant.getRetRequiredCheck(
-                        getAccessByField("ret", field, cls), field));
+                        getAccessByField("ret", field.getField(), cls), field.getField()));
             }
 
         }
@@ -270,22 +269,21 @@ public class CodeGenerator {
         code.append("int tag = input.readTag();\n");
         code.append("if (tag == 0) { break;}\n");
 
-        for (Field field : fields) {
-            boolean isList = isListType(field);
+        for (FieldInfo field : fields) {
+            boolean isList = isListType(field.getField());
             
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
             code.append("if (tag == CodedConstant.makeTag(").append(
-                    protobuf.order());
+                    field.getOrder());
             code.append(",WireFormat.")
-                    .append(protobuf.fieldType().getWireFormat())
+                    .append(field.getFieldType().getWireFormat())
                     .append(")) {\n");
-            String t = protobuf.fieldType().getType();
+            String t = field.getFieldType().getType();
             t = CodedConstant.capitalize(t);
             
             boolean listTypeCheck = false;
             String express = "input.read" + t + "()";
-            if (isList && protobuf.fieldType() == FieldType.OBJECT) {
-                Type type = field.getGenericType();
+            if (isList && field.getFieldType() == FieldType.OBJECT) {
+                Type type = field.getField().getGenericType();
                 if (type instanceof ParameterizedType) {
                     ParameterizedType ptype = (ParameterizedType) type;
                     
@@ -304,8 +302,8 @@ public class CodeGenerator {
                     }
                     
                 }
-            } else if (protobuf.fieldType() == FieldType.OBJECT) {
-                Class cls = field.getType();
+            } else if (field.getFieldType() == FieldType.OBJECT) {
+                Class cls = field.getField().getType();
                 code.append("codec = ProtobufProxy.create(").append(cls.getName()).append(".class);\n");
                 code.append("int length = input.readRawVarint32();\n");
                 code.append("final int oldLimit = input.pushLimit(length);\n");
@@ -314,8 +312,8 @@ public class CodeGenerator {
             }
             
             code.append(
-                    getSetToField("ret", field, cls, express, isList));
-            if (protobuf.fieldType() == FieldType.BYTES) {
+                    getSetToField("ret", field.getField(), cls, express, isList));
+            if (field.getFieldType() == FieldType.BYTES) {
                 code.append(".toByteArray()");
             }
                     
@@ -339,11 +337,10 @@ public class CodeGenerator {
         code.append("throw e;");
         code.append("}");
 
-        for (Field field : fields) {
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
-            if (protobuf.required()) {
+        for (FieldInfo field : fields) {
+            if (field.isRequired()) {
                 code.append(CodedConstant.getRetRequiredCheck(
-                        getAccessByField("ret", field, cls), field));
+                        getAccessByField("ret", field.getField(), cls), field.getField()));
             }
 
         }
@@ -420,45 +417,43 @@ public class CodeGenerator {
         code.append("public byte[] encode(").append(cls.getSimpleName())
                 .append(" t) throws IOException {\n");
         code.append("int size = 0;");
-        for (Field field : fields) {
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+        for (FieldInfo field : fields) {
             
-            boolean isList = isListType(field);
+            boolean isList = isListType(field.getField());
             
             // check type
             if (!isList) {
-                checkType(protobuf.fieldType(), field);
+                checkType(field.getFieldType(), field.getField());
             }
 
-            if (orders.contains(protobuf.order())) {
+            if (orders.contains(field.getOrder())) {
                 throw new IllegalArgumentException("Field order '"
-                        + protobuf.order() + "' on field" + field.getName()
+                        + field.getOrder() + "' on field" + field.getField().getName()
                         + " already exsit.");
             }
             // define field
-            code.append(CodedConstant.getMappedTypeDefined(protobuf.order(),
-                    protobuf.fieldType(), getAccessByField("t", field, cls), isList));
+            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(),
+                    field.getFieldType(), getAccessByField("t", field.getField(), cls), isList));
             // compute size
             code.append("if (!CodedConstant.isNull(")
-                    .append(getAccessByField("t", field, cls)).append("))\n");
+                    .append(getAccessByField("t", field.getField(), cls)).append("))\n");
             code.append("{\nsize+=");
-            code.append(CodedConstant.getMappedTypeSize(protobuf.order(),
-                    protobuf.fieldType(), isList));
+            code.append(CodedConstant.getMappedTypeSize(field.getOrder(),
+                    field.getFieldType(), isList));
             code.append("}\n");
-            if (protobuf.required()) {
-                code.append(CodedConstant.getRequiredCheck(protobuf.order(),
-                        field));
+            if (field.isRequired()) {
+                code.append(CodedConstant.getRequiredCheck(field.getOrder(),
+                        field.getField()));
             }
         }
 
         code.append("final byte[] result = new byte[size];\n");
         code.append("final CodedOutputStream output = CodedOutputStream.newInstance(result);\n");
-        for (Field field : fields) {
-            boolean isList = isListType(field);
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+        for (FieldInfo field : fields) {
+            boolean isList = isListType(field.getField());
             // set write to byte
-            code.append(CodedConstant.getMappedWriteCode("output", protobuf.order(),
-                    protobuf.fieldType(), isList));
+            code.append(CodedConstant.getMappedWriteCode("output", field.getOrder(),
+                    field.getFieldType(), isList));
         }
 
         code.append("return result;\n");
@@ -479,36 +474,34 @@ public class CodeGenerator {
         code.append("public void writeTo(").append(cls.getSimpleName())
                 .append(" t, CodedOutputStream output) throws IOException {\n");
         code.append("int size = 0;");
-        for (Field field : fields) {
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+        for (FieldInfo field : fields) {
             
-            boolean isList = isListType(field);
+            boolean isList = isListType(field.getField());
             
             // check type
             if (!isList) {
-                checkType(protobuf.fieldType(), field);
+                checkType(field.getFieldType(), field.getField());
             }
 
-            if (orders.contains(protobuf.order())) {
+            if (orders.contains(field.getOrder())) {
                 throw new IllegalArgumentException("Field order '"
-                        + protobuf.order() + "' on field" + field.getName()
+                        + field.getOrder() + "' on field" + field.getField().getName()
                         + " already exsit.");
             }
             // define field
-            code.append(CodedConstant.getMappedTypeDefined(protobuf.order(),
-                    protobuf.fieldType(), getAccessByField("t", field, cls), isList));
-            if (protobuf.required()) {
-                code.append(CodedConstant.getRequiredCheck(protobuf.order(),
-                        field));
+            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(),
+                    field.getFieldType(), getAccessByField("t", field.getField(), cls), isList));
+            if (field.isRequired()) {
+                code.append(CodedConstant.getRequiredCheck(field.getOrder(),
+                        field.getField()));
             }
         }
 
-        for (Field field : fields) {
-            boolean isList = isListType(field);
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+        for (FieldInfo field : fields) {
+            boolean isList = isListType(field.getField());
             // set write to byte
-            code.append(CodedConstant.getMappedWriteCode("output", protobuf.order(),
-                    protobuf.fieldType(), isList));
+            code.append(CodedConstant.getMappedWriteCode("output", field.getOrder(),
+                    field.getFieldType(), isList));
         }
 
         code.append("}\n");
@@ -527,34 +520,33 @@ public class CodeGenerator {
         code.append("public int size(").append(cls.getSimpleName())
                 .append(" t) throws IOException {\n");
         code.append("int size = 0;");
-        for (Field field : fields) {
-            Protobuf protobuf = field.getAnnotation(Protobuf.class);
+        for (FieldInfo field : fields) {
             
-            boolean isList = isListType(field);
+            boolean isList = isListType(field.getField());
             
             // check type
             if (!isList) {
-                checkType(protobuf.fieldType(), field);
+                checkType(field.getFieldType(), field.getField());
             }
 
-            if (orders.contains(protobuf.order())) {
+            if (orders.contains(field.getOrder())) {
                 throw new IllegalArgumentException("Field order '"
-                        + protobuf.order() + "' on field" + field.getName()
+                        + field.getOrder() + "' on field" + field.getField().getName()
                         + " already exsit.");
             }
             // define field
-            code.append(CodedConstant.getMappedTypeDefined(protobuf.order(),
-                    protobuf.fieldType(), getAccessByField("t", field, cls), isList));
+            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(),
+                    field.getFieldType(), getAccessByField("t", field.getField(), cls), isList));
             // compute size
             code.append("if (!CodedConstant.isNull(")
-                    .append(getAccessByField("t", field, cls)).append("))\n");
+                    .append(getAccessByField("t", field.getField(), cls)).append("))\n");
             code.append("{\nsize+=");
-            code.append(CodedConstant.getMappedTypeSize(protobuf.order(),
-                    protobuf.fieldType(), isList));
+            code.append(CodedConstant.getMappedTypeSize(field.getOrder(),
+                    field.getFieldType(), isList));
             code.append("}\n");
-            if (protobuf.required()) {
-                code.append(CodedConstant.getRequiredCheck(protobuf.order(),
-                        field));
+            if (field.isRequired()) {
+                code.append(CodedConstant.getRequiredCheck(field.getOrder(),
+                        field.getField()));
             }
         }
 

@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
+import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 
 /**
  * 
@@ -76,11 +78,11 @@ public class ProtobufIDLGenerator {
         Set<Class<?>> subTypes = new HashSet<Class<?>>();
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
         
-        for (Field field : fields) {
-             Protobuf protobuf = field.getAnnotation(Protobuf.class);
-             if (protobuf.fieldType() ==  FieldType.OBJECT) {
-                 if (CodeGenerator.isListType(field)) {
-                     Type type = field.getGenericType();
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
+        for (FieldInfo field : fieldInfos) {
+             if (field.getFieldType() ==  FieldType.OBJECT) {
+                 if (CodeGenerator.isListType(field.getField())) {
+                     Type type = field.getField().getGenericType();
                      if (type instanceof ParameterizedType) {
                          ParameterizedType ptype = (ParameterizedType) type;
                          
@@ -96,23 +98,23 @@ public class ProtobufIDLGenerator {
                                  }
                                  
                                  code.append("repeated ").append(c.getSimpleName()).append(" ").
-                                         append(field.getName()).append("=").
-                                         append(protobuf.order()).append(";\n");
+                                         append(field.getField().getName()).append("=").
+                                         append(field.getOrder()).append(";\n");
                              }
                          }
                      }
                  } else {
-                     Class c = field.getType();
-                     code.append(getFieldRequired(protobuf)).append(" ").append(c.getSimpleName()).append(" ").
-                         append(field.getName()).append("=").append(protobuf.order()).append(";\n");
+                     Class c = field.getField().getType();
+                     code.append(getFieldRequired(field.isRequired())).append(" ").append(c.getSimpleName()).append(" ").
+                         append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
                      if (!cachedTypes.contains(c)) {
                          cachedTypes.add(c);
                          subTypes.add(c);
                      }
                  }
              } else {
-                 code.append(getFieldRequired(protobuf)).append(" ").append(protobuf.fieldType().getType().toLowerCase()).append(" ").
-                 append(field.getName()).append("=").append(protobuf.order()).append(";\n");
+                 code.append(getFieldRequired(field.isRequired())).append(" ").append(field.getFieldType().getType().toLowerCase()).append(" ").
+                 append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
              }
             
             
@@ -134,8 +136,8 @@ public class ProtobufIDLGenerator {
      * @param protobuf
      * @return
      */
-    private static String getFieldRequired(Protobuf protobuf) {
-        if (protobuf.required()) {
+    private static String getFieldRequired(boolean required) {
+        if (required) {
             return "required";
         }
         

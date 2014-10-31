@@ -123,4 +123,48 @@ public class AllTypesTest {
 		
 	}
 	
+	@Test
+    public void  testMutliTypeDefaultTypeEncodeDecode() throws IOException {
+        Codec<AllTypesDojoClassWithDefault> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClassWithDefault.class);
+        //AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
+        AllTypesDojoClassWithDefault c = new AllTypesDojoClassWithDefault();
+        c.boolF = false;
+        c.bytesF = new byte[] {1,2};
+        c.doubleF = 101D;
+        c.fixed32F = 1;
+        c.fixed64F = 2L;
+        c.floatF = 102F;
+        c.int32F = 3;
+        c.int64F = 4L;
+        c.sfixed32F = 5;
+        c.sfixed64F = 6L;
+        c.sint32F = 7;
+        c.sint64F = 8L;
+        c.stringF = "hello";
+        c.uint32F = 9;
+        c.uint64F = 10L;
+        
+        byte[] bb = dojoClassProxy.encode(c);
+        
+        AllTypesDojoClassWithDefault decode = dojoClassProxy.decode(bb);
+        
+        Assert.assertEquals(2, decode.bytesF.length);
+        Assert.assertEquals(1, decode.bytesF[0]);
+        Assert.assertEquals(2, decode.bytesF[1]);
+        Assert.assertEquals(101D, decode.doubleF);
+        Assert.assertEquals(1, decode.fixed32F.intValue());
+        Assert.assertEquals(2L, decode.fixed64F.longValue());
+        Assert.assertEquals(102F, decode.floatF);
+        Assert.assertEquals(3, decode.int32F.intValue());
+        Assert.assertEquals(4L, decode.int64F.intValue());
+        Assert.assertEquals(5, decode.sfixed32F.longValue());
+        Assert.assertEquals(6L, decode.sfixed64F.longValue());
+        Assert.assertEquals(7, decode.sint32F.intValue());
+        Assert.assertEquals(8L, decode.sint64F.longValue());
+        Assert.assertEquals("hello", decode.stringF);
+        Assert.assertEquals(false, decode.boolF.booleanValue());
+        Assert.assertEquals(9, decode.uint32F.intValue());
+        Assert.assertEquals(10L, decode.uint64F.longValue());
+    }
+	
 }

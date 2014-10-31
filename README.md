@@ -10,6 +10,7 @@ jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言
 
 #####1.0.3 增加由.proto 描述文件动态生成Protobuf操作对象的支持，详见下面使用说明。#####
 
+#####1.0.7 @Protobuf 支持全部属性默认设置，详见下面使用说明。#####
 
 #####关联项目：#####
 JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本发布RPC服务<br>
@@ -217,6 +218,36 @@ public void testDecode() throws Exception {
 
 
 ``` 
+
+
+###  @Protubuf注解支持全部属性默认设置 ###
+该功能可以更方便的设置对象属性的类型定义
+
+```java
+
+public class AddressBookProtosPOJOWithDefault {
+
+    @Protobuf
+    public PersonPOJOWithDefault list;
+
+    @Protobuf
+    public String name;
+}
+
+```
+上面的代码等同于如下设置
+```java
+
+public class AddressBookProtosPOJOWithDefault {
+
+    @Protobuf(fieldType = FieldType.OBJECT, order=1, required = false)
+    public PersonPOJO list;
+
+    @Protobuf(fieldType = FieldType.STRING, order=2, required = false)
+    public String name;
+}
+
+ 
 
 更多使用示例请参见testcase代码。
 

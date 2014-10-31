@@ -52,11 +52,11 @@ public @interface Protobuf {
      * 
      * @return field order.
      */
-    int order() default 1;
+    int order() default 0;
 
     /**
      * @return field type
      */
-    FieldType fieldType();
+    FieldType fieldType() default FieldType.DEFAULT;
 
 }

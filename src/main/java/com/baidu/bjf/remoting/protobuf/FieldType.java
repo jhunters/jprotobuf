@@ -42,9 +42,8 @@ public enum FieldType {
     SFIXED64("Long", "sFixed64"      , "WIRETYPE_FIXED64"   ,    ".longValue()"      ),
     SINT32  ("Integer", "sInt32"        , "WIRETYPE_VARINT"     ,    ".intValue()"     ),
     SINT64  ("Long", "sInt64"       , "WIRETYPE_VARINT"    ,    ".longValue()"      ),
-    OBJECT  ("Object", "object"       , "WIRETYPE_LENGTH_DELIMITED"    ,    ""      );
-	
-	
+    OBJECT  ("Object", "object"       , "WIRETYPE_LENGTH_DELIMITED"    ,    ""      ),
+    DEFAULT("", ""       , ""    ,    ""      );
 	
 	/**
 	 * java original type
