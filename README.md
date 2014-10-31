@@ -246,7 +246,7 @@ public class AddressBookProtosPOJOWithDefault {
     @Protobuf(fieldType = FieldType.STRING, order=2, required = false)
     public String name;
 }
-
+```
  
 
 更多使用示例请参见testcase代码。
