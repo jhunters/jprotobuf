@@ -37,13 +37,23 @@ import com.squareup.protoparser.ProtoSchemaParser;
 import com.squareup.protoparser.Type;
 
 /**
- * This class is for dynamic create protobuf utitily class directly from .proto file
+ * This class is for dynamic create protobuf utility class directly from .proto file
  *
  * @author xiemalin
  * @since 1.0.2
  */
 public class ProtobufIDLProxy {
     
+    /**
+     * 
+     */
+    private static final String JAVA_OUTER_CLASSNAME_OPTION = "java_outer_classname";
+
+    /**
+     * 
+     */
+    private static final String JAVA_PACKAGE_OPTION = "java_package";
+
     /**
      * code line end wrap
      */
@@ -253,7 +263,7 @@ public class ProtobufIDLProxy {
         List<Option> options = protoFile.getOptions();
         if (options != null) {
             for (Option option : options) {
-                if (option.getName().equals("java_package")) {
+                if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
                     packageName = option.getValue().toString();
                 }
             }
@@ -279,21 +289,7 @@ public class ProtobufIDLProxy {
         
         for (Field field : fields) {
             // define annotation
-            code.append("@").append(Protobuf.class.getSimpleName()).append("(");
-            
-            String fieldType = fieldTypeMapping.get(field.getType());
-            if (fieldType == null) {
-                fieldType = "FieldType.OBJECT";
-            }
-            
-            code.append("fieldType=").append(fieldType);
-            code.append(", order=").append(field.getTag());
-            if (Label.OPTIONAL == field.getLabel()) {
-                code.append(", required=false");
-            } else if (Label.REQUIRED == field.getLabel())  {
-                code.append(", required=true");
-            }
-            code.append(")\n");
+            generateProtobufDefinedForField(code, field);
             
             FieldType fType = typeMapping.get(field.getType());
             String javaType;
@@ -316,6 +312,30 @@ public class ProtobufIDLProxy {
         
         return cd;
     }
+
+    /**
+     * to generate @Protobuf defined code for target field.
+     * 
+     * @param code
+     * @param field
+     */
+    private static void generateProtobufDefinedForField(StringBuilder code, Field field) {
+        code.append("@").append(Protobuf.class.getSimpleName()).append("(");
+        
+        String fieldType = fieldTypeMapping.get(field.getType());
+        if (fieldType == null) {
+            fieldType = "FieldType.OBJECT";
+        }
+        
+        code.append("fieldType=").append(fieldType);
+        code.append(", order=").append(field.getTag());
+        if (Label.OPTIONAL == field.getLabel()) {
+            code.append(", required=false");
+        } else if (Label.REQUIRED == field.getLabel())  {
+            code.append(", required=true");
+        }
+        code.append(")\n");
+    }
     
     private static Class checkClass(ProtoFile protoFile, Type type) {
         String packageName = protoFile.getPackageName();
@@ -324,9 +344,9 @@ public class ProtobufIDLProxy {
         List<Option> options = protoFile.getOptions();
         if (options != null) {
             for (Option option : options) {
-                if (option.getName().equals("java_package")) {
+                if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
                     packageName = option.getValue().toString();
-                } else if (option.getName().equals("java_outer_classname")) {
+                } else if (option.getName().equals(JAVA_OUTER_CLASSNAME_OPTION)) {
                     defaultClsName = option.getValue().toString();
                 }
             }
@@ -348,6 +368,13 @@ public class ProtobufIDLProxy {
     }
     
     
+    /**
+     * google Protobuf IDL message dependency result
+     * 
+     *
+     * @author xiemalin
+     *
+     */
     private static class CodeDependent {
         private String name;
         private Set<String> dependencies = new HashSet<String>();
