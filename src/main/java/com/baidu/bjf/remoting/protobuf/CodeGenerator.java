@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 
 /**
@@ -74,6 +73,33 @@ public class CodeGenerator {
      */
     public String getClassName() {
         return cls.getSimpleName() + DEFAULT_SUFFIX_CLASSNAME;
+    }
+    
+    public static String getClassName(Class<?> cls) {
+        return cls.getSimpleName() + DEFAULT_SUFFIX_CLASSNAME;
+    }
+    
+    public static String getPackage(Class<?> cls) {
+        Package pkg = cls.getPackage();
+        // maybe null if package is blank or dynamic load class
+        if (pkg == null) {
+            String fullName = cls.getName();
+            int index = fullName.lastIndexOf('.');
+            if (index != -1) {
+                return fullName.substring(0, index);
+            }
+            return "";
+        }
+        
+        return pkg.getName();
+    }
+    
+    /**
+     * get new class name with full package
+     * @return class name
+     */
+    public static String getFullClassName(Class<?> cls) {
+        return getPackage(cls) + "." + getClassName(cls);
     }
     
     /**

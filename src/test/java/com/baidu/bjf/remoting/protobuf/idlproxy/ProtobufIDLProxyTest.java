@@ -121,8 +121,9 @@ public class ProtobufIDLProxyTest {
         byte[] bb = idlProxyObject.encode();
         
         IDLProxyObject newObject = idlProxyObject.decode(bb);
-        System.out.println(newObject.get("name"));
-        System.out.println(newObject.get("list.name"));
+        Assert.assertEquals("hello", newObject.get("name"));
+        Assert.assertEquals("yes", newObject.get("list.name"));
         
     }
+    
 }

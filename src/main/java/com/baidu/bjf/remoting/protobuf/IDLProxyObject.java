@@ -17,6 +17,8 @@ package com.baidu.bjf.remoting.protobuf;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 
@@ -34,6 +36,26 @@ public class IDLProxyObject {
     
     private Class<?> cls;
     
+    private final Map<String, ReflectInfo> cachedFields = new HashMap<String, ReflectInfo>();
+    
+    private boolean cached = true;
+    
+    /**
+     * get the cached
+     * @return the cached
+     */
+    public boolean isCached() {
+        return cached;
+    }
+
+    /**
+     * set cached value to cached
+     * @param cached the cached to set
+     */
+    public void setCached(boolean cached) {
+        this.cached = cached;
+    }
+
     /**
      * default construtor to set {@link Codec} target
      */
@@ -63,14 +85,24 @@ public class IDLProxyObject {
         }
     }
     
-    private IDLProxyObject put(String field, Object value, Object object) {
+    private IDLProxyObject put(String fullField, String field, Object value, Object object) {
+        Field f;
+        // check cache
+        if (cached) {
+            ReflectInfo info = cachedFields.get(fullField);
+            if (info != null) {
+                setField(value, info.target, info.field);
+                return this;
+            }
+        }
+        
         int index = field.indexOf('.');
         if (index != -1) {
             String parent = field.substring(0, index);
             String sub = field.substring(index + 1);
             
             try {
-                Field f = FieldUtils.findField(object.getClass(), parent);
+                f = FieldUtils.findField(object.getClass(), parent);
                 if (f == null) {
                     throw new RuntimeException("No field '" + parent + "' found at class " + object.getClass().getName());
                 }
@@ -81,28 +113,44 @@ public class IDLProxyObject {
                     o = type.newInstance();
                     f.set(object, o);
                 }
-                return put(sub, value, o);
+                return put(fullField, sub, value, o);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
         
+        f = FieldUtils.findField(object.getClass(), field);
+        if (f == null) {
+            throw new RuntimeException("No field '" + field + "' found at class " + object.getClass().getName());
+        }
+        if (cached && !cachedFields.containsKey(fullField)) {
+            cachedFields.put(fullField, new ReflectInfo(f, object));
+        }
+        setField(value, object, f);
+        
+        return this;
+    }
+
+    /**
+     * @param value
+     * @param object
+     * @param f
+     * @throws SecurityException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     */
+    private void setField(Object value, Object object, Field f) {
+        f.setAccessible(true);
         try {
-            Field f = FieldUtils.findField(object.getClass(), field);
-            if (f == null) {
-                throw new RuntimeException("No field '" + field + "' found at class " + object.getClass().getName());
-            }
-            f.setAccessible(true);
             f.set(object, value);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
         
-        return this;
     }
     
     public IDLProxyObject put(String field, Object value) {
-        return put(field, value, target);
+        return put(field, field, value, target);
     }
     
     public Object get(String field) {
@@ -110,7 +158,7 @@ public class IDLProxyObject {
             return null;
         }
         
-        return get(field, target);
+        return get(field, field, target);
         
     }
     
@@ -119,7 +167,15 @@ public class IDLProxyObject {
      * @param target2
      * @return
      */
-    private Object get(String field, Object object) {
+    private Object get(String fullField, String field, Object object) {
+        // check cache
+        Field f;
+        if (cached) {
+            ReflectInfo info = cachedFields.get(fullField);
+            if (info != null) {
+                return getField(info.target, info.field);
+            }        
+        }
         
         int index = field.indexOf('.');
         if (index != -1) {
@@ -127,33 +183,45 @@ public class IDLProxyObject {
             String sub = field.substring(index + 1);
             
             try {
-                Field f = FieldUtils.findField(object.getClass(), parent);
+                f = FieldUtils.findField(object.getClass(), parent);
                 if (f == null) {
                     throw new RuntimeException("No field '" + parent + "' found at class " + object.getClass().getName());
                 }
-                Class<?> type = f.getType();
                 f.setAccessible(true);
                 Object o = f.get(object);
                 if (o == null) {
                     return null;
                 }
-                return get(sub, o);
+                return get(fullField, sub, o);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
         
+        f = FieldUtils.findField(object.getClass(), field);
+        if (f == null) {
+            throw new RuntimeException("No field '" + field + "' found at class " + object.getClass().getName());
+        }
+        if (cached && !cachedFields.containsKey(fullField)) {
+            cachedFields.put(fullField, new ReflectInfo(f, object));
+        }
+        return getField(object, f);
+        
+    }
+
+    /**
+     * @param object
+     * @param f
+     * @return
+     * @throws IllegalAccessException
+     */
+    private Object getField(Object object, Field f) {
+        f.setAccessible(true);
         try {
-            Field f = FieldUtils.findField(object.getClass(), field);
-            if (f == null) {
-                throw new RuntimeException("No field '" + field + "' found at class " + object.getClass().getName());
-            }
-            f.setAccessible(true);
             return f.get(object);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        
     }
 
     public byte[] encode() throws IOException {
@@ -177,4 +245,19 @@ public class IDLProxyObject {
         return target;
     }
     
+    private static class ReflectInfo {
+        private Field field;
+        private Object target;
+        /**
+         * @param field
+         * @param target
+         */
+        public ReflectInfo(Field field, Object target) {
+            super();
+            this.field = field;
+            this.target = target;
+        }
+        
+        
+    }
 }

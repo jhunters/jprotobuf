@@ -16,7 +16,9 @@
 package com.baidu.bjf.remoting.protobuf;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
@@ -31,6 +33,8 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
  * @since 1.0.0
  */
 public final class ProtobufProxy {
+    
+    private static final Map<String, Codec> cached = new HashMap<String, Codec>();
 
     /**
      * To create a protobuf proxy class for target class.
@@ -43,6 +47,13 @@ public final class ProtobufProxy {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
+        
+        String cn = CodeGenerator.getFullClassName(cls);
+        Codec codec = cached.get(cn);
+        if (codec != null) {
+            return codec;
+        }
+        
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
         if (fields.isEmpty()) {
             throw new IllegalArgumentException("Invalid class ["
@@ -76,15 +87,21 @@ public final class ProtobufProxy {
 
         String code = cg.getCode();
         Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader());
-
         try {
             Codec<T> newInstance = (Codec<T>) newClass.newInstance();
+            if(!cached.containsKey(newClass.getName())) {
+                cached.put(newClass.getName(), newInstance);
+            }
             return newInstance;
         } catch (InstantiationException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+    
+    public static void clearCache() {
+        cached.clear();
     }
 
 }
