@@ -235,12 +235,13 @@ public class CodeGenerator {
                 express = "(" + cls.getSimpleName() + ") codec.readFrom(input)";
             }
             
+            if (field.getFieldType() == FieldType.BYTES) {
+                express += ".toByteArray()";
+            }
             
             code.append(
                     getSetToField("ret", field.getField(), cls, express, isList));
-            if (field.getFieldType() == FieldType.BYTES) {
-                code.append(".toByteArray()");
-            }
+
                     
             code.append(";\n");
             
@@ -337,11 +338,13 @@ public class CodeGenerator {
                 express = "(" + cls.getSimpleName() + ") codec.readFrom(input)";
             }
             
+            if (field.getFieldType() == FieldType.BYTES) {
+                express += ".toByteArray()";
+            }
+            
             code.append(
                     getSetToField("ret", field.getField(), cls, express, isList));
-            if (field.getFieldType() == FieldType.BYTES) {
-                code.append(".toByteArray()");
-            }
+
                     
             code.append(";\n");
             
@@ -613,8 +616,14 @@ public class CodeGenerator {
                 LOGGER.debug(e.getMessage(), e);
             }
         }
+        
+        String type = field.getType().getName();
+        if ("[B".equals(type) || "[Ljava.lang.Byte;".equals(type)) {
+            type = "byte[]";
+        } 
+        
         // use reflection to get value
-        String code = "(" + field.getType().getName() + ") ";
+        String code = "(" + type + ") ";
         code += "FieldUtils.getField(" + target + ", \"" + field.getName()
                 + "\")";
 
