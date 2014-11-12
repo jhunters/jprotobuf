@@ -54,6 +54,15 @@ public final class ProtobufProxy {
             return codec;
         }
         
+        // check if has default constructor
+        try {
+            cls.getConstructor(new Class<?>[0]);
+        } catch (NoSuchMethodException e2) {
+            throw new IllegalArgumentException("Class must has default constructor method with no parameters.", e2);
+        } catch (SecurityException e2) {
+            throw new IllegalArgumentException(e2.getMessage(), e2);
+        }
+        
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
         if (fields.isEmpty()) {
             throw new IllegalArgumentException("Invalid class ["
