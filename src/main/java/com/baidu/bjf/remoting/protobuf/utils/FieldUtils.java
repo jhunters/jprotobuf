@@ -15,7 +15,6 @@
  */
 package com.baidu.bjf.remoting.protobuf.utils;
 
-import org.apache.log4j.Logger;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
@@ -23,6 +22,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Field utility class.
@@ -34,7 +35,7 @@ public final class FieldUtils {
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = Logger.getLogger(FieldUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(FieldUtils.class.getName());
 
     /**
      * Get the field represented by the supplied {@link Field field object} on
@@ -60,9 +61,7 @@ public final class FieldUtils {
         try {
             return field.get(t);
         } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(e.getMessage(), e);
-            }
+            LOGGER.log(Level.FINE, e.getMessage(), e);
         }
         return null;
     }
@@ -93,9 +92,7 @@ public final class FieldUtils {
         try {
             field.set(t, value);
         } catch (Exception e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(e.getMessage(), e);
-            }
+            LOGGER.log(Level.FINE, e.getMessage(), e);
         }
     }
 

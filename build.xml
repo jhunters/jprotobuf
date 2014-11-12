@@ -9,7 +9,7 @@
 	<property name="classes.dir" value="build" />
 	<property name="lib.dir" value="lib" />
 
-	<property name="jar.file" value="jprotobuf-1.1.0.jar" />
+	<property name="jar.file" value="jprotobuf-1.1.1.jar" />
 
 	<property name="encoding" value="UTF-8" />
 
