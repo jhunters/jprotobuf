@@ -3,3 +3,9 @@
 # Package Files #
 *.war
 *.ear
+target/jprotobuf-1.10.jar
+target
+.gitignore
+.svn
+.project
+.classpath

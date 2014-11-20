@@ -17,7 +17,13 @@ JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本�
 访问地址： [https://github.com/jhunters/JProtobuf-rpc-http](https://github.com/jhunters/JProtobuf-rpc-http)
 ## 环境要求 ##
 JDK 6 或以上版本
-
+```xml
+<dependency>
+  <groupId>com.baidu</groupId>
+  <artifactId>jprotobuf</artifactId>
+  <version>1.1.0</version>
+</dependency>
+```
 ## API使用说明 ##
 
 示例：假如需要定义protobuf定义一个数据接口，包含两个属性，一个是string，一个是int32
