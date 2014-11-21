@@ -27,17 +27,17 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 /**
  * 
  * Utility class for probuf proxy.
- *
+ * 
  * @author xiemalin
  * @since 1.0.7
  */
 public class ProtobufProxyUtils {
-    
+
     private static final Map<Class, FieldType> TYPE_MAPPING;
-    
+
     static {
         TYPE_MAPPING = new HashMap<Class, FieldType>();
-        
+
         TYPE_MAPPING.put(int.class, FieldType.INT32);
         TYPE_MAPPING.put(Integer.class, FieldType.INT32);
         TYPE_MAPPING.put(short.class, FieldType.INT32);
@@ -59,16 +59,17 @@ public class ProtobufProxyUtils {
     /**
      * to process default value of <code>@Protobuf</code> value on field.
      * 
-     * @param fields all field to process
+     * @param fields
+     *            all field to process
      * @return list of fields
      */
     public static List<FieldInfo> processDefaultValue(List<Field> fields) {
         if (fields == null) {
             return null;
         }
-        
+
         List<FieldInfo> ret = new ArrayList<FieldInfo>(fields.size());
-        
+
         int maxOrder = 0;
         List<FieldInfo> unorderFields = new ArrayList<FieldInfo>(fields.size());
         for (Field field : fields) {
@@ -76,12 +77,12 @@ public class ProtobufProxyUtils {
             if (protobuf == null) {
                 throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
             }
-            
+
             FieldInfo fieldInfo = new FieldInfo();
             fieldInfo.setField(field);
             fieldInfo.setRequired(protobuf.required());
-            
-            //process type
+
+            // process type
             if (protobuf.fieldType() == FieldType.DEFAULT) {
                 FieldType fieldType = TYPE_MAPPING.get(field.getType());
                 if (fieldType == null) {
@@ -91,7 +92,7 @@ public class ProtobufProxyUtils {
             } else {
                 fieldInfo.setFieldType(protobuf.fieldType());
             }
-            
+
             int order = protobuf.order();
             if (order > 0) {
                 fieldInfo.setOrder(order);
@@ -101,20 +102,20 @@ public class ProtobufProxyUtils {
             } else {
                 unorderFields.add(fieldInfo);
             }
-            
+
             ret.add(fieldInfo);
         }
-        
+
         if (unorderFields.isEmpty()) {
             return ret;
         }
-        
+
         for (FieldInfo fieldInfo : unorderFields) {
             maxOrder++;
             fieldInfo.setOrder(maxOrder);
         }
-        
+
         return ret;
     }
-    
+
 }

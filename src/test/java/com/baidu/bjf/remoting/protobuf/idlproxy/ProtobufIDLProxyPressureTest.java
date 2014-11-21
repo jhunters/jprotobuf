@@ -80,7 +80,7 @@ public class ProtobufIDLProxyPressureTest {
     }
 
     private void testSimpleObjectPressureOfCacheControl(IDLProxyObject idlProxyObject, boolean cached)
-        throws IOException {
+            throws IOException {
 
         idlProxyObject.setCached(cached);
         long averageDecode = 0;

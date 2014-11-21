@@ -24,24 +24,25 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 
 /**
  * IDL parsed proxy object
- *
+ * 
  * @author xiemalin
  * @since 1.0.2
  */
 public class IDLProxyObject {
 
     private Codec codec;
-    
+
     private Object target;
-    
+
     private Class<?> cls;
-    
+
     private final Map<String, ReflectInfo> cachedFields = new HashMap<String, ReflectInfo>();
-    
+
     private boolean cached = true;
-    
+
     /**
      * get the cached
+     * 
      * @return the cached
      */
     public boolean isCached() {
@@ -50,7 +51,9 @@ public class IDLProxyObject {
 
     /**
      * set cached value to cached
-     * @param cached the cached to set
+     * 
+     * @param cached
+     *            the cached to set
      */
     public void setCached(boolean cached) {
         this.cached = cached;
@@ -73,9 +76,9 @@ public class IDLProxyObject {
         this.codec = codec;
         this.target = target;
         this.cls = cls;
-        
+
     }
-    
+
     public IDLProxyObject newInstnace() {
         try {
             Object object = cls.newInstance();
@@ -84,7 +87,7 @@ public class IDLProxyObject {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     private IDLProxyObject put(String fullField, String field, Object value, Object object) {
         Field f;
         // check cache
@@ -95,16 +98,17 @@ public class IDLProxyObject {
                 return this;
             }
         }
-        
+
         int index = field.indexOf('.');
         if (index != -1) {
             String parent = field.substring(0, index);
             String sub = field.substring(index + 1);
-            
+
             try {
                 f = FieldUtils.findField(object.getClass(), parent);
                 if (f == null) {
-                    throw new RuntimeException("No field '" + parent + "' found at class " + object.getClass().getName());
+                    throw new RuntimeException("No field '" + parent + "' found at class "
+                            + object.getClass().getName());
                 }
                 Class<?> type = f.getType();
                 f.setAccessible(true);
@@ -118,7 +122,7 @@ public class IDLProxyObject {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        
+
         f = FieldUtils.findField(object.getClass(), field);
         if (f == null) {
             throw new RuntimeException("No field '" + field + "' found at class " + object.getClass().getName());
@@ -127,8 +131,12 @@ public class IDLProxyObject {
             cachedFields.put(fullField, new ReflectInfo(f, object));
         }
         setField(value, object, f);
-        
+
         return this;
+    }
+    
+    public IDLProxyObject put(String field, Object value) {
+        return put(field, field, value, target);
     }
 
     /**
@@ -146,22 +154,17 @@ public class IDLProxyObject {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        
+
     }
-    
-    public IDLProxyObject put(String field, Object value) {
-        return put(field, field, value, target);
-    }
-    
+
     public Object get(String field) {
         if (target == null) {
             return null;
         }
-        
+
         return get(field, field, target);
-        
     }
-    
+
     /**
      * @param field
      * @param target2
@@ -174,18 +177,19 @@ public class IDLProxyObject {
             ReflectInfo info = cachedFields.get(fullField);
             if (info != null) {
                 return getField(info.target, info.field);
-            }        
+            }
         }
-        
+
         int index = field.indexOf('.');
         if (index != -1) {
             String parent = field.substring(0, index);
             String sub = field.substring(index + 1);
-            
+
             try {
                 f = FieldUtils.findField(object.getClass(), parent);
                 if (f == null) {
-                    throw new RuntimeException("No field '" + parent + "' found at class " + object.getClass().getName());
+                    throw new RuntimeException("No field '" + parent + "' found at class "
+                            + object.getClass().getName());
                 }
                 f.setAccessible(true);
                 Object o = f.get(object);
@@ -197,7 +201,7 @@ public class IDLProxyObject {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        
+
         f = FieldUtils.findField(object.getClass(), field);
         if (f == null) {
             throw new RuntimeException("No field '" + field + "' found at class " + object.getClass().getName());
@@ -206,7 +210,7 @@ public class IDLProxyObject {
             cachedFields.put(fullField, new ReflectInfo(f, object));
         }
         return getField(object, f);
-        
+
     }
 
     /**
@@ -227,7 +231,7 @@ public class IDLProxyObject {
     public byte[] encode() throws IOException {
         return codec.encode(target);
     }
-    
+
     public IDLProxyObject decode(byte[] bb) throws IOException {
         if (bb == null) {
             throw new IllegalArgumentException("param 'bb' is null");
@@ -239,15 +243,17 @@ public class IDLProxyObject {
 
     /**
      * get the target
+     * 
      * @return the target
      */
     public Object getTarget() {
         return target;
     }
-    
+
     private static class ReflectInfo {
         private Field field;
         private Object target;
+
         /**
          * @param field
          * @param target
@@ -257,7 +263,6 @@ public class IDLProxyObject {
             this.field = field;
             this.target = target;
         }
-        
-        
+
     }
 }

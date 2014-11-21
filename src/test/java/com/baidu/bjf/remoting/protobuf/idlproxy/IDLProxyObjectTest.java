@@ -24,7 +24,7 @@ import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 
 /**
- * 
+ * IDLProxyObjectTest
  *
  * @author xiemalin
  * @since 1.0.6

@@ -30,38 +30,37 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 /**
  * 
  * Utility class for generate protobuf IDL content from @{@link Protobuf}
- *
+ * 
  * @author xiemalin
  * @since 1.0.1
  */
 public class ProtobufIDLGenerator {
 
-    
     /**
      * get IDL content from class.
      * 
-     * @param cls target protobuf class to parse
+     * @param cls
+     *            target protobuf class to parse
      * @return protobuf IDL content in string
      */
     public static String getIDL(Class<?> cls) {
         StringBuilder code = new StringBuilder();
-        
+
         Set<Class<?>> cachedTypes = new HashSet<Class<?>>();
-        
+
         // define package
         code.append("package ").append(cls.getPackage().getName()).append(";\n");
-        
-        //define outer name class
-        code.append("option java_outer_classname = \"").append(cls.getSimpleName()).
-                append("$$ByJProtobuf\";\n");
-        
+
+        // define outer name class
+        code.append("option java_outer_classname = \"").append(cls.getSimpleName()).append("$$ByJProtobuf\";\n");
+
         cachedTypes.add(cls);
-        
+
         generateIDL(code, cls, cachedTypes);
-        
+
         return code.toString();
     }
-    
+
     /**
      * @param code
      * @param cls
@@ -70,68 +69,67 @@ public class ProtobufIDLGenerator {
     private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes) {
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
         if (fields.isEmpty()) {
-            throw new IllegalArgumentException("Invalid class ["
-                    + cls.getName() + "] no field use annotation @"
+            throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
                     + Protobuf.class.getName());
         }
-        
+
         Set<Class<?>> subTypes = new HashSet<Class<?>>();
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
-        
+
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
         for (FieldInfo field : fieldInfos) {
-             if (field.getFieldType() ==  FieldType.OBJECT) {
-                 if (CodeGenerator.isListType(field.getField())) {
-                     Type type = field.getField().getGenericType();
-                     if (type instanceof ParameterizedType) {
-                         ParameterizedType ptype = (ParameterizedType) type;
-                         
-                         Type[] actualTypeArguments = ptype.getActualTypeArguments();
-                         
-                         if (actualTypeArguments != null && actualTypeArguments.length > 0) {
-                             Type targetType = actualTypeArguments[0];
-                             if (targetType instanceof Class) {
-                                 Class c = (Class) targetType;
-                                 if (!cachedTypes.contains(c)) {
-                                     cachedTypes.add(c);
-                                     subTypes.add(c);
-                                 }
-                                 
-                                 code.append("repeated ").append(c.getSimpleName()).append(" ").
-                                         append(field.getField().getName()).append("=").
-                                         append(field.getOrder()).append(";\n");
-                             }
-                         }
-                     }
-                 } else {
-                     Class c = field.getField().getType();
-                     code.append(getFieldRequired(field.isRequired())).append(" ").append(c.getSimpleName()).append(" ").
-                         append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
-                     if (!cachedTypes.contains(c)) {
-                         cachedTypes.add(c);
-                         subTypes.add(c);
-                     }
-                 }
-             } else {
-                 code.append(getFieldRequired(field.isRequired())).append(" ").append(field.getFieldType().getType().toLowerCase()).append(" ").
-                 append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
-             }
-            
-            
+            if (field.getFieldType() == FieldType.OBJECT) {
+                if (CodeGenerator.isListType(field.getField())) {
+                    Type type = field.getField().getGenericType();
+                    if (type instanceof ParameterizedType) {
+                        ParameterizedType ptype = (ParameterizedType) type;
+
+                        Type[] actualTypeArguments = ptype.getActualTypeArguments();
+
+                        if (actualTypeArguments != null && actualTypeArguments.length > 0) {
+                            Type targetType = actualTypeArguments[0];
+                            if (targetType instanceof Class) {
+                                Class c = (Class) targetType;
+                                if (!cachedTypes.contains(c)) {
+                                    cachedTypes.add(c);
+                                    subTypes.add(c);
+                                }
+
+                                code.append("repeated ").append(c.getSimpleName()).append(" ")
+                                        .append(field.getField().getName()).append("=").append(field.getOrder())
+                                        .append(";\n");
+                            }
+                        }
+                    }
+                } else {
+                    Class c = field.getField().getType();
+                    code.append(getFieldRequired(field.isRequired())).append(" ").append(c.getSimpleName()).append(" ")
+                            .append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
+                    if (!cachedTypes.contains(c)) {
+                        cachedTypes.add(c);
+                        subTypes.add(c);
+                    }
+                }
+            } else {
+                code.append(getFieldRequired(field.isRequired())).append(" ")
+                        .append(field.getFieldType().getType().toLowerCase()).append(" ")
+                        .append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
+            }
+
         }
-        
+
         code.append("}\n");
-        
+
         if (subTypes.isEmpty()) {
             return;
         }
-        
+
         for (Class<?> subType : subTypes) {
             generateIDL(code, subType, cachedTypes);
         }
-        
+
     }
-    
+
     /**
      * @param protobuf
      * @return
@@ -140,7 +138,7 @@ public class ProtobufIDLGenerator {
         if (required) {
             return "required";
         }
-        
+
         return "optional";
     }
 }

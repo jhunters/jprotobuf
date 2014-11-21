@@ -20,8 +20,13 @@ import java.util.List;
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
+/**
+ * RequrieRepeatedDojoClass
+ * @author xiemalin
+ *
+ */
 public class RequrieRepeatedDojoClass {
 
-    @Protobuf(fieldType = FieldType.STRING, order=1, required=false)
+    @Protobuf(fieldType = FieldType.STRING, order = 1, required = false)
     public List<String> list;
 }

@@ -40,6 +40,7 @@ public class FieldInfo {
     int order;
 
     /**
+     * field type
      * @return field type
      */
     FieldType fieldType;

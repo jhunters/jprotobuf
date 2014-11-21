@@ -18,41 +18,42 @@ package com.baidu.bjf.remoting.protobuf.simpletypes;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
+ * Test class for default @Protobuf annotation usage example
+ * 
  * @author xiemalin
- *
+ * 
  */
 public class AllTypesDojoClassWithDefault {
 
-	@Protobuf
-	public Double doubleF;
-	@Protobuf
-	public Float floatF;
-	@Protobuf
-	public Integer int32F;
+    @Protobuf
+    public Double doubleF;
+    @Protobuf
+    public Float floatF;
+    @Protobuf
+    public Integer int32F;
     @Protobuf
     public Long int64F;
     @Protobuf
     public Integer uint32F;
     @Protobuf
-    public Long uint64F;  
+    public Long uint64F;
     @Protobuf
     public Integer sint32F;
     @Protobuf
-    public Long sint64F;  
+    public Long sint64F;
     @Protobuf
     public Integer fixed32F;
     @Protobuf
-    public Long fixed64F;   
+    public Long fixed64F;
     @Protobuf
     public Integer sfixed32F;
     @Protobuf
-    public Long sfixed64F; 
+    public Long sfixed64F;
     @Protobuf
-    public Boolean boolF;    
+    public Boolean boolF;
     @Protobuf
-    public String stringF;      
+    public String stringF;
     @Protobuf
-    public byte[] bytesF;    
-    
-    
+    public byte[] bytesF;
+
 }

@@ -28,6 +28,8 @@ import java.util.logging.Logger;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 
 /**
+ * Code generator utility class.
+ * 
  * @author xiemalin
  * @since 1.0.0
  */
@@ -95,6 +97,21 @@ public class CodeGenerator {
         return pkg.getName();
     }
 
+    public String getPackage() {
+        Package pkg = cls.getPackage();
+        // maybe null if package is blank or dynamic load class
+        if (pkg == null) {
+            String fullName = cls.getName();
+            int index = fullName.lastIndexOf('.');
+            if (index != -1) {
+                return fullName.substring(0, index);
+            }
+            return "";
+        }
+
+        return pkg.getName();
+    }
+
     /**
      * get new class name with full package
      * 
@@ -111,21 +128,6 @@ public class CodeGenerator {
      */
     public String getFullClassName() {
         return getPackage() + "." + getClassName();
-    }
-
-    public String getPackage() {
-        Package pkg = cls.getPackage();
-        // maybe null if package is blank or dynamic load class
-        if (pkg == null) {
-            String fullName = cls.getName();
-            int index = fullName.lastIndexOf('.');
-            if (index != -1) {
-                return fullName.substring(0, index);
-            }
-            return "";
-        }
-
-        return pkg.getName();
     }
 
     /**

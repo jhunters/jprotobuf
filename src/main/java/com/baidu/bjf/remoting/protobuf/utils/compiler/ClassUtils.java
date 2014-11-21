@@ -74,12 +74,12 @@ public class ClassUtils {
      */
     public static Class<?> forName(String[] packages, String className) {
         try {
-            return _forName(className);
+            return doFormName(className);
         } catch (ClassNotFoundException e) {
             if (packages != null && packages.length > 0) {
                 for (String pkg : packages) {
                     try {
-                        return _forName(pkg + "." + className);
+                        return doFormName(pkg + "." + className);
                     } catch (ClassNotFoundException e2) {
                     }
                 }
@@ -97,7 +97,7 @@ public class ClassUtils {
      */
     public static Class<?> forName(String className) {
         try {
-            return _forName(className);
+            return doFormName(className);
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(e.getMessage(), e);
         }
@@ -112,8 +112,7 @@ public class ClassUtils {
      * @throws ClassNotFoundException
      *             if class not found
      */
-    public static Class<?> _forName(String className)
-            throws ClassNotFoundException {
+    public static Class<?> doFormName(String className) throws ClassNotFoundException {
         if ("boolean".equals(className))
             return boolean.class;
         if ("byte".equals(className))
@@ -160,13 +159,15 @@ public class ClassUtils {
         }
     }
 
-    private static Class<?> arrayForName(String className)
-            throws ClassNotFoundException {
-        return Class.forName(
-                className.endsWith("[]") ? "[L"
-                        + className.substring(0, className.length() - 2) + ";"
-                        : className, true, Thread.currentThread()
-                        .getContextClassLoader());
+    private static Class<?> arrayForName(String className) throws ClassNotFoundException {
+        String name;
+        if (className.endsWith("[]")) {
+            name = "[L" + className.substring(0, className.length() - 2) + ";";
+        } else {
+            name = className;
+        }
+        
+        return Class.forName(name, true, Thread.currentThread().getContextClassLoader());
     }
 
     /**
@@ -331,32 +332,28 @@ public class ClassUtils {
 
     public static Class<?> getGenericClass(Class<?> cls, int i) {
         try {
-            ParameterizedType parameterizedType = ((ParameterizedType) cls
-                    .getGenericInterfaces()[0]);
+            ParameterizedType parameterizedType = ((ParameterizedType) cls.getGenericInterfaces()[0]);
             Object genericClass = parameterizedType.getActualTypeArguments()[i];
             if (genericClass instanceof ParameterizedType) { // 处理多级泛型
-                return (Class<?>) ((ParameterizedType) genericClass)
-                        .getRawType();
+                return (Class<?>) ((ParameterizedType) genericClass).getRawType();
             } else if (genericClass instanceof GenericArrayType) { // 处理数组泛型
-                return (Class<?>) ((GenericArrayType) genericClass)
-                        .getGenericComponentType();
+                return (Class<?>) ((GenericArrayType) genericClass).getGenericComponentType();
             } else if (genericClass != null) {
                 return (Class<?>) genericClass;
             }
         } catch (Throwable e) {
+            toString(e);
         }
         if (cls.getSuperclass() != null) {
             return getGenericClass(cls.getSuperclass(), i);
         } else {
-            throw new IllegalArgumentException(cls.getName()
-                    + " generic type undefined!");
+            throw new IllegalArgumentException(cls.getName() + " generic type undefined!");
         }
     }
 
     public static boolean isBeforeJava5(String javaVersion) {
-        return (javaVersion == null || javaVersion.length() == 0
-                || "1.0".equals(javaVersion) || "1.1".equals(javaVersion)
-                || "1.2".equals(javaVersion) || "1.3".equals(javaVersion) || "1.4"
+        return (javaVersion == null || javaVersion.length() == 0 || "1.0".equals(javaVersion)
+                || "1.1".equals(javaVersion) || "1.2".equals(javaVersion) || "1.3".equals(javaVersion) || "1.4"
                 .equals(javaVersion));
     }
 
@@ -384,9 +381,8 @@ public class ClassUtils {
 
     public static void checkBytecode(String name, byte[] bytecode) {
         if (bytecode.length > JIT_LIMIT) {
-            System.err
-                    .println("The template bytecode too long, may be affect the JIT compiler. template class: "
-                            + name);
+            System.err.println("The template bytecode too long, may be affect the JIT compiler. template class: "
+                    + name);
         }
     }
 
@@ -395,16 +391,13 @@ public class ClassUtils {
             return cls.getMethod("size", new Class<?>[0]).getName() + "()";
         } catch (NoSuchMethodException e) {
             try {
-                return cls.getMethod("length", new Class<?>[0]).getName()
-                        + "()";
+                return cls.getMethod("length", new Class<?>[0]).getName() + "()";
             } catch (NoSuchMethodException e2) {
                 try {
-                    return cls.getMethod("getSize", new Class<?>[0]).getName()
-                            + "()";
+                    return cls.getMethod("getSize", new Class<?>[0]).getName() + "()";
                 } catch (NoSuchMethodException e3) {
                     try {
-                        return cls.getMethod("getLength", new Class<?>[0])
-                                .getName() + "()";
+                        return cls.getMethod("getLength", new Class<?>[0]).getName() + "()";
                     } catch (NoSuchMethodException e4) {
                         return null;
                     }
@@ -413,8 +406,7 @@ public class ClassUtils {
         }
     }
 
-    public static String getMethodName(Method method,
-            Class<?>[] parameterClasses, String rightCode) {
+    public static String getMethodName(Method method, Class<?>[] parameterClasses, String rightCode) {
         if (method.getParameterTypes().length > parameterClasses.length) {
             Class<?>[] types = method.getParameterTypes();
             StringBuilder buf = new StringBuilder(rightCode);
@@ -428,8 +420,7 @@ public class ClassUtils {
                     def = "false";
                 } else if (type == char.class) {
                     def = "\'\\0\'";
-                } else if (type == byte.class || type == short.class
-                        || type == int.class || type == long.class
+                } else if (type == byte.class || type == short.class || type == int.class || type == long.class
                         || type == float.class || type == double.class) {
                     def = "0";
                 } else {
@@ -441,8 +432,8 @@ public class ClassUtils {
         return method.getName() + "(" + rightCode + ")";
     }
 
-    public static Method searchMethod(Class<?> currentClass, String name,
-            Class<?>[] parameterTypes) throws NoSuchMethodException {
+    public static Method searchMethod(Class<?> currentClass, String name, Class<?>[] parameterTypes)
+            throws NoSuchMethodException {
         if (currentClass == null) {
             throw new NoSuchMethodException("class == null");
         }
@@ -450,8 +441,7 @@ public class ClassUtils {
             return currentClass.getMethod(name, parameterTypes);
         } catch (NoSuchMethodException e) {
             for (Method method : currentClass.getMethods()) {
-                if (method.getName().equals(name)
-                        && parameterTypes.length == method.getParameterTypes().length
+                if (method.getName().equals(name) && parameterTypes.length == method.getParameterTypes().length
                         && Modifier.isPublic(method.getModifiers())) {
                     if (parameterTypes.length > 0) {
                         Class<?>[] types = method.getParameterTypes();
@@ -474,8 +464,7 @@ public class ClassUtils {
     }
 
     public static String getInitCode(Class<?> type) {
-        if (byte.class.equals(type) || short.class.equals(type)
-                || int.class.equals(type) || long.class.equals(type)
+        if (byte.class.equals(type) || short.class.equals(type) || int.class.equals(type) || long.class.equals(type)
                 || float.class.equals(type) || double.class.equals(type)) {
             return "0";
         } else if (char.class.equals(type)) {

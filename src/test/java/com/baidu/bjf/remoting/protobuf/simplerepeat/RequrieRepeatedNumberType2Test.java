@@ -19,9 +19,9 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.simplerepeat.RequrieRepeatedNumberType.InterClassName;
 
 /**
- *
+ * RequrieRepeatedNumberType2Test
  * @author xiemalin
- *
+ * @since 1.0
  */
 public class RequrieRepeatedNumberType2Test {
 
@@ -41,7 +41,8 @@ public class RequrieRepeatedNumberType2Test {
         type.list1.add(20000);
         
         
-        Codec<RequrieRepeatedNumberTypePOJOClass2> proxy = ProtobufProxy.create(RequrieRepeatedNumberTypePOJOClass2.class);
+        Codec<RequrieRepeatedNumberTypePOJOClass2> proxy;
+        proxy = ProtobufProxy.create(RequrieRepeatedNumberTypePOJOClass2.class);
         try {
             byte[] bb = proxy.encode(type);
             Assert.assertArrayEquals(oldbb, bb);

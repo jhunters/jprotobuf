@@ -11,6 +11,7 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
+ * Single string field pojo test class
  *
  * @author xiemalin
  *

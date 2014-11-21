@@ -50,7 +50,6 @@ import javax.tools.ToolProvider;
 
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 
-
 /**
  * JdkCompiler. (SPI, Singleton, ThreadSafe)
  * 
@@ -62,19 +61,19 @@ public class JdkCompiler extends AbstractCompiler {
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
     private final DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
-    
+
     private final ClassLoaderImpl classLoader;
-    
+
     private final JavaFileManagerImpl javaFileManager;
 
     private volatile List<String> options;
 
-    public JdkCompiler(){
+    public JdkCompiler() {
         options = new ArrayList<String>();
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        if (loader instanceof URLClassLoader 
-                && (! loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
+        if (loader instanceof URLClassLoader
+                && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<File>();
@@ -93,25 +92,26 @@ public class JdkCompiler extends AbstractCompiler {
         });
         javaFileManager = new JavaFileManagerImpl(manager, classLoader);
     }
-    
+
     @Override
     public Class<?> doCompile(String name, String sourceCode) throws Throwable {
         int i = name.lastIndexOf('.');
         String packageName = i < 0 ? "" : name.substring(0, i);
         String className = i < 0 ? name : name.substring(i + 1);
         JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
-        javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName, 
-                                        className + ClassUtils.JAVA_EXTENSION, javaFileObject);
-        Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options, 
-                                          null, Arrays.asList(new JavaFileObject[]{javaFileObject})).call();
-        if (result == null || ! result.booleanValue()) {
-            throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector);
+        javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName, className
+                + ClassUtils.JAVA_EXTENSION, javaFileObject);
+        Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options, null,
+                Arrays.asList(new JavaFileObject[] { javaFileObject })).call();
+        if (result == null || !result.booleanValue()) {
+            throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: "
+                    + diagnosticCollector);
         }
         return classLoader.loadClass(name);
     }
-    
+
     private final class ClassLoaderImpl extends ClassLoader {
-        
+
         private final Map<String, JavaFileObject> classes = new HashMap<String, JavaFileObject>();
 
         ClassLoaderImpl(final ClassLoader parentClassLoader) {
@@ -141,14 +141,16 @@ public class JdkCompiler extends AbstractCompiler {
         }
 
         @Override
-        protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
+        protected synchronized Class<?> loadClass(final String name, final boolean resolve)
+                throws ClassNotFoundException {
             return super.loadClass(name, resolve);
         }
 
         @Override
         public InputStream getResourceAsStream(final String name) {
             if (name.endsWith(ClassUtils.CLASS_EXTENSION)) {
-                String qualifiedClassName = name.substring(0, name.length() - ClassUtils.CLASS_EXTENSION.length()).replace('/', '.');
+                String qualifiedClassName = name.substring(0, name.length() - ClassUtils.CLASS_EXTENSION.length())
+                        .replace('/', '.');
                 JavaFileObjectImpl file = (JavaFileObjectImpl) classes.get(qualifiedClassName);
                 if (file != null) {
                     return new ByteArrayInputStream(file.getByteCode());
@@ -157,24 +159,24 @@ public class JdkCompiler extends AbstractCompiler {
             return super.getResourceAsStream(name);
         }
     }
-    
+
     private static final class JavaFileObjectImpl extends SimpleJavaFileObject {
 
         private ByteArrayOutputStream bytecode;
 
-        private final CharSequence    source;
+        private final CharSequence source;
 
-        public JavaFileObjectImpl(final String baseName, final CharSequence source){
+        public JavaFileObjectImpl(final String baseName, final CharSequence source) {
             super(ClassUtils.toURI(baseName + ClassUtils.JAVA_EXTENSION), Kind.SOURCE);
             this.source = source;
         }
 
-        JavaFileObjectImpl(final String name, final Kind kind){
+        JavaFileObjectImpl(final String name, final Kind kind) {
             super(ClassUtils.toURI(name), kind);
             source = null;
         }
 
-        public JavaFileObjectImpl(URI uri, Kind kind){
+        public JavaFileObjectImpl(URI uri, Kind kind) {
             super(uri, kind);
             source = null;
         }
@@ -201,9 +203,9 @@ public class JdkCompiler extends AbstractCompiler {
             return bytecode.toByteArray();
         }
     }
-    
+
     private static final class JavaFileManagerImpl extends ForwardingJavaFileManager<JavaFileManager> {
-        
+
         private final ClassLoaderImpl classLoader;
 
         private final Map<URI, JavaFileObject> fileObjects = new HashMap<URI, JavaFileObject>();
@@ -214,14 +216,17 @@ public class JdkCompiler extends AbstractCompiler {
         }
 
         @Override
-        public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
+        public FileObject getFileForInput(Location location, String packageName, String relativeName)
+                throws IOException {
             FileObject o = fileObjects.get(uri(location, packageName, relativeName));
-            if (o != null)
+            if (o != null) {
                 return o;
+            }
             return super.getFileForInput(location, packageName, relativeName);
         }
 
-        public void putFileForInput(StandardLocation location, String packageName, String relativeName, JavaFileObject file) {
+        public void putFileForInput(StandardLocation location, String packageName, String relativeName,
+            JavaFileObject file) {
             fileObjects.put(uri(location, packageName, relativeName), file);
         }
 
@@ -230,8 +235,8 @@ public class JdkCompiler extends AbstractCompiler {
         }
 
         @Override
-        public JavaFileObject getJavaFileForOutput(Location location, String qualifiedName, Kind kind, FileObject outputFile)
-                throws IOException {
+        public JavaFileObject getJavaFileForOutput(Location location, String qualifiedName, Kind kind,
+                FileObject outputFile) throws IOException {
             JavaFileObject file = new JavaFileObjectImpl(qualifiedName, kind);
             classLoader.add(qualifiedName, file);
             return file;
@@ -244,8 +249,9 @@ public class JdkCompiler extends AbstractCompiler {
 
         @Override
         public String inferBinaryName(Location loc, JavaFileObject file) {
-            if (file instanceof JavaFileObjectImpl)
+            if (file instanceof JavaFileObjectImpl) {
                 return file.getName();
+            }
             return super.inferBinaryName(loc, file);
         }
 
@@ -286,6 +292,5 @@ public class JdkCompiler extends AbstractCompiler {
             return files;
         }
     }
-
 
 }

@@ -33,27 +33,29 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
  * @since 1.0.0
  */
 public final class ProtobufProxy {
-    
-    private static final Map<String, Codec> cached = new HashMap<String, Codec>();
+
+    private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
 
     /**
      * To create a protobuf proxy class for target class.
      * 
-     * @param <T> target object type to be proxied.
-     * @param cls target object class 
+     * @param <T>
+     *            target object type to be proxied.
+     * @param cls
+     *            target object class
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls) {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
-        
+
         String cn = CodeGenerator.getFullClassName(cls);
-        Codec codec = cached.get(cn);
+        Codec codec = CACHED.get(cn);
         if (codec != null) {
             return codec;
         }
-        
+
         // check if has default constructor
         try {
             cls.getConstructor(new Class<?>[0]);
@@ -62,18 +64,17 @@ public final class ProtobufProxy {
         } catch (SecurityException e2) {
             throw new IllegalArgumentException(e2.getMessage(), e2);
         }
-        
+
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
         if (fields.isEmpty()) {
-            throw new IllegalArgumentException("Invalid class ["
-                    + cls.getName() + "] no field use annotation @"
+            throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
                     + Protobuf.class.getName());
         }
 
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
         CodeGenerator cg = new CodeGenerator(fieldInfos, cls);
-        
-        //try to load first
+
+        // try to load first
         String className = cg.getFullClassName();
         Class<?> c = null;
         try {
@@ -82,7 +83,7 @@ public final class ProtobufProxy {
             // if class not found so should generate a new java source class.
             c = null;
         }
-        
+
         if (c != null) {
             try {
                 Codec<T> newInstance = (Codec<T>) c.newInstance();
@@ -98,8 +99,8 @@ public final class ProtobufProxy {
         Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader());
         try {
             Codec<T> newInstance = (Codec<T>) newClass.newInstance();
-            if(!cached.containsKey(newClass.getName())) {
-                cached.put(newClass.getName(), newInstance);
+            if (!CACHED.containsKey(newClass.getName())) {
+                CACHED.put(newClass.getName(), newInstance);
             }
             return newInstance;
         } catch (InstantiationException e) {
@@ -108,9 +109,9 @@ public final class ProtobufProxy {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     public static void clearCache() {
-        cached.clear();
+        CACHED.clear();
     }
 
 }
