@@ -21,7 +21,7 @@ JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.2</version>
 </dependency>
 ```
 ## API使用说明 ##

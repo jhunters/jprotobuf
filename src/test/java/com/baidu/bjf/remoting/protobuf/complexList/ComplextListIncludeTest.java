@@ -58,6 +58,7 @@ public class ComplextListIncludeTest {
         
         List<PersonPOJO> list = new ArrayList<PersonPOJO>();
         list.add(person);
+        list.add(person);
         pojo.list = list;
         
         bb =  null;
@@ -70,7 +71,7 @@ public class ComplextListIncludeTest {
         
         try {
             AddressBook parseFrom = AddressBook.parseFrom(bb);
-            Assert.assertEquals(1, parseFrom.getPersonCount());
+            Assert.assertEquals(2, parseFrom.getPersonCount());
             Assert.assertEquals("xiemalin", parseFrom.getPerson(0).getName());
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -78,7 +79,7 @@ public class ComplextListIncludeTest {
         
         try {
             AddressBookProtosPOJO decode = codec.decode(bb);
-            Assert.assertEquals(1, decode.list.size());
+            Assert.assertEquals(2, decode.list.size());
             Assert.assertEquals("xiemalin", decode.list.get(0).name);
         } catch (Exception e) {
             e.printStackTrace();
