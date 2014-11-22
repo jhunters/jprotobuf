@@ -58,5 +58,10 @@ public @interface Protobuf {
      * @return field type
      */
     FieldType fieldType() default FieldType.DEFAULT;
+    
+    /**
+     * @return description to the field
+     */
+    String description() default "";
 
 }

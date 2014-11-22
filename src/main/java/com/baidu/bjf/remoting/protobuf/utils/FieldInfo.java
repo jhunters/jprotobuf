@@ -31,6 +31,11 @@ public class FieldInfo {
     private Field field;
     
     boolean required;
+    
+    /**
+     * field description
+     */
+    private String description;
 
     /**
      * Set field order. It starts at 1;
@@ -108,7 +113,28 @@ public class FieldInfo {
     public void setFieldType(FieldType fieldType) {
         this.fieldType = fieldType;
     }
+
+    /**
+     * get the description
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * set description value to description
+     * @param description the description to set
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
     
-    
+    public boolean hasDescription() {
+        if (description == null || description.trim().length() == 0) {
+            return false;
+        }
+        return true;
+    }
     
 }

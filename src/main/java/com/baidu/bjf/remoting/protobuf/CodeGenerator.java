@@ -492,7 +492,6 @@ public class CodeGenerator {
         // encode method
         code.append("public void writeTo(").append(cls.getSimpleName())
                 .append(" t, CodedOutputStream output) throws IOException {\n");
-        code.append("int size = 0;");
         for (FieldInfo field : fields) {
 
             boolean isList = isListType(field.getField());

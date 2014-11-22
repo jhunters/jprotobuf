@@ -141,7 +141,9 @@ public class CodedConstant {
         for (Object object : list) {
             size += computeSize(order, object, type, true);
         }
-        size += list.size();
+        if (type != FieldType.OBJECT) {
+            size += list.size();
+        }
         return size;
     }
 
@@ -175,9 +177,7 @@ public class CodedConstant {
             Codec target = ProtobufProxy.create(cls);
             try {
                 size = target.size(o);
-                if (!list) {
-                    size = size + CodedOutputStream.computeRawVarint32Size(size);
-                }
+                size = size + CodedOutputStream.computeRawVarint32Size(size);
                 return size + CodedOutputStream.computeTagSize(order);
             } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
@@ -235,7 +235,7 @@ public class CodedConstant {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeObject(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(");\n}");
+            ret.append(",").append(fieldName).append(", false);\n}");
             return ret.toString();
         }
 
@@ -269,7 +269,7 @@ public class CodedConstant {
             return;
         }
         for (Object object : list) {
-            writeObject(out, order, type, object);
+            writeObject(out, order, type, object, true);
         }
 
     }
@@ -283,7 +283,8 @@ public class CodedConstant {
      * @param o
      * @throws IOException
      */
-    public static void writeObject(CodedOutputStream out, int order, FieldType type, Object o) throws IOException {
+    public static void writeObject(CodedOutputStream out, int order, FieldType type, 
+            Object o, boolean list) throws IOException {
         if (o == null) {
             return;
         }

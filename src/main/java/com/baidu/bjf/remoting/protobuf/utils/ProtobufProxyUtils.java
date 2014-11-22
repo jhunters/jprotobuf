@@ -81,6 +81,7 @@ public class ProtobufProxyUtils {
             FieldInfo fieldInfo = new FieldInfo();
             fieldInfo.setField(field);
             fieldInfo.setRequired(protobuf.required());
+            fieldInfo.setDescription(protobuf.description());
 
             // process type
             if (protobuf.fieldType() == FieldType.DEFAULT) {

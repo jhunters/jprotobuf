@@ -78,6 +78,9 @@ public class ProtobufIDLGenerator {
 
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
         for (FieldInfo field : fieldInfos) {
+            if (field.hasDescription()) {
+                code.append("// ").append(field.getDescription()).append("\n");
+            }
             if (field.getFieldType() == FieldType.OBJECT) {
                 if (CodeGenerator.isListType(field.getField())) {
                     Type type = field.getField().getGenericType();
