@@ -24,6 +24,7 @@ JDK 6 或以上版本
   <version>1.2.2</version>
 </dependency>
 ```
+[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
 ## API使用说明 ##
 
 示例：假如需要定义protobuf定义一个数据接口，包含两个属性，一个是string，一个是int32
