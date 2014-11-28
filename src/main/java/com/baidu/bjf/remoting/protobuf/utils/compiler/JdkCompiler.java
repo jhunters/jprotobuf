@@ -68,10 +68,9 @@ public class JdkCompiler extends AbstractCompiler {
 
     private volatile List<String> options;
 
-    public JdkCompiler() {
+    public JdkCompiler(final ClassLoader loader) {
         options = new ArrayList<String>();
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
             try {
