@@ -35,6 +35,16 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 public final class ProtobufProxy {
 
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
+    
+    /**
+     * To create a protobuf proxy class for target class.
+     * @param <T>
+     * @param cls
+     * @return
+     */
+    public static <T> Codec<T> create(Class<T> cls) {
+        return create(cls, false);
+    }
 
     /**
      * To create a protobuf proxy class for target class.
@@ -43,9 +53,10 @@ public final class ProtobufProxy {
      *            target object type to be proxied.
      * @param cls
      *            target object class
+     * @param debug true will print generate code
      * @return proxy instance object.
      */
-    public static <T> Codec<T> create(Class<T> cls) {
+    public static <T> Codec<T> create(Class<T> cls, boolean debug) {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
@@ -96,6 +107,11 @@ public final class ProtobufProxy {
         }
 
         String code = cg.getCode();
+        if (debug) {
+            System.out.println("--------------------------generate code begin--------------------------");
+            System.out.println(code);
+            System.out.println("--------------------------generate code end--------------------------");
+        }
         Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader());
         try {
             Codec<T> newInstance = (Codec<T>) newClass.newInstance();

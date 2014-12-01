@@ -49,6 +49,7 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
+import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 /**
  * JdkCompiler. (SPI, Singleton, ThreadSafe)
@@ -73,11 +74,21 @@ public class JdkCompiler extends AbstractCompiler {
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
+            
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<File>();
                 for (URL url : urlClassLoader.getURLs()) {
-                    files.add(new File(url.getFile()));
+                    
+                    String file = url.getFile();
+                    if (StringUtils.endsWith(file, "!/")) {
+                        file = StringUtils.removeEnd(file, "!/");
+                    }
+                    if (file.startsWith("file:")) {
+                        file = StringUtils.removeStart(file, "file:");
+                    }
+                    
+                    files.add(new File(file));
                 }
                 manager.setLocation(StandardLocation.CLASS_PATH, files);
             } catch (IOException e) {
@@ -104,7 +115,7 @@ public class JdkCompiler extends AbstractCompiler {
                 Arrays.asList(new JavaFileObject[] { javaFileObject })).call();
         if (result == null || !result.booleanValue()) {
             throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: "
-                    + diagnosticCollector);
+                    + diagnosticCollector.getDiagnostics());
         }
         return classLoader.loadClass(name);
     }
