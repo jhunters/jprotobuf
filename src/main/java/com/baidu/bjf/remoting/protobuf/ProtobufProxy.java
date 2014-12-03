@@ -53,7 +53,7 @@ public final class ProtobufProxy {
      *            target object type to be proxied.
      * @param cls
      *            target object class
-     * @param debug true will print generate code
+     * @param debug true will print generate java source code
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug) {
