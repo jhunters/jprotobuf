@@ -1,0 +1,15 @@
+package com.baidu.jprotobuf.pbrpc.meta;
+option java_outer_classname = "RpcServiceMetaListPojoClass";
+message RpcServiceMetaListPojo {  
+repeated RpcServiceMetaPojo rpcServiceMetas=1;
+}
+message RpcServiceMetaPojo {  
+optional string serviceName=1;
+optional string methodName=2;
+optional string inputProto=3;
+optional string outputProto=4;
+}
+service EchoService
+{
+      rpc getRpcServiceMetaInfo() returns (RpcServiceMetaListPojo);
+};

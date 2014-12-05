@@ -142,7 +142,7 @@ public class CodedConstant {
             size += computeSize(order, object, type, true);
         }
         if (type != FieldType.OBJECT) {
-            size += list.size();
+            size += list.size() * CodedOutputStream.computeTagSize(order);
         }
         return size;
     }
