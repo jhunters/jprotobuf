@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
+import com.google.protobuf.WireFormat;
 
 /**
  * Code generator utility class.
@@ -201,8 +202,14 @@ public class CodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = isListType(field.getField());
 
-            code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
-            code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {\n");
+            if (field.getFieldType().getInternalFieldType() != WireFormat.FieldType.MESSAGE) {
+                code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(), 
+                        field.getFieldType().getInternalFieldType().getWireType()));
+                code.append(") {\n");
+            } else {
+                code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
+                code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {\n");
+            }
             String t = field.getFieldType().getType();
             t = CodedConstant.capitalize(t);
 
@@ -299,8 +306,15 @@ public class CodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = isListType(field.getField());
 
-            code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
-            code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {\n");
+            if (field.getFieldType().getInternalFieldType() != WireFormat.FieldType.MESSAGE) {
+                code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(), 
+                        field.getFieldType().getInternalFieldType().getWireType()));
+                code.append(") {\n");
+            } else {
+                code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
+                code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {\n");
+            }
+            
             String t = field.getFieldType().getType();
             t = CodedConstant.capitalize(t);
 

@@ -15,6 +15,8 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
+import com.google.protobuf.WireFormat;
+
 
 /**
  * Field type for Protobuf.
@@ -27,23 +29,23 @@ public enum FieldType {
     /**
      * double type defined in .proto file.
      */
-    DOUBLE  ("Double", "double"     , "WIRETYPE_FIXED64", ".doubleValue()"         ),
-    FLOAT   ("Float", "float", "WIRETYPE_FIXED32"    ,    ".floatValue()"),
-    INT64   ("Long", "int64"      , "WIRETYPE_VARINT"    ,    ".longValue()"      ),
-    UINT64  ("Long", "uInt64"      , "WIRETYPE_VARINT"   ,    ".longValue()"       ),
-    INT32   ("Integer", "int32"   , "WIRETYPE_VARINT"    ,    ".intValue()"     ),
-    FIXED64 ("Long", "fixed64"       , "WIRETYPE_FIXED64"    ,    ".longValue()"     ),
-    FIXED32 ("Integer", "fixed32"        , "WIRETYPE_FIXED32"   ,    ".intValue()"      ),
-    BOOL    ("Boolean", "bool"     , "WIRETYPE_VARINT"      , ".booleanValue()"    ),
-    STRING  ("String", "string"     , "WIRETYPE_LENGTH_DELIMITED", ""),
-    BYTES   ("byte[]", "bytes", "WIRETYPE_LENGTH_DELIMITED", ""),
-    UINT32  ("Integer", "uInt32"        , "WIRETYPE_VARINT"    ,    ".intValue()"      ),
-    SFIXED32("Integer", "sFixed32"       , "WIRETYPE_FIXED32"   ,    ".intValue()"      ),
-    SFIXED64("Long", "sFixed64"      , "WIRETYPE_FIXED64"   ,    ".longValue()"      ),
-    SINT32  ("Integer", "sInt32"        , "WIRETYPE_VARINT"     ,    ".intValue()"     ),
-    SINT64  ("Long", "sInt64"       , "WIRETYPE_VARINT"    ,    ".longValue()"      ),
-    OBJECT  ("Object", "object"       , "WIRETYPE_LENGTH_DELIMITED"    ,    ""      ),
-    DEFAULT("", ""       , ""    ,    ""      );
+    DOUBLE  ("Double", "double"     , "WIRETYPE_FIXED64", ".doubleValue()", WireFormat.FieldType.DOUBLE         ),
+    FLOAT   ("Float", "float", "WIRETYPE_FIXED32"    ,    ".floatValue()",  WireFormat.FieldType.FLOAT),
+    INT64   ("Long", "int64"      , "WIRETYPE_VARINT"    ,    ".longValue()",  WireFormat.FieldType.INT64      ),
+    UINT64  ("Long", "uInt64"      , "WIRETYPE_VARINT"   ,    ".longValue()",  WireFormat.FieldType.UINT64      ),
+    INT32   ("Integer", "int32"   , "WIRETYPE_VARINT"    ,    ".intValue()" ,  WireFormat.FieldType.INT32    ),
+    FIXED64 ("Long", "fixed64"       , "WIRETYPE_FIXED64"    ,    ".longValue()" ,  WireFormat.FieldType.FIXED64    ),
+    FIXED32 ("Integer", "fixed32"        , "WIRETYPE_FIXED32"   ,    ".intValue()",  WireFormat.FieldType.FIXED32      ),
+    BOOL    ("Boolean", "bool"     , "WIRETYPE_VARINT"      , ".booleanValue()",  WireFormat.FieldType.BOOL    ),
+    STRING  ("String", "string"     , "WIRETYPE_LENGTH_DELIMITED", "",  WireFormat.FieldType.STRING),
+    BYTES   ("byte[]", "bytes", "WIRETYPE_LENGTH_DELIMITED", "",  WireFormat.FieldType.BYTES),
+    UINT32  ("Integer", "uInt32"        , "WIRETYPE_VARINT"    ,    ".intValue()" ,  WireFormat.FieldType.UINT32     ),
+    SFIXED32("Integer", "sFixed32"       , "WIRETYPE_FIXED32"   ,    ".intValue()" ,  WireFormat.FieldType.SFIXED32     ),
+    SFIXED64("Long", "sFixed64"      , "WIRETYPE_FIXED64"   ,    ".longValue()" ,  WireFormat.FieldType.SFIXED64     ),
+    SINT32  ("Integer", "sInt32"        , "WIRETYPE_VARINT"     ,    ".intValue()" ,  WireFormat.FieldType.SINT32    ),
+    SINT64  ("Long", "sInt64"       , "WIRETYPE_VARINT"    ,    ".longValue()" ,  WireFormat.FieldType.SINT64     ),
+    OBJECT  ("Object", "object"       , "WIRETYPE_LENGTH_DELIMITED"    ,    ""    ,  WireFormat.FieldType.MESSAGE  ),
+    DEFAULT("", ""       , ""    ,    ""    ,  WireFormat.FieldType.MESSAGE  );
     
     /**
      * java original type
@@ -62,6 +64,27 @@ public enum FieldType {
      * to primitive type
      */
     private final String toPrimitiveType;
+    
+    /**
+     * internal field type
+     */
+    private WireFormat.FieldType internalFieldType;
+
+    /**
+     * get the internalFieldType
+     * @return the internalFieldType
+     */
+    public WireFormat.FieldType getInternalFieldType() {
+        return internalFieldType;
+    }
+
+    /**
+     * set internalFieldType value to internalFieldType
+     * @param internalFieldType the internalFieldType to set
+     */
+    public void setInternalFieldType(WireFormat.FieldType internalFieldType) {
+        this.internalFieldType = internalFieldType;
+    }
 
     /**
      * get primitive type in string
@@ -103,10 +126,11 @@ public enum FieldType {
      * @param wireFormat protobuf wire format type
      */
     FieldType(String javaType, String type, String wireFormat,
-            String toPrimitiveType) {
+            String toPrimitiveType, WireFormat.FieldType internalFieldType) {
         this.javaType = javaType;
         this.type = type;
         this.wireFormat = wireFormat;
         this.toPrimitiveType = toPrimitiveType;
+        this.internalFieldType = internalFieldType;
     }
 }
