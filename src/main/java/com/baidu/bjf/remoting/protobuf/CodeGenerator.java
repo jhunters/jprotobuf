@@ -202,7 +202,7 @@ public class CodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = isListType(field.getField());
 
-            if (field.getFieldType().getInternalFieldType() != WireFormat.FieldType.MESSAGE) {
+            if (field.getFieldType() != FieldType.DEFAULT) {
                 code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(), 
                         field.getFieldType().getInternalFieldType().getWireType()));
                 code.append(") {\n");
@@ -306,7 +306,7 @@ public class CodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = isListType(field.getField());
 
-            if (field.getFieldType().getInternalFieldType() != WireFormat.FieldType.MESSAGE) {
+            if (field.getFieldType() != FieldType.DEFAULT) {
                 code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(), 
                         field.getFieldType().getInternalFieldType().getWireType()));
                 code.append(") {\n");
