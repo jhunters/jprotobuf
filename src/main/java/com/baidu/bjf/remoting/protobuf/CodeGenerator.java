@@ -26,7 +26,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
-import com.google.protobuf.WireFormat;
 
 /**
  * Code generator utility class.

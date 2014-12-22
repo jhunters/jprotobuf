@@ -2,9 +2,9 @@ package pkg;
 
 option java_package = "com.baidu.bjf.remoting.protobuf.simplerepeat";
   
-option java_outer_classname = "RequrieRepeatedType";  
+option java_outer_classname = "RequrieRepeatedTypeWithLargeIndex";  
   
 message InterClassName {  
-  repeated string list = 1;
+  repeated string list = 100000;
 }  
   
