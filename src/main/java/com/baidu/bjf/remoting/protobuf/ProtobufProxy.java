@@ -15,7 +15,10 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +48,54 @@ public final class ProtobufProxy {
     public static <T> Codec<T> create(Class<T> cls) {
         return create(cls, false);
     }
+    
+    /**
+     * To generate a protobuf proxy java source code for target class.
+     * 
+     * @param os to generate java source code
+     * @param cls target class
+     * @param charset charset type
+     * @throws IOException in case of any io relative exception.
+     */
+    public static void dynamicCodeGenerate(OutputStream os, Class cls, Charset charset) throws IOException {
+        if (cls == null) {
+            throw new NullPointerException("Parameter cls is null");
+        }
+        if (os == null) {
+            throw new NullPointerException("Parameter os is null");
+        }
+        if (charset == null) {
+            charset = Charset.defaultCharset();
+        }
+        
+        CodeGenerator cg = getCodeGenerator(cls);
+        String code = cg.getCode();
+        
+        os.write(code.getBytes(charset));
+    }
 
+    private static CodeGenerator getCodeGenerator(Class cls) {
+        // check if has default constructor
+        try {
+            cls.getConstructor(new Class<?>[0]);
+        } catch (NoSuchMethodException e2) {
+            throw new IllegalArgumentException("Class must has default constructor method with no parameters.", e2);
+        } catch (SecurityException e2) {
+            throw new IllegalArgumentException(e2.getMessage(), e2);
+        }
+
+        List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
+        if (fields.isEmpty()) {
+            throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
+                    + Protobuf.class.getName());
+        }
+
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
+        CodeGenerator cg = new CodeGenerator(fieldInfos, cls);
+        
+        return cg;
+    }
+    
     /**
      * To create a protobuf proxy class for target class.
      * 
@@ -67,23 +117,7 @@ public final class ProtobufProxy {
             return codec;
         }
 
-        // check if has default constructor
-        try {
-            cls.getConstructor(new Class<?>[0]);
-        } catch (NoSuchMethodException e2) {
-            throw new IllegalArgumentException("Class must has default constructor method with no parameters.", e2);
-        } catch (SecurityException e2) {
-            throw new IllegalArgumentException(e2.getMessage(), e2);
-        }
-
-        List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
-        if (fields.isEmpty()) {
-            throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
-                    + Protobuf.class.getName());
-        }
-
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
-        CodeGenerator cg = new CodeGenerator(fieldInfos, cls);
+        CodeGenerator cg = getCodeGenerator(cls);
 
         // try to load first
         String className = cg.getFullClassName();
