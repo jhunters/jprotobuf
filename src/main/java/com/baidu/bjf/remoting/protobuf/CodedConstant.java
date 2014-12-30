@@ -99,16 +99,16 @@ public class CodedConstant {
      *            is field type is a {@link List}
      * @return full java expression
      */
-    public static String getMappedTypeSize(int order, FieldType type, boolean isList) {
+    public static String getMappedTypeSize(int order, FieldType type, boolean isList, boolean debug) {
         String fieldName = getFieldName(order);
         if (isList) {
             String typeString = type.getType().toUpperCase();
-            return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." + typeString + ");\n";
+            return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." + typeString + "," + Boolean.valueOf(debug) + ");\n";
         }
 
         if (type == FieldType.OBJECT) {
             String typeString = type.getType().toUpperCase();
-            return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + ");\n";
+            return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + "," + Boolean.valueOf(debug) + ");\n";
         }
 
         String t = type.getType();
@@ -132,14 +132,14 @@ public class CodedConstant {
      *            field type of list object
      * @return full java expression
      */
-    public static int computeListSize(int order, List list, FieldType type) {
+    public static int computeListSize(int order, List list, FieldType type, boolean debug) {
         int size = 0;
         if (list == null) {
             return size;
         }
 
         for (Object object : list) {
-            size += computeSize(order, object, type, true);
+            size += computeSize(order, object, type, debug);
         }
         if (type != FieldType.OBJECT) {
             size += list.size() * CodedOutputStream.computeTagSize(order);
@@ -155,8 +155,8 @@ public class CodedConstant {
      * @param type
      * @return
      */
-    public static int computeSize(int order, Object o, FieldType type) {
-        return computeSize(order, o, type, false);
+    public static int computeSize(int order, Object o, FieldType type, boolean debug) {
+        return computeSize(order, o, type, false, debug);
     }
 
     /**
@@ -166,7 +166,7 @@ public class CodedConstant {
      * @param type
      * @return
      */
-    public static int computeSize(int order, Object o, FieldType type, boolean list) {
+    public static int computeSize(int order, Object o, FieldType type, boolean list, boolean debug) {
         int size = 0;
         if (o == null) {
             return size;
@@ -174,7 +174,7 @@ public class CodedConstant {
 
         if (type == FieldType.OBJECT) {
             Class cls = o.getClass();
-            Codec target = ProtobufProxy.create(cls);
+            Codec target = ProtobufProxy.create(cls, debug);
             try {
                 size = target.size(o);
                 size = size + CodedOutputStream.computeRawVarint32Size(size);

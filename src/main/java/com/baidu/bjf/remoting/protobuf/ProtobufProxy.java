@@ -118,6 +118,7 @@ public final class ProtobufProxy {
         }
 
         CodeGenerator cg = getCodeGenerator(cls);
+        cg.setDebug(debug);
 
         // try to load first
         String className = cg.getFullClassName();
