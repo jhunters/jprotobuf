@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
+import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.WireFormat;
@@ -99,16 +100,18 @@ public class CodedConstant {
      *            is field type is a {@link List}
      * @return full java expression
      */
-    public static String getMappedTypeSize(int order, FieldType type, boolean isList, boolean debug) {
+    public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, boolean debug) {
         String fieldName = getFieldName(order);
         if (isList) {
             String typeString = type.getType().toUpperCase();
-            return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." + typeString + "," + Boolean.valueOf(debug) + ");\n";
+            return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." 
+                    + typeString + "," + Boolean.valueOf(debug) + ");\n";
         }
 
         if (type == FieldType.OBJECT) {
             String typeString = type.getType().toUpperCase();
-            return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + "," + Boolean.valueOf(debug) + ");\n";
+            return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + "," 
+                    + Boolean.valueOf(debug) + ");\n";
         }
 
         String t = type.getType();
@@ -116,8 +119,18 @@ public class CodedConstant {
             t = "bytes";
         }
         t = capitalize(t);
-
-        fieldName = fieldName + type.getToPrimitiveType();
+        
+        boolean enumSpecial = false;
+        if (type == FieldType.ENUM) {
+            if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
+                fieldName = "((" + field.getField().getType().getName() + ") " + fieldName + ").value()";
+                enumSpecial = true;
+            }
+        }
+        if (!enumSpecial) {
+            fieldName = fieldName + type.getToPrimitiveType();
+        }
+        
         return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ");\n";
     }
 
@@ -201,6 +214,12 @@ public class CodedConstant {
             size = CodedOutputStream.computeInt64SizeNoTag(Long.valueOf(o.toString()));
         } else if (type == FieldType.FLOAT) {
             size = CodedOutputStream.computeFloatSizeNoTag(Float.valueOf(o.toString()));
+        } else if (type == FieldType.ENUM) {
+            if (o instanceof EnumReadable) {
+                size = CodedOutputStream.computeInt32SizeNoTag(((EnumReadable) o).value());
+            } else if (o instanceof Enum) {
+                size = CodedOutputStream.computeInt32SizeNoTag(((Enum) o).ordinal());
+            }
         }
 
         return size;
@@ -215,7 +234,7 @@ public class CodedConstant {
      *            field type
      * @return full java expression
      */
-    public static String getMappedWriteCode(String prefix, int order, FieldType type, boolean isList) {
+    public static String getMappedWriteCode(FieldInfo field, String prefix, int order, FieldType type, boolean isList) {
         String fieldName = getFieldName(order);
         StringBuilder ret = new StringBuilder();
         ret.append("if (").append(fieldName).append("!=null){");
@@ -228,7 +247,16 @@ public class CodedConstant {
             return ret.toString();
         } else {
             // not list so should add convert to primitive type
-            fieldName = fieldName + type.getToPrimitiveType();
+            boolean enumSpecial = false;
+            if (type == FieldType.ENUM) {
+                if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
+                    fieldName = "((" + field.getField().getType().getName() + ") " + fieldName + ").value()";
+                    enumSpecial = true;
+                }
+            }
+            if (!enumSpecial) {
+                fieldName = fieldName + type.getToPrimitiveType();
+            }
         }
 
         if (type == FieldType.OBJECT) {
@@ -497,6 +525,24 @@ public class CodedConstant {
      */
     public static int makeTag(final int fieldNumber, final int wireType) {
         return (fieldNumber << TAG_TYPE_BITS) | wireType;
+    }
+    
+    
+    public static String getEnumName(Enum[] e, int value) {
+        if (e != null) {
+            int toCompareValue;
+            for (Enum en : e) {
+                if (en instanceof EnumReadable) {
+                    toCompareValue = ((EnumReadable) en).value();
+                } else {
+                    toCompareValue = en.ordinal();
+                }
+                if (value == toCompareValue) {
+                    return en.name();
+                }
+            }
+        }
+        return "";
     }
 
 }

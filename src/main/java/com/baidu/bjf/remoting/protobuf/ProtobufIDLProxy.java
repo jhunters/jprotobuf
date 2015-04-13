@@ -28,6 +28,8 @@ import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
+import com.squareup.protoparser.EnumType;
+import com.squareup.protoparser.EnumType.Value;
 import com.squareup.protoparser.MessageType;
 import com.squareup.protoparser.MessageType.Field;
 import com.squareup.protoparser.MessageType.Label;
@@ -74,7 +76,7 @@ public class ProtobufIDLProxy {
      * type mapping of field type in string
      */
     private static final Map<String, String> fieldTypeMapping;
-
+    
     static {
 
         typeMapping = new HashMap<String, FieldType>();
@@ -112,6 +114,7 @@ public class ProtobufIDLProxy {
         fieldTypeMapping.put("sfixed64", "FieldType.SFIXED64");
         fieldTypeMapping.put("sint64", "FieldType.SINT64");
         fieldTypeMapping.put("sint32", "FieldType.SINT32");
+        fieldTypeMapping.put("enum", "FieldType.ENUM");
     }
 
     /**
@@ -162,6 +165,9 @@ public class ProtobufIDLProxy {
         for (Class cls : list) {
             Object newInstance;
             try {
+                if (Enum.class.isAssignableFrom(cls)) {
+                    continue;
+                }
                 newInstance = cls.newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
@@ -190,13 +196,28 @@ public class ProtobufIDLProxy {
         if (types == null || types.isEmpty()) {
             throw new RuntimeException("No message defined in '.proto' IDL");
         }
+        // XXX need to check internal class types
+        
+        int count = 0;
+        Iterator<Type> iter = types.iterator();
+        while (iter.hasNext()) {
+            Type next = iter.next();
+            if (next instanceof EnumType) {
+                continue;
+            }
+            count++;
+        }
 
-        if (!multi && types.size() > 1) {
+        if (!multi && count > 1) {
             throw new RuntimeException("Only one message defined allowed in '.proto' IDL");
         }
 
         List<Class> ret = new ArrayList<Class>(types.size());
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        
+        List<MessageType> messageTypes = new ArrayList<MessageType>();
+        Set<String> enumNames = new HashSet<String>();
+        Set<String> compiledClass = new HashSet<String>();
         for (Type type : types) {
             Class checkClass = checkClass(protoFile, type);
             if (checkClass != null) {
@@ -204,7 +225,25 @@ public class ProtobufIDLProxy {
                 continue;
             }
 
-            CodeDependent cd = createCodeByType(protoFile, type);
+            CodeDependent cd;
+            if (type instanceof MessageType) {
+                messageTypes.add((MessageType) type);
+                continue;
+            } else {
+                cd = createCodeByType(protoFile, (EnumType) type);
+                enumNames.add(type.getName());
+            }
+            
+            JDKCompilerHelper.COMPILER.compile(cd.code,
+                    ProtobufIDLProxy.class.getClassLoader());
+            compiledClass.add(cd.name);
+            // all enum type class will be ingored to use directly 
+        }
+        
+        for (MessageType mt : messageTypes) {
+            CodeDependent cd;
+            cd = createCodeByType(protoFile, (MessageType) mt, enumNames);
+            
             if (cd.isDepndency()) {
                 cds.add(cd);
             } else {
@@ -212,16 +251,26 @@ public class ProtobufIDLProxy {
             }
         }
 
-        Set<String> compiledClass = new HashSet<String>();
-
         CodeDependent codeDependent;
-
         while ((codeDependent = hasDependency(cds, compiledClass)) != null) {
             Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code,
                     ProtobufIDLProxy.class.getClassLoader());
             ret.add(newClass);
         }
+        
+        return ret;
+    }
 
+    /**
+     * @param types
+     * @return
+     */
+    private static List<Type> featchAllTypes(List<Type> types) {
+        List<Type> ret = new ArrayList<Type>(types);
+        for (Type type : types) {
+            List<Type> nestedTypes = type.getNestedTypes();
+            ret.addAll(nestedTypes);
+        }
         return ret;
     }
 
@@ -248,8 +297,62 @@ public class ProtobufIDLProxy {
         }
         return null;
     }
+    
+    private static CodeDependent createCodeByType(ProtoFile protoFile, EnumType type) {
+        
+        CodeDependent cd = new CodeDependent();
 
-    private static CodeDependent createCodeByType(ProtoFile protoFile, Type type) {
+        String packageName = protoFile.getPackageName();
+        String defaultClsName = type.getName();
+        // to check if has "java_package" option and "java_outer_classname"
+        List<Option> options = protoFile.getOptions();
+        if (options != null) {
+            for (Option option : options) {
+                if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
+                    packageName = option.getValue().toString();
+                }
+            }
+        }
+
+        String simpleName = defaultClsName + DEFAULT_SUFFIX_CLASSNAME;
+
+        // To generate class
+        StringBuilder code = new StringBuilder();
+        // define pack
+        code.append("package ").append(packageName).append(CODE_END);
+        code.append("\n");
+        // add import;
+        code.append("import com.baidu.bjf.remoting.protobuf.EnumReadable;\n");
+
+        // define class
+        code.append("public enum ").append(simpleName).append(" implements EnumReadable {\n");
+        
+        Iterator<Value> iter = type.getValues().iterator();
+        while (iter.hasNext()) {
+            Value value = iter.next();
+            String name = value.getName();
+            int tag = value.getTag();
+            
+            code.append(name).append("(").append(tag).append(")");
+            if (iter.hasNext()) {
+                code.append(",");
+            } else {
+                code.append(";\n");
+            }
+        }
+        
+        code.append("private final int value;\n");
+        code.append(simpleName).append("(int value) { this.value = value;  }\n");
+        code.append("public int value() { return value; }\n");
+        code.append("}\n");
+        
+        cd.name = simpleName;
+        cd.code = code.toString();
+
+        return cd;
+    }
+
+    private static CodeDependent createCodeByType(ProtoFile protoFile, MessageType type, Set<String> enumNames) {
 
         CodeDependent cd = new CodeDependent();
 
@@ -279,13 +382,11 @@ public class ProtobufIDLProxy {
         // define class
         code.append("public class ").append(simpleName).append(" {\n");
 
-        MessageType messageType = (MessageType) type;
-
-        List<Field> fields = messageType.getFields();
+        List<Field> fields = type.getFields();
 
         for (Field field : fields) {
             // define annotation
-            generateProtobufDefinedForField(code, field);
+            generateProtobufDefinedForField(code, field, enumNames);
 
             FieldType fType = typeMapping.get(field.getType());
             String javaType;
@@ -314,12 +415,16 @@ public class ProtobufIDLProxy {
      * @param code
      * @param field
      */
-    private static void generateProtobufDefinedForField(StringBuilder code, Field field) {
+    private static void generateProtobufDefinedForField(StringBuilder code, Field field, Set<String> enumNames) {
         code.append("@").append(Protobuf.class.getSimpleName()).append("(");
 
         String fieldType = fieldTypeMapping.get(field.getType());
         if (fieldType == null) {
-            fieldType = "FieldType.OBJECT";
+            if (enumNames.contains(field.getType())) {
+                fieldType = "FieldType.ENUM";
+            } else {
+                fieldType = "FieldType.OBJECT";
+            }
         }
 
         code.append("fieldType=").append(fieldType);
@@ -366,7 +471,7 @@ public class ProtobufIDLProxy {
      * 
      * 
      * @author xiemalin
-     * 
+     * @since 1.0
      */
     private static class CodeDependent {
         private String name;

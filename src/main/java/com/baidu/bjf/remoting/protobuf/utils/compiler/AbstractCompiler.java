@@ -31,6 +31,8 @@ public abstract class AbstractCompiler implements Compiler {
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([$_a-zA-Z][$_a-zA-Z0-9\\.]*);");
 
     private static final Pattern CLASS_PATTERN = Pattern.compile("class\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)\\s+");
+    
+    private static final Pattern ENUM_PATTERN = Pattern.compile("enum\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)\\s+");
 
     public Class<?> compile(String code, ClassLoader classLoader) {
         code = code.trim();
@@ -46,7 +48,12 @@ public abstract class AbstractCompiler implements Compiler {
         if (matcher.find()) {
             cls = matcher.group(1);
         } else {
-            throw new IllegalArgumentException("No such class name in " + code);
+            matcher = ENUM_PATTERN.matcher(code);
+            if (matcher.find()) {
+                cls = matcher.group(1);
+            } else {
+                throw new IllegalArgumentException("No such class name in " + code);
+            }
         }
         String className = pkg != null && pkg.length() > 0 ? pkg + "." + cls : cls;
         try {

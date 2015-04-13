@@ -12,6 +12,8 @@ jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言
 
 #####1.0.7 @Protobuf 支持全部属性默认设置，详见下面使用说明。#####
 
+#####1.3.1 @Protobuf 支持枚举类型，详见下面使用说明。#####
+
 #####关联项目：#####
 JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
 访问地址： [https://github.com/Baidu-ecom/Jprotobuf-rpc-socket](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket)<br>
@@ -257,6 +259,49 @@ public class AddressBookProtosPOJOWithDefault {
 }
 ```
  
+###  @Protubuf注解支持枚举类型 ###
+
+
+```java
+
+public class EnumPOJOClass {
+
+    @Protobuf(fieldType = FieldType.ENUM)
+    public EnumAttrPOJO enumAttr;
+}
+
+
+```
+
+使用枚举类型必须注意，如果枚举类型的值不是使用默认的ordinal的方式，则必须实现EnumReadable接口，示例代码如下:
+
+
+```java
+
+public enum EnumAttrPOJO implements EnumReadable {
+
+    STRING(100), INT(50);
+    
+    private final int value;
+
+
+    EnumAttrPOJO(int value) { this.value = value; }
+
+    public int toValue() { return this.value; }
+
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.Enumable#value()
+     */
+    public int value() {
+        return toValue();
+    }
+    
+}
+
+
+```
+
+注：目前ProtobufIDLProxy也支持对枚举类型的支持，但目前还不能完全支持含有内部类或内部枚举类型的message的动态解析。
 
 更多使用示例请参见testcase代码。
 

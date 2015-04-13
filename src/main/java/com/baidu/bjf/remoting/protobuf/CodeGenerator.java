@@ -231,7 +231,13 @@ public class CodeGenerator {
             t = CodedConstant.capitalize(t);
 
             boolean listTypeCheck = false;
-            String express = "input.read" + t + "()";
+            String express;
+            if (field.getFieldType() ==  FieldType.ENUM) {
+                express = "Enum.valueOf(" + field.getField().getType().getName() + ".class, CodedConstant.getEnumName(" 
+                        + field.getField().getType().getName() + ".values()," +  "input.read" + t + "()))";
+            } else {
+                express = "input.read" + t + "()";
+            }
             if (isList && field.getFieldType() == FieldType.OBJECT) {
                 Type type = field.getField().getGenericType();
                 if (type instanceof ParameterizedType) {
@@ -344,7 +350,14 @@ public class CodeGenerator {
             t = CodedConstant.capitalize(t);
 
             boolean listTypeCheck = false;
-            String express = "input.read" + t + "()";
+            String express;
+            if (field.getFieldType() ==  FieldType.ENUM) {
+                express = "Enum.valueOf(" + field.getField().getType().getName() + ".class, CodedConstant.getEnumName(" 
+                        + field.getField().getType().getName() + ".values()," +  "input.read" + t + "()))";
+            } else {
+                express = "input.read" + t + "()";
+            }
+            
             if (isList && field.getFieldType() == FieldType.OBJECT) {
                 Type type = field.getField().getGenericType();
                 if (type instanceof ParameterizedType) {
@@ -449,7 +462,7 @@ public class CodeGenerator {
     private void checkType(FieldType type, Field field) {
         Class<?> cls = field.getType();
 
-        if (type == FieldType.OBJECT) {
+        if (type == FieldType.OBJECT || type == FieldType.ENUM) {
             return;
         }
 
@@ -508,7 +521,7 @@ public class CodeGenerator {
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
                     .append("))\n");
             code.append("{\nsize+=");
-            code.append(CodedConstant.getMappedTypeSize(field.getOrder(), field.getFieldType(), isList, debug));
+            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList, debug));
             code.append("}\n");
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));
@@ -520,7 +533,8 @@ public class CodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = isListType(field.getField());
             // set write to byte
-            code.append(CodedConstant.getMappedWriteCode("output", field.getOrder(), field.getFieldType(), isList));
+            code.append(CodedConstant.getMappedWriteCode(field, "output", field.getOrder(), 
+                    field.getFieldType(), isList));
         }
 
         code.append("return result;\n");
@@ -564,7 +578,8 @@ public class CodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = isListType(field.getField());
             // set write to byte
-            code.append(CodedConstant.getMappedWriteCode("output", field.getOrder(), field.getFieldType(), isList));
+            code.append(CodedConstant.getMappedWriteCode(field, "output", 
+                    field.getOrder(), field.getFieldType(), isList));
         }
 
         code.append("}\n");
@@ -603,7 +618,7 @@ public class CodeGenerator {
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
                     .append("))\n");
             code.append("{\nsize+=");
-            code.append(CodedConstant.getMappedTypeSize(field.getOrder(), field.getFieldType(), isList, debug));
+            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList, debug));
             code.append("}\n");
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));

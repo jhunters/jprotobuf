@@ -47,6 +47,7 @@ public class ProtobufIDLGenerator {
         StringBuilder code = new StringBuilder();
 
         Set<Class<?>> cachedTypes = new HashSet<Class<?>>();
+        Set<Class<?>> cachedEnumTypes = new HashSet<Class<?>>();
 
         // define package
         code.append("package ").append(cls.getPackage().getName()).append(";\n");
@@ -56,7 +57,7 @@ public class ProtobufIDLGenerator {
 
         cachedTypes.add(cls);
 
-        generateIDL(code, cls, cachedTypes);
+        generateIDL(code, cls, cachedTypes, cachedEnumTypes);
 
         return code.toString();
     }
@@ -66,7 +67,8 @@ public class ProtobufIDLGenerator {
      * @param cls
      * @return sub message class list
      */
-    private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes) {
+    private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes,
+        Set<Class<?>> cachedEnumTypes) {
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
         if (fields.isEmpty()) {
             throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
@@ -74,6 +76,7 @@ public class ProtobufIDLGenerator {
         }
 
         Set<Class<?>> subTypes = new HashSet<Class<?>>();
+        Set<Class<Enum>> enumTypes = new HashSet<Class<Enum>>();
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
 
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
@@ -114,8 +117,22 @@ public class ProtobufIDLGenerator {
                     }
                 }
             } else {
+                String type = field.getFieldType().getType().toLowerCase();
+                
+                if (field.getFieldType() == FieldType.ENUM) {
+                    // if enum type
+                    Class c = field.getField().getType();
+                    if (Enum.class.isAssignableFrom(c)) {
+                        type = c.getSimpleName();
+                        if (!cachedEnumTypes.contains(c)) {
+                            cachedEnumTypes.add(c);
+                            enumTypes.add(c);
+                        }
+                    }
+                }
+
                 code.append(getFieldRequired(field.isRequired())).append(" ")
-                        .append(field.getFieldType().getType().toLowerCase()).append(" ")
+                        .append(type).append(" ")
                         .append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
             }
 
@@ -123,14 +140,37 @@ public class ProtobufIDLGenerator {
 
         code.append("}\n");
 
+        for (Class<Enum> subType : enumTypes) {
+            generateEnumIDL(code, subType);
+        }
+
         if (subTypes.isEmpty()) {
             return;
         }
 
         for (Class<?> subType : subTypes) {
-            generateIDL(code, subType, cachedTypes);
+            generateIDL(code, subType, cachedTypes, cachedEnumTypes);
         }
 
+    }
+
+    private static void generateEnumIDL(StringBuilder code, Class<Enum> cls) {
+        code.append("enum ").append(cls.getSimpleName()).append(" {  \n");
+
+        Field[] fields = cls.getFields();
+        for (Field field : fields) {
+            String name = field.getName();
+            code.append(name).append("=");
+            Enum value = Enum.valueOf(cls, name);
+            if (value instanceof EnumReadable) {
+                code.append(((EnumReadable) value).value());
+            } else {
+                code.append(value.ordinal());
+            }
+            code.append(";\n");
+        }
+
+        code.append("}\n ");
     }
 
     /**

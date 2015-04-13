@@ -149,12 +149,19 @@ public class IDLProxyObject {
      */
     private void setField(Object value, Object object, Field f) {
         f.setAccessible(true);
+        
+        Object valueToSet = value;
         try {
-            f.set(object, value);
+            // check if field type is enum
+            if (Enum.class.isAssignableFrom(f.getType())) {
+                Enum v = Enum.valueOf((Class<Enum>) f.getType(), String.valueOf(value)); {
+                    valueToSet = v;
+                }
+            }
+            f.set(object, valueToSet);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
     }
 
     public Object get(String field) {
