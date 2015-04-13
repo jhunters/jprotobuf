@@ -33,7 +33,6 @@ import com.baidu.bjf.remoting.protobuf.emun.EnumPOJOClass;
  */
 public class EnumIDLGeneratorTest {
 
-    @Ignore
     @Test
     public void testEnumIDLProxy() throws IOException {
         
