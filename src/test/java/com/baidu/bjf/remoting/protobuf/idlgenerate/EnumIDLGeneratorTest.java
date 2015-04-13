@@ -50,7 +50,7 @@ public class EnumIDLGeneratorTest {
     @Ignore
     @Test
     public void testComplextIDLProxy() throws IOException {
-        InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream("/com/baidu/bjf/remoting/protobuf/idlgenerate/si_product_biz.proto");
+        InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream("si_product_biz.proto");
         
         Map<String, IDLProxyObject> create = ProtobufIDLProxy.create(fis);
         Assert.assertNotNull(create);
