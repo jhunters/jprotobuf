@@ -21,8 +21,8 @@ import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.baidu.bjf.remoting.protobuf.emun.EnumAttrPOJO;
-import com.baidu.bjf.remoting.protobuf.emun.EnumPOJOClass;
+import com.baidu.bjf.remoting.protobuf.enumeration.EnumAttrPOJO;
+import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
 
 /**
  * 
@@ -51,10 +51,25 @@ public class EnumIDLGeneratorTest {
     @Test
     public void testComplextIDLProxy() throws IOException {
         InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream("si_product_biz.proto");
+
+        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(fis);
+        Assert.assertNotNull(map);
+        Assert.assertEquals(23, map.size());
         
-        Map<String, IDLProxyObject> create = ProtobufIDLProxy.create(fis);
-        Assert.assertNotNull(create);
+        boolean containsKey = map.containsKey("ProductAuditRejectRequest");
+        Assert.assertTrue(containsKey);
+        
+        IDLProxyObject idlProxyObject = map.get("ProductAuditRejectRequest");
+        
+        idlProxyObject.put("userid", 500);
+        idlProxyObject.put("head.reserved", 100);
         
         
+        byte[] bytes = idlProxyObject.encode();
+
+        
+        IDLProxyObject decodeProxyObject = idlProxyObject.decode(bytes);
+        Assert.assertEquals(500, decodeProxyObject.get("userid"));
+        Assert.assertEquals(100, decodeProxyObject.get("head.reserved"));
     }
 }

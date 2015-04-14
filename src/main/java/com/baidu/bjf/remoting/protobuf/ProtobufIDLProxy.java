@@ -196,7 +196,6 @@ public class ProtobufIDLProxy {
         if (types == null || types.isEmpty()) {
             throw new RuntimeException("No message defined in '.proto' IDL");
         }
-        // XXX need to check internal class types
         
         int count = 0;
         Iterator<Type> iter = types.iterator();
@@ -230,7 +229,7 @@ public class ProtobufIDLProxy {
                 messageTypes.add((MessageType) type);
                 continue;
             } else {
-                cd = createCodeByType(protoFile, (EnumType) type);
+                cd = createCodeByType(protoFile, (EnumType) type, true);
                 enumNames.add(type.getName());
             }
             
@@ -242,7 +241,7 @@ public class ProtobufIDLProxy {
         
         for (MessageType mt : messageTypes) {
             CodeDependent cd;
-            cd = createCodeByType(protoFile, (MessageType) mt, enumNames);
+            cd = createCodeByType(protoFile, (MessageType) mt, enumNames, true, new ArrayList<Type>());
             
             if (cd.isDepndency()) {
                 cds.add(cd);
@@ -252,25 +251,13 @@ public class ProtobufIDLProxy {
         }
 
         CodeDependent codeDependent;
+        int num = 0;
         while ((codeDependent = hasDependency(cds, compiledClass)) != null) {
             Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code,
                     ProtobufIDLProxy.class.getClassLoader());
             ret.add(newClass);
         }
         
-        return ret;
-    }
-
-    /**
-     * @param types
-     * @return
-     */
-    private static List<Type> featchAllTypes(List<Type> types) {
-        List<Type> ret = new ArrayList<Type>(types);
-        for (Type type : types) {
-            List<Type> nestedTypes = type.getNestedTypes();
-            ret.addAll(nestedTypes);
-        }
         return ret;
     }
 
@@ -298,7 +285,7 @@ public class ProtobufIDLProxy {
         return null;
     }
     
-    private static CodeDependent createCodeByType(ProtoFile protoFile, EnumType type) {
+    private static CodeDependent createCodeByType(ProtoFile protoFile, EnumType type, boolean topLevelClass) {
         
         CodeDependent cd = new CodeDependent();
 
@@ -318,11 +305,13 @@ public class ProtobufIDLProxy {
 
         // To generate class
         StringBuilder code = new StringBuilder();
-        // define pack
-        code.append("package ").append(packageName).append(CODE_END);
-        code.append("\n");
-        // add import;
-        code.append("import com.baidu.bjf.remoting.protobuf.EnumReadable;\n");
+        if (topLevelClass) {
+            // define package
+            code.append("package ").append(packageName).append(CODE_END);
+            code.append("\n");
+            // add import;
+            code.append("import com.baidu.bjf.remoting.protobuf.EnumReadable;\n");
+        }
 
         // define class
         code.append("public enum ").append(simpleName).append(" implements EnumReadable {\n");
@@ -352,7 +341,8 @@ public class ProtobufIDLProxy {
         return cd;
     }
 
-    private static CodeDependent createCodeByType(ProtoFile protoFile, MessageType type, Set<String> enumNames) {
+    private static CodeDependent createCodeByType(ProtoFile protoFile, MessageType type, 
+            Set<String> enumNames, boolean topLevelClass, List<Type> parentNestedTypes) {
 
         CodeDependent cd = new CodeDependent();
 
@@ -372,18 +362,32 @@ public class ProtobufIDLProxy {
 
         // To generate class
         StringBuilder code = new StringBuilder();
-        // define pack
-        code.append("package ").append(packageName).append(CODE_END);
-        code.append("\n");
-        // add import;
-        code.append("import com.baidu.bjf.remoting.protobuf.FieldType;\n");
-        code.append("import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;\n");
+        if (topLevelClass) {
+            // define package
+            code.append("package ").append(packageName).append(CODE_END);
+            code.append("\n");
+            // add import;
+            code.append("import com.baidu.bjf.remoting.protobuf.FieldType;\n");
+            code.append("import com.baidu.bjf.remoting.protobuf.EnumReadable;\n");
+            code.append("import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;\n");
+        }
 
         // define class
-        code.append("public class ").append(simpleName).append(" {\n");
+        String clsName;
+        if (topLevelClass) {
+            clsName = "public class ";
+        } else {
+            clsName = "public static class ";
+        }
+        code.append(clsName).append(simpleName).append(" {\n");
 
         List<Field> fields = type.getFields();
 
+        // get nested types
+        List<Type> nestedTypes = fetchAllNestedTypes(type);
+        List<Type> checkNestedTypes = new ArrayList<Type>(nestedTypes);
+        checkNestedTypes.addAll(parentNestedTypes);
+        
         for (Field field : fields) {
             // define annotation
             generateProtobufDefinedForField(code, field, enumNames);
@@ -392,7 +396,9 @@ public class ProtobufIDLProxy {
             String javaType;
             if (fType == null) {
                 javaType = field.getType() + DEFAULT_SUFFIX_CLASSNAME;
-                cd.addDependency(javaType);
+                if (!isNestedTypeDependency(field.getType(), checkNestedTypes)) {
+                    cd.addDependency(javaType);
+                }
             } else {
                 javaType = fType.getJavaType();
             }
@@ -401,12 +407,69 @@ public class ProtobufIDLProxy {
             code.append("public ").append(javaType);
             code.append(" ").append(field.getName()).append(CODE_END);
         }
+        
+        // to check if has nested classes
+        
+        if (nestedTypes != null && topLevelClass) {
+            for (Type t : nestedTypes) {
+                CodeDependent nestedCd;
+                if (t instanceof EnumType) {
+                    nestedCd = createCodeByType(protoFile, (EnumType) t, false);
+                    enumNames.add(type.getName());
+                } else {
+                    nestedCd = createCodeByType(protoFile, (MessageType) t, enumNames, false, checkNestedTypes);
+                }
+                
+                code.append(nestedCd.code);
+                // merge dependency
+                cd.dependencies.addAll(nestedCd.dependencies);
+            }
+        }
+        
         code.append("}\n");
 
         cd.name = simpleName;
         cd.code = code.toString();
 
         return cd;
+    }
+
+    /**
+     * @param type
+     * @return
+     */
+    private static List<Type> fetchAllNestedTypes(MessageType type) {
+        List<Type> ret = new ArrayList<Type>();
+        
+        List<Type> nestedTypes = type.getNestedTypes();
+        ret.addAll(nestedTypes);
+        for (Type t : nestedTypes) {
+            if (t instanceof MessageType) {
+                List<Type> subNestedTypes = fetchAllNestedTypes((MessageType) t);
+                ret.addAll(subNestedTypes);
+            }
+        }
+        
+        return ret;
+    }
+
+    /**
+     * @param type
+     * @param nestedTypes
+     * @return
+     */
+    private static boolean isNestedTypeDependency(String type, List<Type> nestedTypes) {
+        if (nestedTypes == null) {
+            return false;
+        }
+        
+        for (Type t : nestedTypes) {
+            if (type.equals(t.getName())) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     /**

@@ -170,7 +170,7 @@ public class CodeGenerator {
         genImportCode(code);
 
         code.append("public class " + className + " implements com.baidu.bjf.remoting.protobuf.Codec");
-        code.append("<").append(cls.getName()).append("> {\n");
+        code.append("<").append(cls.getName().replaceAll("\\$", ".")).append("> {\n");
 
         code.append(getEncodeMethodCode());
         code.append(getDecodeMethodCode());
@@ -195,7 +195,7 @@ public class CodeGenerator {
         code.append("import com.baidu.bjf.remoting.protobuf.*;\n");
         code.append("import java.util.*;\n");
 
-        code.append("import ").append(cls.getName()).append(";\n");
+        code.append("import ").append(cls.getName().replaceAll("\\$", ".")).append(";\n");
     }
 
     /**
@@ -206,8 +206,10 @@ public class CodeGenerator {
     private String getDecodeMethodCode() {
         StringBuilder code = new StringBuilder();
 
-        code.append("public ").append(cls.getName()).append(" decode(byte[] bb) throws IOException {\n");
-        code.append(cls.getName()).append(" ret = new ").append(cls.getName()).append("();");
+        code.append("public ").append(cls.getName().replaceAll("\\$", "."));
+        code.append(" decode(byte[] bb) throws IOException {\n");
+        code.append(cls.getName().replaceAll("\\$", ".")).append(" ret = new ");
+        code.append(cls.getName().replaceAll("\\$", ".")).append("();");
         code.append("CodedInputStream input = CodedInputStream.newInstance(bb, 0, bb.length);\n");
         code.append("try {\n");
         code.append("boolean done = false;\n");
@@ -249,7 +251,8 @@ public class CodeGenerator {
                         Type targetType = actualTypeArguments[0];
                         if (targetType instanceof Class) {
                             Class cls = (Class) targetType;
-                            code.append("codec = ProtobufProxy.create(").append(cls.getName()).append(".class");
+                            String name = cls.getName().replaceAll("\\$", "."); // need to parse nested class
+                            code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                             if (debug) {
                                 code.append(", true");
                             }
@@ -257,14 +260,15 @@ public class CodeGenerator {
                             code.append("int length = input.readRawVarint32();\n");
                             code.append("final int oldLimit = input.pushLimit(length);\n");
                             listTypeCheck = true;
-                            express = "(" + cls.getName() + ") codec.readFrom(input)";
+                            express = "(" + name + ") codec.readFrom(input)";
                         }
                     }
 
                 }
             } else if (field.getFieldType() == FieldType.OBJECT) {
                 Class cls = field.getField().getType();
-                code.append("codec = ProtobufProxy.create(").append(cls.getName()).append(".class");
+                String name = cls.getName().replaceAll("\\$", "."); // need to parse nested class
+                code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                 if (debug) {
                     code.append(", true");
                 }
@@ -272,7 +276,7 @@ public class CodeGenerator {
                 code.append("int length = input.readRawVarint32();\n");
                 code.append("final int oldLimit = input.pushLimit(length);\n");
                 listTypeCheck = true;
-                express = "(" + cls.getName() + ") codec.readFrom(input)";
+                express = "(" + name + ") codec.readFrom(input)";
             }
 
             if (field.getFieldType() == FieldType.BYTES) {
@@ -324,9 +328,10 @@ public class CodeGenerator {
     private String getReadFromMethodCode() {
         StringBuilder code = new StringBuilder();
 
-        code.append("public ").append(cls.getName())
+        code.append("public ").append(cls.getName().replaceAll("\\$", "."))
                 .append(" readFrom(CodedInputStream input) throws IOException {\n");
-        code.append(cls.getName()).append(" ret = new ").append(cls.getName()).append("();");
+        code.append(cls.getName().replaceAll("\\$", ".")).append(" ret = new ");
+        code.append(cls.getName().replaceAll("\\$", ".")).append("();");
         code.append("try {\n");
         code.append("boolean done = false;\n");
         code.append("Codec codec = null;\n");
@@ -369,8 +374,8 @@ public class CodeGenerator {
                         Type targetType = actualTypeArguments[0];
                         if (targetType instanceof Class) {
                             Class cls = (Class) targetType;
-                            code.append("codec = ProtobufProxy.create(").append(cls.getName())
-                                    .append(".class");
+                            String name = cls.getName().replaceAll("\\$", "."); // need to parse nested class
+                            code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                             if (debug) {
                                 code.append(", true");
                             }
@@ -378,14 +383,15 @@ public class CodeGenerator {
                             code.append("int length = input.readRawVarint32();\n");
                             code.append("final int oldLimit = input.pushLimit(length);\n");
                             listTypeCheck = true;
-                            express = "(" + cls.getName() + ") codec.readFrom(input)";
+                            express = "(" + name + ") codec.readFrom(input)";
                         }
                     }
 
                 }
             } else if (field.getFieldType() == FieldType.OBJECT) {
                 Class cls = field.getField().getType();
-                code.append("codec = ProtobufProxy.create(").append(cls.getName()).append(".class");
+                String name = cls.getName().replaceAll("\\$", "."); // need to parse nested class
+                code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                 if (debug) {
                     code.append(", true");
                 }
@@ -394,7 +400,7 @@ public class CodeGenerator {
                 code.append("int length = input.readRawVarint32();\n");
                 code.append("final int oldLimit = input.pushLimit(length);\n");
                 listTypeCheck = true;
-                express = "(" + cls.getName() + ") codec.readFrom(input)";
+                express = "(" + name + ") codec.readFrom(input)";
             }
 
             if (field.getFieldType() == FieldType.BYTES) {
@@ -499,7 +505,8 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public byte[] encode(").append(cls.getName()).append(" t) throws IOException {\n");
+        code.append("public byte[] encode(").append(cls.getName().replaceAll("\\$", "."));
+        code.append(" t) throws IOException {\n");
         code.append("int size = 0;");
         for (FieldInfo field : fields) {
 
@@ -552,7 +559,7 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public void writeTo(").append(cls.getName())
+        code.append("public void writeTo(").append(cls.getName().replaceAll("\\$", "."))
                 .append(" t, CodedOutputStream output) throws IOException {\n");
         for (FieldInfo field : fields) {
 
@@ -596,7 +603,8 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public int size(").append(cls.getName()).append(" t) throws IOException {\n");
+        code.append("public int size(").append(cls.getName().replaceAll("\\$", "."));
+        code.append(" t) throws IOException {\n");
         code.append("int size = 0;");
         for (FieldInfo field : fields) {
 

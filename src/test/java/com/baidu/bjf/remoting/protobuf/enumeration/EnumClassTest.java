@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.bjf.remoting.protobuf.emun;
+package com.baidu.bjf.remoting.protobuf.enumeration;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-import com.baidu.bjf.remoting.protobuf.emun.EnumClass.EnumClassInternal;
+import com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumClassInternal;
 
 
 /**
@@ -39,12 +39,12 @@ public class EnumClassTest {
         Assert.assertEquals(EnumAttrPOJO.INT, decode.enumAttr);
         
         byte[] byteArray = EnumClassInternal.newBuilder().setStatus(
-                com.baidu.bjf.remoting.protobuf.emun.EnumClass.EnumAttr.INT).build().toByteArray();
+                com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumAttr.INT).build().toByteArray();
         Assert.assertArrayEquals(bytes, byteArray);
         
-        EnumClassInternal enumClass = com.baidu.bjf.remoting.protobuf.emun.EnumClass.EnumClassInternal.parseFrom(bytes);
+        EnumClassInternal enumClass = com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumClassInternal.parseFrom(bytes);
  
-        Assert.assertEquals(com.baidu.bjf.remoting.protobuf.emun.EnumClass.EnumAttr.INT, enumClass.getStatus());
+        Assert.assertEquals(com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumAttr.INT, enumClass.getStatus());
     }
     
     @Test
@@ -60,10 +60,10 @@ public class EnumClassTest {
         Assert.assertEquals(EnumAttrPOJO.INT, decode.getEnumAttr());
         
         byte[] byteArray = EnumClassInternal.newBuilder().setStatus(
-                com.baidu.bjf.remoting.protobuf.emun.EnumClass.EnumAttr.INT).build().toByteArray();
+                com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumAttr.INT).build().toByteArray();
         Assert.assertArrayEquals(bytes, byteArray);
-        EnumClassInternal enumClass = com.baidu.bjf.remoting.protobuf.emun.EnumClass.EnumClassInternal.parseFrom(bytes);
+        EnumClassInternal enumClass = com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumClassInternal.parseFrom(bytes);
  
-        Assert.assertEquals(com.baidu.bjf.remoting.protobuf.emun.EnumClass.EnumAttr.INT, enumClass.getStatus());
+        Assert.assertEquals(com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumAttr.INT, enumClass.getStatus());
     }
 }

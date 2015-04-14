@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  *
  */
-package com.baidu.bjf.remoting.protobuf.emun;
+package com.baidu.bjf.remoting.protobuf.enumeration;
 
 import com.baidu.bjf.remoting.protobuf.EnumReadable;
 

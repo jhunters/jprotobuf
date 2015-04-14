@@ -26,7 +26,7 @@ import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJOWithDefault;
-import com.baidu.bjf.remoting.protobuf.emun.EnumPOJOClass;
+import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.squareup.protoparser.MessageType;

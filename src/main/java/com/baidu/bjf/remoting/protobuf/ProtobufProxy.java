@@ -39,15 +39,6 @@ public final class ProtobufProxy {
 
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
     
-    /**
-     * To create a protobuf proxy class for target class.
-     * @param <T>
-     * @param cls
-     * @return
-     */
-    public static <T> Codec<T> create(Class<T> cls) {
-        return create(cls, false);
-    }
     
     /**
      * To generate a protobuf proxy java source code for target class.
@@ -76,12 +67,15 @@ public final class ProtobufProxy {
 
     private static CodeGenerator getCodeGenerator(Class cls) {
         // check if has default constructor
-        try {
-            cls.getConstructor(new Class<?>[0]);
-        } catch (NoSuchMethodException e2) {
-            throw new IllegalArgumentException("Class must has default constructor method with no parameters.", e2);
-        } catch (SecurityException e2) {
-            throw new IllegalArgumentException(e2.getMessage(), e2);
+        
+        if (!cls.isMemberClass()) {
+            try {
+                cls.getConstructor(new Class<?>[0]);
+            } catch (NoSuchMethodException e2) {
+                throw new IllegalArgumentException("Class must has default constructor method with no parameters.", e2);
+            } catch (SecurityException e2) {
+                throw new IllegalArgumentException(e2.getMessage(), e2);
+            }
         }
 
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
@@ -94,6 +88,16 @@ public final class ProtobufProxy {
         CodeGenerator cg = new CodeGenerator(fieldInfos, cls);
         
         return cg;
+    }
+    
+    /**
+     * To create a protobuf proxy class for target class.
+     * @param <T>
+     * @param cls
+     * @return
+     */
+    public static <T> Codec<T> create(Class<T> cls) {
+        return create(cls, false);
     }
     
     /**

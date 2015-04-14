@@ -16,7 +16,9 @@
 package com.baidu.bjf.remoting.protobuf;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,7 +116,18 @@ public class IDLProxyObject {
                 f.setAccessible(true);
                 Object o = f.get(object);
                 if (o == null) {
-                    o = type.newInstance();
+                    boolean memberClass = type.isMemberClass();
+                    if (memberClass && Modifier.isStatic(type.getModifiers())) {
+                        Constructor<?> constructor = type.getConstructor(new Class[0]);
+                        constructor.setAccessible(true);
+                        o = constructor.newInstance(new Object[0]);
+                    } else if (memberClass) {
+                        Constructor<?> constructor = type.getConstructor(new Class[]{object.getClass()});
+                        constructor.setAccessible(true);
+                        o = constructor.newInstance(new Object[]{object});
+                    } else {
+                        o = type.newInstance();
+                    }
                     f.set(object, o);
                 }
                 return put(fullField, sub, value, o);
