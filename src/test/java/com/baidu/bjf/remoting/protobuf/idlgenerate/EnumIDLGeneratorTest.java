@@ -9,12 +9,10 @@ package com.baidu.bjf.remoting.protobuf.idlgenerate;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
@@ -85,6 +83,10 @@ public class EnumIDLGeneratorTest {
         
         
         bytes = idlProxyObject.encode();
-        System.out.println(Arrays.toString(bytes));
+        
+        decodeProxyObject = idlProxyObject.decode(bytes);
+        Assert.assertEquals(200, decodeProxyObject.get("userid"));
+        Assert.assertEquals(decodeProxyObject.get("head.request_type") + "", "USER_DEFINED");
+        Assert.assertEquals(decodeProxyObject.get("head.appid") + "", "DSP");
     }
 }
