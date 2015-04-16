@@ -34,7 +34,6 @@ import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
  */
 public class EnumIDLGeneratorTest {
 
-    @Ignore
     @Test
     public void testEnumIDLProxy() throws IOException {
         
@@ -49,7 +48,6 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(enumPOJOClass.enumAttr.value(), EnumAttrPOJO.STRING.value());
     }
     
-    @Ignore
     @Test
     public void testComplextIDLProxy() throws IOException {
         
