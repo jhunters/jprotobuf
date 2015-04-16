@@ -11,7 +11,8 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- *
+ * Simple pojo enumeration class
+ * 
  * @author xiemalin
  * @since 1.4.0
  */

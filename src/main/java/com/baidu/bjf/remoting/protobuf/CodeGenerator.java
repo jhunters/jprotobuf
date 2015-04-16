@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
+import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 /**
  * Code generator utility class.
@@ -93,10 +94,16 @@ public class CodeGenerator {
      * @return class name
      */
     public String getClassName() {
-        return cls.getSimpleName() + DEFAULT_SUFFIX_CLASSNAME;
+        return getClassName(cls);
     }
 
     public static String getClassName(Class<?> cls) {
+        if (cls.isMemberClass()) {
+            String name = cls.getName();
+            name = StringUtils.substringAfterLast(name, ".");
+            return name + DEFAULT_SUFFIX_CLASSNAME; 
+        }
+        
         return cls.getSimpleName() + DEFAULT_SUFFIX_CLASSNAME;
     }
 
@@ -235,8 +242,8 @@ public class CodeGenerator {
             boolean listTypeCheck = false;
             String express;
             if (field.getFieldType() ==  FieldType.ENUM) {
-                express = "Enum.valueOf(" + field.getField().getType().getName() + ".class, CodedConstant.getEnumName(" 
-                        + field.getField().getType().getName() + ".values()," +  "input.read" + t + "()))";
+                express = "Enum.valueOf(" + field.getField().getType().getName().replaceAll("\\$", ".") + ".class, CodedConstant.getEnumName(" 
+                        + field.getField().getType().getName().replaceAll("\\$", ".") + ".values()," +  "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";
             }
@@ -357,8 +364,8 @@ public class CodeGenerator {
             boolean listTypeCheck = false;
             String express;
             if (field.getFieldType() ==  FieldType.ENUM) {
-                express = "Enum.valueOf(" + field.getField().getType().getName() + ".class, CodedConstant.getEnumName(" 
-                        + field.getField().getType().getName() + ".values()," +  "input.read" + t + "()))";
+                express = "Enum.valueOf(" + field.getField().getType().getName().replaceAll("\\$", ".") + ".class, CodedConstant.getEnumName(" 
+                        + field.getField().getType().getName().replaceAll("\\$", ".") + ".values()," +  "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";
             }

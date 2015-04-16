@@ -115,8 +115,8 @@ public final class ProtobufProxy {
             throw new NullPointerException("Parameter cls is null");
         }
 
-        String cn = CodeGenerator.getFullClassName(cls);
-        Codec codec = CACHED.get(cn);
+        String uniClsName = cls.getName();
+        Codec codec = CACHED.get(uniClsName);
         if (codec != null) {
             return codec;
         }
@@ -154,8 +154,8 @@ public final class ProtobufProxy {
         Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader());
         try {
             Codec<T> newInstance = (Codec<T>) newClass.newInstance();
-            if (!CACHED.containsKey(newClass.getName())) {
-                CACHED.put(newClass.getName(), newInstance);
+            if (!CACHED.containsKey(uniClsName)) {
+                CACHED.put(uniClsName, newInstance);
             }
             return newInstance;
         } catch (InstantiationException e) {

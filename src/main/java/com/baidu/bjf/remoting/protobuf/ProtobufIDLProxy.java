@@ -409,13 +409,12 @@ public class ProtobufIDLProxy {
         }
         
         // to check if has nested classes
-        
         if (nestedTypes != null && topLevelClass) {
             for (Type t : nestedTypes) {
                 CodeDependent nestedCd;
                 if (t instanceof EnumType) {
                     nestedCd = createCodeByType(protoFile, (EnumType) t, false);
-                    enumNames.add(type.getName());
+                    enumNames.add(t.getName());
                 } else {
                     nestedCd = createCodeByType(protoFile, (MessageType) t, enumNames, false, checkNestedTypes);
                 }
