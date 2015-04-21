@@ -9,10 +9,12 @@ package com.baidu.bjf.remoting.protobuf.idlgenerate;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
@@ -46,20 +48,73 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(enumPOJOClass.enumAttr.value(), EnumAttrPOJO.STRING.value());
     }
     
-    @Test
-    public void testComplextIDLProxy() throws IOException {
+    private Map<String, IDLProxyObject> initialFromProtofile(String fileName) throws IOException {
         
-        byte[] bytes;
-        IDLProxyObject idlProxyObject;
         
-        InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream("si_product_biz.proto");
-
+        InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream(fileName);
+        
         Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(fis);
         Assert.assertNotNull(map);
         Assert.assertEquals(23, map.size());
         
+        return map;
+    }
+    
+    @Ignore
+    @Test
+    public void testBestComplexIDLProxy() throws IOException {
+        
+        Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
+        
+        boolean containsKey = map.containsKey("ProductTemplateResponse");
+        Assert.assertTrue(containsKey);
+        
+        byte[] bytes;
+        IDLProxyObject idlProxyObject;
+        idlProxyObject = map.get("ProductTemplateResponse");
+        
+        idlProxyObject.put("product_template.property_product_mapping.usage", "TUWEN_ICON");
+        idlProxyObject.put("product_template.property_product_mapping.no", 1001);
+        idlProxyObject.put("product_template.property_product_mapping.type", "IMG");
+        idlProxyObject.put("product_template.property_product_mapping.value", new byte[] {10, 20});
+        idlProxyObject.put("product_template.property_product_mapping.editable", true);
+        idlProxyObject.put("product_template.property_product_mapping.max_length", 10000);
+        idlProxyObject.put("product_template.property_product_mapping.literal", new byte[] {10, 20});
+        idlProxyObject.put("product_template.property_product_mapping.enable_url", false);
+        idlProxyObject.put("product_template.property_product_mapping.name", "matthew".getBytes("utf-8"));
+        
+        idlProxyObject.put("head.result.status", 101);
+        idlProxyObject.put("product_template.id", 1);
+        idlProxyObject.put("product_template.name", "matthew".getBytes("utf-8"));
+        
+        idlProxyObject.put("product_template.type", "USER_DEFINE");
+        idlProxyObject.put("product_template.thumbnail.width", 111);
+        idlProxyObject.put("product_template.thumbnail.height", 112);
+        idlProxyObject.put("product_template.thumbnail.url", "http://test.com");
+        
+        idlProxyObject.put("product_template.preview.width", 111);
+        idlProxyObject.put("product_template.preview.height", 112);
+        idlProxyObject.put("product_template.preview.url", "http://test.com");
+        
+        idlProxyObject.put("product_template.template_size.type", 2);
+        idlProxyObject.put("product_template.template_size.width", 333);
+        idlProxyObject.put("product_template.template_size.height", 444);
+        
+        
+        bytes = idlProxyObject.encode();
+        Assert.assertNotNull(bytes);
+    }
+    
+    @Ignore
+    @Test
+    public void testComplexIDLProxy() throws IOException {
+        Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
+        
         boolean containsKey = map.containsKey("ProductAuditRejectRequest");
         Assert.assertTrue(containsKey);
+        
+        byte[] bytes;
+        IDLProxyObject idlProxyObject;
         
         idlProxyObject = map.get("ProductAuditRejectRequest");
         

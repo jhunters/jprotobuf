@@ -386,6 +386,14 @@ public class ProtobufIDLProxy {
         // get nested types
         List<Type> nestedTypes = fetchAllNestedTypes(type);
         List<Type> checkNestedTypes = new ArrayList<Type>(nestedTypes);
+        
+        // to check if has nested classes and check has Enum type
+        for (Type t : nestedTypes) {
+            if (t instanceof EnumType) {
+                enumNames.add(t.getName());
+            }
+        }
+        
         checkNestedTypes.addAll(parentNestedTypes);
         
         for (Field field : fields) {
@@ -429,7 +437,6 @@ public class ProtobufIDLProxy {
 
         cd.name = simpleName;
         cd.code = code.toString();
-
         return cd;
     }
 
