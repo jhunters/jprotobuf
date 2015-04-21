@@ -301,7 +301,7 @@ public enum EnumAttrPOJO implements EnumReadable {
 
 ```
 
-注：目前ProtobufIDLProxy也支持对枚举类型的支持，但目前还不能完全支持含有内部类或内部枚举类型的message的动态解析。
+注：目前ProtobufIDLProxy已经能完全支持含有内部类或内部枚举类型的message的动态解析。
 
 更多使用示例请参见testcase代码。
 
