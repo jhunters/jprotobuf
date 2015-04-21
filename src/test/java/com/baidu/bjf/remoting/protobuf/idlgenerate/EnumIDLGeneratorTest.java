@@ -9,12 +9,10 @@ package com.baidu.bjf.remoting.protobuf.idlgenerate;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
@@ -60,7 +58,6 @@ public class EnumIDLGeneratorTest {
         return map;
     }
     
-    @Ignore
     @Test
     public void testBestComplexIDLProxy() throws IOException {
         
@@ -105,7 +102,6 @@ public class EnumIDLGeneratorTest {
         Assert.assertNotNull(bytes);
     }
     
-    @Ignore
     @Test
     public void testComplexIDLProxy() throws IOException {
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
