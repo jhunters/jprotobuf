@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.squareup.protoparser.EnumType;
 import com.squareup.protoparser.EnumType.Value;
@@ -123,44 +124,68 @@ public class ProtobufIDLProxy {
     private static final String DEFAULT_SUFFIX_CLASSNAME = "JProtoBufProtoClass";
 
     public static IDLProxyObject createSingle(String data) {
+        return createSingle(data, false);
+    }
+    
+    public static IDLProxyObject createSingle(String data, boolean debug) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug);
         return map.entrySet().iterator().next().getValue();
     }
 
     public static IDLProxyObject createSingle(InputStream is) throws IOException {
+        return createSingle(is, false);
+    }
+    
+    public static IDLProxyObject createSingle(InputStream is, boolean debug) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug);
         return map.entrySet().iterator().next().getValue();
     }
 
     public static IDLProxyObject createSingle(Reader reader) throws IOException {
+        return createSingle(reader, false);
+    }
+    
+    public static IDLProxyObject createSingle(Reader reader, boolean debug) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug);
         return map.entrySet().iterator().next().getValue();
     }
 
     public static Map<String, IDLProxyObject> create(String data) {
+        return create(data, false);
+    }
+    
+    public static Map<String, IDLProxyObject> create(String data, boolean debug) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
-        return doCreate(protoFile, true);
+        return doCreate(protoFile, true, debug);
     }
 
     public static Map<String, IDLProxyObject> create(InputStream is) throws IOException {
+        return create(is, false);
+    }
+    
+    public static Map<String, IDLProxyObject> create(InputStream is, boolean debug) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
-        return doCreate(protoFile, true);
+        return doCreate(protoFile, true, debug);
     }
 
     public static Map<String, IDLProxyObject> create(Reader reader) throws IOException {
+        return create(reader, false);
+    }
+    
+    public static Map<String, IDLProxyObject> create(Reader reader, boolean debug) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
-        return doCreate(protoFile, true);
+        return doCreate(protoFile, true, debug);
     }
 
-    private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi) {
+    private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug) {
 
-        List<Class> list = createClass(protoFile, multi);
+        List<Class> list = createClass(protoFile, multi, debug);
         Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
         for (Class cls : list) {
             Object newInstance;
@@ -173,7 +198,7 @@ public class ProtobufIDLProxy {
                 throw new RuntimeException(e.getMessage(), e);
             }
 
-            Codec codec = ProtobufProxy.create(cls);
+            Codec codec = ProtobufProxy.create(cls, debug);
             IDLProxyObject idlProxyObject = new IDLProxyObject(codec, newInstance, cls);
 
             String name = cls.getSimpleName();
@@ -190,7 +215,7 @@ public class ProtobufIDLProxy {
      * @param protoFile
      * @return
      */
-    private static List<Class> createClass(ProtoFile protoFile, boolean multi) {
+    private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug) {
 
         List<Type> types = protoFile.getTypes();
         if (types == null || types.isEmpty()) {
@@ -232,11 +257,17 @@ public class ProtobufIDLProxy {
                 cd = createCodeByType(protoFile, (EnumType) type, true);
                 enumNames.add(type.getName());
             }
+
+            if (debug) {
+                CodePrinter.printCode(cd.code, "generate jprotobuf code");
+            }
             
             JDKCompilerHelper.COMPILER.compile(cd.code,
                     ProtobufIDLProxy.class.getClassLoader());
             compiledClass.add(cd.name);
             // all enum type class will be ingored to use directly 
+            
+            
         }
         
         for (MessageType mt : messageTypes) {
@@ -253,6 +284,9 @@ public class ProtobufIDLProxy {
         CodeDependent codeDependent;
         int num = 0;
         while ((codeDependent = hasDependency(cds, compiledClass)) != null) {
+            if (debug) {
+                CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
+            }
             Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code,
                     ProtobufIDLProxy.class.getClassLoader());
             ret.add(newClass);

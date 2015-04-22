@@ -34,7 +34,6 @@ public class EnumIDLGeneratorTest {
 
     @Test
     public void testEnumIDLProxy() throws IOException {
-        
         String idl = ProtobufIDLGenerator.getIDL(EnumPOJOClass.class);
         IDLProxyObject idlProxyObject = ProtobufIDLProxy.createSingle(idl);
         
@@ -47,11 +46,9 @@ public class EnumIDLGeneratorTest {
     }
     
     private Map<String, IDLProxyObject> initialFromProtofile(String fileName) throws IOException {
-        
-        
         InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream(fileName);
         
-        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(fis);
+        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(fis, false);
         Assert.assertNotNull(map);
         Assert.assertEquals(23, map.size());
         
@@ -60,7 +57,6 @@ public class EnumIDLGeneratorTest {
     
     @Test
     public void testBestComplexIDLProxy() throws IOException {
-        
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
         
         boolean containsKey = map.containsKey("ProductTemplateResponse");
@@ -128,8 +124,6 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(idlProxyObject2.get("product_template.template_size.type"), 2);
         Assert.assertEquals(idlProxyObject2.get("product_template.template_size.width"), 333);
         Assert.assertEquals(idlProxyObject2.get("product_template.template_size.height"), 444);
-        
-        
     }
     
     @Test

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
@@ -147,9 +148,7 @@ public final class ProtobufProxy {
 
         String code = cg.getCode();
         if (debug) {
-            System.out.println("--------------------------generate code begin--------------------------");
-            System.out.println(code);
-            System.out.println("--------------------------generate code end--------------------------");
+            CodePrinter.printCode(code, "generate protobuf proxy code");
         }
         Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader());
         try {
