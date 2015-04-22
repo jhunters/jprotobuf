@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 
@@ -100,6 +100,36 @@ public class EnumIDLGeneratorTest {
         
         bytes = idlProxyObject.encode();
         Assert.assertNotNull(bytes);
+        
+        IDLProxyObject idlProxyObject2 = idlProxyObject.decode(bytes);
+        
+        Assert.assertEquals(idlProxyObject2.get("product_template.property_product_mapping.usage") + "", "TUWEN_ICON");
+        Assert.assertEquals(idlProxyObject2.get("product_template.property_product_mapping.no"), 1001);
+        Assert.assertEquals(idlProxyObject2.get("product_template.property_product_mapping.type") + "", "IMG");
+        Assert.assertArrayEquals((byte[]) idlProxyObject2.get("product_template.property_product_mapping.value"),
+                new byte[] { 10, 20 });
+        Assert.assertEquals(idlProxyObject2.get("product_template.property_product_mapping.editable"), true);
+        Assert.assertEquals(idlProxyObject2.get("product_template.property_product_mapping.max_length"), 10000);
+        Assert.assertArrayEquals((byte[]) idlProxyObject2.get("product_template.property_product_mapping.literal"),
+                new byte[] { 10, 20 });
+        Assert.assertEquals(idlProxyObject2.get("product_template.property_product_mapping.enable_url"), false);
+        Assert.assertArrayEquals((byte[]) idlProxyObject2.get("product_template.property_product_mapping.name"),
+                "matthew".getBytes("utf-8"));
+        Assert.assertEquals(idlProxyObject2.get("head.result.status"), 101);
+        Assert.assertEquals(idlProxyObject2.get("product_template.id"), 1);
+        Assert.assertArrayEquals((byte[]) idlProxyObject2.get("product_template.name"), "matthew".getBytes("utf-8"));
+        Assert.assertEquals(idlProxyObject2.get("product_template.type") + "", "USER_DEFINE");
+        Assert.assertEquals(idlProxyObject2.get("product_template.thumbnail.width"), 111);
+        Assert.assertEquals(idlProxyObject2.get("product_template.thumbnail.height"), 112);
+        Assert.assertEquals(idlProxyObject2.get("product_template.thumbnail.url"), "http://test.com");
+        Assert.assertEquals(idlProxyObject2.get("product_template.preview.width"), 111);
+        Assert.assertEquals(idlProxyObject2.get("product_template.preview.height"), 112);
+        Assert.assertEquals(idlProxyObject2.get("product_template.preview.url"), "http://test.com");
+        Assert.assertEquals(idlProxyObject2.get("product_template.template_size.type"), 2);
+        Assert.assertEquals(idlProxyObject2.get("product_template.template_size.width"), 333);
+        Assert.assertEquals(idlProxyObject2.get("product_template.template_size.height"), 444);
+        
+        
     }
     
     @Test
