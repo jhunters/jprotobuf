@@ -242,8 +242,9 @@ public class CodeGenerator {
             boolean listTypeCheck = false;
             String express;
             if (field.getFieldType() ==  FieldType.ENUM) {
-                express = "Enum.valueOf(" + field.getField().getType().getName().replaceAll("\\$", ".") + ".class, CodedConstant.getEnumName(" 
-                        + field.getField().getType().getName().replaceAll("\\$", ".") + ".values()," +  "input.read" + t + "()))";
+                String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
+                express = "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" 
+                        + clsName + ".values()," +  "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";
             }
@@ -364,8 +365,9 @@ public class CodeGenerator {
             boolean listTypeCheck = false;
             String express;
             if (field.getFieldType() ==  FieldType.ENUM) {
-                express = "Enum.valueOf(" + field.getField().getType().getName().replaceAll("\\$", ".") + ".class, CodedConstant.getEnumName(" 
-                        + field.getField().getType().getName().replaceAll("\\$", ".") + ".values()," +  "input.read" + t + "()))";
+                String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
+                express = "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" 
+                        + clsName + ".values()," +  "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";
             }
