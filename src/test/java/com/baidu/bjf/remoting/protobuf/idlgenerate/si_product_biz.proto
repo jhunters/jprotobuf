@@ -3,9 +3,9 @@ option java_generic_services = true;
 
 package proto.smartidea;
 
-option java_package = "com.baidu.beidou.util.sidriver.bo";
+option java_package = "com.baidu.util.sidriver.bo";
 
-//option java_package = "com.baidu.unbiz.soma.biz.siconf.rpc.pbrpc.product.protocol";
+//option java_package = "com.baidu.product.protocol";
 // common result status
 message ResponseResult {
     required int32 status = 1;  

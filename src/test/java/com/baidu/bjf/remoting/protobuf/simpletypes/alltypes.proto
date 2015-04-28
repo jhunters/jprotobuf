@@ -18,6 +18,15 @@ message InterClassName {
 	optional sfixed64 sfixed64F = 12;
 	optional bool boolF = 13;
 	optional string stringF = 14;
-    optional bytes bytesF = 15;
+  optional bytes bytesF = 15;
+  optional TypeDef enumT = 16;
+  
+  enum TypeDef {
+    TEXT = 1;
+    NUMBER = 2;
+    DECIMAL = 4;
+    ID = 8;
+    URL = 16;
+};
 }  
   

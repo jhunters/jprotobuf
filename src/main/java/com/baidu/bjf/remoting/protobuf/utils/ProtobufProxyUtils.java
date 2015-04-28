@@ -87,7 +87,12 @@ public class ProtobufProxyUtils {
             if (protobuf.fieldType() == FieldType.DEFAULT) {
                 FieldType fieldType = TYPE_MAPPING.get(field.getType());
                 if (fieldType == null) {
-                    fieldType = FieldType.OBJECT;
+                    // check if type is enum 
+                    if (Enum.class.isAssignableFrom(field.getType())) {
+                        fieldType = FieldType.ENUM;
+                    } else {
+                        fieldType = FieldType.OBJECT;
+                    }
                 }
                 fieldInfo.setFieldType(fieldType);
             } else {

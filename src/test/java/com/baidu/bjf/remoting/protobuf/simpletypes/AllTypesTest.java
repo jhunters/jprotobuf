@@ -24,6 +24,7 @@ import org.junit.Test;
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
+import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName.TypeDef;
 import com.google.protobuf.ByteString;
 
 
@@ -53,6 +54,7 @@ public class AllTypesTest {
 		c.stringF = "hello";
 		c.uint32F = 9;
 		c.uint64F = 10L;
+		c.typeDefEnum = TypeDefEnum.DECIMAL;
 		
 		byte[] bb = dojoClassProxy.encode(c);
 		
@@ -76,6 +78,7 @@ public class AllTypesTest {
         Assert.assertEquals(false, icn.getBoolF());
         Assert.assertEquals(9, icn.getUint32F());
         Assert.assertEquals(10L, icn.getUint64F());
+        Assert.assertEquals(TypeDefEnum.DECIMAL.value(), icn.getEnumT().getNumber());
 	}
 	
 	@Test
@@ -96,6 +99,7 @@ public class AllTypesTest {
 		    .setStringF("world")
 		    .setUint32F(10)
 		    .setUint64F(11L)
+		    .setEnumT(TypeDef.ID)
 		    .build();
 		
 		byte[] bb = icn.toByteArray();
@@ -120,6 +124,7 @@ public class AllTypesTest {
         Assert.assertEquals(true, decode.boolF.booleanValue());
         Assert.assertEquals(10, decode.uint32F.intValue());
         Assert.assertEquals(11L, decode.uint64F.longValue());
+        Assert.assertEquals(TypeDefEnum.ID.value(), decode.typeDefEnum.value());
 		
 	}
 	
@@ -143,6 +148,7 @@ public class AllTypesTest {
         c.stringF = "hello";
         c.uint32F = 9;
         c.uint64F = 10L;
+        c.typeDefEnum = TypeDefEnum.DECIMAL;
         
         byte[] bb = dojoClassProxy.encode(c);
         
@@ -165,6 +171,7 @@ public class AllTypesTest {
         Assert.assertEquals(false, decode.boolF.booleanValue());
         Assert.assertEquals(9, decode.uint32F.intValue());
         Assert.assertEquals(10L, decode.uint64F.longValue());
+        Assert.assertEquals(TypeDefEnum.DECIMAL.value(), decode.typeDefEnum.value());
     }
 	
 }

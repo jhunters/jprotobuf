@@ -362,6 +362,14 @@ public class CodedConstant {
             out.writeUInt32(order, (Integer) o);
         } else if (type == FieldType.UINT64) {
             out.writeUInt64(order, (Long) o);
+        } else if (type == FieldType.ENUM) {
+            int value = 0;
+            if (o instanceof EnumReadable) {
+                value = ((EnumReadable) o).value();
+            } else if (o instanceof Enum) {
+                value = ((Enum) o).ordinal();
+            }
+            out.writeEnum(order, value);
         }
     }
 

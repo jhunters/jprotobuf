@@ -55,5 +55,6 @@ public class AllTypesDojoClassWithDefault {
     public String stringF;
     @Protobuf
     public byte[] bytesF;
-
+    @Protobuf
+    public TypeDefEnum typeDefEnum;
 }

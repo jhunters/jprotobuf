@@ -27,7 +27,7 @@ import com.google.protobuf.WireFormat;
 public enum FieldType {
     
     /**
-     * double type defined in .proto file.
+     * types defined in .proto file.
      */
     DOUBLE  ("Double", "double"     , "WIRETYPE_FIXED64", ".doubleValue()", WireFormat.FieldType.DOUBLE         ),
     FLOAT   ("Float", "float", "WIRETYPE_FIXED32"    ,    ".floatValue()",  WireFormat.FieldType.FLOAT),
