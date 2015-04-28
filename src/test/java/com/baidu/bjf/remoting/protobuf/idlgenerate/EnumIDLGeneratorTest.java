@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 
 import org.junit.Test;
 
@@ -56,7 +55,6 @@ public class EnumIDLGeneratorTest {
         return map;
     }
     
-    @Ignore
     @Test
     public void testBestComplexIDLProxy() throws IOException {
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
@@ -128,7 +126,6 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(idlProxyObject2.get("product_template.template_size.height"), 444);
     }
     
-    @Ignore
     @Test
     public void testComplexIDLProxy() throws IOException {
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
