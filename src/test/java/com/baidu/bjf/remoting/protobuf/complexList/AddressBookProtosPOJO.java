@@ -13,16 +13,21 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- *
+ * 
  * @author xiemalin
- *
+ * 
  */
 public class AddressBookProtosPOJO {
 
-    @Protobuf(fieldType = FieldType.OBJECT, order=1, required = false)
+    @Protobuf(fieldType = FieldType.OBJECT, order = 1, required = false)
     public List<PersonPOJO> list;
 
-    /* (non-Javadoc)
+    @Protobuf(fieldType = FieldType.ENUM, order = 2, required = false)
+    public List<TypeDefEnum> typeList;
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override

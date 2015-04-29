@@ -8,6 +8,115 @@ public final class AddressBookProtos {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
+  /**
+   * Protobuf enum {@code tutorial.TypeDef}
+   */
+  public enum TypeDef
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>TEXT = 1;</code>
+     */
+    TEXT(0, 1),
+    /**
+     * <code>NUMBER = 2;</code>
+     */
+    NUMBER(1, 2),
+    /**
+     * <code>DECIMAL = 4;</code>
+     */
+    DECIMAL(2, 4),
+    /**
+     * <code>ID = 8;</code>
+     */
+    ID(3, 8),
+    /**
+     * <code>URL = 16;</code>
+     */
+    URL(4, 16),
+    ;
+
+    /**
+     * <code>TEXT = 1;</code>
+     */
+    public static final int TEXT_VALUE = 1;
+    /**
+     * <code>NUMBER = 2;</code>
+     */
+    public static final int NUMBER_VALUE = 2;
+    /**
+     * <code>DECIMAL = 4;</code>
+     */
+    public static final int DECIMAL_VALUE = 4;
+    /**
+     * <code>ID = 8;</code>
+     */
+    public static final int ID_VALUE = 8;
+    /**
+     * <code>URL = 16;</code>
+     */
+    public static final int URL_VALUE = 16;
+
+
+    public final int getNumber() { return value; }
+
+    public static TypeDef valueOf(int value) {
+      switch (value) {
+        case 1: return TEXT;
+        case 2: return NUMBER;
+        case 4: return DECIMAL;
+        case 8: return ID;
+        case 16: return URL;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<TypeDef>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<TypeDef>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<TypeDef>() {
+            public TypeDef findValueByNumber(int number) {
+              return TypeDef.valueOf(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(index);
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final TypeDef[] VALUES = values();
+
+    public static TypeDef valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int index;
+    private final int value;
+
+    private TypeDef(int index, int value) {
+      this.index = index;
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:tutorial.TypeDef)
+  }
+
   public interface PersonOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
@@ -1118,6 +1227,20 @@ public final class AddressBookProtos {
      */
     com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.PersonOrBuilder getPersonOrBuilder(
         int index);
+
+    // repeated .tutorial.TypeDef typeDef = 2;
+    /**
+     * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+     */
+    java.util.List<com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef> getTypeDefList();
+    /**
+     * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+     */
+    int getTypeDefCount();
+    /**
+     * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+     */
+    com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef getTypeDef(int index);
   }
   /**
    * Protobuf type {@code tutorial.AddressBook}
@@ -1182,6 +1305,39 @@ public final class AddressBookProtos {
               person_.add(input.readMessage(com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.Person.PARSER, extensionRegistry));
               break;
             }
+            case 16: {
+              int rawValue = input.readEnum();
+              com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef value = com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(2, rawValue);
+              } else {
+                if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+                  typeDef_ = new java.util.ArrayList<com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef>();
+                  mutable_bitField0_ |= 0x00000002;
+                }
+                typeDef_.add(value);
+              }
+              break;
+            }
+            case 18: {
+              int length = input.readRawVarint32();
+              int oldLimit = input.pushLimit(length);
+              while(input.getBytesUntilLimit() > 0) {
+                int rawValue = input.readEnum();
+                com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef value = com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef.valueOf(rawValue);
+                if (value == null) {
+                  unknownFields.mergeVarintField(2, rawValue);
+                } else {
+                  if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+                    typeDef_ = new java.util.ArrayList<com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef>();
+                    mutable_bitField0_ |= 0x00000002;
+                  }
+                  typeDef_.add(value);
+                }
+              }
+              input.popLimit(oldLimit);
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1192,6 +1348,9 @@ public final class AddressBookProtos {
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
           person_ = java.util.Collections.unmodifiableList(person_);
+        }
+        if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
+          typeDef_ = java.util.Collections.unmodifiableList(typeDef_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1260,8 +1419,31 @@ public final class AddressBookProtos {
       return person_.get(index);
     }
 
+    // repeated .tutorial.TypeDef typeDef = 2;
+    public static final int TYPEDEF_FIELD_NUMBER = 2;
+    private java.util.List<com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef> typeDef_;
+    /**
+     * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+     */
+    public java.util.List<com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef> getTypeDefList() {
+      return typeDef_;
+    }
+    /**
+     * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+     */
+    public int getTypeDefCount() {
+      return typeDef_.size();
+    }
+    /**
+     * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+     */
+    public com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef getTypeDef(int index) {
+      return typeDef_.get(index);
+    }
+
     private void initFields() {
       person_ = java.util.Collections.emptyList();
+      typeDef_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1284,6 +1466,9 @@ public final class AddressBookProtos {
       for (int i = 0; i < person_.size(); i++) {
         output.writeMessage(1, person_.get(i));
       }
+      for (int i = 0; i < typeDef_.size(); i++) {
+        output.writeEnum(2, typeDef_.get(i).getNumber());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1296,6 +1481,15 @@ public final class AddressBookProtos {
       for (int i = 0; i < person_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, person_.get(i));
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < typeDef_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeEnumSizeNoTag(typeDef_.get(i).getNumber());
+        }
+        size += dataSize;
+        size += 1 * typeDef_.size();
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1424,6 +1618,8 @@ public final class AddressBookProtos {
         } else {
           personBuilder_.clear();
         }
+        typeDef_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
         return this;
       }
 
@@ -1460,6 +1656,11 @@ public final class AddressBookProtos {
         } else {
           result.person_ = personBuilder_.build();
         }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          typeDef_ = java.util.Collections.unmodifiableList(typeDef_);
+          bitField0_ = (bitField0_ & ~0x00000002);
+        }
+        result.typeDef_ = typeDef_;
         onBuilt();
         return result;
       }
@@ -1500,6 +1701,16 @@ public final class AddressBookProtos {
               personBuilder_.addAllMessages(other.person_);
             }
           }
+        }
+        if (!other.typeDef_.isEmpty()) {
+          if (typeDef_.isEmpty()) {
+            typeDef_ = other.typeDef_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensureTypeDefIsMutable();
+            typeDef_.addAll(other.typeDef_);
+          }
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1774,6 +1985,78 @@ public final class AddressBookProtos {
         return personBuilder_;
       }
 
+      // repeated .tutorial.TypeDef typeDef = 2;
+      private java.util.List<com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef> typeDef_ =
+        java.util.Collections.emptyList();
+      private void ensureTypeDefIsMutable() {
+        if (!((bitField0_ & 0x00000002) == 0x00000002)) {
+          typeDef_ = new java.util.ArrayList<com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef>(typeDef_);
+          bitField0_ |= 0x00000002;
+        }
+      }
+      /**
+       * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+       */
+      public java.util.List<com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef> getTypeDefList() {
+        return java.util.Collections.unmodifiableList(typeDef_);
+      }
+      /**
+       * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+       */
+      public int getTypeDefCount() {
+        return typeDef_.size();
+      }
+      /**
+       * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+       */
+      public com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef getTypeDef(int index) {
+        return typeDef_.get(index);
+      }
+      /**
+       * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+       */
+      public Builder setTypeDef(
+          int index, com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureTypeDefIsMutable();
+        typeDef_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+       */
+      public Builder addTypeDef(com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureTypeDefIsMutable();
+        typeDef_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+       */
+      public Builder addAllTypeDef(
+          java.lang.Iterable<? extends com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef> values) {
+        ensureTypeDefIsMutable();
+        super.addAll(values, typeDef_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated .tutorial.TypeDef typeDef = 2;</code>
+       */
+      public Builder clearTypeDef() {
+        typeDef_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:tutorial.AddressBook)
     }
 
@@ -1807,10 +2090,12 @@ public final class AddressBookProtos {
       "\n\rqiantao.proto\022\010tutorial\"q\n\006Person\022\014\n\004n" +
       "ame\030\001 \002(\t\022\n\n\002id\030\002 \002(\005\022\r\n\005email\030\003 \001(\t\022\017\n\007" +
       "doubleF\030\004 \001(\001\022\016\n\006floatF\030\005 \001(\002\022\016\n\006bytesF\030" +
-      "\006 \001(\014\022\r\n\005boolF\030\007 \001(\010\"/\n\013AddressBook\022 \n\006p" +
-      "erson\030\001 \003(\0132\020.tutorial.PersonB@\n+com.bai" +
-      "du.bjf.remoting.protobuf.complexListB\021Ad" +
-      "dressBookProtos"
+      "\006 \001(\014\022\r\n\005boolF\030\007 \001(\010\"S\n\013AddressBook\022 \n\006p" +
+      "erson\030\001 \003(\0132\020.tutorial.Person\022\"\n\007typeDef" +
+      "\030\002 \003(\0162\021.tutorial.TypeDef*=\n\007TypeDef\022\010\n\004" +
+      "TEXT\020\001\022\n\n\006NUMBER\020\002\022\013\n\007DECIMAL\020\004\022\006\n\002ID\020\010\022" +
+      "\007\n\003URL\020\020B@\n+com.baidu.bjf.remoting.proto" +
+      "buf.complexListB\021AddressBookProtos"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -1828,7 +2113,7 @@ public final class AddressBookProtos {
           internal_static_tutorial_AddressBook_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_tutorial_AddressBook_descriptor,
-              new java.lang.String[] { "Person", });
+              new java.lang.String[] { "Person", "TypeDef", });
           return null;
         }
       };

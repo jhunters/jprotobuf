@@ -243,6 +243,22 @@ public class CodeGenerator {
             String express;
             if (field.getFieldType() ==  FieldType.ENUM) {
                 String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
+                if (isList) {
+                    Type type = field.getField().getGenericType();
+                    if (type instanceof ParameterizedType) {
+                        ParameterizedType ptype = (ParameterizedType) type;
+
+                        Type[] actualTypeArguments = ptype.getActualTypeArguments();
+
+                        if (actualTypeArguments != null && actualTypeArguments.length > 0) {
+                            Type targetType = actualTypeArguments[0];
+                            if (targetType instanceof Class) {
+                                Class cls = (Class) targetType;
+                                clsName = cls.getName().replaceAll("\\$", "."); 
+                            }
+                        }
+                    }
+                }
                 express = "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" 
                         + clsName + ".values()," +  "input.read" + t + "()))";
             } else {
@@ -366,6 +382,22 @@ public class CodeGenerator {
             String express;
             if (field.getFieldType() ==  FieldType.ENUM) {
                 String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
+                if (isList) {
+                    Type type = field.getField().getGenericType();
+                    if (type instanceof ParameterizedType) {
+                        ParameterizedType ptype = (ParameterizedType) type;
+
+                        Type[] actualTypeArguments = ptype.getActualTypeArguments();
+
+                        if (actualTypeArguments != null && actualTypeArguments.length > 0) {
+                            Type targetType = actualTypeArguments[0];
+                            if (targetType instanceof Class) {
+                                Class cls = (Class) targetType;
+                                clsName = cls.getName().replaceAll("\\$", "."); 
+                            }
+                        }
+                    }
+                }
                 express = "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" 
                         + clsName + ".values()," +  "input.read" + t + "()))";
             } else {
