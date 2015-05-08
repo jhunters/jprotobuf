@@ -9,10 +9,11 @@ package com.baidu.bjf.remoting.protobuf.idlgenerate;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
@@ -31,7 +32,11 @@ import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
  * @since 1.4.0
  */
 public class EnumIDLGeneratorTest {
-
+    
+    public List<String> methoda(int a, long b, float c, double d, Map<String, String> map) {
+        return null;
+    }
+    
     @Test
     public void testEnumIDLProxy() throws IOException {
         String idl = ProtobufIDLGenerator.getIDL(EnumPOJOClass.class);
@@ -55,6 +60,7 @@ public class EnumIDLGeneratorTest {
         return map;
     }
     
+    @Ignore
     @Test
     public void testBestComplexIDLProxy() throws IOException {
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
@@ -126,6 +132,7 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(idlProxyObject2.get("product_template.template_size.height"), 444);
     }
     
+    @Ignore
     @Test
     public void testComplexIDLProxy() throws IOException {
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
@@ -163,5 +170,27 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(200, decodeProxyObject.get("userid"));
         Assert.assertEquals(decodeProxyObject.get("head.request_type") + "", "USER_DEFINED");
         Assert.assertEquals(decodeProxyObject.get("head.appid") + "", "DSP");
+    }
+    
+    @Ignore
+    @Test
+    public void testComplexIDLProxyOnError() throws IOException {
+        Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
+        
+        boolean containsKey = map.containsKey("ProductAuditRejectRequest");
+        Assert.assertTrue(containsKey);
+        
+        IDLProxyObject idlProxyObject;
+        
+        idlProxyObject = map.get("ProductAuditRejectRequest");
+        
+        // this field name not exist should throw exception
+        
+        try {
+            idlProxyObject.get("userid_notexist");
+            Assert.fail();
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
     }
 }
