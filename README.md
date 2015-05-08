@@ -14,6 +14,8 @@ jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言
 
 #####1.5.0 @Protobuf 支持枚举类型，详见下面使用说明。#####
 
+#####1.6.0 ProtobufIDLProxy增加对默认值的支持。#####
+
 #####关联项目：#####
 JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
 访问地址： [https://github.com/Baidu-ecom/Jprotobuf-rpc-socket](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket)<br>
@@ -25,7 +27,7 @@ JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.5.8</version>
+  <version>1.6.0</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
