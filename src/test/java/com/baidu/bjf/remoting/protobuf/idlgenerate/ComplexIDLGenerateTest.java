@@ -21,10 +21,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
-import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
-import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
@@ -139,25 +136,6 @@ public class ComplexIDLGenerateTest {
         for (Field field : fields) {
             System.out.println(field.getTag());
         }
-    }
-    
-    @Test
-    public void testDefaultValue() {
-        
-        String idl = "package tutorial;" +
-            "option java_package = \"com.example.tutorial\";" +
-            "option java_outer_classname = \"AddressBookProtos\";" +
-            "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
-            " message PhoneNumber {" +
-                "optional PhoneType type = 2 [default = HOME];" +
-          "}"; 
-        
-        IDLProxyObject idlProxyObject = ProtobufIDLProxy.createSingle(idl);
-        
-        Object type = idlProxyObject.get("type");
-        
-        Assert.assertEquals(type + "", "HOME");
-        
     }
     
     
