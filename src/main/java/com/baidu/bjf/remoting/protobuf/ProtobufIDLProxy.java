@@ -232,7 +232,7 @@ public class ProtobufIDLProxy {
             count++;
         }
 
-        if (!multi && count > 1) {
+        if (!multi && count != 1) {
             throw new RuntimeException("Only one message defined allowed in '.proto' IDL");
         }
 
@@ -447,7 +447,25 @@ public class ProtobufIDLProxy {
 
             // define field
             code.append("public ").append(javaType);
-            code.append(" ").append(field.getName()).append(CODE_END);
+            code.append(" ").append(field.getName());
+            
+            // check if has default
+            Option defaultOption = Option.findByName(field.getOptions(), "default");
+            if (defaultOption != null) {
+                code.append("=");
+                Object defaultValue = defaultOption.getValue();
+                // if is enum type
+                if (defaultValue instanceof Value) {
+                    Value enumValue = (Value) defaultValue;
+                    code.append(javaType).append(".").append(enumValue.getName());
+                } else if (defaultValue instanceof String) {
+                    code.append("\"").append(defaultValue).append("\"");
+                } else {
+                    code.append(String.valueOf(defaultValue));
+                }
+            }
+            
+            code.append(CODE_END);
         }
         
         // to check if has nested classes
@@ -538,6 +556,7 @@ public class ProtobufIDLProxy {
             code.append(", required=true");
         }
         code.append(")\n");
+        
     }
 
     private static Class checkClass(ProtoFile protoFile, Type type) {
