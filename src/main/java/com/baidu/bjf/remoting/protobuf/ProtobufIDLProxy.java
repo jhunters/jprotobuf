@@ -29,6 +29,7 @@ import java.util.Set;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
+import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.squareup.protoparser.EnumType;
 import com.squareup.protoparser.EnumType.Value;
 import com.squareup.protoparser.MessageType;
@@ -316,6 +317,38 @@ public class ProtobufIDLProxy {
                 }
             }
         }
+        
+        // if cds is not empty guess there is some message dependency is not available. so error idl protobuf defined?
+        if (!cds.isEmpty()) {
+            Set<String> guessLoadedClass = new HashSet<String>(compiledClass);
+            iterator = cds.iterator();
+            while (iterator.hasNext()) {
+                guessLoadedClass.add(iterator.next().name);
+            }
+            
+            // to check while message's dependency is missed
+            iterator = cds.iterator();
+            while (iterator.hasNext()) {
+                CodeDependent next = iterator.next();
+                if (!next.isDepndency()) {
+                    continue;
+                }
+                
+                if (guessLoadedClass.containsAll(next.dependencies)) {
+                    continue;
+                }
+                
+                for (String dependClass : next.dependencies) {
+                    if (!guessLoadedClass.contains(dependClass)) {
+                        throw new RuntimeException("Message '" 
+                                + StringUtils.removeEnd(next.name, DEFAULT_SUFFIX_CLASSNAME) + "' depend on message '" 
+                                + StringUtils.removeEnd(dependClass, DEFAULT_SUFFIX_CLASSNAME) + "' is missed");
+                    }
+                }
+            }
+            
+        }
+        
         return null;
     }
     

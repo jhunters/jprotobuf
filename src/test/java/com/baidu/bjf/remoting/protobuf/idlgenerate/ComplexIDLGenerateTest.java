@@ -149,7 +149,9 @@ public class ComplexIDLGenerateTest {
             "option java_outer_classname = \"AddressBookProtos\";" +
             "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
             " message PhoneNumber {" +
-                "optional PhoneType type = 2 [default = HOME];" +
+                "optional PhoneType type = 1 [default = HOME];" +
+                "optional int32 name = 2 [default = 10];" +
+                "optional string vName = 3 [default = \"hello world\"];" +
           "}"; 
         
         IDLProxyObject idlProxyObject = ProtobufIDLProxy.createSingle(idl);
@@ -157,7 +159,30 @@ public class ComplexIDLGenerateTest {
         Object type = idlProxyObject.get("type"); 
         
         Assert.assertEquals(type + "", "HOME");
+        Assert.assertEquals(10, idlProxyObject.get("name"));
+        Assert.assertEquals("hello world", idlProxyObject.get("vName"));
         
+    }
+    
+    @Test
+    public void testMessageDependencyMissException() {
+        
+        String idl = "package tutorial;" +
+            "option java_package = \"com.example.tutorial\";" +
+            "option java_outer_classname = \"AddressBookProtos\";" +
+            "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
+            " message PhoneNumber {" +
+                "optional PhoneType type = 1 [default = HOME];" +
+                "optional int32 name = 2 [default = 10];" +
+                "optional String vName = 3 [default = \"hello world\"];" +
+          "}"; 
+        
+        try {
+            ProtobufIDLProxy.createSingle(idl);
+            Assert.fail();
+        } catch (Exception e) {
+            Assert.assertNotNull(e);
+        }
     }
     
     

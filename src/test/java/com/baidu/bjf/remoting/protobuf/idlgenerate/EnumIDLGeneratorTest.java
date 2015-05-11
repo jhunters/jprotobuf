@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
@@ -59,6 +60,7 @@ public class EnumIDLGeneratorTest {
         return map;
     }
     
+    @Ignore
     @Test
     public void testBestComplexIDLProxy() throws IOException {
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
@@ -130,6 +132,7 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(idlProxyObject2.get("product_template.template_size.height"), 444);
     }
     
+    @Ignore
     @Test
     public void testComplexIDLProxy() throws IOException {
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
@@ -169,6 +172,7 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(decodeProxyObject.get("head.appid") + "", "DSP");
     }
     
+    @Ignore
     @Test
     public void testComplexIDLProxyOnError() throws IOException {
         Map<String, IDLProxyObject> map = initialFromProtofile("si_product_biz.proto");
