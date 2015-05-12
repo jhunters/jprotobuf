@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -100,18 +101,25 @@ public class CodedConstant {
      *            is field type is a {@link List}
      * @return full java expression
      */
-    public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, boolean debug) {
+    public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, 
+            boolean debug, File path) {
         String fieldName = getFieldName(order);
+        
+        String spath = "null";
+        if (path != null) {
+            spath = "new java.io.File(\"" + path.getAbsolutePath().replace('\\', '/') + "\")";
+        }
+        
         if (isList) {
             String typeString = type.getType().toUpperCase();
             return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." 
-                    + typeString + "," + Boolean.valueOf(debug) + ");\n";
+                    + typeString + "," + Boolean.valueOf(debug) + "," + spath + ");\n";
         }
 
         if (type == FieldType.OBJECT) {
             String typeString = type.getType().toUpperCase();
             return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + "," 
-                    + Boolean.valueOf(debug) + ");\n";
+                    + Boolean.valueOf(debug) + "," + spath + ");\n";
         }
 
         String t = type.getType();
@@ -146,14 +154,14 @@ public class CodedConstant {
      *            field type of list object
      * @return full java expression
      */
-    public static int computeListSize(int order, List list, FieldType type, boolean debug) {
+    public static int computeListSize(int order, List list, FieldType type, boolean debug, File path) {
         int size = 0;
         if (list == null) {
             return size;
         }
 
         for (Object object : list) {
-            size += computeSize(order, object, type, debug);
+            size += computeSize(order, object, type, debug, path);
         }
         if (type != FieldType.OBJECT) {
             size += list.size() * CodedOutputStream.computeTagSize(order);
@@ -169,8 +177,8 @@ public class CodedConstant {
      * @param type
      * @return
      */
-    public static int computeSize(int order, Object o, FieldType type, boolean debug) {
-        return computeSize(order, o, type, false, debug);
+    public static int computeSize(int order, Object o, FieldType type, boolean debug, File path) {
+        return computeSize(order, o, type, false, debug, path);
     }
 
     /**
@@ -180,7 +188,7 @@ public class CodedConstant {
      * @param type
      * @return
      */
-    public static int computeSize(int order, Object o, FieldType type, boolean list, boolean debug) {
+    public static int computeSize(int order, Object o, FieldType type, boolean list, boolean debug, File path) {
         int size = 0;
         if (o == null) {
             return size;
@@ -188,7 +196,7 @@ public class CodedConstant {
 
         if (type == FieldType.OBJECT) {
             Class cls = o.getClass();
-            Codec target = ProtobufProxy.create(cls, debug);
+            Codec target = ProtobufProxy.create(cls, debug, path);
             try {
                 size = target.size(o);
                 size = size + CodedOutputStream.computeRawVarint32Size(size);

@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.simpletypes;
 
+import java.io.File;
 import java.io.IOException;
 
 import junit.framework.Assert;

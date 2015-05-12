@@ -15,6 +15,8 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
@@ -39,6 +41,7 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 public final class ProtobufProxy {
 
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
+    private static final Map<String, Byte[]> CACHED_CLASS_FILE = new HashMap<String, Byte[]>();
     
     
     /**
@@ -98,7 +101,27 @@ public final class ProtobufProxy {
      * @return
      */
     public static <T> Codec<T> create(Class<T> cls) {
-        return create(cls, false);
+        return create(cls, false, null);
+    }
+    
+    
+    /**
+     * @param cls target class to be compiled
+     * @param compiledOutputStream compile byte files output stream
+     */
+    public static void Compile(Class<?> cls, File outputPath) {
+        if (outputPath == null) {
+            throw new NullPointerException("Param 'outputPath' is null.");
+        }
+        if (!outputPath.isDirectory()) {
+            throw new RuntimeException("Param 'outputPath' value should be a path directory.");
+        }
+        
+
+    }
+    
+    public static <T> Codec<T> create(Class<T> cls, boolean debug) {
+        return create(cls, debug, null);
     }
     
     /**
@@ -111,9 +134,14 @@ public final class ProtobufProxy {
      * @param debug true will print generate java source code
      * @return proxy instance object.
      */
-    public static <T> Codec<T> create(Class<T> cls, boolean debug) {
+    public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
+        }
+        if (path != null) {
+            if (!path.isDirectory()) {
+                throw new RuntimeException("Param 'path' value should be a path directory.");
+            }
         }
 
         String uniClsName = cls.getName();
@@ -124,6 +152,7 @@ public final class ProtobufProxy {
 
         CodeGenerator cg = getCodeGenerator(cls);
         cg.setDebug(debug);
+        cg.setOutputPath(path);
 
         // try to load first
         String className = cg.getFullClassName();
@@ -150,7 +179,37 @@ public final class ProtobufProxy {
         if (debug) {
             CodePrinter.printCode(code, "generate protobuf proxy code");
         }
-        Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader());
+        
+        FileOutputStream fos = null;
+        if (path != null) {
+            String pkg = "";
+            Package pk = cls.getPackage();
+            if (pk != null) {
+                pkg = pk.getName();
+            }
+            // mkdirs
+            String dir = path + File.separator + pkg.replace('.', File.separatorChar);
+            File f = new File(dir);
+            f.mkdirs();
+            
+            try {
+                fos = new FileOutputStream(new File(f, cg.getClassName() + ".class"));
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            
+        }
+        
+        Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader(), fos);
+        
+        if (fos != null) {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+        
         try {
             Codec<T> newInstance = (Codec<T>) newClass.newInstance();
             if (!CACHED.containsKey(uniClsName)) {

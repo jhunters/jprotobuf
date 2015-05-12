@@ -15,6 +15,8 @@
  */
 package com.baidu.bjf.remoting.protobuf.utils.compiler;
 
+import java.io.OutputStream;
+
 /**
  * Compiler.
  * 
@@ -32,6 +34,6 @@ public interface Compiler {
      *            TODO
      * @return Compiled class
      */
-    Class<?> compile(String code, ClassLoader classLoader);
+    Class<?> compile(String code, ClassLoader classLoader, OutputStream os);
 
 }

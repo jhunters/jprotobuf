@@ -104,7 +104,7 @@ public class JdkCompiler extends AbstractCompiler {
     }
 
     @Override
-    public Class<?> doCompile(String name, String sourceCode) throws Throwable {
+    public Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
         int i = name.lastIndexOf('.');
         String packageName = i < 0 ? "" : name.substring(0, i);
         String className = i < 0 ? name : name.substring(i + 1);
@@ -117,7 +117,14 @@ public class JdkCompiler extends AbstractCompiler {
             throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: "
                     + diagnosticCollector.getDiagnostics());
         }
-        return classLoader.loadClass(name);
+        Class<?> retClass = classLoader.loadClass(name);
+        
+         byte[] bytes = classLoader.loadClassBytes(name);
+        if (os != null && bytes != null) {
+            os.write(bytes);
+            os.flush();
+        }
+        return retClass;
     }
 
     private final class ClassLoaderImpl extends ClassLoader {
@@ -130,6 +137,15 @@ public class JdkCompiler extends AbstractCompiler {
 
         Collection<JavaFileObject> files() {
             return Collections.unmodifiableCollection(classes.values());
+        }
+        
+        public byte[] loadClassBytes(final String qualifiedClassName) {
+            JavaFileObject file = classes.get(qualifiedClassName);
+            if (file != null) {
+                byte[] bytes = ((JavaFileObjectImpl) file).getByteCode();
+                return bytes;
+            }
+            return null;
         }
 
         @Override
@@ -210,6 +226,9 @@ public class JdkCompiler extends AbstractCompiler {
         }
 
         public byte[] getByteCode() {
+            if (bytecode == null) {
+                return null;
+            }
             return bytecode.toByteArray();
         }
     }
@@ -302,5 +321,6 @@ public class JdkCompiler extends AbstractCompiler {
             return files;
         }
     }
+
 
 }

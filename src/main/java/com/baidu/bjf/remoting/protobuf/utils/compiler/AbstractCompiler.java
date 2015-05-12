@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.utils.compiler;
 
+import java.io.OutputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,7 +35,7 @@ public abstract class AbstractCompiler implements Compiler {
     
     private static final Pattern ENUM_PATTERN = Pattern.compile("enum\\s+([$_a-zA-Z][$_a-zA-Z0-9]*)\\s+");
 
-    public Class<?> compile(String code, ClassLoader classLoader) {
+    public Class<?> compile(String code, ClassLoader classLoader, OutputStream os) {
         code = code.trim();
         Matcher matcher = PACKAGE_PATTERN.matcher(code);
         String pkg;
@@ -63,7 +64,7 @@ public abstract class AbstractCompiler implements Compiler {
                 throw new IllegalStateException("The java code not endsWith \"}\", code: \n" + code + "\n");
             }
             try {
-                return doCompile(className, code);
+                return doCompile(className, code, os);
             } catch (RuntimeException t) {
                 throw t;
             } catch (Throwable t) {
@@ -73,6 +74,6 @@ public abstract class AbstractCompiler implements Compiler {
         }
     }
 
-    protected abstract Class<?> doCompile(String name, String source) throws Throwable;
+    protected abstract Class<?> doCompile(String name, String source, OutputStream os) throws Throwable;
 
 }

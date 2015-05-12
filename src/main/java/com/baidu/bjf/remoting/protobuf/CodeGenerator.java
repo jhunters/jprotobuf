@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -52,7 +53,17 @@ public class CodeGenerator {
     private List<FieldInfo> fields;
     
     private boolean debug = false;
+    private File outputPath;
     
+
+    /**
+     * set outputPath value to outputPath
+     * @param outputPath the outputPath to set
+     */
+    public void setOutputPath(File outputPath) {
+        this.outputPath = outputPath;
+    }
+
     /**
      * get the debug
      * @return the debug
@@ -279,7 +290,16 @@ public class CodeGenerator {
                             code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                             if (debug) {
                                 code.append(", true");
+                            } else {
+                                code.append(", false");
                             }
+                            
+                            String spath = "null";
+                            if (outputPath != null) {
+                                spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
+                            }
+                            code.append(",").append(spath);
+                            
                             code.append(");\n");
                             code.append("int length = input.readRawVarint32();\n");
                             code.append("final int oldLimit = input.pushLimit(length);\n");
@@ -295,7 +315,15 @@ public class CodeGenerator {
                 code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                 if (debug) {
                     code.append(", true");
+                } else {
+                    code.append(", false");
                 }
+                
+                String spath = "null";
+                if (outputPath != null) {
+                    spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
+                }
+                code.append(",").append(spath);
                 code.append(");\n");
                 code.append("int length = input.readRawVarint32();\n");
                 code.append("final int oldLimit = input.pushLimit(length);\n");
@@ -419,7 +447,15 @@ public class CodeGenerator {
                             code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                             if (debug) {
                                 code.append(", true");
+                            } else {
+                                code.append(", false");
                             }
+                            
+                            String spath = "null";
+                            if (outputPath != null) {
+                                spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
+                            }
+                            code.append(",").append(spath);
                             code.append(");\n");
                             code.append("int length = input.readRawVarint32();\n");
                             code.append("final int oldLimit = input.pushLimit(length);\n");
@@ -435,7 +471,15 @@ public class CodeGenerator {
                 code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                 if (debug) {
                     code.append(", true");
+                } else {
+                    code.append(", false");
                 }
+                
+                String spath = "null";
+                if (outputPath != null) {
+                    spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
+                }
+                code.append(",").append(spath);
                 code.append(");\n");
                 
                 code.append("int length = input.readRawVarint32();\n");
@@ -569,7 +613,8 @@ public class CodeGenerator {
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
                     .append("))\n");
             code.append("{\nsize+=");
-            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList, debug));
+            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), 
+                    field.getFieldType(), isList, debug, outputPath));
             code.append("}\n");
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));
@@ -667,7 +712,8 @@ public class CodeGenerator {
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
                     .append("))\n");
             code.append("{\nsize+=");
-            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList, debug));
+            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), 
+                    field.getFieldType(), isList, debug, outputPath));
             code.append("}\n");
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));

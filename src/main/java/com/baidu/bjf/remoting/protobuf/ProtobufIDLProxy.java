@@ -199,7 +199,7 @@ public class ProtobufIDLProxy {
                 throw new RuntimeException(e.getMessage(), e);
             }
 
-            Codec codec = ProtobufProxy.create(cls, debug);
+            Codec codec = ProtobufProxy.create(cls, debug, null);
             IDLProxyObject idlProxyObject = new IDLProxyObject(codec, newInstance, cls);
 
             String name = cls.getSimpleName();
@@ -264,7 +264,7 @@ public class ProtobufIDLProxy {
             }
             
             JDKCompilerHelper.COMPILER.compile(cd.code,
-                    ProtobufIDLProxy.class.getClassLoader());
+                    ProtobufIDLProxy.class.getClassLoader(), null);
             compiledClass.add(cd.name);
             // all enum type class will be ingored to use directly 
             
@@ -289,7 +289,7 @@ public class ProtobufIDLProxy {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
             Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code,
-                    ProtobufIDLProxy.class.getClassLoader());
+                    ProtobufIDLProxy.class.getClassLoader(), null);
             ret.add(newClass);
         }
         
