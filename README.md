@@ -16,6 +16,8 @@ jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言
 
 #####1.6.0 ProtobufIDLProxy增加对默认值的支持。#####
 
+#####1.6.3 ProtobufProxy和ProtobufIDLProxy增加生成中间编译java子节码文件功能。，详见下面使用说明。#####
+
 #####关联项目：#####
 JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
 访问地址： [https://github.com/Baidu-ecom/Jprotobuf-rpc-socket](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket)<br>
@@ -27,7 +29,7 @@ JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.6.1</version>
+  <version>1.6.3</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
@@ -302,6 +304,19 @@ public enum EnumAttrPOJO implements EnumReadable {
 
 
 ```
+
+###   ProtobufProxy增加生成中间编译java子节码文件功能 ###
+
+使用示例：
+
+```java
+ProtobufProxy.create(AddressBookProtosPOJO.class, false, new File("D:/"));
+
+ProtobufIDLProxy.create(string, false， new File("D:/"));
+
+```
+上面的示例，则会直接把生成的中间子节码文件生成到D盘根据目录下。
+
 
 注：目前ProtobufIDLProxy已经能完全支持含有内部类或内部枚举类型的message的动态解析。
 
