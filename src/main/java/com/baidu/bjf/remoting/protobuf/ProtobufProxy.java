@@ -31,6 +31,7 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
+import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 /**
  * Proxy tools for protobuf.
@@ -183,10 +184,10 @@ public final class ProtobufProxy {
         FileOutputStream fos = null;
         if (path != null) {
             String pkg = "";
-            Package pk = cls.getPackage();
-            if (pk != null) {
-                pkg = pk.getName();
+            if (className.indexOf('.') != -1) {
+                pkg = StringUtils.substringBeforeLast(className, ".");
             }
+            
             // mkdirs
             String dir = path + File.separator + pkg.replace('.', File.separatorChar);
             File f = new File(dir);
