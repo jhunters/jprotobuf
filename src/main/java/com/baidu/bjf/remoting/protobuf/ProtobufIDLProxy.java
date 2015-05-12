@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -129,9 +130,13 @@ public class ProtobufIDLProxy {
     }
     
     public static IDLProxyObject createSingle(String data, boolean debug) {
+        return createSingle(data, debug, null);
+    }
+    
+    public static IDLProxyObject createSingle(String data, boolean debug, File path) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path);
         return map.entrySet().iterator().next().getValue();
     }
 
@@ -140,9 +145,13 @@ public class ProtobufIDLProxy {
     }
     
     public static IDLProxyObject createSingle(InputStream is, boolean debug) throws IOException {
+        return createSingle(is, false, null); 
+    }
+    
+    public static IDLProxyObject createSingle(InputStream is, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path);
         return map.entrySet().iterator().next().getValue();
     }
 
@@ -151,9 +160,13 @@ public class ProtobufIDLProxy {
     }
     
     public static IDLProxyObject createSingle(Reader reader, boolean debug) throws IOException {
+        return createSingle(reader, debug, null);
+    }
+    
+    public static IDLProxyObject createSingle(Reader reader, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path);
         return map.entrySet().iterator().next().getValue();
     }
 
@@ -162,8 +175,12 @@ public class ProtobufIDLProxy {
     }
     
     public static Map<String, IDLProxyObject> create(String data, boolean debug) {
+        return create(data, debug, null);
+    }
+    
+    public static Map<String, IDLProxyObject> create(String data, boolean debug, File path) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
-        return doCreate(protoFile, true, debug);
+        return doCreate(protoFile, true, debug, path);
     }
 
     public static Map<String, IDLProxyObject> create(InputStream is) throws IOException {
@@ -171,8 +188,12 @@ public class ProtobufIDLProxy {
     }
     
     public static Map<String, IDLProxyObject> create(InputStream is, boolean debug) throws IOException {
+        return create(is, debug, null);
+    }
+    
+    public static Map<String, IDLProxyObject> create(InputStream is, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
-        return doCreate(protoFile, true, debug);
+        return doCreate(protoFile, true, debug, path);
     }
 
     public static Map<String, IDLProxyObject> create(Reader reader) throws IOException {
@@ -180,11 +201,15 @@ public class ProtobufIDLProxy {
     }
     
     public static Map<String, IDLProxyObject> create(Reader reader, boolean debug) throws IOException {
+        return create(reader, debug, null);
+    }
+    
+    public static Map<String, IDLProxyObject> create(Reader reader, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
-        return doCreate(protoFile, true, debug);
+        return doCreate(protoFile, true, debug, path);
     }
 
-    private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug) {
+    private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug, File path) {
 
         List<Class> list = createClass(protoFile, multi, debug);
         Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
@@ -199,7 +224,7 @@ public class ProtobufIDLProxy {
                 throw new RuntimeException(e.getMessage(), e);
             }
 
-            Codec codec = ProtobufProxy.create(cls, debug, null);
+            Codec codec = ProtobufProxy.create(cls, debug, path);
             IDLProxyObject idlProxyObject = new IDLProxyObject(codec, newInstance, cls);
 
             String name = cls.getSimpleName();
