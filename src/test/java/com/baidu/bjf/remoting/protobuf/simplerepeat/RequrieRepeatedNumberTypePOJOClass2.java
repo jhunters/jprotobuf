@@ -21,4 +21,5 @@ public class RequrieRepeatedNumberTypePOJOClass2 {
 
     @Protobuf(fieldType = FieldType.INT32, order = 1, required = false)
     public List<Integer> list1;
+    
 }

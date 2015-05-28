@@ -19,4 +19,15 @@ message Person {
 // Our address book file is just one of these.
 message AddressBook {
   repeated Person person = 1;
+  
+  repeated TypeDef typeDef = 2;
+
+}
+
+  enum TypeDef {
+    TEXT = 1;
+    NUMBER = 2;
+    DECIMAL = 4;
+    ID = 8;
+    URL = 16;
 }

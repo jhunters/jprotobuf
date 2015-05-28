@@ -36,11 +36,11 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 @Inherited
 @Documented
 public @interface Protobuf {
+    
     /**
      * <pre>
      * Specifying Field Rules to <code>required</code> or <code>optional</code> 
      * default is false. <code>optional</code>
-     * Note: repeated is not supported now.
      * </pre>
      * 
      * @return Specifying Field Rules

@@ -39,8 +39,7 @@ public class ProtobufIDLGenerator {
     /**
      * get IDL content from class.
      * 
-     * @param cls
-     *            target protobuf class to parse
+     * @param cls target protobuf class to parse
      * @return protobuf IDL content in string
      */
     public static String getIDL(Class<?> cls) {
@@ -68,7 +67,7 @@ public class ProtobufIDLGenerator {
      * @return sub message class list
      */
     private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes,
-        Set<Class<?>> cachedEnumTypes) {
+            Set<Class<?>> cachedEnumTypes) {
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
         if (fields.isEmpty()) {
             throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
@@ -118,8 +117,11 @@ public class ProtobufIDLGenerator {
                 }
             } else {
                 String type = field.getFieldType().getType().toLowerCase();
-                
-                if (field.getFieldType() == FieldType.ENUM) {
+                String fieldRequired = getFieldRequired(field.isRequired());
+
+                if (CodeGenerator.isListType(field.getField())) {
+                    fieldRequired = "repeated";
+                } else if (field.getFieldType() == FieldType.ENUM) {
                     // if enum type
                     Class c = field.getField().getType();
                     if (Enum.class.isAssignableFrom(c)) {
@@ -131,9 +133,8 @@ public class ProtobufIDLGenerator {
                     }
                 }
 
-                code.append(getFieldRequired(field.isRequired())).append(" ")
-                        .append(type).append(" ")
-                        .append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
+                code.append(fieldRequired).append(" ").append(type).append(" ").append(field.getField().getName())
+                        .append("=").append(field.getOrder()).append(";\n");
             }
 
         }
