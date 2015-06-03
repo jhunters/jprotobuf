@@ -171,8 +171,10 @@ public class CodeGenerator {
      * 
      * @param code
      */
-    private void genPackageCode(StringBuilder code) {
-        code.append("package " + getPackage() + ";\n");
+        if (getPackage().length() >  0) {
+            code.append("package " + getPackage() + ";\n");
+        }
+        
     }
 
     /**
@@ -212,8 +214,10 @@ public class CodeGenerator {
         code.append("import java.lang.reflect.*;\n");
         code.append("import com.baidu.bjf.remoting.protobuf.*;\n");
         code.append("import java.util.*;\n");
-
-        code.append("import ").append(cls.getName().replaceAll("\\$", ".")).append(";\n");
+        
+        if (getPackage().length() >  0) {
+            code.append("import ").append(cls.getName().replaceAll("\\$", ".")).append(";\n");
+        }
     }
 
     /**
