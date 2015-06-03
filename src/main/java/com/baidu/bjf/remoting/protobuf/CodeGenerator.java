@@ -171,6 +171,7 @@ public class CodeGenerator {
      * 
      * @param code
      */
+    private void genPackageCode(StringBuilder code) { 
         if (getPackage().length() >  0) {
             code.append("package " + getPackage() + ";\n");
         }
