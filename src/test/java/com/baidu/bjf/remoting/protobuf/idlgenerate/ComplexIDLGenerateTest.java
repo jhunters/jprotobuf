@@ -30,6 +30,7 @@ import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
+import com.baidu.bjf.remoting.protobuf.simplerepeat.RequrieRepeatedNumberTypePOJOClass2;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.squareup.protoparser.MessageType;
@@ -200,5 +201,12 @@ public class ComplexIDLGenerateTest {
         String code = ProtobufIDLGenerator.getIDL(EnumPOJOClass.class);
         Assert.assertNotNull(code);
         
+    }
+    
+    @Test
+    public void testListIDLGenerate() {
+        String code = ProtobufIDLGenerator.getIDL(RequrieRepeatedNumberTypePOJOClass2.class);
+        
+        Assert.assertTrue(code.indexOf("repeated int32") != -1);
     }
 }
