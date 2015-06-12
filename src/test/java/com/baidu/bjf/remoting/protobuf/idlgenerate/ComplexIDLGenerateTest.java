@@ -209,4 +209,14 @@ public class ComplexIDLGenerateTest {
         
         Assert.assertTrue(code.indexOf("repeated int32") != -1);
     }
+    
+    @Test
+    public void testEmptyClass() {
+        String code = ProtobufIDLGenerator.getIDL(EmptyClass.class);
+        Assert.assertTrue(code.indexOf("message") !=  -1);
+    }
+    
+    private static class EmptyClass {
+        
+    }
 }

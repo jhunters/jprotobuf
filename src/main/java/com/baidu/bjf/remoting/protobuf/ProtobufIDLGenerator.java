@@ -70,10 +70,6 @@ public class ProtobufIDLGenerator {
     private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes,
         Set<Class<?>> cachedEnumTypes) {
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
-        if (fields.isEmpty()) {
-            throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
-                    + Protobuf.class.getName());
-        }
 
         Set<Class<?>> subTypes = new HashSet<Class<?>>();
         Set<Class<Enum>> enumTypes = new HashSet<Class<Enum>>();
