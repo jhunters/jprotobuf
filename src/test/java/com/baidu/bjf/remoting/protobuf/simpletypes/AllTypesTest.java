@@ -15,7 +15,6 @@
  */
 package com.baidu.bjf.remoting.protobuf.simpletypes;
 
-import java.io.File;
 import java.io.IOException;
 
 import junit.framework.Assert;
@@ -126,7 +125,18 @@ public class AllTypesTest {
         Assert.assertEquals(10, decode.uint32F.intValue());
         Assert.assertEquals(11L, decode.uint64F.longValue());
         Assert.assertEquals(TypeDefEnum.ID.value(), decode.typeDefEnum.value());
-		
+        
+        Codec<AllTypesPrimitivePojoClass> pojoClassProxy = ProtobufProxy.create(AllTypesPrimitivePojoClass.class);
+        AllTypesPrimitivePojoClass decode2 = pojoClassProxy.decode(bb);
+        boolean r =
+                decode2.check(decode.doubleF, decode.floatF, decode.int32F, decode.int64F, decode.uint32F,
+                        decode.uint64F, decode.sint32F, decode.sint64F, decode.fixed32F, decode.fixed64F,
+                        decode.sfixed32F, decode.sfixed64F, decode.boolF, decode.stringF, decode.bytesF,
+                        decode.typeDefEnum);
+        System.out.println(r);
+        Assert.assertTrue(r);
+        
+        
 	}
 	
 	@Test
