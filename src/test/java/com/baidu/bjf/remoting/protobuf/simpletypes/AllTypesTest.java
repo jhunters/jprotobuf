@@ -133,7 +133,6 @@ public class AllTypesTest {
                         decode.uint64F, decode.sint32F, decode.sint64F, decode.fixed32F, decode.fixed64F,
                         decode.sfixed32F, decode.sfixed64F, decode.boolF, decode.stringF, decode.bytesF,
                         decode.typeDefEnum);
-        System.out.println(r);
         Assert.assertTrue(r);
         
         

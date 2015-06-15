@@ -59,8 +59,7 @@ public class ProtobufProxyUtils {
     /**
      * to process default value of <code>@Protobuf</code> value on field.
      * 
-     * @param fields
-     *            all field to process
+     * @param fields all field to process
      * @return list of fields
      */
     public static List<FieldInfo> processDefaultValue(List<Field> fields) {
@@ -78,6 +77,16 @@ public class ProtobufProxyUtils {
                 throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
             }
 
+            // check field is support for protocol buffer
+            // any array except byte array is not support
+            String simpleName = field.getType().getName();
+            if (simpleName.startsWith("[")) {
+                if (!simpleName.equals(byte[].class.getName())) {
+                    throw new RuntimeException("Array type of field '" + field.getName() + "' on class '"
+                            + field.getDeclaringClass().getName() + "' is not support,  please use List instead.");
+                }
+            }
+
             FieldInfo fieldInfo = new FieldInfo();
             fieldInfo.setField(field);
             fieldInfo.setRequired(protobuf.required());
@@ -87,7 +96,7 @@ public class ProtobufProxyUtils {
             if (protobuf.fieldType() == FieldType.DEFAULT) {
                 FieldType fieldType = TYPE_MAPPING.get(field.getType());
                 if (fieldType == null) {
-                    // check if type is enum 
+                    // check if type is enum
                     if (Enum.class.isAssignableFrom(field.getType())) {
                         fieldType = FieldType.ENUM;
                     } else {

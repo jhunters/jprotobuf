@@ -43,8 +43,7 @@ public final class ProtobufProxy {
 
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
     private static final Map<String, Byte[]> CACHED_CLASS_FILE = new HashMap<String, Byte[]>();
-    
-    
+
     /**
      * To generate a protobuf proxy java source code for target class.
      * 
@@ -63,21 +62,22 @@ public final class ProtobufProxy {
         if (charset == null) {
             charset = Charset.defaultCharset();
         }
-        
+
         CodeGenerator cg = getCodeGenerator(cls);
         String code = cg.getCode();
-        
+
         os.write(code.getBytes(charset));
     }
 
     private static CodeGenerator getCodeGenerator(Class cls) {
         // check if has default constructor
-        
+
         if (!cls.isMemberClass()) {
             try {
                 cls.getConstructor(new Class<?>[0]);
             } catch (NoSuchMethodException e2) {
-                throw new IllegalArgumentException("Class must has default constructor method with no parameters.", e2);
+                throw new IllegalArgumentException("Class '" + cls.getName()
+                        + "' must has default constructor method with no parameters.", e2);
             } catch (SecurityException e2) {
                 throw new IllegalArgumentException(e2.getMessage(), e2);
             }
@@ -91,12 +91,13 @@ public final class ProtobufProxy {
 
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
         CodeGenerator cg = new CodeGenerator(fieldInfos, cls);
-        
+
         return cg;
     }
-    
+
     /**
      * To create a protobuf proxy class for target class.
+     * 
      * @param <T>
      * @param cls
      * @return
@@ -104,8 +105,7 @@ public final class ProtobufProxy {
     public static <T> Codec<T> create(Class<T> cls) {
         return create(cls, false, null);
     }
-    
-    
+
     /**
      * @param cls target class to be compiled
      * @param compiledOutputStream compile byte files output stream
@@ -117,21 +117,18 @@ public final class ProtobufProxy {
         if (!outputPath.isDirectory()) {
             throw new RuntimeException("Param 'outputPath' value should be a path directory.");
         }
-        
 
     }
-    
+
     public static <T> Codec<T> create(Class<T> cls, boolean debug) {
         return create(cls, debug, null);
     }
-    
+
     /**
      * To create a protobuf proxy class for target class.
      * 
-     * @param <T>
-     *            target object type to be proxied.
-     * @param cls
-     *            target object class
+     * @param <T> target object type to be proxied.
+     * @param cls target object class
      * @param debug true will print generate java source code
      * @return proxy instance object.
      */
@@ -180,29 +177,29 @@ public final class ProtobufProxy {
         if (debug) {
             CodePrinter.printCode(code, "generate protobuf proxy code");
         }
-        
+
         FileOutputStream fos = null;
         if (path != null) {
             String pkg = "";
             if (className.indexOf('.') != -1) {
                 pkg = StringUtils.substringBeforeLast(className, ".");
             }
-            
+
             // mkdirs
             String dir = path + File.separator + pkg.replace('.', File.separatorChar);
             File f = new File(dir);
             f.mkdirs();
-            
+
             try {
                 fos = new FileOutputStream(new File(f, cg.getClassName() + ".class"));
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
-            
+
         }
-        
+
         Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader(), fos);
-        
+
         if (fos != null) {
             try {
                 fos.close();
@@ -210,7 +207,7 @@ public final class ProtobufProxy {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        
+
         try {
             Codec<T> newInstance = (Codec<T>) newClass.newInstance();
             if (!CACHED.containsKey(uniClsName)) {
