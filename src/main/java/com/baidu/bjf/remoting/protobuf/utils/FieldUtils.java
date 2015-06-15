@@ -16,14 +16,16 @@
 package com.baidu.bjf.remoting.protobuf.utils;
 
 
-import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
  * Field utility class.
@@ -32,10 +34,35 @@ import java.util.logging.Logger;
  * @since 1.0.0
  */
 public final class FieldUtils {
+    
+    private static final Map<String, String> PRIMITIVE_TYPE_MAPPING;
+    
+    static {
+        
+        PRIMITIVE_TYPE_MAPPING = new HashMap<String, String>();
+        
+        PRIMITIVE_TYPE_MAPPING.put(int.class.getSimpleName(), Integer.class.getSimpleName());
+        PRIMITIVE_TYPE_MAPPING.put(long.class.getSimpleName(), Long.class.getSimpleName());
+        PRIMITIVE_TYPE_MAPPING.put(short.class.getSimpleName(), Short.class.getSimpleName());
+        PRIMITIVE_TYPE_MAPPING.put(boolean.class.getSimpleName(), Boolean.class.getSimpleName());
+        PRIMITIVE_TYPE_MAPPING.put(double.class.getSimpleName(), Double.class.getSimpleName());
+        PRIMITIVE_TYPE_MAPPING.put(float.class.getSimpleName(), Float.class.getSimpleName());
+        PRIMITIVE_TYPE_MAPPING.put(char.class.getSimpleName(), Character.class.getSimpleName());
+        PRIMITIVE_TYPE_MAPPING.put(byte.class.getSimpleName(), Byte.class.getSimpleName());
+    }
+    
+    
     /**
      * Logger for this class
      */
     private static final Logger LOGGER = Logger.getLogger(FieldUtils.class.getName());
+    
+    public static String toObjectType(String primitiveType) {
+        if (PRIMITIVE_TYPE_MAPPING.containsKey(primitiveType)) {
+            return PRIMITIVE_TYPE_MAPPING.get(primitiveType);
+        }
+        return primitiveType;
+    }
 
     /**
      * Get the field represented by the supplied {@link Field field object} on

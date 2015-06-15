@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
+import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 /**
@@ -767,7 +768,7 @@ public class CodeGenerator {
         }
 
         // use reflection to get value
-        String code = "(" + type + ") ";
+        String code = "(" + FieldUtils.toObjectType(type) + ") ";
         code += "FieldUtils.getField(" + target + ", \"" + field.getName() + "\")";
 
         return code;
