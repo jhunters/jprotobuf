@@ -15,7 +15,9 @@
  */
 package com.baidu.bjf.remoting.protobuf.idlgenerate;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -24,7 +26,6 @@ import org.junit.Test;
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
-import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
@@ -189,24 +190,26 @@ public class ComplexIDLGenerateTest {
     
     @Test
     public void testGenerateIDLSimpleType() throws InvalidProtocolBufferException {
-        
         String code = ProtobufIDLGenerator.getIDL(AllTypesDojoClass.class);
         Assert.assertNotNull(code);
         
     }
     
     @Test
-    public void testGenerateIDLEnumType() {
+    public void testGenerateIDLEnumTypeAndTypesReturns() {
+        final Set<Class<?>> cachedTypes = new HashSet<Class<?>>();
+        final Set<Class<?>> cachedEnumTypes = new HashSet<Class<?>>();
         
-        String code = ProtobufIDLGenerator.getIDL(EnumPOJOClass.class);
+        String code = ProtobufIDLGenerator.getIDL(EnumPOJOClass.class, cachedTypes, cachedEnumTypes);
         Assert.assertNotNull(code);
         
+        Assert.assertEquals(1, cachedTypes.size());
+        Assert.assertEquals(1, cachedEnumTypes.size());
     }
     
     @Test
     public void testListIDLGenerate() {
         String code = ProtobufIDLGenerator.getIDL(RequrieRepeatedNumberTypePOJOClass2.class);
-        
         Assert.assertTrue(code.indexOf("repeated int32") != -1);
     }
     
@@ -218,5 +221,20 @@ public class ComplexIDLGenerateTest {
     
     private static class EmptyClass {
         
+    }
+    
+    @Test
+    public void testProtobufIDLGeneratorGetIDLTypesReturns() {
+        
+        final Set<Class<?>> cachedTypes = new HashSet<Class<?>>();
+        final Set<Class<?>> cachedEnumTypes = new HashSet<Class<?>>();
+        
+        String code = ProtobufIDLGenerator.getIDL(EmptyClass.class, cachedTypes, cachedEnumTypes);
+        Assert.assertTrue(code.indexOf("message") !=  -1);
+        
+        Assert.assertEquals(1, cachedTypes.size());
+        Assert.assertEquals(0, cachedEnumTypes.size());
+        code = ProtobufIDLGenerator.getIDL(EmptyClass.class, cachedTypes, cachedEnumTypes);
+        Assert.assertNull(code);
     }
 }

@@ -39,27 +39,52 @@ public class ProtobufIDLGenerator {
     /**
      * get IDL content from class.
      * 
-     * @param cls
-     *            target protobuf class to parse
+     * @param cls target class to parse for IDL message.
+     * @param cachedTypes if type already in set will not generate IDL. if a new type found will add to set
+     * @param cachedEnumTypes if enum already in set will not generate IDL. if a new enum found will add to set
      * @return protobuf IDL content in string
+     * @see Protobuf
      */
-    public static String getIDL(Class<?> cls) {
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
+            final Set<Class<?>> cachedEnumTypes) {
+
+        Set<Class<?>> types = cachedTypes;
+        if (types == null) {
+            types = new HashSet<Class<?>>();
+        }
+
+        Set<Class<?>> enumTypes = cachedEnumTypes;
+        if (enumTypes == null) {
+            enumTypes = new HashSet<Class<?>>();
+        }
+        
+        if (types.contains(cls)) {
+            return null;
+        }
+
         StringBuilder code = new StringBuilder();
-
-        Set<Class<?>> cachedTypes = new HashSet<Class<?>>();
-        Set<Class<?>> cachedEnumTypes = new HashSet<Class<?>>();
-
         // define package
         code.append("package ").append(cls.getPackage().getName()).append(";\n");
 
         // define outer name class
         code.append("option java_outer_classname = \"").append(cls.getSimpleName()).append("$$ByJProtobuf\";\n");
 
-        cachedTypes.add(cls);
+        types.add(cls);
 
-        generateIDL(code, cls, cachedTypes, cachedEnumTypes);
+        generateIDL(code, cls, types, enumTypes);
 
         return code.toString();
+
+    }
+
+    /**
+     * get IDL content from class.
+     * 
+     * @param cls target protobuf class to parse
+     * @return protobuf IDL content in string
+     */
+    public static String getIDL(final Class<?> cls) {
+        return getIDL(cls, null, null);
     }
 
     /**
@@ -68,7 +93,7 @@ public class ProtobufIDLGenerator {
      * @return sub message class list
      */
     private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes,
-        Set<Class<?>> cachedEnumTypes) {
+            Set<Class<?>> cachedEnumTypes) {
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
 
         Set<Class<?>> subTypes = new HashSet<Class<?>>();
@@ -87,7 +112,6 @@ public class ProtobufIDLGenerator {
                         ParameterizedType ptype = (ParameterizedType) type;
 
                         Type[] actualTypeArguments = ptype.getActualTypeArguments();
-
                         if (actualTypeArguments != null && actualTypeArguments.length > 0) {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
@@ -114,7 +138,7 @@ public class ProtobufIDLGenerator {
                 }
             } else {
                 String type = field.getFieldType().getType().toLowerCase();
-                
+
                 if (field.getFieldType() == FieldType.ENUM) {
                     // if enum type
                     Class c = field.getField().getType();
@@ -126,16 +150,15 @@ public class ProtobufIDLGenerator {
                         }
                     }
                 }
-                
+
                 String required = getFieldRequired(field.isRequired());
-                
+
                 if (CodeGenerator.isListType(field.getField())) {
                     required = "repeated";
                 }
 
-                code.append(required).append(" ")
-                        .append(type).append(" ")
-                        .append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
+                code.append(required).append(" ").append(type).append(" ").append(field.getField().getName())
+                        .append("=").append(field.getOrder()).append(";\n");
             }
 
         }
