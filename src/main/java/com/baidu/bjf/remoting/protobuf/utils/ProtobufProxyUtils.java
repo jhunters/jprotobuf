@@ -81,7 +81,7 @@ public class ProtobufProxyUtils {
             // any array except byte array is not support
             String simpleName = field.getType().getName();
             if (simpleName.startsWith("[")) {
-                if (!simpleName.equals(byte[].class.getName())) {
+                if ((!simpleName.equals(byte[].class.getName())) && (!simpleName.equals(Byte[].class.getName()))) {
                     throw new RuntimeException("Array type of field '" + field.getName() + "' on class '"
                             + field.getDeclaringClass().getName() + "' is not support,  please use List instead.");
                 }

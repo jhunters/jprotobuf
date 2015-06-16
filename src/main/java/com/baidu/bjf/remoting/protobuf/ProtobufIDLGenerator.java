@@ -35,19 +35,19 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
  * @since 1.0.1
  */
 public class ProtobufIDLGenerator {
-
+    
     /**
      * get IDL content from class.
      * 
      * @param cls target class to parse for IDL message.
      * @param cachedTypes if type already in set will not generate IDL. if a new type found will add to set
      * @param cachedEnumTypes if enum already in set will not generate IDL. if a new enum found will add to set
+     * @param ignorePackage set true to ignore generate package and class name
      * @return protobuf IDL content in string
      * @see Protobuf
      */
     public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
-            final Set<Class<?>> cachedEnumTypes) {
-
+            final Set<Class<?>> cachedEnumTypes, boolean ignoreJava) {
         Set<Class<?>> types = cachedTypes;
         if (types == null) {
             types = new HashSet<Class<?>>();
@@ -63,17 +63,35 @@ public class ProtobufIDLGenerator {
         }
 
         StringBuilder code = new StringBuilder();
-        // define package
-        code.append("package ").append(cls.getPackage().getName()).append(";\n");
+        
+        if (!ignoreJava) {
+            // define package
+            code.append("package ").append(cls.getPackage().getName()).append(";\n");
+            code.append("option java_outer_classname = \"").append(cls.getSimpleName()).append("$$ByJProtobuf\";\n");
+        }
 
         // define outer name class
-        code.append("option java_outer_classname = \"").append(cls.getSimpleName()).append("$$ByJProtobuf\";\n");
 
         types.add(cls);
 
         generateIDL(code, cls, types, enumTypes);
 
         return code.toString();
+    }
+
+    /**
+     * get IDL content from class.
+     * 
+     * @param cls target class to parse for IDL message.
+     * @param cachedTypes if type already in set will not generate IDL. if a new type found will add to set
+     * @param cachedEnumTypes if enum already in set will not generate IDL. if a new enum found will add to set
+     * @return protobuf IDL content in string
+     * @see Protobuf
+     */
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
+            final Set<Class<?>> cachedEnumTypes) {
+
+        return getIDL(cls, cachedTypes, cachedEnumTypes, false);
 
     }
 
