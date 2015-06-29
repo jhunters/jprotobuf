@@ -1,22 +1,30 @@
 jprotobuf
 =========
 
+#####What is jprotobuf#####
+
 A very useful utility library for java programmer using google protobuf<br>
 jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言对protobuf类库的使用<br>
-使用jprotobuf可以无需再去了解.proto文件操作与语法，直接使用java注解定义字段类型即可。
+使用jprotobuf可以无需再去了解proto文件操作与语法，直接使用java注解定义字段类型即可。
 
-#####1.0.0 支持普通类型，嵌套对象以及对象数组的Protobuf协议的序列化与反序列化实现。#####
-#####1.0.1 由注解对象动态生成Protobuf的IDL描述文件内容。#####
+#####How it works#####
+jprotobuf工作原理如下：<br>
+1. 扫描类上的注解的信息，进行分析(与protobuf读取proto文件进行分析过程相似)<br>
+2. 根据注解分析的结果，动态生成java代码进行protobuf序列化与反序列化的功能实现<br>
+3. 使用JDK6及以上的 code compile API进行编译后加载到classloader
 
-#####1.0.3 增加由.proto 描述文件动态生成Protobuf操作对象的支持，详见下面使用说明。#####
 
-#####1.0.7 @Protobuf 支持全部属性默认设置，详见下面使用说明。#####
+#####Performace#####
+jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的过程。<br>
+在执行序列化与反序列化的过程中，几乎与protobuf生成的代码效率等同。
 
-#####1.5.0 @Protobuf 支持枚举类型，详见下面使用说明。#####
+#####Features#####
+1. 无需编写proto文件及繁琐的手工编译过程，支持基于POJO对象的注解方式，方便快捷。<br>
+   支持protobuf所有类型，包括对象嵌套，数组，枚举类型<br>
+2. 提供根据proto文件，动态生成代理对象，可省去POJO对象的编写工作。<br>
+   完整支持proto文件所有功能，包括内联对象，匿名对象，枚举类型<br>
+3. 提供从POJO对象的注解方式自动生成proto文件的功能， 方便 proto的管理与维护<br>
 
-#####1.6.0 ProtobufIDLProxy增加对默认值的支持。#####
-
-#####1.6.3 ProtobufProxy和ProtobufIDLProxy增加生成中间编译java子节码文件功能。，详见下面使用说明。#####
 
 #####关联项目：#####
 JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
