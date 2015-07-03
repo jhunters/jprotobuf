@@ -23,7 +23,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
    支持protobuf所有类型，包括对象嵌套，数组，枚举类型<br>
 2. 提供根据proto文件，动态生成代理对象，可省去POJO对象的编写工作。<br>
    完整支持proto文件所有功能，包括内联对象，匿名对象，枚举类型<br>
-3. 提供从POJO对象的注解方式自动生成proto文件的功能， 方便 proto的管理与维护<br>
+3. 提供从POJO对象的注解方式自动生成proto文件的功能， 方便proto描述文件的管理与维护<br>
 
 
 #####关联项目：#####
@@ -31,6 +31,7 @@ JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
 访问地址： [https://github.com/Baidu-ecom/Jprotobuf-rpc-socket](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket)<br>
 JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本发布RPC服务<br>
 访问地址： [https://github.com/jhunters/JProtobuf-rpc-http](https://github.com/jhunters/JProtobuf-rpc-http)
+
 ## 环境要求 ##
 JDK 6 或以上版本
 ```xml
@@ -148,6 +149,12 @@ public class AddressBookProtosPOJO {
 
     @Protobuf(fieldType = FieldType.OBJECT, order=2, required = false)
     public List<Person> person;
+    
+    @Protobuf(fieldType = FieldType.String, order=3, required = false)
+    public List<String> stringList;
+
+    @Protobuf(fieldType = FieldType.INT32, order=3, required = false)
+    public List<Integer> intList;
 }
 
 public class Person {
@@ -204,7 +211,6 @@ public class SimpleTypeTest {
 
 
 ``` 
-
 
 
 ###  增加由.proto 描述文件动态生成Protobuf操作对象的支持 ###

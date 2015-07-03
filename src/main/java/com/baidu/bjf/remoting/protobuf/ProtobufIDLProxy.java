@@ -16,6 +16,7 @@
 package com.baidu.bjf.remoting.protobuf;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -49,6 +50,11 @@ import com.squareup.protoparser.Type;
  * @since 1.0.2
  */
 public class ProtobufIDLProxy {
+
+    /**
+     * 
+     */
+    private static final String UTF_8 = "utf-8";
 
     /**
      * java outer class name
@@ -136,7 +142,7 @@ public class ProtobufIDLProxy {
     public static IDLProxyObject createSingle(String data, boolean debug, File path) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null);
         return map.entrySet().iterator().next().getValue();
     }
 
@@ -151,7 +157,7 @@ public class ProtobufIDLProxy {
     public static IDLProxyObject createSingle(InputStream is, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null);
         return map.entrySet().iterator().next().getValue();
     }
 
@@ -166,10 +172,10 @@ public class ProtobufIDLProxy {
     public static IDLProxyObject createSingle(Reader reader, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
 
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path);
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null);
         return map.entrySet().iterator().next().getValue();
     }
-
+    
     public static Map<String, IDLProxyObject> create(String data) {
         return create(data, false);
     }
@@ -180,7 +186,7 @@ public class ProtobufIDLProxy {
     
     public static Map<String, IDLProxyObject> create(String data, boolean debug, File path) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
-        return doCreate(protoFile, true, debug, path);
+        return doCreate(protoFile, true, debug, path, false, null);
     }
 
     public static Map<String, IDLProxyObject> create(InputStream is) throws IOException {
@@ -193,7 +199,7 @@ public class ProtobufIDLProxy {
     
     public static Map<String, IDLProxyObject> create(InputStream is, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
-        return doCreate(protoFile, true, debug, path);
+        return doCreate(protoFile, true, debug, path, false, null);
     }
 
     public static Map<String, IDLProxyObject> create(Reader reader) throws IOException {
@@ -206,12 +212,31 @@ public class ProtobufIDLProxy {
     
     public static Map<String, IDLProxyObject> create(Reader reader, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
-        return doCreate(protoFile, true, debug, path);
+        return doCreate(protoFile, true, debug, path, false, null);
+    }
+    
+    public static void generateSource(String data, File sourceOutputPath) {
+        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
+
+        doCreate(protoFile, true, false, null, true, sourceOutputPath);
+    }
+    
+    public static void generateSource(InputStream is, File sourceOutputPath) throws IOException {
+        ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
+
+        doCreate(protoFile, true, false, null, true, sourceOutputPath);
+    }
+    
+    public static void generateSource(Reader reader, File sourceOutputPath) throws IOException {
+        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
+
+        doCreate(protoFile, true, false, null, true, sourceOutputPath);
     }
 
-    private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug, File path) {
+    private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, 
+            boolean debug, File path, boolean generateSouceOnly, File sourceOutputDir) {
 
-        List<Class> list = createClass(protoFile, multi, debug);
+        List<Class> list = createClass(protoFile, multi, debug, generateSouceOnly, sourceOutputDir);
         Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
         for (Class cls : list) {
             Object newInstance;
@@ -239,9 +264,23 @@ public class ProtobufIDLProxy {
 
     /**
      * @param protoFile
+     * @param multi
+     * @param debug
+     * @param generateSouceOnly
+     * @param sourceOutputDir
      * @return
      */
-    private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug) {
+    private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug, 
+            boolean generateSouceOnly, File sourceOutputDir) {
+        if (generateSouceOnly) {
+            if (sourceOutputDir == null) {
+                throw new RuntimeException("param 'sourceOutputDir' is null.");
+            }
+            
+            if (!sourceOutputDir.isDirectory()) {
+                throw new RuntimeException("param 'sourceOutputDir' should be a exist file directory.");
+            }
+        }
 
         List<Type> types = protoFile.getTypes();
         if (types == null || types.isEmpty()) {
@@ -288,12 +327,15 @@ public class ProtobufIDLProxy {
                 CodePrinter.printCode(cd.code, "generate jprotobuf code");
             }
             
-            JDKCompilerHelper.COMPILER.compile(cd.code,
-                    ProtobufIDLProxy.class.getClassLoader(), null);
+            if (!generateSouceOnly) {
+                JDKCompilerHelper.COMPILER.compile(cd.code,
+                        ProtobufIDLProxy.class.getClassLoader(), null);
+            } else {
+                // need to output source code to target path
+                writeSourceCode(cd, sourceOutputDir);
+            }
             compiledClass.add(cd.name);
             // all enum type class will be ingored to use directly 
-            
-            
         }
         
         for (MessageType mt : messageTypes) {
@@ -313,12 +355,50 @@ public class ProtobufIDLProxy {
             if (debug) {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
-            Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code,
-                    ProtobufIDLProxy.class.getClassLoader(), null);
-            ret.add(newClass);
+            if (!generateSouceOnly) {
+                Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code,
+                        ProtobufIDLProxy.class.getClassLoader(), null);
+                ret.add(newClass);
+            } else {
+                // need to output source code to target path
+                writeSourceCode(codeDependent, sourceOutputDir);
+            }
         }
         
         return ret;
+    }
+
+    /**
+     * @param cd
+     * @param sourceOutputDir
+     */
+    private static void writeSourceCode(CodeDependent cd, File sourceOutputDir) {
+        if (cd.pkg == null) {
+            cd.pkg = "";
+        }
+        
+        // mkdirs
+        String dir = sourceOutputDir + File.separator + cd.pkg.replace('.', File.separatorChar);
+        File f = new File(dir);
+        f.mkdirs();
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(new File(f, cd.name + ".java"));
+            fos.write(cd.code.getBytes(UTF_8));
+            fos.flush();
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            }
+        }
+        
     }
 
     private static CodeDependent hasDependency(List<CodeDependent> cds, Set<String> compiledClass) {
@@ -428,6 +508,7 @@ public class ProtobufIDLProxy {
         code.append("}\n");
         
         cd.name = simpleName;
+        cd.pkg = packageName;
         cd.code = code.toString();
 
         return cd;
@@ -546,6 +627,7 @@ public class ProtobufIDLProxy {
         code.append("}\n");
 
         cd.name = simpleName;
+        cd.pkg = packageName;
         cd.code = code.toString();
         return cd;
     }
@@ -655,6 +737,7 @@ public class ProtobufIDLProxy {
      */
     private static class CodeDependent {
         private String name;
+        private String pkg;
         private Set<String> dependencies = new HashSet<String>();
         private String code;
 
