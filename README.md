@@ -38,7 +38,7 @@ JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.7.3</version>
+  <version>1.7.4</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
@@ -329,13 +329,23 @@ ProtobufProxy.create(AddressBookProtosPOJO.class, false, new File("D:/"));
 ProtobufIDLProxy.create(string, false， new File("D:/"));
 
 ```
-上面的示例，则会直接把生成的中间子节码文件生成到D盘根据目录下。
+上面的示例，则会直接把生成的中间子节码文件生成到D盘根目录下。
 
 
 注：目前ProtobufIDLProxy已经能完全支持含有内部类或内部枚举类型的message的动态解析。
 
 更多使用示例请参见testcase代码。
 
+
+###   ProtobufIDLProxy增加从proto文件到jprotobuf POJO源代码生成功能 ###
+使用示例：
+
+```java
+InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream("si_product_biz.proto");
+ProtobufIDLProxy.generateSource(fis, new File("D:\\test"));
+
+```
+上面的示例，则会直接把生成的中间子节码文件生成到D盘test目录下。
 
 ## 联系我们 ##
 
