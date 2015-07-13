@@ -11,7 +11,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf</artifactId>
-	<version>1.7.5</version>
+	<version>1.7.6-SNAPSHOT</version>
 
 	<name>Jprotobuf</name>
 	<description>A very useful utility library for java programmer using google protobuf.</description>
