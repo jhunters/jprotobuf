@@ -9,7 +9,6 @@ package com.baidu.bjf.remoting.protobuf.idlgenerate;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -52,11 +51,13 @@ public class EnumIDLGeneratorTest {
     }
     
     private Map<String, IDLProxyObject> initialFromProtofile(String fileName) throws IOException {
-        InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream(fileName);
+        //InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream(fileName);
         
-        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(fis, false);
+        File file = new File(EnumIDLGeneratorTest.class.getResource("si_product_biz.proto").getFile());
+        
+        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(file, false);
         Assert.assertNotNull(map);
-        Assert.assertEquals(23, map.size());
+        Assert.assertEquals(24, map.size());
         
         return map;
     }
@@ -64,8 +65,8 @@ public class EnumIDLGeneratorTest {
     @Ignore
     @Test
     public void testMostComplexIDLSourceGenerate() throws IOException {
-        InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream("si_product_biz.proto");
-        ProtobufIDLProxy.generateSource(fis, new File("D:\\test"));
+        File file = new File(EnumIDLGeneratorTest.class.getResource("si_product_biz.proto").getFile());
+        ProtobufIDLProxy.generateSource(file, new File("D:\\test"));
     }
     
     @Ignore

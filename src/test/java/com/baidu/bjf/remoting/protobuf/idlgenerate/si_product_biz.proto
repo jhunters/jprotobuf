@@ -1,6 +1,8 @@
 option cc_generic_services = true;
 option java_generic_services = true;
 
+import "si_product_biz_ref.proto";
+
 package proto.smartidea;
 
 option java_package = "com.baidu.util.sidriver.bo";
