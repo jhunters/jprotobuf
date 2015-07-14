@@ -51,9 +51,7 @@ public class EnumIDLGeneratorTest {
     }
     
     private Map<String, IDLProxyObject> initialFromProtofile(String fileName) throws IOException {
-        //InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream(fileName);
-        
-        File file = new File(EnumIDLGeneratorTest.class.getResource("si_product_biz.proto").getFile());
+        File file = new File(EnumIDLGeneratorTest.class.getResource(fileName).getFile());
         
         Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(file, false);
         Assert.assertNotNull(map);
@@ -201,5 +199,15 @@ public class EnumIDLGeneratorTest {
         } catch (Exception e) {
             Assert.assertNotNull(e);
         }
+    }
+    
+    @Ignore
+    @Test
+    public void testIDLImportReferenceProxy() throws IOException {
+        File file = new File(EnumIDLGeneratorTest.class.getResource("addressbook.proto").getFile());
+        
+        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(file, false);
+        
+        Assert.assertEquals(2, map.size());
     }
 }

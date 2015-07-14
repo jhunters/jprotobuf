@@ -140,8 +140,8 @@ public class ProtobufIDLProxy {
 
     public static IDLProxyObject createSingle(String data, boolean debug, File path) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
-
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null, cds);
         return map.entrySet().iterator().next().getValue();
     }
 
@@ -155,8 +155,8 @@ public class ProtobufIDLProxy {
 
     public static IDLProxyObject createSingle(InputStream is, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
-
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null, cds);
         return map.entrySet().iterator().next().getValue();
     }
 
@@ -170,8 +170,8 @@ public class ProtobufIDLProxy {
 
     public static IDLProxyObject createSingle(Reader reader, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
-
-        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null, cds);
         return map.entrySet().iterator().next().getValue();
     }
 
@@ -185,7 +185,8 @@ public class ProtobufIDLProxy {
 
     public static Map<String, IDLProxyObject> create(String data, boolean debug, File path) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
-        return doCreate(protoFile, true, debug, path, false, null);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        return doCreate(protoFile, true, debug, path, false, null, cds);
     }
 
     public static Map<String, IDLProxyObject> create(InputStream is) throws IOException {
@@ -198,7 +199,8 @@ public class ProtobufIDLProxy {
 
     public static Map<String, IDLProxyObject> create(InputStream is, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
-        return doCreate(protoFile, true, debug, path, false, null);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        return doCreate(protoFile, true, debug, path, false, null, cds);
     }
 
     public static Map<String, IDLProxyObject> create(Reader reader) throws IOException {
@@ -211,7 +213,8 @@ public class ProtobufIDLProxy {
 
     public static Map<String, IDLProxyObject> create(Reader reader, boolean debug, File path) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
-        return doCreate(protoFile, true, debug, path, false, null);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        return doCreate(protoFile, true, debug, path, false, null, cds);
     }
 
     public static Map<String, IDLProxyObject> create(File file) throws IOException {
@@ -223,13 +226,17 @@ public class ProtobufIDLProxy {
     }
 
     public static Map<String, IDLProxyObject> create(File file, boolean debug, File path) throws IOException {
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        return create(file, debug, path, cds);
+    }
+
+    public static Map<String, IDLProxyObject> create(File file, boolean debug, File path, List<CodeDependent> cds)
+            throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(file);
 
         Set<String> dependencyNames = new HashSet<String>();
 
         Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
-        ret.putAll(doCreate(protoFile, true, debug, path, false, null));
-        
         String parent = file.getParent();
         // parse dependency
         List<String> dependencies = protoFile.getDependencies();
@@ -239,36 +246,41 @@ public class ProtobufIDLProxy {
                     continue;
                 }
                 File dependencyFile = new File(parent, fn);
-                ret.putAll(create(dependencyFile, debug, path));
+                ret.putAll(create(dependencyFile, debug, path, cds));
             }
         }
+
+        ret.putAll(doCreate(protoFile, true, debug, path, false, null, cds));
 
         return ret;
     }
 
     public static void generateSource(String data, File sourceOutputPath) {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
-
-        doCreate(protoFile, true, false, null, true, sourceOutputPath);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
     }
 
     public static void generateSource(InputStream is, File sourceOutputPath) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
-
-        doCreate(protoFile, true, false, null, true, sourceOutputPath);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
     }
 
     public static void generateSource(Reader reader, File sourceOutputPath) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
-
-        doCreate(protoFile, true, false, null, true, sourceOutputPath);
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
     }
-    
+
     public static void generateSource(File file, File sourceOutputPath) throws IOException {
+        List<CodeDependent> cds = new ArrayList<CodeDependent>();
+        generateSource(file, sourceOutputPath, cds);
+    }
+
+    public static void generateSource(File file, File sourceOutputPath, List<CodeDependent> cds) throws IOException {
         ProtoFile protoFile = ProtoSchemaParser.parse(file);
         Set<String> dependencyNames = new HashSet<String>();
-        doCreate(protoFile, true, false, null, true, sourceOutputPath);
-        
         String parent = file.getParent();
         // parse dependency
         List<String> dependencies = protoFile.getDependencies();
@@ -278,15 +290,17 @@ public class ProtobufIDLProxy {
                     continue;
                 }
                 File dependencyFile = new File(parent, fn);
-                generateSource(dependencyFile, sourceOutputPath);
+                generateSource(dependencyFile, sourceOutputPath, cds);
             }
         }
+
+        doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
     }
 
     private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug, File path,
-            boolean generateSouceOnly, File sourceOutputDir) {
+            boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds) {
 
-        List<Class> list = createClass(protoFile, multi, debug, generateSouceOnly, sourceOutputDir);
+        List<Class> list = createClass(protoFile, multi, debug, generateSouceOnly, sourceOutputDir, cds);
         Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
         for (Class cls : list) {
             Object newInstance;
@@ -321,7 +335,7 @@ public class ProtobufIDLProxy {
      * @return
      */
     private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug,
-            boolean generateSouceOnly, File sourceOutputDir) {
+            boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds) {
         if (generateSouceOnly) {
             if (sourceOutputDir == null) {
                 throw new RuntimeException("param 'sourceOutputDir' is null.");
@@ -352,7 +366,6 @@ public class ProtobufIDLProxy {
         }
 
         List<Class> ret = new ArrayList<Class>(types.size());
-        List<CodeDependent> cds = new ArrayList<CodeDependent>();
 
         List<MessageType> messageTypes = new ArrayList<MessageType>();
         Set<String> enumNames = new HashSet<String>();
@@ -399,8 +412,9 @@ public class ProtobufIDLProxy {
         }
 
         CodeDependent codeDependent;
-        int num = 0;
-        while ((codeDependent = hasDependency(cds, compiledClass)) != null) {
+        // copy cds
+        List<CodeDependent> copiedCds = new ArrayList<ProtobufIDLProxy.CodeDependent>(cds);
+        while ((codeDependent = hasDependency(copiedCds, compiledClass)) != null) {
             if (debug) {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
