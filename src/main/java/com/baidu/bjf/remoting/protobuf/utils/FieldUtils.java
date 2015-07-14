@@ -71,7 +71,6 @@ public final class FieldUtils {
      * wrapped if the underlying field has a primitive type.
      * <p>
      * Thrown exceptions are handled via a call to
-     * {@link #handleReflectionException(Exception)}.
      * 
      * @param t
      *            the target object from which to get the field
@@ -101,7 +100,6 @@ public final class FieldUtils {
      * field has a primitive type.
      * <p>
      * Thrown exceptions are handled via a call to
-     * {@link #handleReflectionException(Exception)}.
      * 
      * @param t
      *            the target object on which to set the field

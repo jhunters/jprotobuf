@@ -91,14 +91,12 @@ public class CodedConstant {
     }
 
     /**
-     * get mapped type size compute java expression
-     * 
-     * @param order
-     *            field order
-     * @param type
-     *            field type
-     * @param isList
-     *            is field type is a {@link List}
+     * @param field field
+     * @param order field order
+     * @param type field type
+     * @param isList  is field type is a {@link List}
+     * @param debug debug mode if true enable debug.
+     * @param path
      * @return full java expression
      */
     public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, 
@@ -144,14 +142,11 @@ public class CodedConstant {
     }
 
     /**
-     * get list type field serialized size java expression
-     * 
-     * @param order
-     *            field order
-     * @param list
-     *            field value
-     * @param type
-     *            field type of list object
+     * @param order field order
+     * @param list field value
+     * @param type  field type of list obj
+     * @param debug
+     * @param path
      * @return full java expression
      */
     public static int computeListSize(int order, List list, FieldType type, boolean debug, File path) {

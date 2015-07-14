@@ -108,7 +108,7 @@ public final class ProtobufProxy {
 
     /**
      * @param cls target class to be compiled
-     * @param compiledOutputStream compile byte files output stream
+     * @param outputPath compile byte files output stream
      */
     public static void Compile(Class<?> cls, File outputPath) {
         if (outputPath == null) {

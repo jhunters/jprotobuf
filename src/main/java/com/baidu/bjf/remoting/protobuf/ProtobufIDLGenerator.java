@@ -42,7 +42,7 @@ public class ProtobufIDLGenerator {
      * @param cls target class to parse for IDL message.
      * @param cachedTypes if type already in set will not generate IDL. if a new type found will add to set
      * @param cachedEnumTypes if enum already in set will not generate IDL. if a new enum found will add to set
-     * @param ignorePackage set true to ignore generate package and class name
+     * @param ignoreJava set true to ignore generate package and class name
      * @return protobuf IDL content in string
      * @see Protobuf
      */
