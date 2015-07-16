@@ -20,7 +20,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class AddressBookProtosPOJO {
 
     @Protobuf(fieldType = FieldType.OBJECT, order = 1, required = false)
-    public List<PersonPOJO> list;
+    private List<PersonPOJO> list;
 
     @Protobuf(fieldType = FieldType.ENUM, order = 2, required = false)
     public List<TypeDefEnum> typeList;
@@ -34,4 +34,22 @@ public class AddressBookProtosPOJO {
     public String toString() {
         return "AddressBookProtosPOJO [list=" + list + "]";
     }
+
+    /**
+     * get the list
+     * @return the list
+     */
+    public List<PersonPOJO> getList() {
+        return list;
+    }
+
+    /**
+     * set list value to list
+     * @param list the list to set
+     */
+    public void setList(List<PersonPOJO> list) {
+        this.list = list;
+    }
+    
+    
 }

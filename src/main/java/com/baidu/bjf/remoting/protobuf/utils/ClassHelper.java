@@ -30,6 +30,18 @@ import java.util.Set;
  * @since 1.0.0
  */
 public class ClassHelper {
+    
+    /**
+     * get class internal name from Class.getName(). sub class like A$B to A.B
+     * @param clsName class name
+     * @return internalname
+     */
+    public static String getInternalName(String clsName) {
+        if (clsName == null) {
+            return null;
+        }
+        return clsName.replace('$', '.');
+    }
 
     /**
      * To fix name with thread context of class loader

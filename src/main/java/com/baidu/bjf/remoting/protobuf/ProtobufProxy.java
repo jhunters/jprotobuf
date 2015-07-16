@@ -42,7 +42,6 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 public final class ProtobufProxy {
 
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
-    private static final Map<String, Byte[]> CACHED_CLASS_FILE = new HashMap<String, Byte[]>();
 
     /**
      * To generate a protobuf proxy java source code for target class.

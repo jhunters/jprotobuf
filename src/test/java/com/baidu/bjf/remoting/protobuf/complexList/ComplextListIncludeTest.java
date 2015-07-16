@@ -7,7 +7,6 @@
  */
 package com.baidu.bjf.remoting.protobuf.complexList;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +43,11 @@ public class ComplextListIncludeTest {
 
         byte[] bb = book.toByteArray();
 
-        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class);
+        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, true);
         try {
             AddressBookProtosPOJO decode = codec.decode(bb);
-            Assert.assertEquals(2, decode.list.size());
-            Assert.assertEquals("xiemalin", decode.list.get(0).name);
+            Assert.assertEquals(2, decode.getList().size());
+            Assert.assertEquals("xiemalin", decode.getList().get(0).name);
             Assert.assertEquals(2, decode.typeList.size());
             Assert.assertEquals(TypeDefEnum.DECIMAL.value(), decode.typeList.get(0).value());
         } catch (Exception e) {
@@ -68,7 +67,7 @@ public class ComplextListIncludeTest {
         List<PersonPOJO> list = new ArrayList<PersonPOJO>();
         list.add(person);
         list.add(person);
-        pojo.list = list;
+        pojo.setList(list);
         
         pojo.typeList = new ArrayList<TypeDefEnum>();
         pojo.typeList.add(TypeDefEnum.DECIMAL);

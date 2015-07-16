@@ -124,7 +124,7 @@ public class ProtobufIDLGenerator {
                 code.append("// ").append(field.getDescription()).append("\n");
             }
             if (field.getFieldType() == FieldType.OBJECT) {
-                if (CodeGenerator.isListType(field.getField())) {
+                if (field.isList()) {
                     Type type = field.getField().getGenericType();
                     if (type instanceof ParameterizedType) {
                         ParameterizedType ptype = (ParameterizedType) type;
@@ -171,7 +171,7 @@ public class ProtobufIDLGenerator {
 
                 String required = getFieldRequired(field.isRequired());
 
-                if (CodeGenerator.isListType(field.getField())) {
+                if (field.isList()) {
                     required = "repeated";
                 }
 

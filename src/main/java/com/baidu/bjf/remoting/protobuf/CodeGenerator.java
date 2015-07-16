@@ -52,13 +52,13 @@ public class CodeGenerator {
      * target fields which marked <code> @Protofuf </code> annotation
      */
     private List<FieldInfo> fields;
-    
+
     private boolean debug = false;
     private File outputPath;
-    
 
     /**
      * set outputPath value to outputPath
+     * 
      * @param outputPath the outputPath to set
      */
     public void setOutputPath(File outputPath) {
@@ -67,6 +67,7 @@ public class CodeGenerator {
 
     /**
      * get the debug
+     * 
      * @return the debug
      */
     public boolean isDebug() {
@@ -75,6 +76,7 @@ public class CodeGenerator {
 
     /**
      * set debug value to debug
+     * 
      * @param debug the debug to set
      */
     public void setDebug(boolean debug) {
@@ -89,10 +91,8 @@ public class CodeGenerator {
     /**
      * Constructor
      * 
-     * @param fields
-     *            protobuf mapped fields
-     * @param cls
-     *            protobuf mapped class
+     * @param fields protobuf mapped fields
+     * @param cls protobuf mapped class
      */
     public CodeGenerator(List<FieldInfo> fields, Class<?> cls) {
         super();
@@ -113,9 +113,9 @@ public class CodeGenerator {
         if (cls.isMemberClass()) {
             String name = cls.getName();
             name = StringUtils.substringAfterLast(name, ".");
-            return name + DEFAULT_SUFFIX_CLASSNAME; 
+            return name + DEFAULT_SUFFIX_CLASSNAME;
         }
-        
+
         return cls.getSimpleName() + DEFAULT_SUFFIX_CLASSNAME;
     }
 
@@ -172,11 +172,11 @@ public class CodeGenerator {
      * 
      * @param code
      */
-    private void genPackageCode(StringBuilder code) { 
-        if (getPackage().length() >  0) {
+    private void genPackageCode(StringBuilder code) {
+        if (getPackage().length() > 0) {
             code.append("package " + getPackage() + ";\n");
         }
-        
+
     }
 
     /**
@@ -216,8 +216,8 @@ public class CodeGenerator {
         code.append("import java.lang.reflect.*;\n");
         code.append("import com.baidu.bjf.remoting.protobuf.*;\n");
         code.append("import java.util.*;\n");
-        
-        if (getPackage().length() >  0) {
+
+        if (getPackage().length() > 0) {
             code.append("import ").append(cls.getName().replaceAll("\\$", ".")).append(";\n");
         }
     }
@@ -246,8 +246,9 @@ public class CodeGenerator {
             boolean isList = isListType(field.getField());
 
             if (field.getFieldType() != FieldType.DEFAULT) {
-                code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(), 
-                        field.getFieldType().getInternalFieldType().getWireType()));
+                code.append("if (tag == ").append(
+                        CodedConstant.makeTag(field.getOrder(), field.getFieldType().getInternalFieldType()
+                                .getWireType()));
                 code.append(") {\n");
             } else {
                 code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
@@ -258,7 +259,7 @@ public class CodeGenerator {
 
             boolean listTypeCheck = false;
             String express;
-            if (field.getFieldType() ==  FieldType.ENUM) {
+            if (field.getFieldType() == FieldType.ENUM) {
                 String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
                 if (isList) {
                     Type type = field.getField().getGenericType();
@@ -271,13 +272,14 @@ public class CodeGenerator {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
                                 Class cls = (Class) targetType;
-                                clsName = cls.getName().replaceAll("\\$", "."); 
+                                clsName = cls.getName().replaceAll("\\$", ".");
                             }
                         }
                     }
                 }
-                express = "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" 
-                        + clsName + ".values()," +  "input.read" + t + "()))";
+                express =
+                        "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName + ".values(),"
+                                + "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";
             }
@@ -299,13 +301,13 @@ public class CodeGenerator {
                             } else {
                                 code.append(", false");
                             }
-                            
+
                             String spath = "null";
                             if (outputPath != null) {
                                 spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
                             }
                             code.append(",").append(spath);
-                            
+
                             code.append(");\n");
                             code.append("int length = input.readRawVarint32();\n");
                             code.append("final int oldLimit = input.pushLimit(length);\n");
@@ -324,7 +326,7 @@ public class CodeGenerator {
                 } else {
                     code.append(", false");
                 }
-                
+
                 String spath = "null";
                 if (outputPath != null) {
                     spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
@@ -401,20 +403,21 @@ public class CodeGenerator {
             boolean isList = isListType(field.getField());
 
             if (field.getFieldType() != FieldType.DEFAULT) {
-                code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(), 
-                        field.getFieldType().getInternalFieldType().getWireType()));
+                code.append("if (tag == ").append(
+                        CodedConstant.makeTag(field.getOrder(), field.getFieldType().getInternalFieldType()
+                                .getWireType()));
                 code.append(") {\n");
             } else {
                 code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
                 code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {\n");
             }
-            
+
             String t = field.getFieldType().getType();
             t = CodedConstant.capitalize(t);
 
             boolean listTypeCheck = false;
             String express;
-            if (field.getFieldType() ==  FieldType.ENUM) {
+            if (field.getFieldType() == FieldType.ENUM) {
                 String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
                 if (isList) {
                     Type type = field.getField().getGenericType();
@@ -427,17 +430,18 @@ public class CodeGenerator {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
                                 Class cls = (Class) targetType;
-                                clsName = cls.getName().replaceAll("\\$", "."); 
+                                clsName = cls.getName().replaceAll("\\$", ".");
                             }
                         }
                     }
                 }
-                express = "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" 
-                        + clsName + ".values()," +  "input.read" + t + "()))";
+                express =
+                        "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName + ".values(),"
+                                + "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";
             }
-            
+
             if (isList && field.getFieldType() == FieldType.OBJECT) {
                 Type type = field.getField().getGenericType();
                 if (type instanceof ParameterizedType) {
@@ -456,7 +460,7 @@ public class CodeGenerator {
                             } else {
                                 code.append(", false");
                             }
-                            
+
                             String spath = "null";
                             if (outputPath != null) {
                                 spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
@@ -480,14 +484,14 @@ public class CodeGenerator {
                 } else {
                     code.append(", false");
                 }
-                
+
                 String spath = "null";
                 if (outputPath != null) {
                     spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
                 }
                 code.append(",").append(spath);
                 code.append(");\n");
-                
+
                 code.append("int length = input.readRawVarint32();\n");
                 code.append("final int oldLimit = input.pushLimit(length);\n");
                 listTypeCheck = true;
@@ -584,7 +588,8 @@ public class CodeGenerator {
      */
     private String getMismatchTypeErroMessage(FieldType type, Field field) {
         return "Type mismatch. @Protobuf required type '" + type.getJavaType() + "' but field type is '"
-                + field.getType().getSimpleName() + "'";
+                + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
+                + field.getDeclaringClass().getName();
     }
 
     /**
@@ -619,8 +624,8 @@ public class CodeGenerator {
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
                     .append("))\n");
             code.append("{\nsize+=");
-            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), 
-                    field.getFieldType(), isList, debug, outputPath));
+            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList, debug,
+                    outputPath));
             code.append("}\n");
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));
@@ -632,8 +637,8 @@ public class CodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = isListType(field.getField());
             // set write to byte
-            code.append(CodedConstant.getMappedWriteCode(field, "output", field.getOrder(), 
-                    field.getFieldType(), isList));
+            code.append(CodedConstant.getMappedWriteCode(field, "output", field.getOrder(), field.getFieldType(),
+                    isList));
         }
 
         code.append("return result;\n");
@@ -677,8 +682,8 @@ public class CodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = isListType(field.getField());
             // set write to byte
-            code.append(CodedConstant.getMappedWriteCode(field, "output", 
-                    field.getOrder(), field.getFieldType(), isList));
+            code.append(CodedConstant.getMappedWriteCode(field, "output", field.getOrder(), field.getFieldType(),
+                    isList));
         }
 
         code.append("}\n");
@@ -718,8 +723,8 @@ public class CodeGenerator {
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
                     .append("))\n");
             code.append("{\nsize+=");
-            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), 
-                    field.getFieldType(), isList, debug, outputPath));
+            code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList, debug,
+                    outputPath));
             code.append("}\n");
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));
@@ -735,12 +740,9 @@ public class CodeGenerator {
     /**
      * get field access code
      * 
-     * @param target
-     *            target instance name
-     * @param field
-     *            java field instance
-     * @param cls
-     *            mapped class
+     * @param target target instance name
+     * @param field java field instance
+     * @param cls mapped class
      * @return full field access java code
      */
     protected String getAccessByField(String target, Field field, Class<?> cls) {
@@ -775,8 +777,8 @@ public class CodeGenerator {
     }
 
     /**
-     * generate access {@link Field} value source code. support public field
-     * access, getter method access and reflection access.
+     * generate access {@link Field} value source code. support public field access, getter method access and reflection
+     * access.
      * 
      * @param target
      * @param field

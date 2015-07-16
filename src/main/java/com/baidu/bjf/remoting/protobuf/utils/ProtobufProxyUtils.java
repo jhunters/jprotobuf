@@ -33,7 +33,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class ProtobufProxyUtils {
 
-    private static final Map<Class, FieldType> TYPE_MAPPING;
+    public static final Map<Class, FieldType> TYPE_MAPPING;
 
     static {
         TYPE_MAPPING = new HashMap<Class, FieldType>();
@@ -48,6 +48,7 @@ public class ProtobufProxyUtils {
         TYPE_MAPPING.put(Long.class, FieldType.INT64);
         TYPE_MAPPING.put(String.class, FieldType.STRING);
         TYPE_MAPPING.put(byte[].class, FieldType.BYTES);
+        TYPE_MAPPING.put(Byte[].class, FieldType.BYTES);
         TYPE_MAPPING.put(Float.class, FieldType.FLOAT);
         TYPE_MAPPING.put(float.class, FieldType.FLOAT);
         TYPE_MAPPING.put(double.class, FieldType.DOUBLE);
@@ -87,8 +88,7 @@ public class ProtobufProxyUtils {
                 }
             }
 
-            FieldInfo fieldInfo = new FieldInfo();
-            fieldInfo.setField(field);
+            FieldInfo fieldInfo = new FieldInfo(field);
             fieldInfo.setRequired(protobuf.required());
             fieldInfo.setDescription(protobuf.description());
 
