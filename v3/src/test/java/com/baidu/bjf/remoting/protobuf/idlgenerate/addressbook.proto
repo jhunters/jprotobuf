@@ -1,0 +1,9 @@
+package com.base.research;
+option java_package = "com.base.research.protobufMsg.test";
+option java_outer_classname = "AddressBookProto";
+
+import "person.proto";
+
+message AddressBook {
+repeated Person person = 1;
+}

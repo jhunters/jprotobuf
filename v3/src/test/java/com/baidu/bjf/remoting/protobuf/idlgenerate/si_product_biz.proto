@@ -1,0 +1,338 @@
+option cc_generic_services = true;
+option java_generic_services = true;
+
+import "si_product_biz_ref.proto";
+
+package proto.smartidea;
+
+option java_package = "com.baidu.util.sidriver.bo";
+
+//option java_package = "com.baidu.product.protocol";
+// common result status
+message ResponseResult {
+    required int32 status = 1;  
+    optional bytes message = 2; 
+};
+
+enum AttributeTypeDef {
+    TEXT = 1;
+    NUMBER = 2;
+    DECIMAL = 4;
+    ID = 8;
+    URL = 16;
+};
+
+enum AppidType {
+    BEIDOU = 0;
+    DSP = 1;
+};
+
+enum FlowTagType {
+    FROM_BEIDOU = 0;
+    FROM_GOOGLE = 1;
+};
+
+message FlowConditionType {                       
+    optional uint32 flow_tag = 1 ;   
+};
+
+
+message ProductPropertyRequest {
+    enum RequestType {
+        SYS_DEFAULT = 1;   
+        USER_DEFINED = 2;  
+    };
+    message Head {
+        required RequestType request_type = 1;
+        optional AppidType appid = 2 ;
+    };
+    required Head head = 1;
+    optional int32 userid = 2; 
+};
+
+message ProductPropertyResponse {
+    message Head {
+        required ResponseResult result = 1;
+    };
+    message PropertyElement {
+        required bytes name = 1;        
+        optional bytes literal = 2;    
+        required int32 type = 3;       
+    };
+
+    required Head head = 1;
+    repeated PropertyElement filter_elements = 2;
+    repeated PropertyElement word_elements = 3;
+    repeated PropertyElement template_elements = 4; 
+};
+
+
+message ProductFilterCondition {
+    required bytes name = 1;       
+    required int32 type = 2;        
+    required bytes operation = 3;  
+    required bytes value = 4;       
+};
+message ProductQuantityRequest {
+    message Head {
+        required int32 reserved = 1;
+        optional AppidType appid = 2 ;
+    };
+    required Head head = 1;
+    required int32 userid = 2;
+    repeated ProductFilterCondition filter_condition = 3;
+};
+
+message ProductQuantityResponse {
+    message Head {
+        required ResponseResult result = 1;
+    };
+    required Head head = 1;
+    required int32 quantity = 2;       
+};
+
+
+
+enum ProductTemplateType {
+    SYS_DEFAULT = 1;    
+    USER_DEFINE = 2;    
+};
+
+
+enum TemplateMaterial {
+    MT_TEXT = 1;
+    MT_IMAGE = 2;
+    MT_FLASH = 3;
+    MT_VIDEO = 4;
+    MT_TUWEN = 5;
+    MT_HTML = 9;
+};
+
+message ProductTemplateRequest {
+    message Head {
+        required ProductTemplateType template_type = 1;
+        optional AppidType appid = 2 ;
+    };
+    required Head head = 1;
+    required int32 userid = 2; 
+};
+
+message ProductTemplateSize {
+    required int32 type = 1;    
+    required int32 width = 2;   
+    required int32 height = 3;  
+};
+
+message ProductTemplateResponse {
+    message Head {
+        required ResponseResult result = 1;
+    };
+    message PropertyProductMapping {
+        enum Type {
+            TEXT = 1;
+            IMG = 2;
+        };
+        enum Usage {
+            DEFAULT1 = 1;
+            TUWEN_ICON= 2;
+        };
+        required int32 no = 1;          
+        required bytes name = 2;       
+        required Type type = 3;         
+        required bytes value = 4;       
+        required bool editable = 5;     
+        required int32 max_length = 6;  
+        required bytes literal = 7;     
+        optional bool enable_url = 8;   
+        optional Usage usage = 9 ;       
+    };
+    message PictureProperty {
+        required int32 width = 1;   
+        required int32 height = 2;  
+        required string url = 3;    
+    };
+    message ProductTemplate {
+        required int32 id = 1;                                        	
+        required bytes name = 2;                                      
+        required ProductTemplateType type = 3;                          
+        required PictureProperty thumbnail = 4;                         
+        required PictureProperty preview = 5;							
+        repeated ProductTemplateSize template_size = 6;                 
+        repeated PropertyProductMapping property_product_mapping = 7;  
+        optional TemplateMaterial wltype = 8;        
+    };
+    required Head head = 1;
+    repeated ProductTemplate product_template = 2;  
+};
+
+message TemplateElementConf{
+    required int32 no = 1;          			
+    required bytes name = 2;       				
+    required bytes value = 3;       			
+    required bytes literal = 4;     			
+    optional string target_url = 5;   			
+    optional string wireless_target_url = 6; 	
+};
+
+message TextInfoItem {
+    required string title = 1;
+    required string desc1 = 2;
+    required string desc2 = 3;
+    required bytes targeturl = 4;
+    optional bytes icon = 5;
+};
+
+
+message AdUrl{
+	required string target_url = 1;            
+	required string show_url = 2;              
+	required string wireless_target_url = 3;   
+	required string wireless_show_url = 4;     
+};
+
+
+message ProductPreviewRequest {
+    message Head {
+        required int32 reserved = 1;
+        optional AppidType appid = 2;
+    };
+    required Head head = 1;
+    required int32 userid = 2;                                
+    repeated ProductFilterCondition filter_condition = 3;      
+    repeated TemplateElementConf template_conf = 4;				
+    required uint32 template_id = 5;                            
+    repeated ProductTemplateSize template_size = 6;            
+    optional TemplateMaterial template_wl = 7 ; 
+    optional AdUrl ad_url = 8;                     				 
+    optional FlowConditionType flow_condition = 9;               
+    optional bytes default_icon = 10;                          
+};
+
+
+message ProductPreviewItem {
+    required ProductTemplateSize template_size = 1;         // ģ��ߴ�
+    required bytes html_snippet = 2;                        // ���htmlƬ��
+    optional TextInfoItem preview_text = 3;                 // �ı�Ԥ�����
+    repeated string target_urls = 4;                        // ����е����е��url 
+};
+
+message ProductPreviewResponse {
+    message Head {
+        required ResponseResult result = 1;
+    };
+    required Head head = 1;
+    repeated ProductPreviewItem preview_items = 2;          // Ԥ���Ĺ��
+};
+
+// ��Ʒ��ƻ�ȡ����
+message ProductNameRequest {
+    message Head {
+        required int32 reserved = 1;
+        optional AppidType appid = 2 ;
+    };
+    required Head head = 1;
+    required int32 userid = 2;
+    repeated int64 product_ids = 3;        // ��Ʒ���id�б�
+};
+// ��Ʒ��ƻ�ȡ��Ӧ
+message ProductNameResponse {
+    message Head {
+        required ResponseResult result = 1;
+    };
+    message ProductNameItem {
+        required int64 product_id = 1;     // ��Ʒ���id
+        required bytes product_name = 2;    // ��Ʒ������
+    };
+    required Head head = 1;
+    repeated ProductNameItem product_name_items = 2;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////
+// ��˷���
+message IdeaAuditPreviewRequest {
+    message Head {
+        required int32 reserved = 1;
+        optional AppidType appid = 2;
+    };
+    required Head head = 1;
+    required uint64 ad_id = 2;                      // ���adid
+    required uint32 group_id = 3;                   // �����id
+    required uint32 plan_id = 4;                    // ���ƻ�id
+    required int32 user_id = 5;                    // �����id
+	required uint32 template_id = 6;				// ģ��id
+    required int32 width = 7;   					// ��
+    required int32 height = 8;  					// ��
+    repeated ProductFilterCondition filter_condition = 9; // ����ɸѡ����
+    repeated TemplateElementConf template_conf = 10;      // ģ���������
+    optional TemplateMaterial template_wl = 15;
+    optional AdUrl ad_url = 16;              //����url
+
+    // dsp�������
+    optional int32 dsp_advertiser_id = 11;               // �û�id
+    optional uint64 dsp_campaign_id = 12;                // ����id
+    optional uint64 dsp_ad_id = 13;                      // ���id
+    optional uint64 dsp_creative_id = 14;                // ����id
+    
+    // ͼ��Ĭ��ͼ����Ϣ
+    optional bytes default_icon = 17;                    // ͼ��Ĭ��ͼ��url
+};
+
+
+message IdeaPreviewItem {
+	required uint64 ad_id = 1;                      	// ���adid
+    required int32 user_id = 2;                   	 	// �����id
+  	required int64 product_id = 3;        				// ��Ʒid
+  	required string product_url = 4;    				// ��Ʒurl
+	required int32 width = 5;   						// ��
+    required int32 height = 6;  						// ��
+    required bytes html_snippet = 7;                    // ���htmlƬ��
+    optional TextInfoItem preview_text = 12;            // �ı�Ԥ�����
+
+    // dsp�������
+    optional int32 dsp_advertiser_id = 8;                   // �û�id
+    optional uint64 dsp_campaign_id = 9;                    // ����id
+    optional uint64 dsp_ad_id = 10;                          // ���id
+    optional uint64 dsp_creative_id = 11;                    // ����id
+};
+
+message IdeaAuditPreviewResponse {
+    message Head {
+        required ResponseResult result = 1;
+    };
+    required Head head = 1;
+    repeated IdeaPreviewItem idea_preview_items = 2;  // ������˵Ĵ���
+};
+
+message ProductAuditRejectRequest {
+    message Head {
+        required int32 reserved = 1;
+    };
+    required Head head = 1;
+    required int32 userid = 2;
+    repeated int64 product_ids = 3;        // �ܾ�Ĳ�Ʒ���id
+};
+message ProductAuditRejectResponse {
+    message Head {
+        required ResponseResult result = 1;
+    }
+    required Head head = 1;
+};
+
+// ��Ʒҵ���߼�����
+service ProductBizService {
+    // ��Ʒ���Է���
+    rpc SearchProductProperty (ProductPropertyRequest) returns (ProductPropertyResponse);
+    // ��Ʒ����Ԥ������
+    rpc SearchProductQuantity (ProductQuantityRequest) returns (ProductQuantityResponse);
+    // ģ�����
+    rpc SearchProductTemplate (ProductTemplateRequest) returns (ProductTemplateResponse);
+    // ��Ʒ����Ԥ������֤
+    rpc SearchProductPreview (ProductPreviewRequest) returns (ProductPreviewResponse);
+    // ��Ʒ��ƻ�ȡ����
+    rpc SearchProductName (ProductNameRequest) returns (ProductNameResponse);
+    // [���]��ȡ��Ʒ�������
+    rpc AuditSearchRandomProductIdea (IdeaAuditPreviewRequest) returns (IdeaAuditPreviewResponse);
+    // [���]�ܾ��Ʒ�������
+    rpc AuditRejectProducts (ProductAuditRejectRequest) returns (ProductAuditRejectResponse);
+};
+
