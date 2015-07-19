@@ -46,7 +46,6 @@ public enum FieldType {
     SINT64  ("Long", "sInt64"       , "WIRETYPE_VARINT"    ,    ".longValue()" ,  WireFormat.FieldType.SINT64   ,"0L"  ),
     OBJECT  ("Object", "object"       , "WIRETYPE_LENGTH_DELIMITED"    ,    ""    ,  WireFormat.FieldType.MESSAGE ,null ),
     ENUM ("Enum", "enum"       , "WIRETYPE_VARINT"    ,    ".ordinal()"    ,  WireFormat.FieldType.ENUM , null ),
-    MAP ("Map", "map"       , "WIRETYPE_VARINT"    ,    ""    ,  WireFormat.FieldType.MESSAGE , null ),
     DEFAULT("", ""       , ""    ,    ""    ,  WireFormat.FieldType.MESSAGE , null );
     
     /**
