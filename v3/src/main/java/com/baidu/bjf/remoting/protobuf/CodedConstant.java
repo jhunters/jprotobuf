@@ -163,9 +163,23 @@ public class CodedConstant {
         String keyClass;
         String defaultKeyValue;
         if (fieldType == null) {
-            // may be object
-            keyClass = WIREFORMAT_CLSNAME + ".MESSAGE";
-            defaultKeyValue = "new " + ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "()";
+            // may be object or enum
+            if (Enum.class.isAssignableFrom(field.getGenericKeyType())) {
+                keyClass = WIREFORMAT_CLSNAME + ".ENUM";
+                Class<?> declaringClass = field.getGenericKeyType();
+                Field[] fields = declaringClass.getFields();
+                if (fields != null && fields.length > 0) {
+                    defaultKeyValue =
+                            ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "."
+                                    + fields[0].getName();
+                } else {
+                    defaultKeyValue = "0";
+                }
+
+            } else {
+                keyClass = WIREFORMAT_CLSNAME + ".MESSAGE";
+                defaultKeyValue = "new " + ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "()";
+            }
         } else {
             keyClass = WIREFORMAT_CLSNAME + "." + fieldType.toString();
             defaultKeyValue = fieldType.getDefaultValue();
@@ -175,9 +189,23 @@ public class CodedConstant {
         String valueClass;
         String defaultValueValue;
         if (fieldType == null) {
-            // may be object
-            valueClass = WIREFORMAT_CLSNAME + ".MESSAGE";
-            defaultValueValue = "new " + ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "()";
+            // may be object or enum
+            if (Enum.class.isAssignableFrom(field.getGenericeValueType())) {
+                valueClass = WIREFORMAT_CLSNAME + ".ENUM";
+                Class<?> declaringClass = field.getGenericeValueType();
+                Field[] fields = declaringClass.getFields();
+                if (fields != null && fields.length > 0) {
+                    defaultValueValue =
+                            ClassHelper.getInternalName(field.getGenericeValueType().getName()) + "."
+                                    + fields[0].getName();
+                } else {
+                    defaultValueValue = "0";
+                }
+
+            } else {
+                valueClass = WIREFORMAT_CLSNAME + ".MESSAGE";
+                defaultValueValue = "new " + ClassHelper.getInternalName(field.getGenericeValueType().getName()) + "()";
+            }
         } else {
             valueClass = WIREFORMAT_CLSNAME + "." + fieldType.toString();
             defaultValueValue = fieldType.getDefaultValue();
@@ -359,13 +387,13 @@ public class CodedConstant {
         } else if (isMap) {
             ret.append("CodedConstant.writeToMap(").append(prefix).append(",");
             ret.append(order).append(",").append(fieldName);
-            
+
             String joinedSentence = getMapFieldGenericParameterString(field);
             ret.append(",").append(joinedSentence);
-            
+
             ret.append(");\n}");
             return ret.toString();
-            
+
         } else {
             // not list so should add convert to primitive type
             boolean enumSpecial = false;
@@ -858,7 +886,15 @@ public class CodedConstant {
                 if (value instanceof Internal.EnumLite) {
                     output.writeEnumNoTag(((Internal.EnumLite) value).getNumber());
                 } else {
-                    output.writeEnumNoTag(((Integer) value).intValue());
+                    
+                    if (value instanceof EnumReadable) {
+                        output.writeEnumNoTag(((EnumReadable) value).value());
+                    } else if (value instanceof Enum) {
+                        output.writeEnumNoTag(((Enum) value).ordinal());
+                    } else {
+                        output.writeEnumNoTag(((Integer) value).intValue());
+                    }
+                    
                 }
                 break;
         }
@@ -923,6 +959,12 @@ public class CodedConstant {
                 if (value instanceof Internal.EnumLite) {
                     return CodedOutputStream.computeEnumSizeNoTag(((Internal.EnumLite) value).getNumber());
                 } else {
+                    if (value instanceof EnumReadable) {
+                        return CodedOutputStream.computeEnumSizeNoTag(((EnumReadable) value).value());
+                    } else if (value instanceof Enum) {
+                        return CodedOutputStream.computeEnumSizeNoTag(((Enum) value).ordinal());
+                    }
+                    
                     return CodedOutputStream.computeEnumSizeNoTag((Integer) value);
                 }
         }

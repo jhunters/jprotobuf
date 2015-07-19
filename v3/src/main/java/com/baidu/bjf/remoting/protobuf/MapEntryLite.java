@@ -245,7 +245,7 @@ public class MapEntryLite<K, V> extends AbstractMessageLite {
   @Override
   public boolean isInitialized() {
     if (metadata.valueType.getJavaType() == WireFormat.JavaType.MESSAGE) {
-      return ((MessageLite) value).isInitialized();
+      return value != null;
     }
     return true;
   }

@@ -28,7 +28,6 @@ import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.sun.org.apache.bcel.internal.util.InstructionFinder.CodeConstraint;
 
 /**
  * Code generator utility class.
@@ -300,9 +299,7 @@ public class CodeGenerator {
                 }
             } else if (field.isMap()) {
 
-                String getMapCommand = "(Map<" + field.getGenericKeyType().getName();
-                getMapCommand = getMapCommand + ", " + field.getGenericeValueType().getName() + ">)";
-                getMapCommand = getMapCommand + getAccessByField("ret", field.getField(), cls);
+                String getMapCommand = getMapCommand(field);
 
                 express = "CodedConstant.putMapValue(input, " + getMapCommand + ",";
                 express += CodedConstant.getMapFieldGenericParameterString(field);
@@ -369,6 +366,22 @@ public class CodeGenerator {
         code.append("}\n");
 
         return code.toString();
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    private String getMapCommand(FieldInfo field) {
+        String keyGeneric;
+        keyGeneric = field.getGenericKeyType().getName();
+        
+        String valueGeneric;
+        valueGeneric = field.getGenericeValueType().getName();
+        String getMapCommand = "(Map<" + keyGeneric;
+        getMapCommand = getMapCommand + ", " + valueGeneric + ">)";
+        getMapCommand = getMapCommand + getAccessByField("ret", field.getField(), cls);
+        return getMapCommand;
     }
 
     /**
@@ -554,7 +567,8 @@ public class CodeGenerator {
      */
     private String getMismatchTypeErroMessage(FieldType type, Field field) {
         return "Type mismatch. @Protobuf required type '" + type.getJavaType() + "' but field type is '"
-                + field.getType().getSimpleName() + "'";
+        + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
+        + field.getDeclaringClass().getName();
     }
 
     /**

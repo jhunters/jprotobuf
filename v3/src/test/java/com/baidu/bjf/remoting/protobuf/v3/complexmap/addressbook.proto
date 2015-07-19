@@ -1,0 +1,33 @@
+syntax = "proto2";
+// See README.txt for information and build instructions.
+
+package com.baidu.bjf.remoting.protobuf.v3;
+
+
+
+option java_package = "com.baidu.bjf.remoting.protobuf.v3.complexmap";
+option java_outer_classname = "AddressBookProtos";
+
+message Person {
+  required string name = 1;
+  
+  map<string, PhoneType> phoneTypeEnumValueMap = 2;
+
+  enum PhoneType {
+    MOBILE = 0;
+    HOME = 1;
+    WORK = 2;
+  }
+  
+  map<string, PhoneNumber> phoneNumberObjectValueMap = 3;
+
+  message PhoneNumber {
+    required string number = 1;
+    optional PhoneType type = 2 [default = HOME];
+  }
+
+
+}
+
+
+
