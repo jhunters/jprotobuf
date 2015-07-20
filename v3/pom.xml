@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
+		<groupId>com.baidu.rigel</groupId>
+		<artifactId>basepom</artifactId>
+		<version>1.0.4</version>
 	</parent>
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf</artifactId>
-	<version>2.0.0</version>
+	<version>2.0.0-SNAPSHOT</version>
 
-	<name>Jprotobuf</name>
+	<name>jprotobuf</name>
 	<description>A very useful utility library for java programmer using google protobuf.</description>
 	<url>https://github.com/jhunters/jprotobuf/</url>
 
@@ -21,11 +22,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<java.version>1.6</java.version>
-		<junit.version>4.10</junit.version> 
-		<fest.version>2.0M10</fest.version>
-		<github.global.server>github</github.global.server>
+		<junit.version>4.10</junit.version>
 	</properties>
-
 
 	<issueManagement>
 		<system>GitHub Issues</system>
@@ -49,7 +47,7 @@
 	<organization>
 		<name>Baidu, Inc.</name>
 		<url>http://baidu.com</url>
-	</organization>
+	</organization> 
 
 	<dependencies>
 		<dependency>
@@ -71,6 +69,13 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>jboss</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.8.0.GA</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -84,6 +89,7 @@
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
 </project>

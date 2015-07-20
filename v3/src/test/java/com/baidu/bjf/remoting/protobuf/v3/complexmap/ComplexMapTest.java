@@ -28,7 +28,7 @@ public class ComplexMapTest {
     @Test
     public void testPOJOEncode() throws IOException {
 
-        Codec<ComplexMapPOJO> complexMapPOJOCodec = ProtobufProxy.create(ComplexMapPOJO.class, true);
+        Codec<ComplexMapPOJO> complexMapPOJOCodec = ProtobufProxy.create(ComplexMapPOJO.class, false);
 
         // initialize POJO value
         ComplexMapPOJO pojo = new ComplexMapPOJO();

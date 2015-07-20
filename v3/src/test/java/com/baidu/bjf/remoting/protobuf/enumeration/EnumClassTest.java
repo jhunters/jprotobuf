@@ -29,7 +29,7 @@ public class EnumClassTest {
     public void testEnum() throws IOException {
         
         
-        Codec<EnumPOJOClass> codec = ProtobufProxy.create(EnumPOJOClass.class, true);
+        Codec<EnumPOJOClass> codec = ProtobufProxy.create(EnumPOJOClass.class, false);
         EnumPOJOClass ec = new EnumPOJOClass();
         ec.enumAttr = EnumAttrPOJO.INT;
         

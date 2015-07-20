@@ -41,6 +41,9 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  */
 public final class ProtobufProxy {
 
+    /**
+     * cached {@link Codec} instance by class full name.
+     */
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
 
     /**
@@ -97,9 +100,9 @@ public final class ProtobufProxy {
     /**
      * To create a protobuf proxy class for target class.
      * 
-     * @param <T>
-     * @param cls
-     * @return
+     * @param <T> generic type
+     * @param cls target class to parse <code>@Protobuf</code> annotation
+     * @return {@link Codec} instance proxy
      */
     public static <T> Codec<T> create(Class<T> cls) {
         return create(cls, false, null);
@@ -129,7 +132,7 @@ public final class ProtobufProxy {
      * @param <T> target object type to be proxied.
      * @param cls target object class
      * @param debug true will print generate java source code
-     * @return proxy instance object.
+     * @return proxying instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
         if (cls == null) {

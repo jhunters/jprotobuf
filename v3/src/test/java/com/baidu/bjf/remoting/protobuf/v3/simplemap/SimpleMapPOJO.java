@@ -24,14 +24,48 @@ public class SimpleMapPOJO {
     public String name;
     
     @Protobuf(fieldType = FieldType.MAP)
-    public Map<String, String> stringMap;
+    private Map<String, String> stringMap;
     
     @Protobuf(fieldType = FieldType.MAP)
-    public Map<Integer, Integer> intMap;
+    private Map<Integer, Integer> intMap;
     
     @Protobuf(fieldType = FieldType.MAP)
     public Map<Long, Long> longMap;
     
     @Protobuf(fieldType = FieldType.MAP)
     public Map<Boolean, Boolean> booleanMap;
+
+    /**
+     * get the stringMap
+     * @return the stringMap
+     */
+    public Map<String, String> getStringMap() {
+        return stringMap;
+    }
+
+    /**
+     * set stringMap value to stringMap
+     * @param stringMap the stringMap to set
+     */
+    public void setStringMap(Map<String, String> stringMap) {
+        this.stringMap = stringMap;
+    }
+
+    /**
+     * get the intMap
+     * @return the intMap
+     */
+    public Map<Integer, Integer> getMyIntMap() {
+        return intMap;
+    }
+
+    /**
+     * set intMap value to intMap
+     * @param intMap the intMap to set
+     */
+    public void setMyIntMap(Map<Integer, Integer> intMap) {
+        this.intMap = intMap;
+    }
+    
+    
 }

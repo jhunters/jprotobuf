@@ -38,6 +38,21 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 public class CodeGenerator {
 
     /**
+     * line break for editor
+     */
+    public static final String LINE_BREAK = "\n";
+
+    /**
+     * java line end
+     */
+    public static final String JAVA_END = ";";
+
+    /**
+     * line break for JAVA
+     */
+    public static final String JAVA_LINE_BREAK = JAVA_END + LINE_BREAK;
+
+    /**
      * auto proxied suffix class name
      */
     private static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
@@ -52,7 +67,14 @@ public class CodeGenerator {
      */
     private List<FieldInfo> fields;
 
+    /**
+     * enable debug mode
+     */
     private boolean debug = false;
+
+    /**
+     * static path for output dynamic compiled class file.
+     */
     private File outputPath;
 
     /**
@@ -83,12 +105,12 @@ public class CodeGenerator {
     }
 
     /**
-     * target class
+     * target class to parse <code>@Protobuf</code> annotation to generate code
      */
     private Class<?> cls;
 
     /**
-     * Constructor
+     * Constructor method
      * 
      * @param fields protobuf mapped fields
      * @param cls protobuf mapped class
@@ -105,56 +127,11 @@ public class CodeGenerator {
      * @return class name
      */
     public String getClassName() {
-        return getClassName(cls);
-    }
-
-    public static String getClassName(Class<?> cls) {
-        if (cls.isMemberClass()) {
-            String name = cls.getName();
-            name = StringUtils.substringAfterLast(name, ".");
-            return name + DEFAULT_SUFFIX_CLASSNAME;
-        }
-
-        return cls.getSimpleName() + DEFAULT_SUFFIX_CLASSNAME;
-    }
-
-    public static String getPackage(Class<?> cls) {
-        Package pkg = cls.getPackage();
-        // maybe null if package is blank or dynamic load class
-        if (pkg == null) {
-            String fullName = cls.getName();
-            int index = fullName.lastIndexOf('.');
-            if (index != -1) {
-                return fullName.substring(0, index);
-            }
-            return "";
-        }
-
-        return pkg.getName();
+        return ClassHelper.getClassName(cls) + DEFAULT_SUFFIX_CLASSNAME;
     }
 
     public String getPackage() {
-        Package pkg = cls.getPackage();
-        // maybe null if package is blank or dynamic load class
-        if (pkg == null) {
-            String fullName = cls.getName();
-            int index = fullName.lastIndexOf('.');
-            if (index != -1) {
-                return fullName.substring(0, index);
-            }
-            return "";
-        }
-
-        return pkg.getName();
-    }
-
-    /**
-     * get new class name with full package
-     * 
-     * @return class name
-     */
-    public static String getFullClassName(Class<?> cls) {
-        return getPackage(cls) + "." + getClassName(cls);
+        return ClassHelper.getPackage(cls);
     }
 
     /**
@@ -163,7 +140,7 @@ public class CodeGenerator {
      * @return class name
      */
     public String getFullClassName() {
-        return getPackage() + "." + getClassName();
+        return getPackage() + ClassHelper.PACKAGE_SEPARATOR + getClassName();
     }
 
     /**
@@ -173,7 +150,7 @@ public class CodeGenerator {
      */
     private void genPackageCode(StringBuilder code) {
         if (getPackage().length() > 0) {
-            code.append("package " + getPackage() + ";\n");
+            code.append("package " + getPackage() + JAVA_LINE_BREAK);
         }
 
     }
@@ -190,8 +167,9 @@ public class CodeGenerator {
         genPackageCode(code);
         genImportCode(code);
 
+        // define class code
         code.append("public class " + className + " implements com.baidu.bjf.remoting.protobuf.Codec");
-        code.append("<").append(ClassHelper.getInternalName(cls.getName())).append("> {\n");
+        code.append("<").append(ClassHelper.getInternalName(cls.getName())).append("> {" + LINE_BREAK);
 
         code.append(getEncodeMethodCode());
         code.append(getDecodeMethodCode());
@@ -209,37 +187,32 @@ public class CodeGenerator {
      * @param code
      */
     private void genImportCode(StringBuilder code) {
-        code.append("import com.google.protobuf.*;\n");
-        code.append("import java.io.IOException;\n");
-        code.append("import com.baidu.bjf.remoting.protobuf.utils.*;\n");
-        code.append("import java.lang.reflect.*;\n");
-        code.append("import com.baidu.bjf.remoting.protobuf.*;\n");
-        code.append("import java.util.*;\n");
+        code.append("import com.google.protobuf.*").append(JAVA_LINE_BREAK);
+        code.append("import java.io.IOException").append(JAVA_LINE_BREAK);
+        code.append("import com.baidu.bjf.remoting.protobuf.utils.*").append(JAVA_LINE_BREAK);
+        code.append("import java.lang.reflect.*").append(JAVA_LINE_BREAK);
+        code.append("import com.baidu.bjf.remoting.protobuf.*").append(JAVA_LINE_BREAK);
+        code.append("import java.util.*").append(JAVA_LINE_BREAK);
 
-        if (getPackage().length() > 0) {
-            code.append("import ").append(ClassHelper.getInternalName(cls.getName())).append(";\n");
+        if (!StringUtils.isEmpty(getPackage())) {
+            code.append("import ").append(ClassHelper.getInternalName(cls.getName())).append(JAVA_LINE_BREAK);
         }
     }
 
     /**
-     * generate <code>decode</code> method source code
+     * To generate parse google protocol buffer byte array parser code.
      * 
-     * @return
+     * @param code add new generated code to the builder.
      */
-    private String getDecodeMethodCode() {
-        StringBuilder code = new StringBuilder();
-
-        code.append("public ").append(ClassHelper.getInternalName(cls.getName()));
-        code.append(" decode(byte[] bb) throws IOException {\n");
+    private void getParseBytesMethodCode(StringBuilder code) {
         code.append(ClassHelper.getInternalName(cls.getName())).append(" ret = new ");
-        code.append(ClassHelper.getInternalName(cls.getName())).append("();");
-        code.append("CodedInputStream input = CodedInputStream.newInstance(bb, 0, bb.length);\n");
-        code.append("try {\n");
-        code.append("boolean done = false;\n");
-        code.append("Codec codec = null;\n");
-        code.append("while (!done) {\n");
-        code.append("int tag = input.readTag();\n");
-        code.append("if (tag == 0) { break;}\n");
+        code.append(ClassHelper.getInternalName(cls.getName())).append("()" + JAVA_LINE_BREAK);
+        code.append("try {").append(LINE_BREAK);
+        code.append("boolean done = false").append(JAVA_LINE_BREAK);
+        code.append("Codec codec = null").append(JAVA_LINE_BREAK);
+        code.append("while (!done) {").append(LINE_BREAK);
+        code.append("int tag = input.readTag()").append(JAVA_LINE_BREAK);
+        code.append("if (tag == 0) { break;}").append(LINE_BREAK);
 
         for (FieldInfo field : fields) {
             boolean isList = field.isList();
@@ -248,16 +221,19 @@ public class CodeGenerator {
                 code.append("if (tag == ").append(
                         CodedConstant.makeTag(field.getOrder(), field.getFieldType().getInternalFieldType()
                                 .getWireType()));
-                code.append(") {\n");
+                code.append(") {").append(LINE_BREAK);
             } else {
                 code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
-                code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {\n");
+                code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {")
+                        .append(LINE_BREAK);
             }
             String t = field.getFieldType().getType();
             t = CodedConstant.capitalize(t);
 
             boolean listTypeCheck = false;
             String express;
+
+            // enumeration type
             if (field.getFieldType() == FieldType.ENUM) {
                 String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
                 if (isList) {
@@ -272,6 +248,8 @@ public class CodeGenerator {
             } else {
                 express = "input.read" + t + "()";
             }
+
+            // if List type and element is object message type
             if (isList && field.getFieldType() == FieldType.OBJECT) {
                 if (field.getGenericKeyType() != null) {
                     Class cls = field.getGenericKeyType();
@@ -290,9 +268,9 @@ public class CodeGenerator {
                     }
                     code.append(",").append(spath);
 
-                    code.append(");\n");
-                    code.append("int length = input.readRawVarint32();\n");
-                    code.append("final int oldLimit = input.pushLimit(length);\n");
+                    code.append(")").append(JAVA_LINE_BREAK);
+                    code.append("int length = input.readRawVarint32()").append(JAVA_LINE_BREAK);
+                    code.append("final int oldLimit = input.pushLimit(length)").append(JAVA_LINE_BREAK);
                     listTypeCheck = true;
                     express = "(" + name + ") codec.readFrom(input)";
 
@@ -305,7 +283,7 @@ public class CodeGenerator {
                 express += CodedConstant.getMapFieldGenericParameterString(field);
                 express += ")";
 
-            } else if (field.getFieldType() == FieldType.OBJECT) {
+            } else if (field.getFieldType() == FieldType.OBJECT) { // if object message type
                 Class cls = field.getField().getType();
                 String name = ClassHelper.getInternalName(cls.getName()); // need to parse nested class
                 code.append("codec = ProtobufProxy.create(").append(name).append(".class");
@@ -320,9 +298,9 @@ public class CodeGenerator {
                     spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
                 }
                 code.append(",").append(spath);
-                code.append(");\n");
-                code.append("int length = input.readRawVarint32();\n");
-                code.append("final int oldLimit = input.pushLimit(length);\n");
+                code.append(")").append(JAVA_LINE_BREAK);
+                code.append("int length = input.readRawVarint32()").append(JAVA_LINE_BREAK);
+                code.append("final int oldLimit = input.pushLimit(length)").append(JAVA_LINE_BREAK);
                 listTypeCheck = true;
                 express = "(" + name + ") codec.readFrom(input)";
             }
@@ -333,38 +311,50 @@ public class CodeGenerator {
 
             code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap()));
 
-            code.append(";\n");
+            code.append(JAVA_LINE_BREAK);
 
             if (listTypeCheck) {
-                code.append("input.checkLastTagWas(0);\n");
-                code.append("input.popLimit(oldLimit);\n");
+                code.append("input.checkLastTagWas(0)").append(JAVA_LINE_BREAK);
+                code.append("input.popLimit(oldLimit)").append(JAVA_LINE_BREAK);
             }
 
-            code.append("continue;\n");
-            code.append("}");
+            code.append("continue").append(JAVA_LINE_BREAK);
+            code.append("}").append(LINE_BREAK);
 
         }
 
-        code.append("input.skipField(tag);\n");
-        code.append("}");
-        code.append("} catch (com.google.protobuf.InvalidProtocolBufferException e) {");
-        code.append("throw e;");
-        code.append("} catch (java.io.IOException e) {");
-        code.append("throw e;");
-        code.append("}");
+        code.append("input.skipField(tag)").append(JAVA_LINE_BREAK);
+        code.append("}").append(LINE_BREAK);
+        code.append("} catch (com.google.protobuf.InvalidProtocolBufferException e) {").append(LINE_BREAK);
+        code.append("throw e").append(JAVA_LINE_BREAK);
+        code.append("} catch (java.io.IOException e) {").append(LINE_BREAK);
+        code.append("throw e").append(JAVA_LINE_BREAK);
+        code.append("}").append(LINE_BREAK);
 
         for (FieldInfo field : fields) {
             if (field.isRequired()) {
                 code.append(CodedConstant.getRetRequiredCheck(getAccessByField("ret", field.getField(), cls),
                         field.getField()));
             }
-
         }
 
-        code.append("return ret;\n");
+        code.append("return ret").append(JAVA_LINE_BREAK);
 
-        code.append("}\n");
+        code.append("}").append(LINE_BREAK);
+    }
 
+    /**
+     * generate <code>decode</code> method source code
+     * 
+     * @return
+     */
+    private String getDecodeMethodCode() {
+        StringBuilder code = new StringBuilder();
+
+        code.append("public ").append(ClassHelper.getInternalName(cls.getName()));
+        code.append(" decode(byte[] bb) throws IOException {").append(LINE_BREAK);
+        code.append("CodedInputStream input = CodedInputStream.newInstance(bb, 0, bb.length)").append(JAVA_LINE_BREAK);
+        getParseBytesMethodCode(code);
         return code.toString();
     }
 
@@ -375,7 +365,7 @@ public class CodeGenerator {
     private String getMapCommand(FieldInfo field) {
         String keyGeneric;
         keyGeneric = field.getGenericKeyType().getName();
-        
+
         String valueGeneric;
         valueGeneric = field.getGenericeValueType().getName();
         String getMapCommand = "(Map<" + keyGeneric;
@@ -393,142 +383,9 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
 
         code.append("public ").append(ClassHelper.getInternalName(cls.getName()))
-                .append(" readFrom(CodedInputStream input) throws IOException {\n");
-        code.append(ClassHelper.getInternalName(cls.getName())).append(" ret = new ");
-        code.append(ClassHelper.getInternalName(cls.getName())).append("();");
-        code.append("try {\n");
-        code.append("boolean done = false;\n");
-        code.append("Codec codec = null;\n");
-        code.append("while (!done) {\n");
-        code.append("int tag = input.readTag();\n");
-        code.append("if (tag == 0) { break;}\n");
+                .append(" readFrom(CodedInputStream input) throws IOException {").append(LINE_BREAK);
 
-        for (FieldInfo field : fields) {
-            boolean isList = field.isList();
-
-            if (field.getFieldType() != FieldType.DEFAULT) {
-                code.append("if (tag == ").append(
-                        CodedConstant.makeTag(field.getOrder(), field.getFieldType().getInternalFieldType()
-                                .getWireType()));
-                code.append(") {\n");
-            } else {
-                code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
-                code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {\n");
-            }
-
-            String t = field.getFieldType().getType();
-            t = CodedConstant.capitalize(t);
-
-            boolean listTypeCheck = false;
-            String express;
-            if (field.getFieldType() == FieldType.ENUM) {
-                String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
-                if (isList) {
-                    if (field.getGenericKeyType() != null) {
-                        Class cls = field.getGenericKeyType();
-                        clsName = ClassHelper.getInternalName(cls.getName());
-                    }
-                }
-                express =
-                        "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName + ".values(),"
-                                + "input.read" + t + "()))";
-            } else {
-                express = "input.read" + t + "()";
-            }
-
-            if (isList && field.getFieldType() == FieldType.OBJECT) {
-
-                if (field.getGenericKeyType() != null) {
-                    Class cls = field.getGenericKeyType();
-
-                    String name = ClassHelper.getInternalName(cls.getName()); // need to parse nested class
-                    code.append("codec = ProtobufProxy.create(").append(name).append(".class");
-                    if (debug) {
-                        code.append(", true");
-                    } else {
-                        code.append(", false");
-                    }
-
-                    String spath = "null";
-                    if (outputPath != null) {
-                        spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
-                    }
-                    code.append(",").append(spath);
-                    code.append(");\n");
-                    code.append("int length = input.readRawVarint32();\n");
-                    code.append("final int oldLimit = input.pushLimit(length);\n");
-                    listTypeCheck = true;
-                    express = "(" + name + ") codec.readFrom(input)";
-                }
-            } else if (field.isMap()) {
-
-                String getMapCommand = "(Map<" + field.getGenericKeyType().getName();
-                getMapCommand = getMapCommand + ", " + field.getGenericeValueType().getName() + ">)";
-                getMapCommand = getMapCommand + getAccessByField("ret", field.getField(), cls);
-
-                express = "CodedConstant.putMapValue(input, " + getMapCommand + ",";
-                express += CodedConstant.getMapFieldGenericParameterString(field);
-                express += ")";
-            } else if (field.getFieldType() == FieldType.OBJECT) {
-                Class cls = field.getField().getType();
-                String name = ClassHelper.getInternalName(cls.getName()); // need to parse nested class
-                code.append("codec = ProtobufProxy.create(").append(name).append(".class");
-                if (debug) {
-                    code.append(", true");
-                } else {
-                    code.append(", false");
-                }
-
-                String spath = "null";
-                if (outputPath != null) {
-                    spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
-                }
-                code.append(",").append(spath);
-                code.append(");\n");
-
-                code.append("int length = input.readRawVarint32();\n");
-                code.append("final int oldLimit = input.pushLimit(length);\n");
-                listTypeCheck = true;
-                express = "(" + name + ") codec.readFrom(input)";
-            }
-
-            if (field.getFieldType() == FieldType.BYTES) {
-                express += ".toByteArray()";
-            }
-
-            code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap()));
-
-            code.append(";\n");
-
-            if (listTypeCheck) {
-                code.append("input.checkLastTagWas(0);\n");
-                code.append("input.popLimit(oldLimit);\n");
-            }
-
-            code.append("continue;\n");
-            code.append("}");
-
-        }
-
-        code.append("input.skipField(tag);\n");
-        code.append("}");
-        code.append("} catch (com.google.protobuf.InvalidProtocolBufferException e) {");
-        code.append("throw e;");
-        code.append("} catch (java.io.IOException e) {");
-        code.append("throw e;");
-        code.append("}");
-
-        for (FieldInfo field : fields) {
-            if (field.isRequired()) {
-                code.append(CodedConstant.getRetRequiredCheck(getAccessByField("ret", field.getField(), cls),
-                        field.getField()));
-            }
-
-        }
-
-        code.append("return ret;\n");
-
-        code.append("}\n");
+        getParseBytesMethodCode(code);
 
         return code.toString();
     }
@@ -547,8 +404,8 @@ public class CodeGenerator {
         }
 
         String javaType = type.getJavaType();
-        if ("Integer".equals(javaType)) {
-            if (cls.getSimpleName().equals("int") || "Integer".equals(cls.getSimpleName())) {
+        if (Integer.class.getSimpleName().equals(javaType)) {
+            if (cls.getSimpleName().equals("int") || Integer.class.getSimpleName().equals(cls.getSimpleName())) {
                 return;
             }
             throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
@@ -563,30 +420,28 @@ public class CodeGenerator {
      * 
      * @param type
      * @param field
-     * @return
+     * @return error message for mismatch type
      */
     private String getMismatchTypeErroMessage(FieldType type, Field field) {
         return "Type mismatch. @Protobuf required type '" + type.getJavaType() + "' but field type is '"
-        + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
-        + field.getDeclaringClass().getName();
+                + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
+                + field.getDeclaringClass().getName();
     }
 
     /**
      * generate <code>encode</code> method source code
      * 
-     * @return
+     * @return encode method code
      */
     private String getEncodeMethodCode() {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
         code.append("public byte[] encode(").append(ClassHelper.getInternalName(cls.getName()));
-        code.append(" t) throws IOException {\n");
-        code.append("int size = 0;");
+        code.append(" t) throws IOException {").append(LINE_BREAK);
+        code.append("int size = 0").append(JAVA_END);
         for (FieldInfo field : fields) {
-
             boolean isList = field.isList();
-
             // check type
             if (!isList) {
                 checkType(field.getFieldType(), field.getField());
@@ -601,27 +456,24 @@ public class CodeGenerator {
                     getAccessByField("t", field.getField(), cls), isList, field.isMap()));
             // compute size
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
-                    .append("))\n");
-            code.append("{\nsize+=");
+                    .append("))").append("{").append(LINE_BREAK);
+            code.append("size += ");
             code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList,
-                    field.isMap(), debug, outputPath));
-            code.append("}\n");
+                    field.isMap(), debug, outputPath)).append(LINE_BREAK);
+            code.append("}").append(LINE_BREAK);
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));
             }
         }
 
-        code.append("final byte[] result = new byte[size];\n");
-        code.append("final CodedOutputStream output = CodedOutputStream.newInstance(result);\n");
-        for (FieldInfo field : fields) {
-            boolean isList = field.isList();
-            // set write to byte
-            code.append(CodedConstant.getMappedWriteCode(field, "output", field.getOrder(), field.getFieldType(),
-                    isList, field.isMap()));
-        }
-
-        code.append("return result;\n");
-        code.append("}\n");
+        code.append("final byte[] result = new byte[size]").append(JAVA_LINE_BREAK);
+        code.append("final CodedOutputStream output = CodedOutputStream.newInstance(result)").append(JAVA_LINE_BREAK);
+        
+        // call writeTo method
+        code.append("writeTo(t, output)").append(JAVA_LINE_BREAK);
+        
+        code.append("return result").append(JAVA_LINE_BREAK);
+        code.append("}").append(LINE_BREAK);
 
         return code.toString();
     }
@@ -636,7 +488,7 @@ public class CodeGenerator {
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
         code.append("public void writeTo(").append(ClassHelper.getInternalName(cls.getName()))
-                .append(" t, CodedOutputStream output) throws IOException {\n");
+                .append(" t, CodedOutputStream output) throws IOException {").append(LINE_BREAK);
         for (FieldInfo field : fields) {
 
             boolean isList = field.isList();
@@ -665,7 +517,7 @@ public class CodeGenerator {
                     isList, field.isMap()));
         }
 
-        code.append("}\n");
+        code.append("}").append(LINE_BREAK);
 
         return code.toString();
     }
@@ -680,8 +532,8 @@ public class CodeGenerator {
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
         code.append("public int size(").append(ClassHelper.getInternalName(cls.getName()));
-        code.append(" t) throws IOException {\n");
-        code.append("int size = 0;");
+        code.append(" t) throws IOException {").append(LINE_BREAK);
+        code.append("int size = 0").append(JAVA_LINE_BREAK);
         for (FieldInfo field : fields) {
 
             boolean isList = field.isList();
@@ -700,18 +552,18 @@ public class CodeGenerator {
                     getAccessByField("t", field.getField(), cls), isList, field.isMap()));
             // compute size
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
-                    .append("))\n");
-            code.append("{\nsize+=");
+                    .append("))").append("{").append(LINE_BREAK);
+            code.append("size += ");
             code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList,
                     field.isMap(), debug, outputPath));
-            code.append("}\n");
+            code.append("}").append(LINE_BREAK);
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));
             }
         }
 
-        code.append("return size;\n");
-        code.append("}\n");
+        code.append("return size").append(JAVA_LINE_BREAK);
+        code.append("}").append(LINE_BREAK);
 
         return code.toString();
     }
@@ -726,7 +578,7 @@ public class CodeGenerator {
      */
     protected String getAccessByField(String target, Field field, Class<?> cls) {
         if (field.getModifiers() == Modifier.PUBLIC) {
-            return target + "." + field.getName();
+            return target + ClassHelper.PACKAGE_SEPARATOR + field.getName();
         }
         // check if has getter method
         String getter;
@@ -738,7 +590,7 @@ public class CodeGenerator {
         // check method exist
         try {
             cls.getMethod(getter, new Class<?>[0]);
-            return target + "." + getter + "()";
+            return target + ClassHelper.PACKAGE_SEPARATOR + getter + "()";
         } catch (Exception e) {
             LOGGER.log(Level.FINE, e.getMessage(), e);
         }
@@ -768,62 +620,73 @@ public class CodeGenerator {
      */
     protected String getSetToField(String target, Field field, Class<?> cls, String express, boolean isList,
             boolean isMap) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
         if (isList || isMap) {
-            ret = "if ((" + getAccessByField(target, field, cls) + ") == null) {\n";
+            ret.append("if ((").append(getAccessByField(target, field, cls)).append(") == null) {").append(LINE_BREAK);
         }
-        if (field.getModifiers() == Modifier.PUBLIC) {
+        // if field of public modifier we can access directly
+        if (Modifier.isPublic(field.getModifiers())) {
             if (isList) {
-                ret += target + "." + field.getName() + "= new ArrayList();\n}";
+                // should initialize list
+                ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName())
+                        .append("= new ArrayList()").append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
                 if (express != null) {
-                    ret += target + "." + field.getName() + ".add(" + express + ")";
+                    ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName()).append(".add(")
+                            .append(express).append(")");
                 }
-                return ret;
+                return ret.toString();
             } else if (isMap) {
-                ret += target + "." + field.getName() + "= new HashMap();\n}";
-                return ret + express;
+                ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName())
+                        .append("= new HashMap()").append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
+                return ret.append(express).toString();
             }
-            return target + "." + field.getName() + "=" + express + "\n";
+            return target + ClassHelper.PACKAGE_SEPARATOR + field.getName() + "=" + express + LINE_BREAK;
         }
         String setter = "set" + CodedConstant.capitalize(field.getName());
         // check method exist
         try {
             cls.getMethod(setter, new Class<?>[] { field.getType() });
             if (isList) {
-                ret += "List __list = new ArrayList();\n";
-                ret += target + "." + setter + "(__list);\n}";
+                ret.append("List __list = new ArrayList()").append(JAVA_LINE_BREAK);
+                ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(setter).append("(__list)")
+                        .append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
 
                 if (express != null) {
-                    ret += "(" + getAccessByField(target, field, cls) + ").add(" + express + ")";
+                    ret.append("(").append(getAccessByField(target, field, cls)).append(").add(").append(express)
+                            .append(")");
                 }
-                return ret;
+                return ret.toString();
             } else if (isMap) {
-                ret += "List __list = new HashMap();\n";
-                ret += target + "." + setter + "(__list);\n}";
+                ret.append("Map __map = new HashMap()").append(JAVA_LINE_BREAK);
+                ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(setter).append("(__map)")
+                        .append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
                 return ret + express;
             }
-            return target + "." + setter + "(" + express + ")\n";
+            return target + ClassHelper.PACKAGE_SEPARATOR + setter + "(" + express + ")\n";
         } catch (Exception e) {
             LOGGER.log(Level.FINE, e.getMessage(), e);
         }
 
         if (isList) {
-            ret += "List __list = new ArrayList();\n";
-            ret += "FieldUtils.setField(" + target + ", \"" + field.getName() + "\", __list);\n}";
+            ret.append("List __list = new ArrayList()").append(JAVA_LINE_BREAK);
+            ret.append("FieldUtils.setField(").append(target).append(", \"").append(field.getName())
+                    .append("\", __list)").append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
             if (express != null) {
-                ret += "(" + getAccessByField(target, field, cls) + ").add(" + express + ")";
+                ret.append("(").append(getAccessByField(target, field, cls)).append(").add(").append(express)
+                        .append(")");
             }
-            return ret;
+            return ret.toString();
         } else if (isMap) {
-            ret += "List __list = new HashMap();\n";
-            ret += "FieldUtils.setField(" + target + ", \"" + field.getName() + "\", __list);\n}";
+            ret.append("Map __map = new HashMap()").append(JAVA_LINE_BREAK);
+            ret.append("FieldUtils.setField(").append(target).append(", \"").append(field.getName())
+                    .append("\", __map)").append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
             return ret + express;
         }
 
         // use reflection to get value
         String code = "";
         if (express != null) {
-            code = "FieldUtils.setField(" + target + ", \"" + field.getName() + "\", " + express + ")\n";
+            code = "FieldUtils.setField(" + target + ", \"" + field.getName() + "\", " + express + ")" + LINE_BREAK;
         }
         return code;
     }

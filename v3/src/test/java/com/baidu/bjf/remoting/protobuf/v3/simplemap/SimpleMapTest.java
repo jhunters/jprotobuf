@@ -9,6 +9,7 @@ package com.baidu.bjf.remoting.protobuf.v3.simplemap;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,18 +31,20 @@ public class SimpleMapTest {
     @Test
     public void testPOJOEncode() throws IOException {
         
-        Codec<SimpleMapPOJO> simpleMapPojoCodec = ProtobufProxy.create(SimpleMapPOJO.class, true);
+        Codec<SimpleMapPOJO> simpleMapPojoCodec = ProtobufProxy.create(SimpleMapPOJO.class, false);
         
         // initialize map
         SimpleMapPOJO pojo = new SimpleMapPOJO();
         pojo.name = "xiemalin";
         
-        pojo.stringMap = new HashMap<String, String>();
-        pojo.stringMap.put("hello", "world");
-        pojo.stringMap.put("welcome", "China");
+        Map<String, String> stringMap = new HashMap<String, String>();
+        stringMap.put("hello", "world");
+        stringMap.put("welcome", "China");
+        pojo.setStringMap(stringMap);
         
-        pojo.intMap = new HashMap<Integer, Integer>();
-        pojo.intMap.put(100, 200);
+        Map<Integer, Integer> intMap = new HashMap<Integer, Integer>();
+        intMap.put(100, 200);
+        pojo.setMyIntMap(intMap);
         
         pojo.longMap = new HashMap<Long, Long>();
         pojo.longMap.put(Long.MIN_VALUE, Long.MAX_VALUE);
@@ -58,9 +61,9 @@ public class SimpleMapTest {
         
         Assert.assertEquals(pojo.name, person.getName());
         
-        Assert.assertEquals(pojo.stringMap, person.getStringMap());
+        Assert.assertEquals(pojo.getStringMap(), person.getStringMap());
         
-        Assert.assertEquals(pojo.intMap, person.getIntMap());
+        Assert.assertEquals(pojo.getMyIntMap(), person.getIntMap());
         Assert.assertEquals(pojo.longMap, person.getLongMap());
         Assert.assertEquals(pojo.booleanMap, person.getBooleanMap());
     }
@@ -84,15 +87,15 @@ public class SimpleMapTest {
         byte[] bytes = person.toByteArray();
         Assert.assertNotNull(bytes);
         
-        Codec<SimpleMapPOJO> simpleMapPojoCodec = ProtobufProxy.create(SimpleMapPOJO.class, true);
+        Codec<SimpleMapPOJO> simpleMapPojoCodec = ProtobufProxy.create(SimpleMapPOJO.class, false);
         
         SimpleMapPOJO pojo = simpleMapPojoCodec.decode(bytes);
         
         Assert.assertEquals(pojo.name, person.getName());
         
-        Assert.assertEquals(pojo.stringMap, person.getStringMap());
+        Assert.assertEquals(pojo.getStringMap(), person.getStringMap());
         
-        Assert.assertEquals(pojo.intMap, person.getIntMap());
+        Assert.assertEquals(pojo.getMyIntMap(), person.getIntMap());
         Assert.assertEquals(pojo.longMap, person.getLongMap());
         Assert.assertEquals(pojo.booleanMap, person.getBooleanMap());
     }

@@ -42,7 +42,7 @@ public class ProtobufIDLProxyPressureTest {
     @Test
     public void testPressureWithCached() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJOWithDefault.class);
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code, true);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code, false);
 
         IDLProxyObject idlProxyObject = idlProxyObjects.get(AddressBookProtosPOJOWithDefault.class.getSimpleName());
 

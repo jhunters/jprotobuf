@@ -68,21 +68,22 @@ public class CodedConstant {
      * @return full java expression
      */
     public static String getMappedTypeDefined(int order, FieldType type, String express, boolean isList, boolean isMap) {
-
+        StringBuilder code = new StringBuilder();
         String fieldName = getFieldName(order);
         if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
             // add null check
-            String code = "com.google.protobuf.ByteString " + fieldName + "=null;\n";
-            code += "if (!CodedConstant.isNull(" + express + ")) {\n";
+            code.append("com.google.protobuf.ByteString ").append(fieldName).append(" = null")
+                    .append(CodeGenerator.JAVA_LINE_BREAK);
+            code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(CodeGenerator.LINE_BREAK);
 
             String method = "copyFromUtf8";
             if (type == FieldType.BYTES) {
                 method = "copyFrom";
             }
-
-            code += fieldName + " = com.google.protobuf.ByteString." + method + "(" + express + ");\n";
-            code += "}";
-            return code;
+            code.append(fieldName).append(" = com.google.protobuf.ByteString.").append(method).append("(")
+                    .append(express).append(")").append(CodeGenerator.JAVA_LINE_BREAK);
+            code.append("}").append(CodeGenerator.LINE_BREAK);
+            return code.toString();
         }
         // add null check
         String defineType = type.getJavaType();
@@ -91,13 +92,12 @@ public class CodedConstant {
         } else if (isMap) {
             defineType = "Map";
         }
-
-        String code = defineType + " " + fieldName + "=null;\n";
-        code += "if (!CodedConstant.isNull(" + express + ")) {\n";
-
-        code += fieldName + "=" + express + ";\n";
-        code += "}";
-        return code;
+        code.setLength(0);
+        code.append(defineType).append(" ").append(fieldName).append(" = null").append(CodeGenerator.JAVA_LINE_BREAK);
+        code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(CodeGenerator.LINE_BREAK);
+        code.append(fieldName).append(" = ").append(express).append(CodeGenerator.JAVA_LINE_BREAK);
+        code.append("}").append(CodeGenerator.LINE_BREAK);
+        return code.toString();
     }
 
     /**
@@ -120,17 +120,18 @@ public class CodedConstant {
 
         String typeString = type.getType().toUpperCase();
         if (isList) {
-            return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
-                    + Boolean.valueOf(debug) + "," + spath + ");\n";
+            return "CodedConstant.computeListSize(" + order + ", " + fieldName + ", FieldType." + typeString + ", "
+                    + Boolean.valueOf(debug) + ", " + spath + ")" + CodeGenerator.JAVA_LINE_BREAK;
         } else if (isMap) {
 
             String joinedSentence = getMapFieldGenericParameterString(field);
-            return "CodedConstant.computeMapSize(" + order + "," + fieldName + "," + joinedSentence + ");\n";
+            return "CodedConstant.computeMapSize(" + order + ", " + fieldName + ", " + joinedSentence + ")"
+                    + CodeGenerator.JAVA_LINE_BREAK;
         }
 
         if (type == FieldType.OBJECT) {
             return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
-                    + Boolean.valueOf(debug) + "," + spath + ");\n";
+                    + Boolean.valueOf(debug) + "," + spath + ")" + CodeGenerator.JAVA_LINE_BREAK;
         }
 
         String t = type.getType();
@@ -151,7 +152,8 @@ public class CodedConstant {
             fieldName = fieldName + type.getToPrimitiveType();
         }
 
-        return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ");\n";
+        return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ")"
+                + CodeGenerator.JAVA_LINE_BREAK;
     }
 
     /**
@@ -376,13 +378,14 @@ public class CodedConstant {
             boolean isMap) {
         String fieldName = getFieldName(order);
         StringBuilder ret = new StringBuilder();
-        ret.append("if (").append(fieldName).append("!=null){");
+        ret.append("if (").append(fieldName).append(" != null){").append(CodeGenerator.LINE_BREAK);
 
         if (isList) {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeToList(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(");\n}");
+            ret.append(",").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(CodeGenerator.LINE_BREAK);
             return ret.toString();
         } else if (isMap) {
             ret.append("CodedConstant.writeToMap(").append(prefix).append(",");
@@ -391,7 +394,7 @@ public class CodedConstant {
             String joinedSentence = getMapFieldGenericParameterString(field);
             ret.append(",").append(joinedSentence);
 
-            ret.append(");\n}");
+            ret.append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}").append(CodeGenerator.LINE_BREAK);
             return ret.toString();
 
         } else {
@@ -413,20 +416,26 @@ public class CodedConstant {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeObject(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(", false);\n}");
+            ret.append(",").append(fieldName).append(", false)").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(CodeGenerator.LINE_BREAK);
+            ;
             return ret.toString();
         }
 
         if (type == FieldType.STRING || type == FieldType.BYTES) {
             ret.append(prefix).append(".writeBytes(").append(order);
-            ret.append(", ").append(fieldName).append(");\n}");
+            ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(CodeGenerator.LINE_BREAK);
+            ;
             return ret.toString();
         }
         String t = type.getType();
         t = capitalize(t);
 
         ret.append(prefix).append(".write").append(t).append("(").append(order);
-        ret.append(", ").append(fieldName).append(");\n}");
+        ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                .append(CodeGenerator.LINE_BREAK);
+        ;
         return ret.toString();
     }
 
@@ -886,7 +895,7 @@ public class CodedConstant {
                 if (value instanceof Internal.EnumLite) {
                     output.writeEnumNoTag(((Internal.EnumLite) value).getNumber());
                 } else {
-                    
+
                     if (value instanceof EnumReadable) {
                         output.writeEnumNoTag(((EnumReadable) value).value());
                     } else if (value instanceof Enum) {
@@ -894,7 +903,7 @@ public class CodedConstant {
                     } else {
                         output.writeEnumNoTag(((Integer) value).intValue());
                     }
-                    
+
                 }
                 break;
         }
@@ -964,7 +973,7 @@ public class CodedConstant {
                     } else if (value instanceof Enum) {
                         return CodedOutputStream.computeEnumSizeNoTag(((Enum) value).ordinal());
                     }
-                    
+
                     return CodedOutputStream.computeEnumSizeNoTag((Integer) value);
                 }
         }

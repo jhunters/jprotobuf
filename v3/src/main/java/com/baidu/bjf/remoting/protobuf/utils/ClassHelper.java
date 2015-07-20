@@ -32,6 +32,16 @@ import java.util.Set;
 public class ClassHelper {
     
     /**
+     * package separator char
+     */
+    private static final char PACKAGE_SEPARATOR_CHAR = '.';
+    
+    /**
+     * package separator string
+     */
+    public static final String PACKAGE_SEPARATOR = PACKAGE_SEPARATOR_CHAR + "";
+    
+    /**
      * get class internal name from Class.getName(). sub class like A$B to A.B
      * @param clsName class name
      * @return internalname
@@ -40,7 +50,7 @@ public class ClassHelper {
         if (clsName == null) {
             return null;
         }
-        return clsName.replace('$', '.');
+        return clsName.replace('$', PACKAGE_SEPARATOR_CHAR);
     }
 
     /**
@@ -255,5 +265,46 @@ public class ClassHelper {
         }
         return obj.getClass().getSimpleName() + "@" + System.identityHashCode(obj);
 
+    }
+    
+    /**
+     * get class simple name from {@link Class} instance. <br>
+     * Here we should take case member class is a little different from common class.
+     * 
+     * @param cls target class
+     * @return simple class name
+     */
+    public static String getClassName(Class<?> cls) {
+        if (cls.isMemberClass()) {
+            String name = cls.getName();
+            name = StringUtils.substringAfterLast(name, PACKAGE_SEPARATOR);
+            return name;
+        }
+
+        return cls.getSimpleName();
+    }
+    
+    public static String getPackage(Class<?> cls) {
+        Package pkg = cls.getPackage();
+        // maybe null if package is blank or dynamic load class
+        if (pkg == null) {
+            String fullName = cls.getName();
+            int index = fullName.lastIndexOf(PACKAGE_SEPARATOR_CHAR);
+            if (index != -1) {
+                return fullName.substring(0, index);
+            }
+            return "";
+        }
+
+        return pkg.getName();
+    }
+    
+    /**
+     * get new class name with full package
+     * 
+     * @return class name
+     */
+    public static String getFullClassName(Class<?> cls) {
+        return getPackage(cls) + PACKAGE_SEPARATOR + getClassName(cls);
     }
 }
