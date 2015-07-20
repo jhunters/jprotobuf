@@ -71,6 +71,10 @@ public class JdkCompiler extends AbstractCompiler {
 
     public JdkCompiler(final ClassLoader loader) {
         options = new ArrayList<String>();
+        if (compiler == null) {
+            throw new RuntimeException(
+                    "compiler is null maybe you are on JRE enviroment please change to JDK enviroment.");
+        }
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {

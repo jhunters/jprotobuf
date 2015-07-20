@@ -71,15 +71,20 @@ public class JdkCompiler extends AbstractCompiler {
 
     public JdkCompiler(final ClassLoader loader) {
         options = new ArrayList<String>();
+        if (compiler == null) {
+            throw new RuntimeException(
+                    "compiler is null maybe you are on JRE enviroment please change to JDK enviroment.");
+        }
+
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
-            
+
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<File>();
                 for (URL url : urlClassLoader.getURLs()) {
-                    
+
                     String file = url.getFile();
                     if (StringUtils.endsWith(file, "!/")) {
                         file = StringUtils.removeEnd(file, "!/");
@@ -87,7 +92,7 @@ public class JdkCompiler extends AbstractCompiler {
                     if (file.startsWith("file:")) {
                         file = StringUtils.removeStart(file, "file:");
                     }
-                    
+
                     files.add(new File(file));
                 }
                 manager.setLocation(StandardLocation.CLASS_PATH, files);
@@ -111,15 +116,16 @@ public class JdkCompiler extends AbstractCompiler {
         JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
         javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName, className
                 + ClassUtils.JAVA_EXTENSION, javaFileObject);
-        Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options, null,
-                Arrays.asList(new JavaFileObject[] { javaFileObject })).call();
+        Boolean result =
+                compiler.getTask(null, javaFileManager, diagnosticCollector, options, null,
+                        Arrays.asList(new JavaFileObject[] { javaFileObject })).call();
         if (result == null || !result.booleanValue()) {
             throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: "
                     + diagnosticCollector.getDiagnostics());
         }
         Class<?> retClass = classLoader.loadClass(name);
-        
-         byte[] bytes = classLoader.loadClassBytes(name);
+
+        byte[] bytes = classLoader.loadClassBytes(name);
         if (os != null && bytes != null) {
             os.write(bytes);
             os.flush();
@@ -138,7 +144,7 @@ public class JdkCompiler extends AbstractCompiler {
         Collection<JavaFileObject> files() {
             return Collections.unmodifiableCollection(classes.values());
         }
-        
+
         public byte[] loadClassBytes(final String qualifiedClassName) {
             JavaFileObject file = classes.get(qualifiedClassName);
             if (file != null) {
@@ -175,8 +181,8 @@ public class JdkCompiler extends AbstractCompiler {
         @Override
         public InputStream getResourceAsStream(final String name) {
             if (name.endsWith(ClassUtils.CLASS_EXTENSION)) {
-                String qualifiedClassName = name.substring(0, name.length() - ClassUtils.CLASS_EXTENSION.length())
-                        .replace('/', '.');
+                String qualifiedClassName =
+                        name.substring(0, name.length() - ClassUtils.CLASS_EXTENSION.length()).replace('/', '.');
                 JavaFileObjectImpl file = (JavaFileObjectImpl) classes.get(qualifiedClassName);
                 if (file != null) {
                     return new ByteArrayInputStream(file.getByteCode());
@@ -255,7 +261,7 @@ public class JdkCompiler extends AbstractCompiler {
         }
 
         public void putFileForInput(StandardLocation location, String packageName, String relativeName,
-            JavaFileObject file) {
+                JavaFileObject file) {
             fileObjects.put(uri(location, packageName, relativeName), file);
         }
 
@@ -321,6 +327,5 @@ public class JdkCompiler extends AbstractCompiler {
             return files;
         }
     }
-
 
 }
