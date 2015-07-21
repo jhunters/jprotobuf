@@ -23,11 +23,10 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
    支持protobuf所有类型，包括对象嵌套，数组，枚举类型<br>
 2. 提供根据proto文件，动态生成代理对象，可省去POJO对象的编写工作。<br>
    完整支持proto文件所有功能，包括内联对象，匿名对象，枚举类型<br>
-3. 提供从POJO对象的注解方式自动生成proto文件的功能， 方便proto描述文件的管理与维护<br>
+3. 提供从POJO对象的注解方式自动生成proto文件的功能， 方便proto描述文件的管理与维护
+4. Map数据结构支持.  @Protobuf(fieldType = FieldType.MAP)
+<br>
 
-#####Which version#####
-1. jprotobuf-1.x supports google protocol buffer v2.5.x<br>
-2. jprotobuf-2.x supports google protocol buffer v3.0.0-alpha-2. 实现对MAP结构的支持<br>
 
 #####关联项目：#####
 JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
@@ -36,14 +35,8 @@ JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本�
 访问地址： [https://github.com/jhunters/JProtobuf-rpc-http](https://github.com/jhunters/JProtobuf-rpc-http)
 
 ## 环境要求 ##
-JDK 6 或以上版本
+JDK 6 或以上版本 google protocol buffer v3版本
 ```xml
-<dependency>
-  <groupId>com.baidu</groupId>
-  <artifactId>jprotobuf</artifactId>
-  <version>1.7.9</version>
-</dependency>
-
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
@@ -149,7 +142,7 @@ b 使用jprotobuf API进行序列化与反序列化操作
 
 
 
-### 嵌套对象的开发示例 ###
+### 嵌套对象与MAP的开发示例 ###
 ```java
 public class AddressBookProtosPOJO {
 
@@ -164,6 +157,12 @@ public class AddressBookProtosPOJO {
 
     @Protobuf(fieldType = FieldType.INT32, order=3, required = false)
     public List<Integer> intList;
+
+    @Protobuf(fieldType = FieldType.MAP, order=4, required = false)
+    public Map<String, String> stringMap;
+
+    @Protobuf(fieldType = FieldType.MAP, order=5, required = false)
+    public Map<String, Person> personMap;
 }
 
 public class Person {
@@ -191,6 +190,7 @@ public class Person {
 
 
 ``` 
+注：如同google protocol buffer v3规范要求，MAP结构的key，不允许为 float, double和Message对象。
 
 ### 由注解对象动态生成Protobuf的IDL描述文件内容 ###
 JProtobuf提供一个非常实用的功能，可以动态生成Protobuf的IDL描述文件内容
