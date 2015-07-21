@@ -41,7 +41,7 @@ JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.7.7</version>
+  <version>1.7.9</version>
 </dependency>
 
 <dependency>
