@@ -693,6 +693,10 @@ public class ProtobufIDLProxy {
         cd.name = simpleName;
         cd.pkg = packageName;
         cd.code = code.toString();
+        
+        // finally dependency should remove self
+        cd.dependencies.remove(cd.name);
+        
         return cd;
     }
 
