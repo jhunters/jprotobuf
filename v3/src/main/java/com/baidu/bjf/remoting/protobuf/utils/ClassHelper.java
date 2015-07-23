@@ -34,7 +34,7 @@ public class ClassHelper {
     /**
      * package separator char
      */
-    private static final char PACKAGE_SEPARATOR_CHAR = '.';
+    public static final char PACKAGE_SEPARATOR_CHAR = '.';
     
     /**
      * package separator string
@@ -297,6 +297,26 @@ public class ClassHelper {
         }
 
         return pkg.getName();
+    }
+    
+    /**
+     * To test class if has default constructor method
+     * 
+     * @param cls target class
+     * @return true if has default constructor method
+     */
+    public static boolean hasDefaultConstructor(Class<?> cls) {
+        if (cls == null) {
+            return false;
+        }
+        try {
+            cls.getConstructor(new Class<?>[0]);
+        } catch (NoSuchMethodException e2) {
+            return false;
+        } catch (SecurityException e2) {
+            throw new IllegalArgumentException(e2.getMessage(), e2);
+        }
+        return true;
     }
     
     /**

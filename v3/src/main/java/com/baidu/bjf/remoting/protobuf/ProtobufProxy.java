@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
@@ -75,13 +76,10 @@ public final class ProtobufProxy {
         // check if has default constructor
 
         if (!cls.isMemberClass()) {
-            try {
-                cls.getConstructor(new Class<?>[0]);
-            } catch (NoSuchMethodException e2) {
+            boolean hasDefaultConstructor = ClassHelper.hasDefaultConstructor(cls);
+            if (!hasDefaultConstructor) {
                 throw new IllegalArgumentException("Class '" + cls.getName()
-                        + "' must has default constructor method with no parameters.", e2);
-            } catch (SecurityException e2) {
-                throw new IllegalArgumentException(e2.getMessage(), e2);
+                        + "' must has default constructor method with no parameters.");
             }
         }
 
@@ -179,36 +177,13 @@ public final class ProtobufProxy {
         if (debug) {
             CodePrinter.printCode(code, "generate protobuf proxy code");
         }
+        String newClassName = cg.getClassName();
 
-        FileOutputStream fos = null;
-        if (path != null) {
-            String pkg = "";
-            if (className.indexOf('.') != -1) {
-                pkg = StringUtils.substringBeforeLast(className, ".");
-            }
-
-            // mkdirs
-            String dir = path + File.separator + pkg.replace('.', File.separatorChar);
-            File f = new File(dir);
-            f.mkdirs();
-
-            try {
-                fos = new FileOutputStream(new File(f, cg.getClassName() + ".class"));
-            } catch (Exception e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-
-        }
+        OutputStream fos = prepareTargetClassFileOutputInstance(path, className, newClassName);
 
         Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader(), fos);
 
-        if (fos != null) {
-            try {
-                fos.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        }
+        closeOutputStream(fos);
 
         try {
             Codec<T> newInstance = (Codec<T>) newClass.newInstance();
@@ -221,6 +196,51 @@ public final class ProtobufProxy {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * close target {@link OutputStream} instance.
+     * @param fos target {@link OutputStream} instance to be closed
+     */
+    private static void closeOutputStream(OutputStream fos) {
+        if (fos != null) {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+    }
+
+    /**
+     * To crate {@link FileOutputStream} of full file path for target java class to write out
+     * 
+     * @param path parent path
+     * @param className original class name
+     * @param newClassName new class name
+     * @return {@link FileOutputStream} instance.
+     */
+    private static OutputStream prepareTargetClassFileOutputInstance(File path, String className, String newClassName) {
+        FileOutputStream fos = null;
+        if (path != null) {
+            String pkg = "";
+            if (className.indexOf(ClassHelper.PACKAGE_SEPARATOR_CHAR) != -1) {
+                pkg = StringUtils.substringBeforeLast(className, ClassHelper.PACKAGE_SEPARATOR);
+            }
+
+            // mkdirs
+            String dir = path + File.separator + pkg.replace(ClassHelper.PACKAGE_SEPARATOR_CHAR, File.separatorChar);
+            File f = new File(dir);
+            f.mkdirs();
+
+            try {
+                fos = new FileOutputStream(new File(f, newClassName + ".class"));
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+
+        }
+        return fos;
     }
 
     public static void clearCache() {

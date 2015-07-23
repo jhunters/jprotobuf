@@ -180,6 +180,12 @@ public class CodedConstant {
 
             } else {
                 keyClass = WIREFORMAT_CLSNAME + ".MESSAGE";
+                // check constructor
+                boolean hasDefaultConstructor = ClassHelper.hasDefaultConstructor(field.getGenericKeyType());
+                if (!hasDefaultConstructor) {
+                    throw new IllegalArgumentException("Class '" + field.getGenericKeyType().getName()
+                            + "' must has default constructor method with no parameters.");
+                }
                 defaultKeyValue = "new " + ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "()";
             }
         } else {
@@ -206,6 +212,12 @@ public class CodedConstant {
 
             } else {
                 valueClass = WIREFORMAT_CLSNAME + ".MESSAGE";
+                // check constructor
+                boolean hasDefaultConstructor = ClassHelper.hasDefaultConstructor(field.getGenericeValueType());
+                if (!hasDefaultConstructor) {
+                    throw new IllegalArgumentException("Class '" + field.getGenericeValueType().getName()
+                            + "' must has default constructor method with no parameters.");
+                }
                 defaultValueValue = "new " + ClassHelper.getInternalName(field.getGenericeValueType().getName()) + "()";
             }
         } else {

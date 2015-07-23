@@ -18,6 +18,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class PhoneNumberPOJO  {
     
+    
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */

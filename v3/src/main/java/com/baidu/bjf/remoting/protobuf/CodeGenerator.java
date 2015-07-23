@@ -56,6 +56,11 @@ public class CodeGenerator {
      * auto proxied suffix class name
      */
     private static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
+    
+    /**
+     * 
+     */
+    public static final String JAVA_CLASS_FILE_SUFFIX = ".class";
 
     /**
      * Logger for this class

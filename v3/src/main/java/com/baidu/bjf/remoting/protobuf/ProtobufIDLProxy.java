@@ -32,15 +32,17 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.squareup.protoparser.EnumType;
-import com.squareup.protoparser.EnumType.Value;
-import com.squareup.protoparser.MessageType;
-import com.squareup.protoparser.MessageType.Field;
-import com.squareup.protoparser.MessageType.Label;
-import com.squareup.protoparser.Option;
+import com.squareup.protoparser.DataType;
+import com.squareup.protoparser.EnumConstantElement;
+import com.squareup.protoparser.EnumElement;
+import com.squareup.protoparser.FieldElement;
+import com.squareup.protoparser.FieldElement.Label;
+import com.squareup.protoparser.MessageElement;
+import com.squareup.protoparser.OptionElement;
+import com.squareup.protoparser.OptionElement.Kind;
 import com.squareup.protoparser.ProtoFile;
-import com.squareup.protoparser.ProtoSchemaParser;
-import com.squareup.protoparser.Type;
+import com.squareup.protoparser.ProtoParser;
+import com.squareup.protoparser.TypeElement;
 
 /**
  * This class is for dynamic create protobuf utility class directly from .proto file
@@ -139,7 +141,7 @@ public class ProtobufIDLProxy {
     }
 
     public static IDLProxyObject createSingle(String data, boolean debug, File path) {
-        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
+        ProtoFile protoFile = ProtoParser.parse(DEFAULT_FILE_NAME, data);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null, cds);
         return map.entrySet().iterator().next().getValue();
@@ -150,11 +152,11 @@ public class ProtobufIDLProxy {
     }
 
     public static IDLProxyObject createSingle(InputStream is, boolean debug) throws IOException {
-        return createSingle(is, false, null);
+        return createSingle(is, debug, null);
     }
 
     public static IDLProxyObject createSingle(InputStream is, boolean debug, File path) throws IOException {
-        ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
+        ProtoFile protoFile = ProtoParser.parseUtf8(DEFAULT_FILE_NAME, is);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null, cds);
         return map.entrySet().iterator().next().getValue();
@@ -169,7 +171,7 @@ public class ProtobufIDLProxy {
     }
 
     public static IDLProxyObject createSingle(Reader reader, boolean debug, File path) throws IOException {
-        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
+        ProtoFile protoFile = ProtoParser.parse(DEFAULT_FILE_NAME, reader);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null, cds);
         return map.entrySet().iterator().next().getValue();
@@ -184,7 +186,7 @@ public class ProtobufIDLProxy {
     }
 
     public static Map<String, IDLProxyObject> create(String data, boolean debug, File path) {
-        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
+        ProtoFile protoFile = ProtoParser.parse(DEFAULT_FILE_NAME, data);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         return doCreate(protoFile, true, debug, path, false, null, cds);
     }
@@ -198,7 +200,7 @@ public class ProtobufIDLProxy {
     }
 
     public static Map<String, IDLProxyObject> create(InputStream is, boolean debug, File path) throws IOException {
-        ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
+        ProtoFile protoFile = ProtoParser.parseUtf8(DEFAULT_FILE_NAME, is);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         return doCreate(protoFile, true, debug, path, false, null, cds);
     }
@@ -212,7 +214,7 @@ public class ProtobufIDLProxy {
     }
 
     public static Map<String, IDLProxyObject> create(Reader reader, boolean debug, File path) throws IOException {
-        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
+        ProtoFile protoFile = ProtoParser.parse(DEFAULT_FILE_NAME, reader);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         return doCreate(protoFile, true, debug, path, false, null, cds);
     }
@@ -232,14 +234,14 @@ public class ProtobufIDLProxy {
 
     public static Map<String, IDLProxyObject> create(File file, boolean debug, File path, List<CodeDependent> cds)
             throws IOException {
-        ProtoFile protoFile = ProtoSchemaParser.parse(file);
+        ProtoFile protoFile = ProtoParser.parseUtf8(file);
 
         Set<String> dependencyNames = new HashSet<String>();
 
         Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
         String parent = file.getParent();
         // parse dependency
-        List<String> dependencies = protoFile.getDependencies();
+        List<String> dependencies = protoFile.dependencies();
         if (dependencies != null && !dependencies.isEmpty()) {
             for (String fn : dependencies) {
                 if (dependencyNames.contains(fn)) {
@@ -256,19 +258,19 @@ public class ProtobufIDLProxy {
     }
 
     public static void generateSource(String data, File sourceOutputPath) {
-        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
+        ProtoFile protoFile = ProtoParser.parse(DEFAULT_FILE_NAME, data);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
     }
 
     public static void generateSource(InputStream is, File sourceOutputPath) throws IOException {
-        ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
+        ProtoFile protoFile = ProtoParser.parseUtf8(DEFAULT_FILE_NAME, is);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
     }
 
     public static void generateSource(Reader reader, File sourceOutputPath) throws IOException {
-        ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
+        ProtoFile protoFile = ProtoParser.parse(DEFAULT_FILE_NAME, reader);
         List<CodeDependent> cds = new ArrayList<CodeDependent>();
         doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
     }
@@ -279,11 +281,11 @@ public class ProtobufIDLProxy {
     }
 
     public static void generateSource(File file, File sourceOutputPath, List<CodeDependent> cds) throws IOException {
-        ProtoFile protoFile = ProtoSchemaParser.parse(file);
+        ProtoFile protoFile = ProtoParser.parseUtf8(file);
         Set<String> dependencyNames = new HashSet<String>();
         String parent = file.getParent();
         // parse dependency
-        List<String> dependencies = protoFile.getDependencies();
+        List<String> dependencies = protoFile.dependencies();
         if (dependencies != null && !dependencies.isEmpty()) {
             for (String fn : dependencies) {
                 if (dependencyNames.contains(fn)) {
@@ -334,8 +336,8 @@ public class ProtobufIDLProxy {
      * @param sourceOutputDir
      * @return
      */
-    private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug,
-            boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds) {
+    private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug, boolean generateSouceOnly,
+            File sourceOutputDir, List<CodeDependent> cds) {
         if (generateSouceOnly) {
             if (sourceOutputDir == null) {
                 throw new RuntimeException("param 'sourceOutputDir' is null.");
@@ -346,16 +348,16 @@ public class ProtobufIDLProxy {
             }
         }
 
-        List<Type> types = protoFile.getTypes();
+        List<TypeElement> types = protoFile.typeElements();
         if (types == null || types.isEmpty()) {
             throw new RuntimeException("No message defined in '.proto' IDL");
         }
 
         int count = 0;
-        Iterator<Type> iter = types.iterator();
+        Iterator<TypeElement> iter = types.iterator();
         while (iter.hasNext()) {
-            Type next = iter.next();
-            if (next instanceof EnumType) {
+            TypeElement next = iter.next();
+            if (next instanceof EnumElement) {
                 continue;
             }
             count++;
@@ -367,10 +369,10 @@ public class ProtobufIDLProxy {
 
         List<Class> ret = new ArrayList<Class>(types.size());
 
-        List<MessageType> messageTypes = new ArrayList<MessageType>();
+        List<MessageElement> messageTypes = new ArrayList<MessageElement>();
         Set<String> enumNames = new HashSet<String>();
         Set<String> compiledClass = new HashSet<String>();
-        for (Type type : types) {
+        for (TypeElement type : types) {
             Class checkClass = checkClass(protoFile, type);
             if (checkClass != null) {
                 ret.add(checkClass);
@@ -378,12 +380,12 @@ public class ProtobufIDLProxy {
             }
 
             CodeDependent cd;
-            if (type instanceof MessageType) {
-                messageTypes.add((MessageType) type);
+            if (type instanceof MessageElement) {
+                messageTypes.add((MessageElement) type);
                 continue;
             } else {
-                cd = createCodeByType(protoFile, (EnumType) type, true);
-                enumNames.add(type.getName());
+                cd = createCodeByType(protoFile, (EnumElement) type, true);
+                enumNames.add(type.name());
             }
 
             if (debug) {
@@ -400,9 +402,9 @@ public class ProtobufIDLProxy {
             // all enum type class will be ingored to use directly
         }
 
-        for (MessageType mt : messageTypes) {
+        for (MessageElement mt : messageTypes) {
             CodeDependent cd;
-            cd = createCodeByType(protoFile, (MessageType) mt, enumNames, true, new ArrayList<Type>());
+            cd = createCodeByType(protoFile, (MessageElement) mt, enumNames, true, new ArrayList<TypeElement>());
 
             if (cd.isDepndency()) {
                 cds.add(cd);
@@ -419,9 +421,8 @@ public class ProtobufIDLProxy {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
             if (!generateSouceOnly) {
-                Class<?> newClass =
-                        JDKCompilerHelper.COMPILER.compile(codeDependent.code, ProtobufIDLProxy.class.getClassLoader(),
-                                null);
+                Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code,
+                        ProtobufIDLProxy.class.getClassLoader(), null);
                 ret.add(newClass);
             } else {
                 // need to output source code to target path
@@ -521,18 +522,18 @@ public class ProtobufIDLProxy {
         return null;
     }
 
-    private static CodeDependent createCodeByType(ProtoFile protoFile, EnumType type, boolean topLevelClass) {
+    private static CodeDependent createCodeByType(ProtoFile protoFile, EnumElement type, boolean topLevelClass) {
 
         CodeDependent cd = new CodeDependent();
 
-        String packageName = protoFile.getPackageName();
-        String defaultClsName = type.getName();
+        String packageName = protoFile.packageName();
+        String defaultClsName = type.name();
         // to check if has "java_package" option and "java_outer_classname"
-        List<Option> options = protoFile.getOptions();
+        List<OptionElement> options = protoFile.options();
         if (options != null) {
-            for (Option option : options) {
-                if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
-                    packageName = option.getValue().toString();
+            for (OptionElement option : options) {
+                if (option.name().equals(JAVA_PACKAGE_OPTION)) {
+                    packageName = option.value().toString();
                 }
             }
         }
@@ -552,11 +553,11 @@ public class ProtobufIDLProxy {
         // define class
         code.append("public enum ").append(simpleName).append(" implements EnumReadable {\n");
 
-        Iterator<Value> iter = type.getValues().iterator();
+        Iterator<EnumConstantElement> iter = type.constants().iterator();
         while (iter.hasNext()) {
-            Value value = iter.next();
-            String name = value.getName();
-            int tag = value.getTag();
+            EnumConstantElement value = iter.next();
+            String name = value.name();
+            int tag = value.tag();
 
             code.append(name).append("(").append(tag).append(")");
             if (iter.hasNext()) {
@@ -578,19 +579,19 @@ public class ProtobufIDLProxy {
         return cd;
     }
 
-    private static CodeDependent createCodeByType(ProtoFile protoFile, MessageType type, Set<String> enumNames,
-            boolean topLevelClass, List<Type> parentNestedTypes) {
+    private static CodeDependent createCodeByType(ProtoFile protoFile, MessageElement type, Set<String> enumNames,
+            boolean topLevelClass, List<TypeElement> parentNestedTypes) {
 
         CodeDependent cd = new CodeDependent();
 
-        String packageName = protoFile.getPackageName();
-        String defaultClsName = type.getName();
+        String packageName = protoFile.packageName();
+        String defaultClsName = type.name();
         // to check if has "java_package" option and "java_outer_classname"
-        List<Option> options = protoFile.getOptions();
+        List<OptionElement> options = protoFile.options();
         if (options != null) {
-            for (Option option : options) {
-                if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
-                    packageName = option.getValue().toString();
+            for (OptionElement option : options) {
+                if (option.name().equals(JAVA_PACKAGE_OPTION)) {
+                    packageName = option.value().toString();
                 }
             }
         }
@@ -618,50 +619,82 @@ public class ProtobufIDLProxy {
         }
         code.append(clsName).append(simpleName).append(" {\n");
 
-        List<Field> fields = type.getFields();
+        List<FieldElement> fields = type.fields();
 
         // get nested types
-        List<Type> nestedTypes = fetchAllNestedTypes(type);
-        List<Type> checkNestedTypes = new ArrayList<Type>(nestedTypes);
+        List<TypeElement> nestedTypes = fetchAllNestedTypes(type);
+        List<TypeElement> checkNestedTypes = new ArrayList<TypeElement>(nestedTypes);
 
         // to check if has nested classes and check has Enum type
-        for (Type t : nestedTypes) {
-            if (t instanceof EnumType) {
-                enumNames.add(t.getName());
+        for (TypeElement t : nestedTypes) {
+            if (t instanceof EnumElement) {
+                enumNames.add(t.name());
             }
         }
 
         checkNestedTypes.addAll(parentNestedTypes);
 
-        for (Field field : fields) {
+        for (FieldElement field : fields) {
             // define annotation
             generateProtobufDefinedForField(code, field, enumNames);
 
-            FieldType fType = typeMapping.get(field.getType());
+            DataType dataType = field.type();
+            String typeName;
+            if (dataType.kind() == DataType.Kind.MAP) {
+                typeName = getTypeName(((DataType.MapType) dataType).keyType());
+            } else {
+                typeName = getTypeName(field);
+            }
+
+            FieldType fType = typeMapping.get(typeName);
             String javaType;
             if (fType == null) {
-                javaType = field.getType() + DEFAULT_SUFFIX_CLASSNAME;
-                if (!isNestedTypeDependency(field.getType(), checkNestedTypes)) {
+                javaType = getTypeName(field) + DEFAULT_SUFFIX_CLASSNAME;
+                if (!isNestedTypeDependency(field.type(), checkNestedTypes)) {
                     cd.addDependency(javaType);
                 }
             } else {
                 javaType = fType.getJavaType();
             }
 
+            // fix java type for map type
+            if (dataType.kind() == DataType.Kind.MAP) {
+                DataType.MapType mapType = (DataType.MapType) dataType;
+                String keyType = mapType.keyType().toString();
+                FieldType subType = typeMapping.get(keyType);
+                String keyJavaType;
+                if (subType == null) {
+                    keyJavaType = keyType;
+                } else {
+                    keyJavaType = subType.getJavaType();
+                }
+                
+                String valueType = mapType.valueType().toString();
+                subType = typeMapping.get(valueType);
+                String valueJavaType;
+                if (subType == null) {
+                    valueJavaType = valueType;
+                } else {
+                    valueJavaType = subType.getJavaType();
+                }
+                
+                javaType = Map.class.getName() + "<" + keyJavaType + ", "
+                        + valueJavaType + ">";
+            }
+
             // define field
             code.append("public ").append(javaType);
-            code.append(" ").append(field.getName());
+            code.append(" ").append(field.name());
 
             // check if has default
-            Option defaultOption = Option.findByName(field.getOptions(), "default");
+            OptionElement defaultOption = OptionElement.findByName(field.options(), "default");
             if (defaultOption != null) {
                 code.append("=");
-                Object defaultValue = defaultOption.getValue();
+                Object defaultValue = defaultOption.value();
                 // if is enum type
-                if (defaultValue instanceof EnumType.Value) {
-                    EnumType.Value enumValue = (EnumType.Value) defaultValue;
-                    code.append(javaType).append(".").append(enumValue.getName());
-                } else if (defaultValue instanceof String) {
+                if (defaultOption.kind() == Kind.ENUM) {
+                    code.append(javaType).append(".").append(defaultValue);
+                } else if (defaultOption.kind() == Kind.STRING) {
                     code.append("\"").append(defaultValue).append("\"");
                 } else {
                     code.append(String.valueOf(defaultValue));
@@ -673,13 +706,13 @@ public class ProtobufIDLProxy {
 
         // to check if has nested classes
         if (nestedTypes != null && topLevelClass) {
-            for (Type t : nestedTypes) {
+            for (TypeElement t : nestedTypes) {
                 CodeDependent nestedCd;
-                if (t instanceof EnumType) {
-                    nestedCd = createCodeByType(protoFile, (EnumType) t, false);
-                    enumNames.add(t.getName());
+                if (t instanceof EnumElement) {
+                    nestedCd = createCodeByType(protoFile, (EnumElement) t, false);
+                    enumNames.add(t.name());
                 } else {
-                    nestedCd = createCodeByType(protoFile, (MessageType) t, enumNames, false, checkNestedTypes);
+                    nestedCd = createCodeByType(protoFile, (MessageElement) t, enumNames, false, checkNestedTypes);
                 }
 
                 code.append(nestedCd.code);
@@ -693,24 +726,33 @@ public class ProtobufIDLProxy {
         cd.name = simpleName;
         cd.pkg = packageName;
         cd.code = code.toString();
-        
+
         // finally dependency should remove self
         cd.dependencies.remove(cd.name);
         return cd;
+    }
+
+    private static String getTypeName(FieldElement field) {
+        DataType type = field.type();
+        return type.toString();
+    }
+
+    private static String getTypeName(DataType type) {
+        return type.toString();
     }
 
     /**
      * @param type
      * @return
      */
-    private static List<Type> fetchAllNestedTypes(MessageType type) {
-        List<Type> ret = new ArrayList<Type>();
+    private static List<TypeElement> fetchAllNestedTypes(MessageElement type) {
+        List<TypeElement> ret = new ArrayList<TypeElement>();
 
-        List<Type> nestedTypes = type.getNestedTypes();
+        List<TypeElement> nestedTypes = type.nestedElements();
         ret.addAll(nestedTypes);
-        for (Type t : nestedTypes) {
-            if (t instanceof MessageType) {
-                List<Type> subNestedTypes = fetchAllNestedTypes((MessageType) t);
+        for (TypeElement t : nestedTypes) {
+            if (t instanceof MessageElement) {
+                List<TypeElement> subNestedTypes = fetchAllNestedTypes((MessageElement) t);
                 ret.addAll(subNestedTypes);
             }
         }
@@ -723,13 +765,13 @@ public class ProtobufIDLProxy {
      * @param nestedTypes
      * @return
      */
-    private static boolean isNestedTypeDependency(String type, List<Type> nestedTypes) {
+    private static boolean isNestedTypeDependency(DataType type, List<TypeElement> nestedTypes) {
         if (nestedTypes == null) {
             return false;
         }
 
-        for (Type t : nestedTypes) {
-            if (type.equals(t.getName())) {
+        for (TypeElement t : nestedTypes) {
+            if (type.kind().name().equals(t.name())) {
                 return true;
             }
         }
@@ -743,40 +785,45 @@ public class ProtobufIDLProxy {
      * @param code
      * @param field
      */
-    private static void generateProtobufDefinedForField(StringBuilder code, Field field, Set<String> enumNames) {
+    private static void generateProtobufDefinedForField(StringBuilder code, FieldElement field, Set<String> enumNames) {
         code.append("@").append(Protobuf.class.getSimpleName()).append("(");
 
-        String fieldType = fieldTypeMapping.get(field.getType());
+        String fieldType = fieldTypeMapping.get(getTypeName(field));
         if (fieldType == null) {
-            if (enumNames.contains(field.getType())) {
+            if (enumNames.contains(getTypeName(field))) {
                 fieldType = "FieldType.ENUM";
             } else {
-                fieldType = "FieldType.OBJECT";
+                if (field.type().kind() == DataType.Kind.MAP) {
+                    fieldType = "FieldType.MAP";
+                } else {
+                    fieldType = "FieldType.OBJECT";
+                }
+
             }
         }
 
         code.append("fieldType=").append(fieldType);
-        code.append(", order=").append(field.getTag());
-        if (Label.OPTIONAL == field.getLabel()) {
+        code.append(", order=").append(field.tag());
+        if (com.squareup.protoparser.FieldElement.Label.OPTIONAL == field.label()) {
             code.append(", required=false");
-        } else if (Label.REQUIRED == field.getLabel()) {
+        } else if (Label.REQUIRED == field.label()) {
             code.append(", required=true");
         }
         code.append(")\n");
 
     }
 
-    private static Class checkClass(ProtoFile protoFile, Type type) {
-        String packageName = protoFile.getPackageName();
-        String defaultClsName = type.getName();
+    private static Class checkClass(ProtoFile protoFile, TypeElement type) {
+        String packageName = protoFile.packageName();
+        String defaultClsName = type.name();
         // to check if has "java_package" option and "java_outer_classname"
-        List<Option> options = protoFile.getOptions();
+        List<OptionElement> options = protoFile.options();
         if (options != null) {
-            for (Option option : options) {
-                if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
-                    packageName = option.getValue().toString();
-                } else if (option.getName().equals(JAVA_OUTER_CLASSNAME_OPTION)) {
-                    defaultClsName = option.getValue().toString();
+            for (OptionElement option : options) {
+                if (option.name().equals(JAVA_PACKAGE_OPTION)) {
+                    packageName = option.value().toString();
+                } else if (option.name().equals(JAVA_OUTER_CLASSNAME_OPTION)) {
+                    defaultClsName = option.value().toString();
                 }
             }
         }
