@@ -11,7 +11,7 @@ option java_outer_classname = "AddressBookProtos";
 message Person {
   required string name = 1;
  
-  map<string, string> stringMap = 2;
+  optional map<string, string> stringMap = 2;
 
 
 }

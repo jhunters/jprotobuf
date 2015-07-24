@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
@@ -37,7 +38,7 @@ import junit.framework.Assert;
  */
 public class MapTypeIDLProxyTest {
 
-    
+    @Ignore
     @Test
     public void testSimpleMap() throws IOException {
         InputStream is = MapTypeIDLProxyTest.class.getResourceAsStream("simple-map.proto");
