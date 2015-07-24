@@ -27,7 +27,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
 
 #####Which version#####
 1. jprotobuf-1.x supports google protocol buffer v2.5.x<br>
-2. jprotobuf-2.x supports google protocol buffer v3.0.0-alpha-2. 实现对MAP结构的支持[文档](https://github.com/jhunters/jprotobuf/tree/master/v3)<br>
+2. jprotobuf-2.x supports google protocol buffer v3.0.0-alpha-2. 实现对MAP结构的支持. [文档](https://github.com/jhunters/jprotobuf/tree/master/v3)<br>
 
 #####关联项目：#####
 JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
@@ -36,21 +36,29 @@ JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本�
 访问地址： [https://github.com/jhunters/JProtobuf-rpc-http](https://github.com/jhunters/JProtobuf-rpc-http)
 
 ## 环境要求 ##
-JDK 6 或以上版本
+jprotobuf-1.x  JDK 6 或以上版本
+
 ```xml
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
   <version>1.7.9</version>
 </dependency>
+```
+[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
 
+
+jprotobuf-2.x  JDK 7 或以上版本
+```xml
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.0.1-SNAPSHOT</version>
 </dependency>
 ```
-[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
+[下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
+
+
 ## API使用说明 ##
 
 示例：假如需要定义protobuf定义一个数据接口，包含两个属性，一个是string，一个是int32
