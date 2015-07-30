@@ -150,7 +150,7 @@ public class ProtobufIDLProxy {
     }
 
     public static IDLProxyObject createSingle(InputStream is, boolean debug) throws IOException {
-        return createSingle(is, false, null);
+        return createSingle(is, debug, null);
     }
 
     public static IDLProxyObject createSingle(InputStream is, boolean debug, File path) throws IOException {

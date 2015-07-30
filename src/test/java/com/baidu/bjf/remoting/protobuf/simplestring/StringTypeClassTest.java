@@ -35,7 +35,7 @@ public class StringTypeClassTest {
         StringTypePOJOClass pojo = new StringTypePOJOClass();
         pojo.setStr("你好!");
         
-        Codec<StringTypePOJOClass> codec = ProtobufProxy.create(StringTypePOJOClass.class);
+        Codec<StringTypePOJOClass> codec = ProtobufProxy.create(StringTypePOJOClass.class, false);
         try {
             byte[] bb = codec.encode(pojo);
             System.out.println(Arrays.toString(bb));
@@ -44,7 +44,6 @@ public class StringTypeClassTest {
             StringTypePOJOClass newPojo = codec.decode(bb);
             System.out.println(newPojo.getStr());
             Assert.assertEquals("你好!", newPojo.getStr());
-            
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

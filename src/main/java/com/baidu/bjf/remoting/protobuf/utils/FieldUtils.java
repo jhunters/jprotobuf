@@ -61,7 +61,7 @@ public final class FieldUtils {
         if (PRIMITIVE_TYPE_MAPPING.containsKey(primitiveType)) {
             return PRIMITIVE_TYPE_MAPPING.get(primitiveType);
         }
-        return primitiveType;
+        return ClassHelper.getInternalName(primitiveType);
     }
 
     /**

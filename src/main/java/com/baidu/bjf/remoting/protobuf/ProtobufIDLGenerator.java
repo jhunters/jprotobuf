@@ -134,14 +134,24 @@ public class ProtobufIDLGenerator {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
                                 Class c = (Class) targetType;
-                                if (!cachedTypes.contains(c)) {
-                                    cachedTypes.add(c);
-                                    subTypes.add(c);
+                                
+                                String fieldTypeName;
+                                if (ProtobufProxyUtils.isScalarType(c)) {
+                                    
+                                    FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(c);
+                                    fieldTypeName = fieldType.getType();
+                                    
+                                } else {
+                                    if (!cachedTypes.contains(c)) {
+                                        cachedTypes.add(c);
+                                        subTypes.add(c);
+                                    }
+                                    fieldTypeName = c.getSimpleName();
                                 }
-
-                                code.append("repeated ").append(c.getSimpleName()).append(" ")
-                                        .append(field.getField().getName()).append("=").append(field.getOrder())
-                                        .append(";\n");
+                                
+                                code.append("repeated ").append(fieldTypeName).append(" ")
+                                .append(field.getField().getName()).append("=").append(field.getOrder())
+                                .append(";\n");
                             }
                         }
                     }

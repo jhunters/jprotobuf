@@ -33,10 +33,10 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class ProtobufProxyUtils {
 
-    public static final Map<Class, FieldType> TYPE_MAPPING;
+    public static final Map<Class<?>, FieldType> TYPE_MAPPING;
 
     static {
-        TYPE_MAPPING = new HashMap<Class, FieldType>();
+        TYPE_MAPPING = new HashMap<Class<?>, FieldType>();
 
         TYPE_MAPPING.put(int.class, FieldType.INT32);
         TYPE_MAPPING.put(Integer.class, FieldType.INT32);
@@ -55,6 +55,15 @@ public class ProtobufProxyUtils {
         TYPE_MAPPING.put(Double.class, FieldType.DOUBLE);
         TYPE_MAPPING.put(Boolean.class, FieldType.BOOL);
         TYPE_MAPPING.put(boolean.class, FieldType.BOOL);
+    }
+    
+    /**
+     * Test if target type is from protocol buffer default type
+     * @param cls target type 
+     * @return true if is from protocol buffer default type
+     */
+    public static boolean isScalarType(Class<?> cls) {
+        return TYPE_MAPPING.containsKey(cls);
     }
 
     /**
