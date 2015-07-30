@@ -42,7 +42,7 @@ jprotobuf-1.x  JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.7.9</version>
+  <version>1.8.0</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
@@ -58,6 +58,37 @@ jprotobuf-2.x  JDK 7 或以上版本
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
 
+#####quick start：#####
+Compiling .proto files
+```property
+java -jar  jprotobuf-jar-with-dependencies.jar  --java_out=.  test.proto
+
+create success. output path=D:\jprotobuf_local\source\.
+
+--java_out 指定的生成java源代码目录
+```
+
+生成的代码示例如下：
+```java
+import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+public class PersonJProtoBufProtoClass {
+	@Protobuf(fieldType=FieldType.STRING, order=1, required=true)
+	public String name;
+	@Protobuf(fieldType=FieldType.INT32, order=2, required=true)
+	public Integer id;
+	@Protobuf(fieldType=FieldType.STRING, order=3, required=false)
+	public String email;
+	@Protobuf(fieldType=FieldType.DOUBLE, order=4, required=false)
+	public Double doubleF;
+	@Protobuf(fieldType=FieldType.FLOAT, order=5, required=false)
+	public Float floatF;
+	@Protobuf(fieldType=FieldType.BYTES, order=6, required=false)
+	public byte[] bytesF;
+	@Protobuf(fieldType=FieldType.BOOL, order=7, required=false)
+	public Boolean boolF;
+}
+```
 
 ## API使用说明 ##
 
