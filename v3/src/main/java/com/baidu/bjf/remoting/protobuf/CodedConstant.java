@@ -18,22 +18,39 @@ package com.baidu.bjf.remoting.protobuf;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.baidu.bjf.remoting.protobuf.descriptor.DescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.FieldDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.FileDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.Label;
+import com.baidu.bjf.remoting.protobuf.descriptor.Type;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
+import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.Descriptors;
+import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Internal;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.LazyField;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageLite;
 import com.google.protobuf.WireFormat;
+import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
+import com.squareup.protoparser.DataType;
+import com.squareup.protoparser.DataType.Kind;
+import com.squareup.protoparser.FieldElement;
+import com.squareup.protoparser.MessageElement;
+import com.squareup.protoparser.ProtoFile;
+import com.squareup.protoparser.ProtoParser;
+import com.squareup.protoparser.TypeElement;
 
 /**
  * Utility class for codec.
@@ -45,6 +62,8 @@ public class CodedConstant {
 
     private static final String WIREFORMAT_CLSNAME = ClassHelper
             .getInternalName(com.google.protobuf.WireFormat.FieldType.class.getName());
+    
+    private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
 
     /**
      * get field name
@@ -992,5 +1011,111 @@ public class CodedConstant {
 
         throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
     }
+    
+    public static Descriptor getDescriptor(Class<?> cls) throws IOException {
+        
+        String idl = ProtobufIDLGenerator.getIDL(cls);
+        ProtoFile file = ProtoParser.parse(ProtobufIDLProxy.DEFAULT_FILE_NAME, idl);
+        
+        FileDescriptorProtoPOJO fileDescriptorProto = new FileDescriptorProtoPOJO();
+        
+        fileDescriptorProto.name = ProtobufIDLProxy.DEFAULT_FILE_NAME;
+        fileDescriptorProto.pkg = file.packageName();
+        fileDescriptorProto.dependencies = file.dependencies();
+        fileDescriptorProto.publicDependency = convertList(file.publicDependencies());
+        fileDescriptorProto.weakDependency = null; // XXX
+        
+        fileDescriptorProto.messageTypes = new ArrayList<>();
+        fileDescriptorProto.enumTypes = new ArrayList<>();
+        fileDescriptorProto.services = new ArrayList<>();
+        
+        
+        
+        List<TypeElement> typeElements = file.typeElements();
+        if (typeElements != null) {
+            for (TypeElement typeElement : typeElements) {
+                if (typeElement instanceof MessageElement) {
+                    fileDescriptorProto.messageTypes.add(getDescritorProtoPOJO((MessageElement) typeElement));
+                }
+                
+                
+            }
+        }
+        FileDescriptorProto fileproto;
+        try {
+            fileproto = FileDescriptorProto.parseFrom(descriptorCodec.encode(fileDescriptorProto));
+            
+            String escapeBytes = StringUtils.escapeBytes(descriptorCodec.encode(fileDescriptorProto));
+            System.out.println(escapeBytes);
+            
+        } catch (InvalidProtocolBufferException e) {
+          throw new IOException(
+            "Failed to parse protocol buffer descriptor for generated code.", e);
+        }
+        
+        
+        return fileproto.getDescriptorForType();
+    }
 
+    private static DescriptorProtoPOJO getDescritorProtoPOJO(MessageElement typeElement) {
+        
+        DescriptorProtoPOJO ret = new DescriptorProtoPOJO();
+        ret.name = typeElement.name();
+        ret.fields = new ArrayList<>();
+        ret.nestedTypes = new ArrayList<>();
+        ret.enumTypes = new ArrayList<>();
+        ret.extensionRanges = new ArrayList<>();
+        ret.extensions = new ArrayList<>();
+        ret.options = new ArrayList<>();
+        ret.oneofDecls = new ArrayList<>();
+        
+        List<FieldElement> fields = typeElement.fields();
+        if (fields != null) {
+            FieldDescriptorProtoPOJO fieldDescriptorProto;
+            for (FieldElement fieldElement : fields) {
+                fieldDescriptorProto = new FieldDescriptorProtoPOJO();
+                fieldDescriptorProto.name = fieldElement.name();
+                fieldDescriptorProto.extendee = null; // XXX
+                fieldDescriptorProto.number = fieldElement.tag();
+                
+                com.squareup.protoparser.FieldElement.Label label = fieldElement.label();
+                if (label == com.squareup.protoparser.FieldElement.Label.OPTIONAL) {
+                    fieldDescriptorProto.label = Label.LABEL_OPTIONAL;
+                }  else if (label == com.squareup.protoparser.FieldElement.Label.REQUIRED) {
+                    fieldDescriptorProto.label = Label.LABEL_REQUIRED;
+                } else if (label == com.squareup.protoparser.FieldElement.Label.REPEATED) {
+                    fieldDescriptorProto.label = Label.LABEL_REPEATED;
+                }
+               
+                DataType type = fieldElement.type();
+                if (type.kind() == Kind.MAP) {
+                    fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                } else if (type.kind() == Kind.MAP || type.kind() == Kind.NAMED) {
+                    fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                    fieldDescriptorProto.typeName = ((DataType.NamedType) type).name();
+                }  else {
+                    fieldDescriptorProto.type = Type.valueOf(((DataType.ScalarType) type).ordinal());
+                }
+               
+                ret.fields.add(fieldDescriptorProto);
+            }
+        }
+        
+        
+        
+        return ret;
+    }
+
+    private static List<Integer> convertList(List<String> list) {
+        if (list == null) {
+            return null;
+        }
+        List<Integer> ret = new ArrayList<>(list.size());
+        for (String v : list) {
+            ret.add(StringUtils.toInt(v));
+        }
+        
+        return ret;
+    }
+    
 }

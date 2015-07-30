@@ -28,6 +28,7 @@ import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.google.protobuf.Descriptors.Descriptor;
 
 /**
  * Code generator utility class.
@@ -175,12 +176,17 @@ public class CodeGenerator {
         // define class code
         code.append("public class " + className + " implements com.baidu.bjf.remoting.protobuf.Codec");
         code.append("<").append(ClassHelper.getInternalName(cls.getName())).append("> {" + LINE_BREAK);
+        
+        // define Descriptor field
+        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
+        code.append("private ").append(descriptorClsName).append(" descriptor").append(JAVA_LINE_BREAK);
 
         code.append(getEncodeMethodCode());
         code.append(getDecodeMethodCode());
         code.append(getSizeMethodCode());
         code.append(getWriteToMethodCode());
         code.append(getReadFromMethodCode());
+        code.append(getGetDescriptorMethodCode());
         code.append("}");
 
         return code.toString();
@@ -360,6 +366,28 @@ public class CodeGenerator {
         code.append(" decode(byte[] bb) throws IOException {").append(LINE_BREAK);
         code.append("CodedInputStream input = CodedInputStream.newInstance(bb, 0, bb.length)").append(JAVA_LINE_BREAK);
         getParseBytesMethodCode(code);
+        return code.toString();
+    }
+    
+    
+    /**
+     * generate <code>getDescriptor</code> method code
+     * @return source code
+     */
+    private Object getGetDescriptorMethodCode() {
+        StringBuilder code = new StringBuilder();
+
+        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
+        code.append("public ").append(descriptorClsName);
+        code.append(" getDescriptor() throws IOException {").append(LINE_BREAK);
+        code.append("if (this.descriptor != null) {").append(LINE_BREAK);
+        code.append("return this.descriptor").append(JAVA_LINE_BREAK);
+        code.append("}").append(LINE_BREAK);
+        code.append(descriptorClsName).append(" descriptor = ");
+        code.append("CodedConstant.getDescriptor(").append(ClassHelper.getInternalName(cls.getName()))
+                .append(JAVA_CLASS_FILE_SUFFIX).append(")").append(JAVA_LINE_BREAK);
+        code.append("return (this.descriptor = descriptor)").append(JAVA_LINE_BREAK);
+        code.append("}").append(LINE_BREAK);
         return code.toString();
     }
 

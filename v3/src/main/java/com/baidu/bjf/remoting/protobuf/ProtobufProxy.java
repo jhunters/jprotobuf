@@ -86,7 +86,7 @@ public final class ProtobufProxy {
         List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
         if (fields.isEmpty()) {
             throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
-                    + Protobuf.class.getName());
+                    + Protobuf.class.getName() + " at class " + cls.getName());
         }
 
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);

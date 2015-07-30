@@ -16,6 +16,7 @@
 package com.baidu.bjf.remoting.protobuf;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
@@ -134,14 +135,24 @@ public class ProtobufIDLGenerator {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
                                 Class c = (Class) targetType;
-                                if (!cachedTypes.contains(c)) {
-                                    cachedTypes.add(c);
-                                    subTypes.add(c);
+                                
+                                String fieldTypeName;
+                                if (ProtobufProxyUtils.isScalarType(c)) {
+                                    
+                                    FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(c);
+                                    fieldTypeName = fieldType.getType();
+                                    
+                                } else {
+                                    if (!cachedTypes.contains(c)) {
+                                        cachedTypes.add(c);
+                                        subTypes.add(c);
+                                    }
+                                    fieldTypeName = c.getSimpleName();
                                 }
-
-                                code.append("repeated ").append(c.getSimpleName()).append(" ")
-                                        .append(field.getField().getName()).append("=").append(field.getOrder())
-                                        .append(";\n");
+                                
+                                code.append("repeated ").append(fieldTypeName).append(" ")
+                                .append(field.getField().getName()).append("=").append(field.getOrder())
+                                .append(";\n");
                             }
                         }
                     }
@@ -167,6 +178,10 @@ public class ProtobufIDLGenerator {
                             enumTypes.add(c);
                         }
                     }
+                } else if (field.getFieldType() == FieldType.MAP) {
+                    type = type + "<" + ProtobufProxyUtils.processProtobufType(field.getGenericeValueType()) + ", ";
+                    type = type + ProtobufProxyUtils.processProtobufType(field.getGenericeValueType())  + ">";
+                    
                 }
 
                 String required = getFieldRequired(field.isRequired());
@@ -202,6 +217,11 @@ public class ProtobufIDLGenerator {
 
         Field[] fields = cls.getFields();
         for (Field field : fields) {
+            
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+            
             String name = field.getName();
             code.append(name).append("=");
             Enum value = Enum.valueOf(cls, name);
