@@ -218,19 +218,19 @@ public class ProtobufIDLGenerator {
         Field[] fields = cls.getFields();
         for (Field field : fields) {
             
-            if (Modifier.isStatic(field.getModifiers())) {
-                continue;
-            }
-            
             String name = field.getName();
             code.append(name).append("=");
-            Enum value = Enum.valueOf(cls, name);
-            if (value instanceof EnumReadable) {
-                code.append(((EnumReadable) value).value());
-            } else {
-                code.append(value.ordinal());
+            try {
+                Enum value = Enum.valueOf(cls, name);
+                if (value instanceof EnumReadable) {
+                    code.append(((EnumReadable) value).value());
+                } else {
+                    code.append(value.ordinal());
+                }
+                code.append(";\n");
+            } catch (Exception e) {
+                continue;
             }
-            code.append(";\n");
         }
 
         code.append("}\n ");
