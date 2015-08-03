@@ -138,6 +138,9 @@ public enum FieldType {
      * @return java original type
      */
     public String getJavaType() {
+        if (this == FieldType.ENUM) {
+            return Enum.class.getName();
+        }
         return javaType;
     }
 

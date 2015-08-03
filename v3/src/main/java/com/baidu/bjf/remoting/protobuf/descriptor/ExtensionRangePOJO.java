@@ -19,7 +19,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.DescriptorProto.ExtensionRange;
 
 /**
- * JProtobuf supports for {@link ExtensionRange}
+ * JProtobuf POJO supports for {@link ExtensionRange}
  * @author xiemalin
  * @since 2.0.1
  */

@@ -37,6 +37,8 @@ import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Descriptors.DescriptorValidationException;
+import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.Internal;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.LazyField;
@@ -46,7 +48,9 @@ import com.google.protobuf.WireFormat;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.squareup.protoparser.DataType;
 import com.squareup.protoparser.DataType.Kind;
+import com.squareup.protoparser.DataType.MapType;
 import com.squareup.protoparser.FieldElement;
+import com.squareup.protoparser.FieldElement.Builder;
 import com.squareup.protoparser.MessageElement;
 import com.squareup.protoparser.ProtoFile;
 import com.squareup.protoparser.ProtoParser;
@@ -60,9 +64,11 @@ import com.squareup.protoparser.TypeElement;
  */
 public class CodedConstant {
 
-    private static final String WIREFORMAT_CLSNAME = ClassHelper
-            .getInternalName(com.google.protobuf.WireFormat.FieldType.class.getName());
-    
+    private static final String MAP_ENTRY_SUFFIX = "Entry";
+
+    private static final String WIREFORMAT_CLSNAME =
+            ClassHelper.getInternalName(com.google.protobuf.WireFormat.FieldType.class.getName());
+
     private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
 
     /**
@@ -86,7 +92,8 @@ public class CodedConstant {
      * @param isMap is field type is a {@link Map}
      * @return full java expression
      */
-    public static String getMappedTypeDefined(int order, FieldType type, String express, boolean isList, boolean isMap) {
+    public static String getMappedTypeDefined(int order, FieldType type, String express, boolean isList,
+            boolean isMap) {
         StringBuilder code = new StringBuilder();
         String fieldName = getFieldName(order);
         if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
@@ -190,9 +197,8 @@ public class CodedConstant {
                 Class<?> declaringClass = field.getGenericKeyType();
                 Field[] fields = declaringClass.getFields();
                 if (fields != null && fields.length > 0) {
-                    defaultKeyValue =
-                            ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "."
-                                    + fields[0].getName();
+                    defaultKeyValue = ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "."
+                            + fields[0].getName();
                 } else {
                     defaultKeyValue = "0";
                 }
@@ -222,9 +228,8 @@ public class CodedConstant {
                 Class<?> declaringClass = field.getGenericeValueType();
                 Field[] fields = declaringClass.getFields();
                 if (fields != null && fields.length > 0) {
-                    defaultValueValue =
-                            ClassHelper.getInternalName(field.getGenericeValueType().getName()) + "."
-                                    + fields[0].getName();
+                    defaultValueValue = ClassHelper.getInternalName(field.getGenericeValueType().getName()) + "."
+                            + fields[0].getName();
                 } else {
                     defaultValueValue = "0";
                 }
@@ -255,7 +260,7 @@ public class CodedConstant {
      * @param path
      * @return full java expression
      */
-    public static int computeListSize(int order, List list, FieldType type, boolean debug, File path) {
+    public static int computeListSize(int order, List<?> list, FieldType type, boolean debug, File path) {
         int size = 0;
         if (list == null) {
             return size;
@@ -274,9 +279,8 @@ public class CodedConstant {
             K defaultKey, com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) {
         int size = 0;
         for (java.util.Map.Entry<K, V> entry : map.entrySet()) {
-            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry =
-                    com.baidu.bjf.remoting.protobuf.MapEntry.<K, V> newDefaultInstance(null, keyType, defaultKey,
-                            valueType, defalutValue);
+            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
+                    .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
 
             com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
                     valuesDefaultEntry.newBuilderForType().setKey(entry.getKey()).setValue(entry.getValue()).build();
@@ -293,9 +297,8 @@ public class CodedConstant {
     public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
             com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
             com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) throws IOException {
-        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry =
-                com.baidu.bjf.remoting.protobuf.MapEntry.<K, V> newDefaultInstance(null, keyType, defaultKey,
-                        valueType, defalutValue);
+        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
+                .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
 
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
                 input.readMessage(valuesDefaultEntry.getParserForType(), null);
@@ -306,9 +309,8 @@ public class CodedConstant {
     public static <K, V> void writeToMap(CodedOutputStream output, int order, Map<K, V> map,
             com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
             com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) throws IOException {
-        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry =
-                com.baidu.bjf.remoting.protobuf.MapEntry.<K, V> newDefaultInstance(null, keyType, defaultKey,
-                        valueType, defalutValue);
+        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
+                .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
         for (java.util.Map.Entry<K, V> entry : map.entrySet()) {
             com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
                     valuesDefaultEntry.newBuilderForType().setKey(entry.getKey()).setValue(entry.getValue()).build();
@@ -335,7 +337,7 @@ public class CodedConstant {
         }
 
         Class cls = o.getClass();
-        Codec target = ProtobufProxy.create(cls, false, null);
+        Codec target = ProtobufProxy.create(cls);
         try {
             size = target.size(o);
             size = size + CodedOutputStream.computeRawVarint32Size(size);
@@ -1011,54 +1013,57 @@ public class CodedConstant {
 
         throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
     }
-    
+
     public static Descriptor getDescriptor(Class<?> cls) throws IOException {
-        
+
         String idl = ProtobufIDLGenerator.getIDL(cls);
         ProtoFile file = ProtoParser.parse(ProtobufIDLProxy.DEFAULT_FILE_NAME, idl);
-        
+
         FileDescriptorProtoPOJO fileDescriptorProto = new FileDescriptorProtoPOJO();
-        
+
         fileDescriptorProto.name = ProtobufIDLProxy.DEFAULT_FILE_NAME;
         fileDescriptorProto.pkg = file.packageName();
         fileDescriptorProto.dependencies = file.dependencies();
         fileDescriptorProto.publicDependency = convertList(file.publicDependencies());
         fileDescriptorProto.weakDependency = null; // XXX
-        
+
         fileDescriptorProto.messageTypes = new ArrayList<>();
         fileDescriptorProto.enumTypes = new ArrayList<>();
         fileDescriptorProto.services = new ArrayList<>();
-        
-        
-        
+
         List<TypeElement> typeElements = file.typeElements();
         if (typeElements != null) {
             for (TypeElement typeElement : typeElements) {
                 if (typeElement instanceof MessageElement) {
-                    fileDescriptorProto.messageTypes.add(getDescritorProtoPOJO((MessageElement) typeElement));
+                    fileDescriptorProto.messageTypes
+                            .add(getDescritorProtoPOJO(fileDescriptorProto, (MessageElement) typeElement));
                 }
-                
-                
+
             }
         }
+        
         FileDescriptorProto fileproto;
         try {
-            fileproto = FileDescriptorProto.parseFrom(descriptorCodec.encode(fileDescriptorProto));
-            
-            String escapeBytes = StringUtils.escapeBytes(descriptorCodec.encode(fileDescriptorProto));
-            System.out.println(escapeBytes);
-            
+            byte[] bs = descriptorCodec.encode(fileDescriptorProto);
+            fileproto = FileDescriptorProto.parseFrom(bs);
         } catch (InvalidProtocolBufferException e) {
-          throw new IOException(
-            "Failed to parse protocol buffer descriptor for generated code.", e);
+            throw new IOException("Failed to parse protocol buffer descriptor for generated code.", e);
         }
-        
-        
-        return fileproto.getDescriptorForType();
+
+        FileDescriptor fileDescriptor;
+        try {
+            fileDescriptor =
+                    FileDescriptor.buildFrom(fileproto, new com.google.protobuf.Descriptors.FileDescriptor[] {});
+        } catch (DescriptorValidationException e) {
+            throw new IOException(e.getMessage(), e);
+        }
+
+        return fileDescriptor.getMessageTypes().get(0);
     }
 
-    private static DescriptorProtoPOJO getDescritorProtoPOJO(MessageElement typeElement) {
-        
+    private static DescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
+            MessageElement typeElement) {
+
         DescriptorProtoPOJO ret = new DescriptorProtoPOJO();
         ret.name = typeElement.name();
         ret.fields = new ArrayList<>();
@@ -1068,7 +1073,7 @@ public class CodedConstant {
         ret.extensions = new ArrayList<>();
         ret.options = new ArrayList<>();
         ret.oneofDecls = new ArrayList<>();
-        
+
         List<FieldElement> fields = typeElement.fields();
         if (fields != null) {
             FieldDescriptorProtoPOJO fieldDescriptorProto;
@@ -1077,34 +1082,74 @@ public class CodedConstant {
                 fieldDescriptorProto.name = fieldElement.name();
                 fieldDescriptorProto.extendee = null; // XXX
                 fieldDescriptorProto.number = fieldElement.tag();
-                
+
                 com.squareup.protoparser.FieldElement.Label label = fieldElement.label();
                 if (label == com.squareup.protoparser.FieldElement.Label.OPTIONAL) {
                     fieldDescriptorProto.label = Label.LABEL_OPTIONAL;
-                }  else if (label == com.squareup.protoparser.FieldElement.Label.REQUIRED) {
+                } else if (label == com.squareup.protoparser.FieldElement.Label.REQUIRED) {
                     fieldDescriptorProto.label = Label.LABEL_REQUIRED;
                 } else if (label == com.squareup.protoparser.FieldElement.Label.REPEATED) {
                     fieldDescriptorProto.label = Label.LABEL_REPEATED;
                 }
-               
+
                 DataType type = fieldElement.type();
                 if (type.kind() == Kind.MAP) {
+                    String messageName = StringUtils.capitalize(fieldDescriptorProto.name) + MAP_ENTRY_SUFFIX;
                     fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                    fieldDescriptorProto.typeName = CodeGenerator.PACKAGE_SPLIT + fileDescriptorProto.pkg
+                            + CodeGenerator.PACKAGE_SPLIT + ret.name + CodeGenerator.PACKAGE_SPLIT
+                            + messageName;
+                    // refix label type
+                    fieldDescriptorProto.label = Label.LABEL_REPEATED;
+                    
+                    // here should add key and value type message type
+                    DataType.MapType mapType = (DataType.MapType) type;
+                    
+                    MessageElement messageElement =  getMapKVMessageElements(messageName, mapType);
+                    
+                    ret.nestedTypes.add(getDescritorProtoPOJO(fileDescriptorProto, messageElement));
+                    
                 } else if (type.kind() == Kind.MAP || type.kind() == Kind.NAMED) {
                     fieldDescriptorProto.type = Type.TYPE_MESSAGE;
                     fieldDescriptorProto.typeName = ((DataType.NamedType) type).name();
-                }  else {
-                    fieldDescriptorProto.type = Type.valueOf(((DataType.ScalarType) type).ordinal());
+                } else {
+                    fieldDescriptorProto.type = Type.valueOf("TYPE_" + ((DataType.ScalarType) type).name());
                 }
-               
+
                 ret.fields.add(fieldDescriptorProto);
             }
         }
         
-        
-        
+        List<TypeElement> nestedElements = typeElement.nestedElements();
+        if (nestedElements != null) {
+            for (TypeElement nestedTypeElement : nestedElements) {
+                if (typeElement instanceof MessageElement) {
+                    ret.nestedTypes
+                            .add(getDescritorProtoPOJO(fileDescriptorProto, (MessageElement) nestedTypeElement));
+                }
+            }
+        }
+
         return ret;
     }
+
+    private static MessageElement getMapKVMessageElements(String name, MapType mapType) {
+        MessageElement.Builder ret = MessageElement.builder();
+        ret.name(name);
+        
+        DataType keyType = mapType.keyType();
+        Builder fieldBuilder = FieldElement.builder().name("key").tag(1);
+        fieldBuilder.type(keyType).label(com.squareup.protoparser.FieldElement.Label.OPTIONAL);
+        ret.addField(fieldBuilder.build());
+        
+        DataType valueType = mapType.valueType();
+        fieldBuilder = FieldElement.builder().name("value").tag(2);
+        fieldBuilder.type(valueType).label(com.squareup.protoparser.FieldElement.Label.OPTIONAL);
+        ret.addField(fieldBuilder.build());
+        
+        return ret.build();
+    }
+    
 
     private static List<Integer> convertList(List<String> list) {
         if (list == null) {
@@ -1114,8 +1159,8 @@ public class CodedConstant {
         for (String v : list) {
             ret.add(StringUtils.toInt(v));
         }
-        
+
         return ret;
     }
-    
+
 }

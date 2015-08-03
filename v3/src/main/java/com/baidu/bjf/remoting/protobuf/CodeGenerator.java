@@ -58,6 +58,8 @@ public class CodeGenerator {
      */
     private static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
     
+    public static final String PACKAGE_SPLIT = ".";
+    
     /**
      * 
      */
@@ -254,7 +256,7 @@ public class CodeGenerator {
                     }
                 }
                 express =
-                        "Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName + ".values(),"
+                        "java.lang.Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName + ".values(),"
                                 + "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";
