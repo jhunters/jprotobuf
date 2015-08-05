@@ -73,7 +73,7 @@ public class ProtobufIDLProxy {
     /**
      * default proto file name
      */
-    private static final String DEFAULT_FILE_NAME = "jprotobuf_autogenerate";
+    public static final String DEFAULT_FILE_NAME = "jprotobuf_autogenerate";
 
     /**
      * type mapping of field type

@@ -18,13 +18,32 @@ package com.baidu.bjf.remoting.protobuf;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.baidu.bjf.remoting.protobuf.descriptor.DescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.EnumDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.ExtensionRangePOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.FieldDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.FileDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.Label;
+import com.baidu.bjf.remoting.protobuf.descriptor.MessageOptionsPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.ServiceDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.Type;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
+import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedOutputStream;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.WireFormat;
+import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
+import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Descriptors.DescriptorValidationException;
+import com.google.protobuf.Descriptors.FileDescriptor;
+import com.squareup.protoparser.MessageType;
+import com.squareup.protoparser.ProtoFile;
+import com.squareup.protoparser.ProtoSchemaParser;
 
 /**
  * Utility class for codec.
@@ -33,6 +52,8 @@ import com.google.protobuf.WireFormat;
  * @since 1.0.0
  */
 public class CodedConstant {
+    
+    private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
 
     /**
      * get field name
@@ -556,6 +577,123 @@ public class CodedConstant {
             }
         }
         return "";
+    }
+    
+    public static Descriptor getDescriptor(Class<?> cls) throws IOException {
+
+        String idl = ProtobufIDLGenerator.getIDL(cls);
+        ProtoFile file = ProtoSchemaParser.parse(ProtobufIDLProxy.DEFAULT_FILE_NAME, idl);
+
+        FileDescriptorProtoPOJO fileDescriptorProto = new FileDescriptorProtoPOJO();
+
+        fileDescriptorProto.name = ProtobufIDLProxy.DEFAULT_FILE_NAME;
+        fileDescriptorProto.pkg = file.getPackageName();
+        fileDescriptorProto.dependencies = file.getDependencies();
+        fileDescriptorProto.publicDependency = convertList(file.getPublicDependencies());
+        fileDescriptorProto.weakDependency = null; // XXX
+
+        fileDescriptorProto.messageTypes = new ArrayList<DescriptorProtoPOJO>();
+        fileDescriptorProto.enumTypes = new ArrayList<EnumDescriptorProtoPOJO>();
+        fileDescriptorProto.services = new ArrayList<ServiceDescriptorProtoPOJO>();
+
+        List<com.squareup.protoparser.Type> typeElements = file.getTypes();
+        if (typeElements != null) {
+            for (com.squareup.protoparser.Type typeElement : typeElements) {
+                if (typeElement instanceof MessageType) {
+                    fileDescriptorProto.messageTypes
+                            .add(getDescritorProtoPOJO(fileDescriptorProto, (MessageType) typeElement));
+                }
+
+            }
+        }
+        
+        FileDescriptorProto fileproto;
+        try {
+            byte[] bs = descriptorCodec.encode(fileDescriptorProto);
+            fileproto = FileDescriptorProto.parseFrom(bs);
+        } catch (InvalidProtocolBufferException e) {
+            throw new IOException("Failed to parse protocol buffer descriptor for generated code.", e);
+        }
+
+        FileDescriptor fileDescriptor;
+        try {
+            fileDescriptor =
+                    FileDescriptor.buildFrom(fileproto, new com.google.protobuf.Descriptors.FileDescriptor[] {});
+        } catch (DescriptorValidationException e) {
+            throw new IOException(e.getMessage(), e);
+        }
+
+        return fileDescriptor.getMessageTypes().get(0);
+    }
+
+    private static DescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
+            MessageType typeElement) {
+
+        DescriptorProtoPOJO ret = new DescriptorProtoPOJO();
+        ret.name = typeElement.getName();
+        ret.fields = new ArrayList<FieldDescriptorProtoPOJO>();
+        ret.nestedTypes = new ArrayList<DescriptorProtoPOJO>();
+        ret.enumTypes = new ArrayList<EnumDescriptorProtoPOJO>();
+        ret.extensionRanges = new ArrayList<ExtensionRangePOJO>();
+        ret.extensions = new ArrayList<FieldDescriptorProtoPOJO>();
+        ret.options = new ArrayList<MessageOptionsPOJO>();
+
+        List<com.squareup.protoparser.MessageType.Field> fields = typeElement.getFields();
+        if (fields != null) {
+            FieldDescriptorProtoPOJO fieldDescriptorProto;
+            for (com.squareup.protoparser.MessageType.Field fieldElement : fields) {
+                fieldDescriptorProto = new FieldDescriptorProtoPOJO();
+                fieldDescriptorProto.name = fieldElement.getName();
+                fieldDescriptorProto.extendee = null; // XXX
+                fieldDescriptorProto.number = fieldElement.getTag();
+
+                com.squareup.protoparser.MessageType.Label label = fieldElement.getLabel();
+                if (label == com.squareup.protoparser.MessageType.Label.OPTIONAL) {
+                    fieldDescriptorProto.label = Label.LABEL_OPTIONAL;
+                } else if (label == com.squareup.protoparser.MessageType.Label.REQUIRED) {
+                    fieldDescriptorProto.label = Label.LABEL_REQUIRED;
+                } else if (label == com.squareup.protoparser.MessageType.Label.REPEATED) {
+                    fieldDescriptorProto.label = Label.LABEL_REPEATED;
+                }
+
+                String type = fieldElement.getType();
+                fieldDescriptorProto.defaultValue = fieldElement.getDefault();
+                
+                try {
+                    fieldDescriptorProto.type = Type.valueOf("TYPE_" + type.toUpperCase());
+                } catch (Exception e) {
+                    fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                    fieldDescriptorProto.typeName = type;
+                }
+                
+                ret.fields.add(fieldDescriptorProto);
+            }
+        }
+        
+        List<com.squareup.protoparser.Type> nestedElements = typeElement.getNestedTypes();
+        if (nestedElements != null) {
+            for (com.squareup.protoparser.Type nestedTypeElement : nestedElements) {
+                if (typeElement instanceof MessageType) {
+                    ret.nestedTypes
+                            .add(getDescritorProtoPOJO(fileDescriptorProto, (MessageType) nestedTypeElement));
+                }
+            }
+        }
+
+        return ret;
+    }
+
+
+    private static List<Integer> convertList(List<String> list) {
+        if (list == null) {
+            return null;
+        }
+        List<Integer> ret = new ArrayList<Integer>(list.size());
+        for (String v : list) {
+            ret.add(StringUtils.toInt(v));
+        }
+
+        return ret;
     }
 
 }

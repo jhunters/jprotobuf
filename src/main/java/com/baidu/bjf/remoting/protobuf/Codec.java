@@ -19,6 +19,8 @@ import java.io.IOException;
 
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
+import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.Descriptors.DescriptorValidationException;
 
 /**
  * Codec interface include encode and decode support.
@@ -72,5 +74,12 @@ public interface Codec<T> {
      * @throws IOException if byte array is invalid
      */
     T readFrom(CodedInputStream intput) throws IOException;
+    
+    /**
+     * Get {@code Descriptor} to support dynamic mesage call for protocol buffer
+     * @return  {@link Descriptor} instance
+     * @throws IOException in case of create {@link Descriptor} failed
+     */
+    Descriptor getDescriptor() throws IOException;
     
 }
