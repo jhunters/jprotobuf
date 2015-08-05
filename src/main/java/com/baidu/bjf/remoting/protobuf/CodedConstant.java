@@ -661,9 +661,10 @@ public class CodedConstant {
                 
                 try {
                     fieldDescriptorProto.type = Type.valueOf("TYPE_" + type.toUpperCase());
+                    
                 } catch (Exception e) {
                     fieldDescriptorProto.type = Type.TYPE_MESSAGE;
-                    fieldDescriptorProto.typeName = type;
+                    fieldDescriptorProto.typeName = "." + fileDescriptorProto.pkg + "." + type;
                 }
                 
                 ret.fields.add(fieldDescriptorProto);

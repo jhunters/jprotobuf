@@ -123,7 +123,7 @@ public class ProtobufIDLGenerator {
             if (field.hasDescription()) {
                 code.append("// ").append(field.getDescription()).append("\n");
             }
-            if (field.getFieldType() == FieldType.OBJECT) {
+            if (field.getFieldType() == FieldType.OBJECT || field.getFieldType() == FieldType.ENUM) {
                 if (field.isList()) {
                     Type type = field.getField().getGenericType();
                     if (type instanceof ParameterizedType) {
@@ -142,10 +142,19 @@ public class ProtobufIDLGenerator {
                                     fieldTypeName = fieldType.getType();
                                     
                                 } else {
-                                    if (!cachedTypes.contains(c)) {
-                                        cachedTypes.add(c);
-                                        subTypes.add(c);
+                                    if (field.getFieldType() == FieldType.ENUM) {
+                                        if (!cachedEnumTypes.contains(c)) {
+                                            cachedEnumTypes.add(c);
+                                            enumTypes.add(c);
+                                        }
+                                    } else  {
+                                        
+                                        if (!cachedTypes.contains(c)) {
+                                            cachedTypes.add(c);
+                                            subTypes.add(c);
+                                        }
                                     }
+                                    
                                     fieldTypeName = c.getSimpleName();
                                 }
                                 
