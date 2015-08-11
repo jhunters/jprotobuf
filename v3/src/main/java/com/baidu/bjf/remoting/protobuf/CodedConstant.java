@@ -20,10 +20,15 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.descriptor.DescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.EnumDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.EnumOptionsPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.EnumValueDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.FieldDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.FileDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.Label;
@@ -35,6 +40,7 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
+import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
@@ -45,13 +51,15 @@ import com.google.protobuf.LazyField;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageLite;
 import com.google.protobuf.WireFormat;
-import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.squareup.protoparser.DataType;
 import com.squareup.protoparser.DataType.Kind;
 import com.squareup.protoparser.DataType.MapType;
+import com.squareup.protoparser.EnumConstantElement;
+import com.squareup.protoparser.EnumElement;
 import com.squareup.protoparser.FieldElement;
 import com.squareup.protoparser.FieldElement.Builder;
 import com.squareup.protoparser.MessageElement;
+import com.squareup.protoparser.OptionElement;
 import com.squareup.protoparser.ProtoFile;
 import com.squareup.protoparser.ProtoParser;
 import com.squareup.protoparser.TypeElement;
@@ -1031,17 +1039,32 @@ public class CodedConstant {
         fileDescriptorProto.enumTypes = new ArrayList<>();
         fileDescriptorProto.services = new ArrayList<>();
 
+        Set<String> messageSet = new HashSet<String>();
+        Set<String> enumSet = new HashSet<String>();
+
         List<TypeElement> typeElements = file.typeElements();
         if (typeElements != null) {
+
             for (TypeElement typeElement : typeElements) {
                 if (typeElement instanceof MessageElement) {
-                    fileDescriptorProto.messageTypes
-                            .add(getDescritorProtoPOJO(fileDescriptorProto, (MessageElement) typeElement));
+                    messageSet.add(typeElement.name());
+                } else if (typeElement instanceof EnumElement) {
+                    enumSet.add(typeElement.name());
+                }
+            }
+
+            for (TypeElement typeElement : typeElements) {
+                if (typeElement instanceof MessageElement) {
+                    fileDescriptorProto.messageTypes.add(getDescritorProtoPOJO(fileDescriptorProto,
+                            (MessageElement) typeElement, messageSet, enumSet));
+                } else if (typeElement instanceof EnumElement) {
+                    fileDescriptorProto.enumTypes.add(
+                            getDescritorProtoPOJO(fileDescriptorProto, (EnumElement) typeElement, messageSet, enumSet));
                 }
 
             }
         }
-        
+
         FileDescriptorProto fileproto;
         try {
             byte[] bs = descriptorCodec.encode(fileDescriptorProto);
@@ -1061,8 +1084,40 @@ public class CodedConstant {
         return fileDescriptor.getMessageTypes().get(0);
     }
 
+    private static EnumDescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
+            EnumElement typeElement, Set<String> messageSet, Set<String> enumSet) {
+
+        EnumDescriptorProtoPOJO ret = new EnumDescriptorProtoPOJO();
+        ret.name = typeElement.name();
+        ret.values = new ArrayList<EnumValueDescriptorProtoPOJO>();
+        ret.options = new ArrayList<EnumOptionsPOJO>();
+
+        List<EnumConstantElement> values = typeElement.constants();
+        if (values != null) {
+            EnumValueDescriptorProtoPOJO fieldDescriptorProto;
+            for (EnumConstantElement fieldElement : values) {
+                fieldDescriptorProto = new EnumValueDescriptorProtoPOJO();
+                fieldDescriptorProto.name = fieldElement.name();
+                fieldDescriptorProto.number = fieldElement.tag();
+
+                ret.values.add(fieldDescriptorProto);
+            }
+        }
+
+        List<OptionElement> options = typeElement.options();
+        if (options != null) {
+            EnumOptionsPOJO fieldDescriptorProto;
+            for (OptionElement option : options) {
+                fieldDescriptorProto = new EnumOptionsPOJO();
+                ret.options.add(fieldDescriptorProto);
+            }
+        }
+
+        return ret;
+    }
+
     private static DescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
-            MessageElement typeElement) {
+            MessageElement typeElement, Set<String> messageSet, Set<String> enumSet) {
 
         DescriptorProtoPOJO ret = new DescriptorProtoPOJO();
         ret.name = typeElement.name();
@@ -1097,21 +1152,25 @@ public class CodedConstant {
                     String messageName = StringUtils.capitalize(fieldDescriptorProto.name) + MAP_ENTRY_SUFFIX;
                     fieldDescriptorProto.type = Type.TYPE_MESSAGE;
                     fieldDescriptorProto.typeName = CodeGenerator.PACKAGE_SPLIT + fileDescriptorProto.pkg
-                            + CodeGenerator.PACKAGE_SPLIT + ret.name + CodeGenerator.PACKAGE_SPLIT
-                            + messageName;
+                            + CodeGenerator.PACKAGE_SPLIT + ret.name + CodeGenerator.PACKAGE_SPLIT + messageName;
                     // refix label type
                     fieldDescriptorProto.label = Label.LABEL_REPEATED;
-                    
+
                     // here should add key and value type message type
                     DataType.MapType mapType = (DataType.MapType) type;
-                    
-                    MessageElement messageElement =  getMapKVMessageElements(messageName, mapType);
-                    
-                    ret.nestedTypes.add(getDescritorProtoPOJO(fileDescriptorProto, messageElement));
-                    
+
+                    MessageElement messageElement = getMapKVMessageElements(messageName, mapType);
+
+                    ret.nestedTypes
+                            .add(getDescritorProtoPOJO(fileDescriptorProto, messageElement, messageSet, enumSet));
+
                 } else if (type.kind() == Kind.MAP || type.kind() == Kind.NAMED) {
-                    fieldDescriptorProto.type = Type.TYPE_MESSAGE;
                     fieldDescriptorProto.typeName = ((DataType.NamedType) type).name();
+                    if (messageSet.contains(fieldDescriptorProto.typeName)) {
+                        fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                    } else {
+                        fieldDescriptorProto.type = Type.TYPE_ENUM;
+                    }
                 } else {
                     fieldDescriptorProto.type = Type.valueOf("TYPE_" + ((DataType.ScalarType) type).name());
                 }
@@ -1119,13 +1178,17 @@ public class CodedConstant {
                 ret.fields.add(fieldDescriptorProto);
             }
         }
-        
+
         List<TypeElement> nestedElements = typeElement.nestedElements();
         if (nestedElements != null) {
+
             for (TypeElement nestedTypeElement : nestedElements) {
-                if (typeElement instanceof MessageElement) {
-                    ret.nestedTypes
-                            .add(getDescritorProtoPOJO(fileDescriptorProto, (MessageElement) nestedTypeElement));
+                if (nestedTypeElement instanceof MessageElement) {
+                    ret.nestedTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (MessageElement) nestedTypeElement,
+                            messageSet, enumSet));
+                } else if (nestedTypeElement instanceof EnumElement) {
+                    ret.enumTypes.add(
+                            getDescritorProtoPOJO(fileDescriptorProto, (EnumElement) nestedTypeElement, messageSet, enumSet));
                 }
             }
         }
@@ -1136,20 +1199,19 @@ public class CodedConstant {
     private static MessageElement getMapKVMessageElements(String name, MapType mapType) {
         MessageElement.Builder ret = MessageElement.builder();
         ret.name(name);
-        
+
         DataType keyType = mapType.keyType();
         Builder fieldBuilder = FieldElement.builder().name("key").tag(1);
         fieldBuilder.type(keyType).label(com.squareup.protoparser.FieldElement.Label.OPTIONAL);
         ret.addField(fieldBuilder.build());
-        
+
         DataType valueType = mapType.valueType();
         fieldBuilder = FieldElement.builder().name("value").tag(2);
         fieldBuilder.type(valueType).label(com.squareup.protoparser.FieldElement.Label.OPTIONAL);
         ret.addField(fieldBuilder.build());
-        
+
         return ret.build();
     }
-    
 
     private static List<Integer> convertList(List<String> list) {
         if (list == null) {

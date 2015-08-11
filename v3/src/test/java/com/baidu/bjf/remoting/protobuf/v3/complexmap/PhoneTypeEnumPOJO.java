@@ -7,6 +7,8 @@
  */
 package com.baidu.bjf.remoting.protobuf.v3.complexmap;
 
+import java.io.UnsupportedEncodingException;
+
 import com.baidu.bjf.remoting.protobuf.EnumReadable;
 
 /**
@@ -38,4 +40,15 @@ public enum PhoneTypeEnumPOJO implements EnumReadable {
         return value;
     }
 
+    public static void main(String[] args) {
+        try {
+         // Convert from Unicode to UTF-8
+         String string = "a\u7f51a";
+         byte[] utf8 = string.getBytes("UTF-8");
+         // Convert from UTF-8 to Unicode
+         string = new String(utf8, "UTF-8");
+         System.out.println(string);
+         } catch (UnsupportedEncodingException e) {
+         }
+    }
 }

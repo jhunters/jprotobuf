@@ -289,6 +289,9 @@ public class SimpleMapTest {
         Codec<SimpleMapPOJO> codec = ProtobufProxy.create(SimpleMapPOJO.class, false);
 
         Descriptor descriptor = codec.getDescriptor();
+        
+        String escapeBytes = StringUtils.escapeBytes(descriptor.toProto().toByteArray());
+        System.out.println(escapeBytes);
 
         FieldDescriptor stringMapFD = descriptor.findFieldByName("stringMap");
 

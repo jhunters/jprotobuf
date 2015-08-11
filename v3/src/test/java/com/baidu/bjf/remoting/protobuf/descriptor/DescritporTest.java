@@ -89,7 +89,7 @@ public class DescritporTest {
         
         Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, false);
         Descriptor descriptor = codec.getDescriptor();
-
+        
         stringMapFD = descriptor.findFieldByName("list");
 
         bytes = getProtoBytes2();

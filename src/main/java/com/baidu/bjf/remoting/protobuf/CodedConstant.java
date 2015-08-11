@@ -20,10 +20,14 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.descriptor.DescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.EnumDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.EnumOptionsPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.EnumValueDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.ExtensionRangePOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.FieldDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.FileDescriptorProtoPOJO;
@@ -35,13 +39,16 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedOutputStream;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.WireFormat;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.Descriptors.FileDescriptor;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.WireFormat;
+import com.squareup.protoparser.EnumType;
+import com.squareup.protoparser.EnumType.Value;
 import com.squareup.protoparser.MessageType;
+import com.squareup.protoparser.Option;
 import com.squareup.protoparser.ProtoFile;
 import com.squareup.protoparser.ProtoSchemaParser;
 
@@ -52,14 +59,13 @@ import com.squareup.protoparser.ProtoSchemaParser;
  * @since 1.0.0
  */
 public class CodedConstant {
-    
+
     private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
 
     /**
      * get field name
      * 
-     * @param order
-     *            field order
+     * @param order field order
      * @return field name
      */
     private static String getFieldName(int order) {
@@ -70,14 +76,10 @@ public class CodedConstant {
     /**
      * get mapped type defined java expression.
      * 
-     * @param order
-     *            field order
-     * @param type
-     *            field type
-     * @param express
-     *            java expression
-     * @param isList
-     *            is field type is a {@link List}
+     * @param order field order
+     * @param type field type
+     * @param express java expression
+     * @param isList is field type is a {@link List}
      * @return full java expression
      */
     public static String getMappedTypeDefined(int order, FieldType type, String express, boolean isList) {
@@ -115,29 +117,29 @@ public class CodedConstant {
      * @param field field
      * @param order field order
      * @param type field type
-     * @param isList  is field type is a {@link List}
+     * @param isList is field type is a {@link List}
      * @param debug debug mode if true enable debug.
      * @param path
      * @return full java expression
      */
-    public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, 
-            boolean debug, File path) {
+    public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, boolean debug,
+            File path) {
         String fieldName = getFieldName(order);
-        
+
         String spath = "null";
         if (path != null) {
             spath = "new java.io.File(\"" + path.getAbsolutePath().replace('\\', '/') + "\")";
         }
-        
+
         if (isList) {
             String typeString = type.getType().toUpperCase();
-            return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." 
-                    + typeString + "," + Boolean.valueOf(debug) + "," + spath + ");\n";
+            return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
+                    + Boolean.valueOf(debug) + "," + spath + ");\n";
         }
 
         if (type == FieldType.OBJECT) {
             String typeString = type.getType().toUpperCase();
-            return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + "," 
+            return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
                     + Boolean.valueOf(debug) + "," + spath + ");\n";
         }
 
@@ -146,26 +148,26 @@ public class CodedConstant {
             t = "bytes";
         }
         t = capitalize(t);
-        
+
         boolean enumSpecial = false;
         if (type == FieldType.ENUM) {
             if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
                 String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
-                fieldName = "((" + clsName  + ") " + fieldName + ").value()";
+                fieldName = "((" + clsName + ") " + fieldName + ").value()";
                 enumSpecial = true;
             }
         }
         if (!enumSpecial) {
             fieldName = fieldName + type.getToPrimitiveType();
         }
-        
+
         return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ");\n";
     }
 
     /**
      * @param order field order
      * @param list field value
-     * @param type  field type of list obj
+     * @param type field type of list obj
      * @param debug
      * @param path
      * @return full java expression
@@ -253,10 +255,8 @@ public class CodedConstant {
     /**
      * get mapped object byte write java expression
      * 
-     * @param order
-     *            field order
-     * @param type
-     *            field type
+     * @param order field order
+     * @param type field type
      * @return full java expression
      */
     public static String getMappedWriteCode(FieldInfo field, String prefix, int order, FieldType type, boolean isList) {
@@ -309,14 +309,10 @@ public class CodedConstant {
     /**
      * write list to {@link CodedOutputStream} object.
      * 
-     * @param out
-     *            target output stream to write
-     * @param order
-     *            field order
-     * @param type
-     *            field type
-     * @param list
-     *            target list object to be serialized
+     * @param out target output stream to write
+     * @param order field order
+     * @param type field type
+     * @param list target list object to be serialized
      */
     public static void writeToList(CodedOutputStream out, int order, FieldType type, List list) throws IOException {
         if (list == null) {
@@ -337,8 +333,8 @@ public class CodedConstant {
      * @param o
      * @throws IOException
      */
-    public static void writeObject(CodedOutputStream out, int order, FieldType type, 
-            Object o, boolean list) throws IOException {
+    public static void writeObject(CodedOutputStream out, int order, FieldType type, Object o, boolean list)
+            throws IOException {
         if (o == null) {
             return;
         }
@@ -400,10 +396,8 @@ public class CodedConstant {
     /**
      * get required field check java expression
      * 
-     * @param order
-     *            field order
-     * @param field
-     *            java field
+     * @param order field order
+     * @param field java field
      * @return full java expression
      */
     public static String getRequiredCheck(int order, Field field) {
@@ -418,10 +412,8 @@ public class CodedConstant {
     /**
      * get return required field check java expression
      * 
-     * @param express
-     *            java expression
-     * @param field
-     *            java field
+     * @param express java expression
+     * @param field java field
      * @return full java expression
      */
     public static String getRetRequiredCheck(String express, Field field) {
@@ -435,8 +427,7 @@ public class CodedConstant {
     /**
      * check object is null
      * 
-     * @param o
-     *            to check
+     * @param o to check
      * @return true if is null
      */
     public static boolean isNull(Object o) {
@@ -446,8 +437,7 @@ public class CodedConstant {
     /**
      * check double is null
      * 
-     * @param o
-     *            to check
+     * @param o to check
      * @return true if is null
      */
     public static boolean isNull(double o) {
@@ -457,8 +447,7 @@ public class CodedConstant {
     /**
      * check int is null
      * 
-     * @param o
-     *            to check
+     * @param o to check
      * @return true if is null
      */
     public static boolean isNull(int o) {
@@ -468,8 +457,7 @@ public class CodedConstant {
     /**
      * check byte is null
      * 
-     * @param o
-     *            to check
+     * @param o to check
      * @return true if is null
      */
     public static boolean isNull(byte o) {
@@ -479,8 +467,7 @@ public class CodedConstant {
     /**
      * check short is null
      * 
-     * @param o
-     *            to check
+     * @param o to check
      * @return true if is null
      */
     public static boolean isNull(short o) {
@@ -490,8 +477,7 @@ public class CodedConstant {
     /**
      * check long is null
      * 
-     * @param o
-     *            to check
+     * @param o to check
      * @return true if is null
      */
     public static boolean isNull(long o) {
@@ -501,8 +487,7 @@ public class CodedConstant {
     /**
      * check float is null
      * 
-     * @param o
-     *            to check
+     * @param o to check
      * @return true if is null
      */
     public static boolean isNull(float o) {
@@ -512,8 +497,7 @@ public class CodedConstant {
     /**
      * check char is null
      * 
-     * @param o
-     *            to check
+     * @param o to check
      * @return true if is null
      */
     public static boolean isNull(char o) {
@@ -526,12 +510,11 @@ public class CodedConstant {
 
     /**
      * <p>
-     * Capitalizes a String changing the first letter to title case as per
-     * {@link Character#toTitleCase(char)}. No other letters are changed.
+     * Capitalizes a String changing the first letter to title case as per {@link Character#toTitleCase(char)}. No other
+     * letters are changed.
      * </p>
      * 
-     * @param str
-     *            the String to capitalize, may be null
+     * @param str the String to capitalize, may be null
      * @return the capitalized String, <code>null</code> if null String input
      */
     public static String capitalize(String str) {
@@ -551,17 +534,14 @@ public class CodedConstant {
     /**
      * make protobuf tag
      * 
-     * @param fieldNumber
-     *            field number order
-     * @param wireType
-     *            wireformat type
+     * @param fieldNumber field number order
+     * @param wireType wireformat type
      * @return tag id
      */
     public static int makeTag(final int fieldNumber, final int wireType) {
         return (fieldNumber << TAG_TYPE_BITS) | wireType;
     }
-    
-    
+
     public static String getEnumName(Enum[] e, int value) {
         if (e != null) {
             int toCompareValue;
@@ -578,7 +558,7 @@ public class CodedConstant {
         }
         return "";
     }
-    
+
     public static Descriptor getDescriptor(Class<?> cls) throws IOException {
 
         String idl = ProtobufIDLGenerator.getIDL(cls);
@@ -596,17 +576,34 @@ public class CodedConstant {
         fileDescriptorProto.enumTypes = new ArrayList<EnumDescriptorProtoPOJO>();
         fileDescriptorProto.services = new ArrayList<ServiceDescriptorProtoPOJO>();
 
+        Set<String> messageSet = new HashSet<String>();
+        Set<String> enumSet = new HashSet<String>();
+
         List<com.squareup.protoparser.Type> typeElements = file.getTypes();
         if (typeElements != null) {
+
             for (com.squareup.protoparser.Type typeElement : typeElements) {
                 if (typeElement instanceof MessageType) {
-                    fileDescriptorProto.messageTypes
-                            .add(getDescritorProtoPOJO(fileDescriptorProto, (MessageType) typeElement));
+                    messageSet.add(typeElement.getName());
+                } else if (typeElement instanceof EnumType) {
+                    enumSet.add(typeElement.getName());
+                }
+
+            }
+
+            for (com.squareup.protoparser.Type typeElement : typeElements) {
+
+                if (typeElement instanceof MessageType) {
+                    fileDescriptorProto.messageTypes.add(
+                            getDescritorProtoPOJO(fileDescriptorProto, (MessageType) typeElement, messageSet, enumSet));
+                } else if (typeElement instanceof EnumType) {
+                    fileDescriptorProto.enumTypes.add(
+                            getDescritorProtoPOJO(fileDescriptorProto, (EnumType) typeElement, messageSet, enumSet));
                 }
 
             }
         }
-        
+
         FileDescriptorProto fileproto;
         try {
             byte[] bs = descriptorCodec.encode(fileDescriptorProto);
@@ -627,7 +624,7 @@ public class CodedConstant {
     }
 
     private static DescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
-            MessageType typeElement) {
+            MessageType typeElement, Set<String> messageSet, Set<String> enumSet) {
 
         DescriptorProtoPOJO ret = new DescriptorProtoPOJO();
         ret.name = typeElement.getName();
@@ -658,25 +655,33 @@ public class CodedConstant {
 
                 String type = fieldElement.getType();
                 fieldDescriptorProto.defaultValue = fieldElement.getDefault();
-                
+
                 try {
                     fieldDescriptorProto.type = Type.valueOf("TYPE_" + type.toUpperCase());
-                    
+
                 } catch (Exception e) {
-                    fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                    if (messageSet.contains(type)) {
+                        fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                    } else {
+                        fieldDescriptorProto.type = Type.TYPE_ENUM;
+                    }
+
                     fieldDescriptorProto.typeName = "." + fileDescriptorProto.pkg + "." + type;
                 }
-                
+
                 ret.fields.add(fieldDescriptorProto);
             }
         }
-        
+
         List<com.squareup.protoparser.Type> nestedElements = typeElement.getNestedTypes();
         if (nestedElements != null) {
             for (com.squareup.protoparser.Type nestedTypeElement : nestedElements) {
-                if (typeElement instanceof MessageType) {
-                    ret.nestedTypes
-                            .add(getDescritorProtoPOJO(fileDescriptorProto, (MessageType) nestedTypeElement));
+                if (nestedTypeElement instanceof MessageType) {
+                    ret.nestedTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (MessageType) nestedTypeElement,
+                            messageSet, enumSet));
+                } else {
+                    ret.enumTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (EnumType) nestedTypeElement,
+                            messageSet, enumSet));
                 }
             }
         }
@@ -684,6 +689,38 @@ public class CodedConstant {
         return ret;
     }
 
+    private static EnumDescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
+            EnumType typeElement, Set<String> messageSet, Set<String> enumSet) {
+
+        EnumDescriptorProtoPOJO ret = new EnumDescriptorProtoPOJO();
+        ret.name = typeElement.getName();
+        ret.values = new ArrayList<EnumValueDescriptorProtoPOJO>();
+        ret.options = new ArrayList<EnumOptionsPOJO>();
+
+        List<Value> values = typeElement.getValues();
+        if (values != null) {
+            EnumValueDescriptorProtoPOJO fieldDescriptorProto;
+            for (com.squareup.protoparser.EnumType.Value fieldElement : values) {
+                fieldDescriptorProto = new EnumValueDescriptorProtoPOJO();
+                fieldDescriptorProto.name = fieldElement.getName();
+                fieldDescriptorProto.number = fieldElement.getTag();
+                
+                ret.values.add(fieldDescriptorProto);
+            }
+        }
+        
+        List<Option> options = typeElement.getOptions();
+        if (options != null) {
+            EnumOptionsPOJO fieldDescriptorProto;
+            for (Option option : options) {
+                fieldDescriptorProto = new EnumOptionsPOJO();
+                ret.options.add(fieldDescriptorProto);
+            }
+        }
+        
+
+        return ret;
+    }
 
     private static List<Integer> convertList(List<String> list) {
         if (list == null) {
