@@ -168,9 +168,17 @@ public class ProtobufIDLGenerator {
                     Class c = field.getField().getType();
                     code.append(getFieldRequired(field.isRequired())).append(" ").append(c.getSimpleName()).append(" ")
                             .append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
-                    if (!cachedTypes.contains(c)) {
-                        cachedTypes.add(c);
-                        subTypes.add(c);
+                    if (field.getFieldType() == FieldType.ENUM) {
+                        if (!cachedEnumTypes.contains(c)) {
+                            cachedEnumTypes.add(c);
+                            enumTypes.add(c);
+                        }
+                    } else  {
+                        
+                        if (!cachedTypes.contains(c)) {
+                            cachedTypes.add(c);
+                            subTypes.add(c);
+                        }
                     }
                 }
             } else {
