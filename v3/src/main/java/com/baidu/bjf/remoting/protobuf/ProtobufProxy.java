@@ -24,6 +24,9 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
@@ -43,6 +46,11 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 public final class ProtobufProxy {
     
     public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<>();
+    
+    /**
+     * Logger for this class
+     */
+    private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
 
     /**
      * cached {@link Codec} instance by class full name.
@@ -202,6 +210,17 @@ public final class ProtobufProxy {
                 if (!CACHED.containsKey(uniClsName)) {
                     CACHED.put(uniClsName, newInstance);
                 }
+                
+                try {
+                    // try to eagle load
+                    Set<Class<?>> relativeProxyClasses = cg.getRelativeProxyClasses();
+                    for (Class<?> relativeClass : relativeProxyClasses) {
+                        ProtobufProxy.create(relativeClass, debug, path);
+                    }
+                } catch (Exception e) {
+                    LOGGER.log(Level.FINE, e.getMessage(), e.getCause());
+                }
+                
                 return newInstance;
             } catch (InstantiationException e) {
                 throw new RuntimeException(e.getMessage(), e);

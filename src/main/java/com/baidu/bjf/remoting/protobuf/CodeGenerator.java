@@ -77,7 +77,16 @@ public class CodeGenerator {
 
     private boolean debug = false;
     private File outputPath;
+    private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
 
+    /**
+     * get relativeProxyClasses
+     * @return relativeProxyClasses
+     */
+    public Set<Class<?>> getRelativeProxyClasses() {
+        return relativeProxyClasses;
+    }
+    
     /**
      * set outputPath value to outputPath
      * 
@@ -344,6 +353,7 @@ public class CodeGenerator {
                             Class cls = (Class) targetType;
                             String name = cls.getName().replaceAll("\\$", "."); // need to parse nested class
                             code.append("codec = ProtobufProxy.create(").append(name).append(".class");
+                            
                             if (debug) {
                                 code.append(", true");
                             } else {
@@ -357,6 +367,10 @@ public class CodeGenerator {
                             code.append(",").append(spath);
 
                             code.append(");\n");
+                            
+                            // try to eagle load
+                            relativeProxyClasses.add(cls);
+                            
                             code.append("int length = input.readRawVarint32();\n");
                             code.append("final int oldLimit = input.pushLimit(length);\n");
                             listTypeCheck = true;
@@ -381,6 +395,9 @@ public class CodeGenerator {
                 }
                 code.append(",").append(spath);
                 code.append(");\n");
+                // try to eagle load
+                relativeProxyClasses.add(cls);
+                
                 code.append("int length = input.readRawVarint32();\n");
                 code.append("final int oldLimit = input.pushLimit(length);\n");
                 listTypeCheck = true;
@@ -515,6 +532,7 @@ public class CodeGenerator {
                             }
                             code.append(",").append(spath);
                             code.append(");\n");
+                            
                             code.append("int length = input.readRawVarint32();\n");
                             code.append("final int oldLimit = input.pushLimit(length);\n");
                             listTypeCheck = true;
@@ -539,7 +557,7 @@ public class CodeGenerator {
                 }
                 code.append(",").append(spath);
                 code.append(");\n");
-
+                
                 code.append("int length = input.readRawVarint32();\n");
                 code.append("final int oldLimit = input.pushLimit(length);\n");
                 listTypeCheck = true;

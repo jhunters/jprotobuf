@@ -84,6 +84,16 @@ public class CodeGenerator {
      * static path for output dynamic compiled class file.
      */
     private File outputPath;
+    
+    private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
+
+    /**
+     * get relativeProxyClasses
+     * @return relativeProxyClasses
+     */
+    public Set<Class<?>> getRelativeProxyClasses() {
+        return relativeProxyClasses;
+    }
 
     /**
      * set outputPath value to outputPath
