@@ -681,6 +681,11 @@ public class ProtobufIDLProxy {
                 javaType = Map.class.getName() + "<" + keyJavaType + ", "
                         + valueJavaType + ">";
             }
+            
+            // check if repeated type
+            if (Label.REPEATED == field.label()) {
+                javaType = List.class.getName() + "<" + javaType + ">";
+            }
 
             // define field
             code.append("public ").append(javaType);

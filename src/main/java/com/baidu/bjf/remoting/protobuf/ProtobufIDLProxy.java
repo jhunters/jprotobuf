@@ -647,6 +647,11 @@ public class ProtobufIDLProxy {
             } else {
                 javaType = fType.getJavaType();
             }
+            
+            // check if repeated type
+            if (Label.REPEATED == field.getLabel()) {
+                javaType = List.class.getName() + "<" + javaType + ">";
+            }
 
             // define field
             code.append("public ").append(javaType);
@@ -762,7 +767,7 @@ public class ProtobufIDLProxy {
             code.append(", required=false");
         } else if (Label.REQUIRED == field.getLabel()) {
             code.append(", required=true");
-        }
+        } 
         code.append(")\n");
 
     }

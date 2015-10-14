@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
@@ -58,6 +59,11 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  * @since 1.0.0
  */
 public class JdkCompiler extends AbstractCompiler {
+    
+    /**
+     * Logger for this class
+     */
+    private static final Logger LOGGER = Logger.getLogger(JdkCompiler.class.getName());
 
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
@@ -110,6 +116,9 @@ public class JdkCompiler extends AbstractCompiler {
 
     @Override
     public synchronized Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
+        
+        LOGGER.info("Begin to compile source code: class is '" + name + "'");
+        
         int i = name.lastIndexOf('.');
         String packageName = i < 0 ? "" : name.substring(0, i);
         String className = i < 0 ? name : name.substring(i + 1);
@@ -123,12 +132,19 @@ public class JdkCompiler extends AbstractCompiler {
             throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: "
                     + diagnosticCollector.getDiagnostics());
         }
+        
+        LOGGER.info("compile source code done: class is '" + name + "'");
+        
+        LOGGER.info("loading class '" + name + "'");
         Class<?> retClass = classLoader.loadClass(name);
+        LOGGER.info("loading class done  '" + name + "'");
 
-        byte[] bytes = classLoader.loadClassBytes(name);
-        if (os != null && bytes != null) {
-            os.write(bytes);
-            os.flush();
+        if (os != null) {
+            byte[] bytes = classLoader.loadClassBytes(name);
+            if (bytes != null) {
+                os.write(bytes);
+                os.flush();
+            }
         }
         return retClass;
     }
