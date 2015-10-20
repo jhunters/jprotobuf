@@ -205,7 +205,7 @@ public final class ProtobufProxy {
 
         }
 
-        Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader(), fos);
+        Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(code, cls.getClassLoader(), fos);
 
         if (fos != null) {
             try {

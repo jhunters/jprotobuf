@@ -67,8 +67,6 @@ public class JdkCompiler extends AbstractCompiler {
 
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
-    private final DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
-
     private final ClassLoaderImpl classLoader;
 
     private final JavaFileManagerImpl javaFileManager;
@@ -81,7 +79,7 @@ public class JdkCompiler extends AbstractCompiler {
             throw new RuntimeException(
                     "compiler is null maybe you are on JRE enviroment please change to JDK enviroment.");
         }
-
+        DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
@@ -125,6 +123,8 @@ public class JdkCompiler extends AbstractCompiler {
         JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
         javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName, className
                 + ClassUtils.JAVA_EXTENSION, javaFileObject);
+        
+        DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
         Boolean result =
                 compiler.getTask(null, javaFileManager, diagnosticCollector, options, null,
                         Arrays.asList(new JavaFileObject[] { javaFileObject })).call();

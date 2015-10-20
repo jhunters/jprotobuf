@@ -391,7 +391,7 @@ public class ProtobufIDLProxy {
             }
 
             if (!generateSouceOnly) {
-                JDKCompilerHelper.COMPILER.compile(cd.code, ProtobufIDLProxy.class.getClassLoader(), null);
+                JDKCompilerHelper.getJdkCompiler().compile(cd.code, ProtobufIDLProxy.class.getClassLoader(), null);
             } else {
                 // need to output source code to target path
                 writeSourceCode(cd, sourceOutputDir);
@@ -420,7 +420,7 @@ public class ProtobufIDLProxy {
             }
             if (!generateSouceOnly) {
                 Class<?> newClass =
-                        JDKCompilerHelper.COMPILER.compile(codeDependent.code, ProtobufIDLProxy.class.getClassLoader(),
+                        JDKCompilerHelper.getJdkCompiler().compile(codeDependent.code, ProtobufIDLProxy.class.getClassLoader(),
                                 null);
                 ret.add(newClass);
             } else {
