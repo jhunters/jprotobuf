@@ -26,14 +26,15 @@ import java.io.OutputStream;
 public interface Compiler {
 
     /**
-     * Compile java source code.
-     * 
-     * @param code
-     *            Java source code
-     * @param classLoader
-     *            TODO
+     * TODO
+     * @param code Java source code
+     * @param classLoader current classloader
+     * @param os target output compiled byte code
+     * @param timestamp time stamp of class file
      * @return Compiled class
      */
-    Class<?> compile(String code, ClassLoader classLoader, OutputStream os);
+    Class<?> compile(String className, String code, ClassLoader classLoader, OutputStream os, long timestamp);
 
+    
+    byte[] loadBytes(String className);
 }

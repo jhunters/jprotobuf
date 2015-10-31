@@ -29,12 +29,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.baidu.bjf.remoting.protobuf.utils.compiler.ClassUtils;
 
 /**
  * Proxy tools for protobuf.
@@ -45,7 +47,7 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 public final class ProtobufProxy {
 
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
-    
+
     /**
      * Logger for this class
      */
@@ -83,8 +85,8 @@ public final class ProtobufProxy {
             try {
                 cls.getConstructor(new Class<?>[0]);
             } catch (NoSuchMethodException e2) {
-                throw new IllegalArgumentException("Class '" + cls.getName()
-                        + "' must has default constructor method with no parameters.", e2);
+                throw new IllegalArgumentException(
+                        "Class '" + cls.getName() + "' must has default constructor method with no parameters.", e2);
             } catch (SecurityException e2) {
                 throw new IllegalArgumentException(e2.getMessage(), e2);
             }
@@ -149,6 +151,9 @@ public final class ProtobufProxy {
             }
         }
 
+        // get last modify time
+        long lastModify = ClassHelper.getLastModifyTime(cls);
+
         String uniClsName = cls.getName();
         Codec codec = CACHED.get(uniClsName);
         if (codec != null) {
@@ -205,7 +210,8 @@ public final class ProtobufProxy {
 
         }
 
-        Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(code, cls.getClassLoader(), fos);
+        Class<?> newClass =
+                JDKCompilerHelper.getJdkCompiler().compile(className, code, cls.getClassLoader(), fos, lastModify);
 
         if (fos != null) {
             try {
@@ -220,7 +226,7 @@ public final class ProtobufProxy {
             if (!CACHED.containsKey(uniClsName)) {
                 CACHED.put(uniClsName, newInstance);
             }
-            
+
             try {
                 // try to eagle load
                 Set<Class<?>> relativeProxyClasses = cg.getRelativeProxyClasses();
@@ -230,15 +236,14 @@ public final class ProtobufProxy {
             } catch (Exception e) {
                 LOGGER.log(Level.FINE, e.getMessage(), e.getCause());
             }
-            
+
             return newInstance;
         } catch (InstantiationException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        
-        
+
     }
 
     public static void clearCache() {

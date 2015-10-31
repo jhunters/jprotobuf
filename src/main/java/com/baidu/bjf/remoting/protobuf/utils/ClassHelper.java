@@ -15,7 +15,9 @@
  */
 package com.baidu.bjf.remoting.protobuf.utils;
 
+import java.io.File;
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +43,20 @@ public class ClassHelper {
             return null;
         }
         return clsName.replace('$', '.');
+    }
+    
+    public static long getLastModifyTime(Class<?> cls) {
+        if (cls == null) {
+            return -1L;
+        }
+        
+        String clsName = cls.getName().replace('.', '/') + ".class";
+        URL resource = cls.getClassLoader().getResource(clsName);
+        if (resource != null) {
+            return new File(resource.getFile()).lastModified();
+        }
+        
+        return -1L;
     }
 
     /**

@@ -32,6 +32,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.baidu.bjf.remoting.protobuf.utils.compiler.ClassUtils;
 import com.squareup.protoparser.EnumType;
 import com.squareup.protoparser.EnumType.Value;
 import com.squareup.protoparser.MessageType;
@@ -334,8 +335,8 @@ public class ProtobufIDLProxy {
      * @param sourceOutputDir
      * @return
      */
-    private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug,
-            boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds) {
+    private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug, boolean generateSouceOnly,
+            File sourceOutputDir, List<CodeDependent> cds) {
         if (generateSouceOnly) {
             if (sourceOutputDir == null) {
                 throw new RuntimeException("param 'sourceOutputDir' is null.");
@@ -391,7 +392,8 @@ public class ProtobufIDLProxy {
             }
 
             if (!generateSouceOnly) {
-                JDKCompilerHelper.getJdkCompiler().compile(cd.code, ProtobufIDLProxy.class.getClassLoader(), null);
+                JDKCompilerHelper.getJdkCompiler().compile(cd.getClassName(), cd.code, ProtobufIDLProxy.class.getClassLoader(),
+                        null, -1);
             } else {
                 // need to output source code to target path
                 writeSourceCode(cd, sourceOutputDir);
@@ -419,9 +421,8 @@ public class ProtobufIDLProxy {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
             if (!generateSouceOnly) {
-                Class<?> newClass =
-                        JDKCompilerHelper.getJdkCompiler().compile(codeDependent.code, ProtobufIDLProxy.class.getClassLoader(),
-                                null);
+                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.getClassName(), codeDependent.code,
+                        ProtobufIDLProxy.class.getClassLoader(), null, -1);
                 ret.add(newClass);
             } else {
                 // need to output source code to target path
@@ -647,7 +648,7 @@ public class ProtobufIDLProxy {
             } else {
                 javaType = fType.getJavaType();
             }
-            
+
             // check if repeated type
             if (Label.REPEATED == field.getLabel()) {
                 javaType = List.class.getName() + "<" + javaType + ">";
@@ -698,10 +699,10 @@ public class ProtobufIDLProxy {
         cd.name = simpleName;
         cd.pkg = packageName;
         cd.code = code.toString();
-        
+
         // finally dependency should remove self
         cd.dependencies.remove(cd.name);
-        
+
         return cd;
     }
 
@@ -767,7 +768,7 @@ public class ProtobufIDLProxy {
             code.append(", required=false");
         } else if (Label.REQUIRED == field.getLabel()) {
             code.append(", required=true");
-        } 
+        }
         code.append(")\n");
 
     }
@@ -820,6 +821,13 @@ public class ProtobufIDLProxy {
 
         private void addDependency(String name) {
             dependencies.add(name);
+        }
+        
+        public String getClassName() {
+            if (StringUtils.isEmpty(pkg)) {
+                return name;
+            }
+            return pkg + "." + name;
         }
     }
 }

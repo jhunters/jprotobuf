@@ -148,6 +148,12 @@ public class JdkCompiler extends AbstractCompiler {
         }
         return retClass;
     }
+    
+    @Override
+    public byte[] loadBytes(String className) {
+        byte[] bytes = classLoader.loadClassBytes(className);
+        return bytes;
+    }
 
     private final class ClassLoaderImpl extends ClassLoader {
 
@@ -343,5 +349,6 @@ public class JdkCompiler extends AbstractCompiler {
             return files;
         }
     }
+
 
 }
