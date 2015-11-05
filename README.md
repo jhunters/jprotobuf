@@ -64,7 +64,7 @@ jprotobuf-android android兼容版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-android</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
