@@ -59,16 +59,6 @@ jprotobuf-2.x  JDK 7 或以上版本
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
 
 
-jprotobuf-android android兼容版本
-```xml
-<dependency>
-  <groupId>com.baidu</groupId>
-  <artifactId>jprotobuf-android</artifactId>
-  <version>1.0.1</version>
-</dependency>
-```
-[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
-
 ## API使用说明 ##
 
 示例：假如需要定义protobuf定义一个数据接口，包含两个属性，一个是string，一个是int32
