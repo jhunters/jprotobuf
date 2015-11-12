@@ -58,6 +58,15 @@ jprotobuf-2.x  JDK 7 或以上版本
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
 
+jprotobuf-android  
+```xml
+<dependency>
+  <groupId>com.baidu</groupId>
+  <artifactId>jprotobuf-android</artifactId>
+  <version>1.1.1</version>
+</dependency>
+```
+[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
 
 ## API使用说明 ##
 
