@@ -35,7 +35,7 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
  * @since 1.0.1
  */
 public class ProtobufIDLGenerator {
-    
+
     /**
      * get IDL content from class.
      * 
@@ -46,7 +46,7 @@ public class ProtobufIDLGenerator {
      * @return protobuf IDL content in string
      * @see Protobuf
      */
-    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
             final Set<Class<?>> cachedEnumTypes, boolean ignoreJava) {
         Set<Class<?>> types = cachedTypes;
         if (types == null) {
@@ -57,13 +57,13 @@ public class ProtobufIDLGenerator {
         if (enumTypes == null) {
             enumTypes = new HashSet<Class<?>>();
         }
-        
+
         if (types.contains(cls)) {
             return null;
         }
 
         StringBuilder code = new StringBuilder();
-        
+
         if (!ignoreJava) {
             // define package
             code.append("package ").append(cls.getPackage().getName()).append(";\n");
@@ -88,7 +88,7 @@ public class ProtobufIDLGenerator {
      * @return protobuf IDL content in string
      * @see Protobuf
      */
-    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
             final Set<Class<?>> cachedEnumTypes) {
 
         return getIDL(cls, cachedTypes, cachedEnumTypes, false);
@@ -134,33 +134,13 @@ public class ProtobufIDLGenerator {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
                                 Class c = (Class) targetType;
-                                
-                                String fieldTypeName;
-                                if (ProtobufProxyUtils.isScalarType(c)) {
-                                    
-                                    FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(c);
-                                    fieldTypeName = fieldType.getType();
-                                    
-                                } else {
-                                    if (field.getFieldType() == FieldType.ENUM) {
-                                        if (!cachedEnumTypes.contains(c)) {
-                                            cachedEnumTypes.add(c);
-                                            enumTypes.add(c);
-                                        }
-                                    } else  {
-                                        
-                                        if (!cachedTypes.contains(c)) {
-                                            cachedTypes.add(c);
-                                            subTypes.add(c);
-                                        }
-                                    }
-                                    
-                                    fieldTypeName = c.getSimpleName();
-                                }
-                                
+
+                                String fieldTypeName = getProtoDefineTypeName(c, field, cachedTypes, cachedEnumTypes,
+                                        subTypes, enumTypes);
+
                                 code.append("repeated ").append(fieldTypeName).append(" ")
-                                .append(field.getField().getName()).append("=").append(field.getOrder())
-                                .append(";\n");
+                                        .append(field.getField().getName()).append("=").append(field.getOrder())
+                                        .append(";\n");
                             }
                         }
                     }
@@ -173,8 +153,8 @@ public class ProtobufIDLGenerator {
                             cachedEnumTypes.add(c);
                             enumTypes.add(c);
                         }
-                    } else  {
-                        
+                    } else {
+
                         if (!cachedTypes.contains(c)) {
                             cachedTypes.add(c);
                             subTypes.add(c);
@@ -202,8 +182,16 @@ public class ProtobufIDLGenerator {
                     required = "repeated";
                 }
 
-                code.append(required).append(" ").append(type).append(" ").append(field.getField().getName())
-                        .append("=").append(field.getOrder()).append(";\n");
+                code.append(required).append(" ").append(type);
+                if (FieldType.MAP == field.getFieldType()) {
+                    // map type should generate as map<K, V>
+                    String kType = getProtoDefineTypeName(field.getGenericKeyType(), field, cachedTypes,
+                            cachedEnumTypes, subTypes, enumTypes);
+                    String vType = getProtoDefineTypeName(field.getGenericeValueType(), field, cachedTypes,
+                            cachedEnumTypes, subTypes, enumTypes);
+                    code.append('<').append(kType).append(',').append(vType).append(">");
+                }
+                code.append(" ").append(field.getField().getName()).append("=").append(field.getOrder()).append(";\n");
             }
 
         }
@@ -224,12 +212,40 @@ public class ProtobufIDLGenerator {
 
     }
 
+    private static String getProtoDefineTypeName(Class c, FieldInfo field, Set<Class<?>> cachedTypes,
+            Set<Class<?>> cachedEnumTypes, Set<Class<?>> subTypes, Set<Class<Enum>> enumTypes) {
+        String fieldTypeName = null;
+        if (ProtobufProxyUtils.isScalarType(c)) {
+
+            FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(c);
+            fieldTypeName = fieldType.getType();
+
+        } else {
+            if (field.getFieldType() == FieldType.ENUM) {
+                if (!cachedEnumTypes.contains(c)) {
+                    cachedEnumTypes.add(c);
+                    enumTypes.add(c);
+                }
+            } else {
+
+                if (!cachedTypes.contains(c)) {
+                    cachedTypes.add(c);
+                    subTypes.add(c);
+                }
+            }
+
+            fieldTypeName = c.getSimpleName();
+        }
+
+        return fieldTypeName;
+    }
+
     private static void generateEnumIDL(StringBuilder code, Class<Enum> cls) {
         code.append("enum ").append(cls.getSimpleName()).append(" {  \n");
 
         Field[] fields = cls.getFields();
         for (Field field : fields) {
-            
+
             String name = field.getName();
             code.append(name).append("=");
             try {

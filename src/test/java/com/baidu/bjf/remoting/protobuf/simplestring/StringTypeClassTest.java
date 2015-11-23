@@ -35,7 +35,7 @@ public class StringTypeClassTest {
         StringTypePOJOClass pojo = new StringTypePOJOClass();
         pojo.setStr("你好!");
         
-        Codec<StringTypePOJOClass> codec = ProtobufProxy.create(StringTypePOJOClass.class, false);
+        Codec<StringTypePOJOClass> codec = ProtobufProxy.create(StringTypePOJOClass.class);
         try {
             byte[] bb = codec.encode(pojo);
             System.out.println(Arrays.toString(bb));

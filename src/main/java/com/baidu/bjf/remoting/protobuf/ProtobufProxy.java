@@ -36,7 +36,6 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.baidu.bjf.remoting.protobuf.utils.compiler.ClassUtils;
 
 /**
  * Proxy tools for protobuf.
@@ -46,12 +45,17 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.ClassUtils;
  */
 public final class ProtobufProxy {
 
-    private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
+    public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
 
     /**
      * Logger for this class
      */
     private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
+
+    /**
+     * cached {@link Codec} instance by class full name.
+     */
+    private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
 
     /**
      * To generate a protobuf proxy java source code for target class.
@@ -112,7 +116,12 @@ public final class ProtobufProxy {
      * @return
      */
     public static <T> Codec<T> create(Class<T> cls) {
-        return create(cls, false, null);
+        Boolean debug = DEBUG_CONTROLLER.get();
+        if (debug == null) {
+            debug = false;
+        }
+
+        return create(cls, debug, null);
     }
 
     /**
@@ -142,6 +151,24 @@ public final class ProtobufProxy {
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
+        DEBUG_CONTROLLER.set(debug);
+        try {
+            return doCreate(cls, debug, path);
+        } finally {
+            DEBUG_CONTROLLER.remove();
+        }
+
+    }
+
+    /**
+     * To create a protobuf proxy class for target class.
+     * 
+     * @param <T> target object type to be proxied.
+     * @param cls target object class
+     * @param debug true will print generate java source code
+     * @return proxy instance object.
+     */
+    private static <T> Codec<T> doCreate(Class<T> cls, boolean debug, File path) {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
@@ -243,7 +270,6 @@ public final class ProtobufProxy {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-
     }
 
     public static void clearCache() {

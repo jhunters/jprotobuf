@@ -86,10 +86,13 @@ public final class ProtobufProxy {
         // check if has default constructor
 
         if (!cls.isMemberClass()) {
-            boolean hasDefaultConstructor = ClassHelper.hasDefaultConstructor(cls);
-            if (!hasDefaultConstructor) {
-                throw new IllegalArgumentException("Class '" + cls.getName()
-                        + "' must has default constructor method with no parameters.");
+            try {
+                cls.getConstructor(new Class<?>[0]);
+            } catch (NoSuchMethodException e2) {
+                throw new IllegalArgumentException(
+                        "Class '" + cls.getName() + "' must has default constructor method with no parameters.", e2);
+            } catch (SecurityException e2) {
+                throw new IllegalArgumentException(e2.getMessage(), e2);
             }
         }
 
@@ -161,7 +164,8 @@ public final class ProtobufProxy {
                     throw new RuntimeException("Param 'path' value should be a path directory.");
                 }
             }
-            
+        // get last modify time
+        long lastModify = ClassHelper.getLastModifyTime(cls);
             String uniClsName = cls.getName();
             Codec codec = CACHED.get(uniClsName);
             if (codec != null) {
@@ -201,7 +205,8 @@ public final class ProtobufProxy {
             
             OutputStream fos = prepareTargetClassFileOutputInstance(path, className, newClassName);
             
-            Class<?> newClass = JDKCompilerHelper.COMPILER.compile(code, cls.getClassLoader(), fos);
+        Class<?> newClass =
+                JDKCompilerHelper.getJdkCompiler().compile(className, code, cls.getClassLoader(), fos, lastModify);
             
             closeOutputStream(fos);
             

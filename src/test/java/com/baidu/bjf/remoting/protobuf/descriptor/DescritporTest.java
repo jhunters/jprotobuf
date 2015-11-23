@@ -40,9 +40,9 @@ import com.google.protobuf.DynamicMessage;
  */
 public class DescritporTest {
 
-    Codec<DescriptorProtoPOJO> codec = ProtobufProxy.create(DescriptorProtoPOJO.class, false);
+    Codec<DescriptorProtoPOJO> codec = ProtobufProxy.create(DescriptorProtoPOJO.class);
 
-    Codec<FileDescriptorProtoPOJO> codec2 = ProtobufProxy.create(FileDescriptorProtoPOJO.class, false);
+    Codec<FileDescriptorProtoPOJO> codec2 = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
 
     @Test
     public void testPOJODescriptorWorksWell() throws IOException {
@@ -60,7 +60,7 @@ public class DescritporTest {
     }
 
     private byte[] getProtoBytes2() throws IOException {
-        Codec<AddressBookProtosPOJO> simpleMapPojoCodec = ProtobufProxy.create(AddressBookProtosPOJO.class, false);
+        Codec<AddressBookProtosPOJO> simpleMapPojoCodec = ProtobufProxy.create(AddressBookProtosPOJO.class);
 
         // initialize
 
@@ -87,7 +87,7 @@ public class DescritporTest {
         Object field = parseFrom.getField(stringMapFD);
         Assert.assertTrue(field instanceof List);
         
-        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, false);
+        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class);
         Descriptor descriptor = codec.getDescriptor();
 
         stringMapFD = descriptor.findFieldByName("list");

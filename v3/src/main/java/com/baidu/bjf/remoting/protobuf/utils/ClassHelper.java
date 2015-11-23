@@ -15,7 +15,9 @@
  */
 package com.baidu.bjf.remoting.protobuf.utils;
 
+import java.io.File;
 import java.lang.reflect.Array;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,17 +32,17 @@ import java.util.Set;
  * @since 1.0.0
  */
 public class ClassHelper {
-    
+
     /**
      * package separator char
      */
     public static final char PACKAGE_SEPARATOR_CHAR = '.';
-    
+
     /**
      * package separator string
      */
     public static final String PACKAGE_SEPARATOR = PACKAGE_SEPARATOR_CHAR + "";
-    
+
     /**
      * get class internal name from Class.getName(). sub class like A$B to A.B
      * @param clsName class name
@@ -53,14 +55,26 @@ public class ClassHelper {
         return clsName.replace('$', PACKAGE_SEPARATOR_CHAR);
     }
 
+    public static long getLastModifyTime(Class<?> cls) {
+        if (cls == null) {
+            return -1L;
+        }
+
+        String clsName = cls.getName().replace('.', '/') + ".class";
+        URL resource = cls.getClassLoader().getResource(clsName);
+        if (resource != null) {
+            return new File(resource.getFile()).lastModified();
+        }
+
+        return -1L;
+    }
+
     /**
      * To fix name with thread context of class loader
      * 
-     * @param name
-     *            class name
+     * @param name class name
      * @return loaded class
-     * @throws ClassNotFoundException
-     *             if class not found
+     * @throws ClassNotFoundException if class not found
      */
     public static Class<?> forNameWithThreadContextClassLoader(String name) throws ClassNotFoundException {
         return forName(name, Thread.currentThread().getContextClassLoader());
@@ -69,13 +83,10 @@ public class ClassHelper {
     /**
      * to initialize clss by name from caller.
      * 
-     * @param name
-     *            class name
-     * @param caller
-     *            caller of Class type
+     * @param name class name
+     * @param caller caller of Class type
      * @return loaded class
-     * @throws ClassNotFoundException
-     *             if class not found
+     * @throws ClassNotFoundException if class not found
      */
     public static Class<?> forNameWithCallerClassLoader(String name, Class<?> caller) throws ClassNotFoundException {
         return forName(name, caller.getClassLoader());
@@ -84,8 +95,7 @@ public class ClassHelper {
     /**
      * get class loader from caller calss
      * 
-     * @param caller
-     *            caller of Class type
+     * @param caller caller of Class type
      * @return loaded class loader
      */
     public static ClassLoader getCallerClassLoader(Class<?> caller) {
@@ -95,8 +105,7 @@ public class ClassHelper {
     /**
      * get class loader
      * 
-     * @param cls
-     *            target class to get ownered class loader
+     * @param cls target class to get ownered class loader
      * @return class loader
      */
     public static ClassLoader getClassLoader(Class<?> cls) {
@@ -115,15 +124,12 @@ public class ClassHelper {
     }
 
     /**
-     * Return the default ClassLoader to use: typically the thread context
-     * ClassLoader, if available; the ClassLoader that loaded the ClassUtils
-     * class will be used as fallback.
+     * Return the default ClassLoader to use: typically the thread context ClassLoader, if available; the ClassLoader
+     * that loaded the ClassUtils class will be used as fallback.
      * <p>
-     * Call this method if you intend to use the thread context ClassLoader in a
-     * scenario where you absolutely need a non-null ClassLoader reference: for
-     * example, for class path resource loading (but not necessarily for
-     * <code>Class.forName</code>, which accepts a <code>null</code> ClassLoader
-     * reference as well).
+     * Call this method if you intend to use the thread context ClassLoader in a scenario where you absolutely need a
+     * non-null ClassLoader reference: for example, for class path resource loading (but not necessarily for
+     * <code>Class.forName</code>, which accepts a <code>null</code> ClassLoader reference as well).
      * 
      * @return the default ClassLoader (never <code>null</code>)
      * @see java.lang.Thread#getContextClassLoader()
@@ -133,28 +139,21 @@ public class ClassHelper {
     }
 
     /**
-     * Same as <code>Class.forName()</code>, except that it works for primitive
-     * types.
+     * Same as <code>Class.forName()</code>, except that it works for primitive types.
      */
     public static Class<?> forName(String name) throws ClassNotFoundException {
         return forName(name, getClassLoader());
     }
 
     /**
-     * Replacement for <code>Class.forName()</code> that also returns Class
-     * instances for primitives (like "int") and array class names (like
-     * "String[]").
+     * Replacement for <code>Class.forName()</code> that also returns Class instances for primitives (like "int") and
+     * array class names (like "String[]").
      * 
-     * @param name
-     *            the name of the Class
-     * @param classLoader
-     *            the class loader to use (may be <code>null</code>, which
-     *            indicates the default class loader)
+     * @param name the name of the Class
+     * @param classLoader the class loader to use (may be <code>null</code>, which indicates the default class loader)
      * @return Class instance for the supplied name
-     * @throws ClassNotFoundException
-     *             if the class was not found
-     * @throws LinkageError
-     *             if the class file could not be loaded
+     * @throws ClassNotFoundException if the class was not found
+     * @throws LinkageError if the class file could not be loaded
      * @see Class#forName(String, boolean, ClassLoader)
      */
     public static Class<?> forName(String name, ClassLoader classLoader) throws ClassNotFoundException, LinkageError {
@@ -192,17 +191,15 @@ public class ClassHelper {
     }
 
     /**
-     * Resolve the given class name as primitive class, if appropriate,
-     * according to the JVM's naming rules for primitive classes.
+     * Resolve the given class name as primitive class, if appropriate, according to the JVM's naming rules for
+     * primitive classes.
      * <p>
-     * Also supports the JVM's internal class names for primitive arrays. Does
-     * <i>not</i> support the "[]" suffix notation for primitive arrays; this is
-     * only supported by {@link #forName}.
+     * Also supports the JVM's internal class names for primitive arrays. Does <i>not</i> support the "[]" suffix
+     * notation for primitive arrays; this is only supported by {@link #forName}.
      * 
-     * @param name
-     *            the name of the potentially primitive class
-     * @return the primitive class, or <code>null</code> if the name does not
-     *         denote a primitive class or primitive array class
+     * @param name the name of the potentially primitive class
+     * @return the primitive class, or <code>null</code> if the name does not denote a primitive class or primitive
+     *         array class
      */
     public static Class<?> resolvePrimitiveClassName(String name) {
         Class<?> result = null;
@@ -221,14 +218,13 @@ public class ClassHelper {
     private static final String INTERNAL_ARRAY_PREFIX = "[L";
 
     /**
-     * Map with primitive type name as key and corresponding primitive type as
-     * value, for example: "int" -> "int.class".
+     * Map with primitive type name as key and corresponding primitive type as value, for example: "int" -> "int.class".
      */
     private static final Map<String, Class<?>> PRIMIIIVE_TYPE_NAME_MAP = new HashMap<String, Class<?>>(16);
 
     /**
-     * Map with primitive wrapper type as key and corresponding primitive type
-     * as value, for example: Integer.class -> int.class.
+     * Map with primitive wrapper type as key and corresponding primitive type as value, for example: Integer.class ->
+     * int.class.
      */
     private static final Map<Class<?>, Class<?>> PRIMITIVE_WRAPPER_TYPE_MAP = new HashMap<Class<?>, Class<?>>(8);
 
@@ -255,8 +251,7 @@ public class ClassHelper {
     /**
      * To get short message of object instance.
      * 
-     * @param obj
-     *            target object
+     * @param obj target object
      * @return short message
      */
     public static String toShortString(Object obj) {
@@ -266,7 +261,7 @@ public class ClassHelper {
         return obj.getClass().getSimpleName() + "@" + System.identityHashCode(obj);
 
     }
-    
+
     /**
      * get class simple name from {@link Class} instance. <br>
      * Here we should take case member class is a little different from common class.
@@ -283,7 +278,7 @@ public class ClassHelper {
 
         return cls.getSimpleName();
     }
-    
+
     public static String getPackage(Class<?> cls) {
         Package pkg = cls.getPackage();
         // maybe null if package is blank or dynamic load class
@@ -298,7 +293,7 @@ public class ClassHelper {
 
         return pkg.getName();
     }
-    
+
     /**
      * To test class if has default constructor method
      * 
@@ -318,7 +313,7 @@ public class ClassHelper {
         }
         return true;
     }
-    
+
     /**
      * get new class name with full package
      * 

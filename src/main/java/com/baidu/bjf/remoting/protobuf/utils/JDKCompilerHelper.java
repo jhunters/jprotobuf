@@ -15,8 +15,8 @@
  */
 package com.baidu.bjf.remoting.protobuf.utils;
 
-import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
+import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 
 /**
  * static access for {@link JdkCompiler}
@@ -30,7 +30,7 @@ public class JDKCompilerHelper {
      * singleton instance for {@link JdkCompiler}
      */
     public static Compiler COMPILER =
-            new JdkCompiler(JDKCompilerHelper.class.getClassLoader());
+            new JdkCompiler(JdkCompiler.class.getClassLoader());
 
     public static Compiler getJdkCompiler() {
         return COMPILER;

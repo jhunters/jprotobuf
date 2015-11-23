@@ -393,7 +393,8 @@ public class ProtobufIDLProxy {
             }
 
             if (!generateSouceOnly) {
-                JDKCompilerHelper.COMPILER.compile(cd.code, ProtobufIDLProxy.class.getClassLoader(), null);
+                JDKCompilerHelper.getJdkCompiler().compile(cd.getClassName(), cd.code, ProtobufIDLProxy.class.getClassLoader(),
+                        null, -1);
             } else {
                 // need to output source code to target path
                 writeSourceCode(cd, sourceOutputDir);
@@ -421,8 +422,8 @@ public class ProtobufIDLProxy {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
             if (!generateSouceOnly) {
-                Class<?> newClass = JDKCompilerHelper.COMPILER.compile(codeDependent.code,
-                        ProtobufIDLProxy.class.getClassLoader(), null);
+                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.getClassName(), codeDependent.code,
+                        ProtobufIDLProxy.class.getClassLoader(), null, -1);
                 ret.add(newClass);
             } else {
                 // need to output source code to target path
@@ -866,6 +867,12 @@ public class ProtobufIDLProxy {
 
         private void addDependency(String name) {
             dependencies.add(name);
+        }
+        public String getClassName() {
+            if (StringUtils.isEmpty(pkg)) {
+                return name;
+            }
+            return pkg + "." + name;
         }
     }
 }

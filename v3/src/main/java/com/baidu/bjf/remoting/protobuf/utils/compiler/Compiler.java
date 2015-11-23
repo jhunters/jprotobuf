@@ -34,6 +34,8 @@ public interface Compiler {
      *            TODO
      * @return Compiled class
      */
-    Class<?> compile(String code, ClassLoader classLoader, OutputStream os);
+    Class<?> compile(String className, String code, ClassLoader classLoader, OutputStream os, long timestamp);
 
+    
+    byte[] loadBytes(String className);
 }

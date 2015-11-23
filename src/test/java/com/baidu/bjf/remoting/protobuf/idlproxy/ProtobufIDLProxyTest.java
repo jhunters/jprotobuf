@@ -44,7 +44,7 @@ public class ProtobufIDLProxyTest {
                 + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
                 + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
                 + "  required string message = 1; }";
-        IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
+        IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent, true);
 
         // 动态设置字段值
         object.put("message", "hello你好");

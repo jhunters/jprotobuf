@@ -34,7 +34,7 @@ public class IDLProxyObjectTest {
     @Test
     public void testSimplePOJO() {
         
-        Codec<SimplePOJO> codec = ProtobufProxy.create(SimplePOJO.class);
+        Codec<SimplePOJO> codec = ProtobufProxy.create(SimplePOJO.class, true);
         
         SimplePOJO  target = new SimplePOJO();
         
