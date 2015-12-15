@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.tools.DiagnosticCollector;
@@ -114,8 +115,10 @@ public class JdkCompiler extends AbstractCompiler {
 
     @Override
     public synchronized Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
-        
-        LOGGER.info("Begin to compile source code: class is '" + name + "'");
+         
+    	if (LOGGER.isLoggable(Level.FINE)) {
+    		LOGGER.fine("Begin to compile source code: class is '" + name + "'");
+    	}
         
         int i = name.lastIndexOf('.');
         String packageName = i < 0 ? "" : name.substring(0, i);
@@ -133,11 +136,15 @@ public class JdkCompiler extends AbstractCompiler {
                     + diagnosticCollector.getDiagnostics());
         }
         
-        LOGGER.info("compile source code done: class is '" + name + "'");
+        if (LOGGER.isLoggable(Level.FINE)) {
+        	LOGGER.fine("compile source code done: class is '" + name + "'");
+        	LOGGER.fine("loading class '" + name + "'");
+        }
         
-        LOGGER.info("loading class '" + name + "'");
         Class<?> retClass = classLoader.loadClass(name);
-        LOGGER.info("loading class done  '" + name + "'");
+        if (LOGGER.isLoggable(Level.FINE)) {
+        	LOGGER.fine("loading class done  '" + name + "'");
+        }
 
         if (os != null) {
             byte[] bytes = classLoader.loadClassBytes(name);
