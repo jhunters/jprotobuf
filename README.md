@@ -69,6 +69,39 @@ jprotobuf-android
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
 
+#####quick start：#####
+Compiling .proto files
+```property
+java -jar  jprotobuf-jar-with-dependencies.jar  --java_out=.  test.proto
+
+create success. output path=D:\jprotobuf_local\source\.
+
+--java_out 指定的生成java源代码目录
+```
+
+生成的代码示例如下：
+```java
+import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+public class PersonJProtoBufProtoClass {
+	@Protobuf(fieldType=FieldType.STRING, order=1, required=true)
+	public String name;
+	@Protobuf(fieldType=FieldType.INT32, order=2, required=true)
+	public Integer id;
+	@Protobuf(fieldType=FieldType.STRING, order=3, required=false)
+	public String email;
+	@Protobuf(fieldType=FieldType.DOUBLE, order=4, required=false)
+	public Double doubleF;
+	@Protobuf(fieldType=FieldType.FLOAT, order=5, required=false)
+	public Float floatF;
+	@Protobuf(fieldType=FieldType.BYTES, order=6, required=false)
+	public byte[] bytesF;
+	@Protobuf(fieldType=FieldType.BOOL, order=7, required=false)
+	public Boolean boolF;
+}
+```
+
+
 ## API使用说明 ##
 
 示例：假如需要定义protobuf定义一个数据接口，包含两个属性，一个是string，一个是int32
