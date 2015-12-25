@@ -35,6 +35,7 @@ import com.baidu.bjf.remoting.protobuf.descriptor.Label;
 import com.baidu.bjf.remoting.protobuf.descriptor.MessageOptionsPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.ServiceDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.Type;
+import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.google.protobuf.ByteString;
@@ -275,7 +276,7 @@ public class CodedConstant {
             boolean enumSpecial = false;
             if (type == FieldType.ENUM) {
                 if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
-                    String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
+                    String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
                     fieldName = "((" + clsName + ") " + fieldName + ").value()";
                     enumSpecial = true;
                 }
@@ -289,20 +290,26 @@ public class CodedConstant {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeObject(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(", false);\n}");
+            ret.append(",").append(fieldName).append(", false)").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(CodeGenerator.LINE_BREAK);
+            ;
             return ret.toString();
         }
 
         if (type == FieldType.STRING || type == FieldType.BYTES) {
             ret.append(prefix).append(".writeBytes(").append(order);
-            ret.append(", ").append(fieldName).append(");\n}");
+            ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(CodeGenerator.LINE_BREAK);
+            ;
             return ret.toString();
         }
         String t = type.getType();
         t = capitalize(t);
 
         ret.append(prefix).append(".write").append(t).append("(").append(order);
-        ret.append(", ").append(fieldName).append(");\n}");
+        ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                .append(CodeGenerator.LINE_BREAK);
+        ;
         return ret.toString();
     }
 
