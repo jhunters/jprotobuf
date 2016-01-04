@@ -61,7 +61,12 @@ public class ClassHelper {
         }
 
         String clsName = cls.getName().replace('.', '/') + ".class";
-        URL resource = cls.getClassLoader().getResource(clsName);
+        ClassLoader classLoader = cls.getClassLoader();
+        if (classLoader == null) {
+        	return -1L;
+        }
+        
+        URL resource = classLoader.getResource(clsName);
         if (resource != null) {
             return new File(resource.getFile()).lastModified();
         }
