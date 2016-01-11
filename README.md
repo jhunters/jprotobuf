@@ -43,7 +43,7 @@ jprotobuf-1.x  JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.8.7</version>
+  <version>1.9.0</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
@@ -65,6 +65,16 @@ jprotobuf-android
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-android</artifactId>
   <version>1.1.1</version>
+</dependency>
+```
+[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
+
+jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的预编译操作
+```xml
+<dependency>
+  <groupId>com.baidu</groupId>
+  <artifactId>jprotobuf-precompile-plugin</artifactId>
+  <version>1.1.3</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
@@ -101,6 +111,42 @@ public class PersonJProtoBufProtoClass {
 }
 ```
 
+Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf注解标识的对象都会进行预编译操作，并生成相应的class文件到目标jar或war中， 使用示例如下：
+```xml
+	<plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>3.0</version>
+		<configuration>
+			<source>${java.version}</source>
+			<target>${java.version}</target>
+		</configuration>
+	</plugin>
+	<plugin>
+		<groupId>com.baidu</groupId>
+		<artifactId>jprotobuf-precompile-plugin</artifactId>
+		<version>1.1.2</version>
+		<configuration>
+			<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+			<filterClassPackage>com.baidu</filterClassPackage>
+		</configuration>
+		<executions>
+			<execution>
+				<phase>compile</phase>
+				<goals>
+					<goal>precompile</goal>
+				</goals>
+			</execution>
+		</executions>
+	</plugin>
+```
+filterClassPackage 用来指定进行预编译时需要扫描的package,目前只支持配置一个package名称<br>
+maven执行命令如下:<br>
+```property
+mvn jprotobuf:precompile
+or
+mvn package 
+```
 
 ## API使用说明 ##
 
