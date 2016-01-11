@@ -159,6 +159,16 @@ public final class ProtobufProxy {
         }
 
     }
+    
+    private static ClassLoader getClassLoader() {
+    	ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    	if (contextClassLoader != null) {
+    		return contextClassLoader;
+    	}
+    	
+    	return null;
+    }
+    
 
     /**
      * To create a protobuf proxy class for target class.
@@ -195,7 +205,7 @@ public final class ProtobufProxy {
         String className = cg.getFullClassName();
         Class<?> c = null;
         try {
-            c = Class.forName(className);
+            c = Class.forName(className, true, getClassLoader());
         } catch (ClassNotFoundException e1) {
             // if class not found so should generate a new java source class.
             c = null;
