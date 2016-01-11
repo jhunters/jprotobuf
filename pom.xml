@@ -12,7 +12,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf</artifactId>
-	<version>1.8.9</version>
+	<version>1.9.0</version>
 
 	<name>Jprotobuf</name>
 	<description>A very useful utility library for java programmer using google protobuf.</description>
@@ -90,7 +90,7 @@
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
-<!-- 			<plugin>
+			<plugin>
 				<groupId>com.baidu</groupId>
 				<artifactId>jprotobuf-precompile-plugin</artifactId>
 				<version>1.1.0</version>
@@ -106,7 +106,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin> -->			
+			</plugin>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
