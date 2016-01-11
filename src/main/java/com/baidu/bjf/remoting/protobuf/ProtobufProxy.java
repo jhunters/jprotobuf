@@ -182,11 +182,6 @@ public final class ProtobufProxy {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
-        if (path != null) {
-            if (!path.isDirectory()) {
-                throw new RuntimeException("Param 'path' value should be a path directory. path=" + path);
-            }
-        }
 
         // get last modify time
         long lastModify = ClassHelper.getLastModifyTime(cls);
@@ -228,7 +223,7 @@ public final class ProtobufProxy {
         }
 
         FileOutputStream fos = null;
-        if (path != null) {
+        if (path != null && path.isDirectory()) {
             String pkg = "";
             if (className.indexOf('.') != -1) {
                 pkg = StringUtils.substringBeforeLast(className, ".");
