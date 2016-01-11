@@ -174,7 +174,7 @@ public final class ProtobufProxy {
         }
         if (path != null) {
             if (!path.isDirectory()) {
-                throw new RuntimeException("Param 'path' value should be a path directory.");
+                throw new RuntimeException("Param 'path' value should be a path directory. path=" + path);
             }
         }
 

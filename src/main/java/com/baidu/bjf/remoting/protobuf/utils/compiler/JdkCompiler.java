@@ -76,6 +76,10 @@ public class JdkCompiler extends AbstractCompiler {
 
     public JdkCompiler(final ClassLoader loader) {
         options = new ArrayList<String>();
+        options.add("-source");
+        options.add("1.6");
+        options.add("-target");
+        options.add("1.6");
         if (compiler == null) {
             throw new RuntimeException(
                     "compiler is null maybe you are on JRE enviroment please change to JDK enviroment.");
