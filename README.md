@@ -69,7 +69,7 @@ jprotobuf-android
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
 
-jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的预编译操作
+jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的预编译操作. 注：只支持版本>=1.9.1
 ```xml
 <dependency>
   <groupId>com.baidu</groupId>
