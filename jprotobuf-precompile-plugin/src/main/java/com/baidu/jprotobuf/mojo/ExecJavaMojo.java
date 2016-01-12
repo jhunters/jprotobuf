@@ -43,6 +43,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -287,13 +288,16 @@ public class ExecJavaMojo
             getLog().debug( msg );
         }
 
+        final Log log = getLog();
         IsolatedThreadGroup threadGroup = new IsolatedThreadGroup( mainClass /* name */);
         Thread bootstrapThread = new Thread( threadGroup, new Runnable()
         {
             public void run()
             {
+            	long current = System.currentTimeMillis();
                 try
-                {
+                {   
+                	
                     Method main =
                         Thread.currentThread().getContextClassLoader().loadClass( mainClass ).getMethod( "main",
                                                                                                          new Class[] { String[].class } );
@@ -318,6 +322,8 @@ public class ExecJavaMojo
                 catch ( Exception e )
                 { // just pass it on
                     Thread.currentThread().getThreadGroup().uncaughtException( Thread.currentThread(), e );
+                } finally {
+                	log.info("JProtobuf pre compile done time took: " + (System.currentTimeMillis() - current) + "ms");
                 }
             }
         }, mainClass + ".main()" );

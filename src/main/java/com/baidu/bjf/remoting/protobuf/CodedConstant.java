@@ -127,11 +127,7 @@ public class CodedConstant {
             File path) {
         String fieldName = getFieldName(order);
 
-        String spath = "null";
-        if (path != null) {
-            spath = "new java.io.File(\"" + path.getAbsolutePath().replace('\\', '/') + "\")";
-        }
-
+        String spath = "ProtobufProxy.OUTPUT_PATH.get()";
         if (isList) {
             String typeString = type.getType().toUpperCase();
             return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." + typeString + ","

@@ -43,7 +43,7 @@ jprotobuf-1.x  JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.9.1</version>
+  <version>1.9.4</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
@@ -69,12 +69,12 @@ jprotobuf-android
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
 
-jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的预编译操作. 注：只支持版本>=1.9.1
+jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的预编译操作. 注：plugin版本建议使用>=1.2.0， jprotobuf 支持版本>=1.9.4  
 ```xml
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>1.1.4</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)

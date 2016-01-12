@@ -293,10 +293,7 @@ public class CodeGenerator {
 						code.append(", false");
 					}
 
-					String spath = "null";
-					if (outputPath != null) {
-						spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
-					}
+					String spath = "ProtobufProxy.OUTPUT_PATH.get()";
 					code.append(",").append(spath);
 
 					code.append(")").append(JAVA_LINE_BREAK);
@@ -322,10 +319,7 @@ public class CodeGenerator {
 					code.append(", false");
 				}
 
-				String spath = "null";
-				if (outputPath != null) {
-					spath = "new java.io.File(\"" + outputPath.getAbsolutePath().replace('\\', '/') + "\")";
-				}
+				String spath = "ProtobufProxy.OUTPUT_PATH.get()";
 				code.append(",").append(spath);
 				code.append(")").append(JAVA_LINE_BREAK);
 				code.append("int length = input.readRawVarint32()").append(JAVA_LINE_BREAK);
