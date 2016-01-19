@@ -53,13 +53,12 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 
 /**
- * Executes the supplied java class in the current VM with the enclosing project's dependencies as classpath.
- * 
- * @author <a href="mailto:kaare.nilsen@gmail.com">Kaare Nilsen</a>, <a href="mailto:dsmiley@mitre.org">David Smiley</a>
- * @since 1.0
+ * Executes {@link JprotobufPreCompileMain} main method to invoke JProtobuf pre comple action
+ * @author xiemalin
+ * @since 1.2.1
  */
 @Mojo( name = "precompile", threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST )
-public class ExecJavaMojo
+public class PreCompileMojo
     extends AbstractExecMojo
 {
     @Component

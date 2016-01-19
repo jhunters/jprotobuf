@@ -15,6 +15,10 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 
 import jodd.io.findfile.ClassScanner;
 
+/**
+ * @author xiemalin
+ * @since 1.0
+ */
 public class JprotobufPreCompileMain {
 
 	public static void main(String[] args) {
