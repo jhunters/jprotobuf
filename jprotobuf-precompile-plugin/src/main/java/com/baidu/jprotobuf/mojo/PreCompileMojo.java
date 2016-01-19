@@ -45,6 +45,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -57,7 +58,7 @@ import org.apache.maven.project.artifact.MavenMetadataSource;
  * @author xiemalin
  * @since 1.2.1
  */
-@Mojo( name = "precompile", threadSafe = true, requiresDependencyResolution = ResolutionScope.TEST )
+@Mojo( name = "precompile", defaultPhase = LifecyclePhase.COMPILE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE )
 public class PreCompileMojo
     extends AbstractExecMojo
 {

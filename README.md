@@ -74,7 +74,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
@@ -116,7 +116,7 @@ Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf
 	<plugin>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-precompile-plugin</artifactId>
-		<version>1.1.4</version>
+		<version>1.2.1</version>
 		<configuration>
 			<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 			<filterClassPackage>com.baidu</filterClassPackage>
