@@ -428,10 +428,9 @@ ProtobufIDLProxy.create(string, false， new File("D:/"));
 ```
 上面的示例，则会直接把生成的中间子节码文件生成到D盘根目录下。
 
-
 注：目前ProtobufIDLProxy已经能完全支持含有内部类或内部枚举类型的message的动态解析。
 
-更多使用示例请参见testcase代码。
+
 
 
 ###   ProtobufIDLProxy增加从proto文件到jprotobuf POJO源代码生成功能 ###
@@ -442,10 +441,10 @@ InputStream fis = EnumIDLGeneratorTest.class.getResourceAsStream("si_product_biz
 ProtobufIDLProxy.generateSource(fis, new File("D:\\test"));
 
 ```
-上面的示例，则会直接把生成的中间子节码文件生成到D盘test目录下。
+上面的示例，则会直接把生成的源码文件生成到D盘test目录下。
 
-## 联系我们 ##
+更多使用示例请参见testcase代码。
 
-email: [rigel-opensource@baidu.com](mailto://rigel-opensource@baidu.com "发邮件给jprotobuf开发组")
+
 
 
