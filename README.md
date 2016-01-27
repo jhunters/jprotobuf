@@ -416,7 +416,7 @@ public enum EnumAttrPOJO implements EnumReadable {
 
 ```
 
-###   ProtobufProxy增加生成中间编译java子节码文件功能 ###
+###   ProtobufProxy增加生成中间编译java字节码文件功能 ###
 
 使用示例：
 
