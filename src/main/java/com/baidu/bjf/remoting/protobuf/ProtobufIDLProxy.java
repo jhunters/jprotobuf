@@ -32,7 +32,6 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.baidu.bjf.remoting.protobuf.utils.compiler.ClassUtils;
 import com.squareup.protoparser.EnumType;
 import com.squareup.protoparser.EnumType.Value;
 import com.squareup.protoparser.MessageType;
@@ -385,6 +384,7 @@ public class ProtobufIDLProxy {
             } else {
                 cd = createCodeByType(protoFile, (EnumType) type, true);
                 enumNames.add(type.getName());
+                enumNames.add(type.getFullyQualifiedName());
             }
 
             if (debug) {
@@ -605,7 +605,7 @@ public class ProtobufIDLProxy {
             }
         }
 
-        String simpleName = defaultClsName + DEFAULT_SUFFIX_CLASSNAME;
+        String simpleName = getProxyClassName(defaultClsName);
 
         // To generate class
         StringBuilder code = new StringBuilder();
@@ -640,6 +640,7 @@ public class ProtobufIDLProxy {
         for (Type t : nestedTypes) {
             if (t instanceof EnumType) {
                 enumNames.add(t.getName());
+                enumNames.add(t.getFullyQualifiedName());
             }
         }
 

@@ -163,6 +163,10 @@ public class CodeGenerator {
 	 * @return class name
 	 */
 	public String getFullClassName() {
+		if (StringUtils.isEmpty(getPackage())) {
+			return getClassName();
+		}
+		
 		return getPackage() + ClassHelper.PACKAGE_SEPARATOR + getClassName();
 	}
 

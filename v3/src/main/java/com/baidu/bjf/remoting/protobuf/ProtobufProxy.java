@@ -44,9 +44,9 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  * @since 1.0.0
  */
 public final class ProtobufProxy {
-    
-    public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<>();
-    
+
+    public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
+
     /**
      * Logger for this class
      */
@@ -56,6 +56,8 @@ public final class ProtobufProxy {
      * cached {@link Codec} instance by class full name.
      */
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
+    
+    public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
 
     /**
      * To generate a protobuf proxy java source code for target class.
@@ -111,16 +113,16 @@ public final class ProtobufProxy {
     /**
      * To create a protobuf proxy class for target class.
      * 
-     * @param <T> generic type
-     * @param cls target class to parse <code>@Protobuf</code> annotation
-     * @return {@link Codec} instance proxy
+     * @param <T>
+     * @param cls
+     * @return
      */
     public static <T> Codec<T> create(Class<T> cls) {
         Boolean debug = DEBUG_CONTROLLER.get();
         if (debug == null) {
-            debug  = false;
+            debug = false;
         }
-        
+
         return create(cls, debug, null);
     }
 
@@ -128,7 +130,7 @@ public final class ProtobufProxy {
      * @param cls target class to be compiled
      * @param outputPath compile byte files output stream
      */
-    public static void Compile(Class<?> cls, File outputPath) {
+    public static void compile(Class<?> cls, File outputPath) {
         if (outputPath == null) {
             throw new NullPointerException("Param 'outputPath' is null.");
         }
@@ -148,101 +150,105 @@ public final class ProtobufProxy {
      * @param <T> target object type to be proxied.
      * @param cls target object class
      * @param debug true will print generate java source code
-     * @return proxying instance object.
+     * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
-        
         DEBUG_CONTROLLER.set(debug);
-        
+        OUTPUT_PATH.set(path);
         try {
-            
-            if (cls == null) {
-                throw new NullPointerException("Parameter cls is null");
-            }
-            if (path != null) {
-                if (!path.isDirectory()) {
-                    throw new RuntimeException("Param 'path' value should be a path directory.");
-                }
-            }
+            return doCreate(cls, debug);
+        } finally {
+            DEBUG_CONTROLLER.remove();
+            OUTPUT_PATH.remove();
+        }
+
+    }
+    
+    private static ClassLoader getClassLoader() {
+    	ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    	if (contextClassLoader != null) {
+    		return contextClassLoader;
+    	}
+    	
+    	return null;
+    }
+    
+    /**
+     * To create a protobuf proxy class for target class.
+     * 
+     * @param <T> target object type to be proxied.
+     * @param cls target object class
+     * @param debug true will print generate java source code
+     * @return proxy instance object.
+     */
+    protected static <T> Codec<T> doCreate(Class<T> cls, boolean debug) {
+        if (cls == null) {
+            throw new NullPointerException("Parameter cls is null");
+        }
+
         // get last modify time
         long lastModify = ClassHelper.getLastModifyTime(cls);
-            String uniClsName = cls.getName();
-            Codec codec = CACHED.get(uniClsName);
-            if (codec != null) {
-                return codec;
-            }
-            
-            CodeGenerator cg = getCodeGenerator(cls);
-            cg.setDebug(debug);
-            cg.setOutputPath(path);
-            
-            // try to load first
-            String className = cg.getFullClassName();
-            Class<?> c = null;
+
+        String uniClsName = cls.getName();
+        Codec codec = CACHED.get(uniClsName);
+        if (codec != null) {
+            return codec;
+        }
+
+        CodeGenerator cg = getCodeGenerator(cls);
+        cg.setDebug(debug);
+        File path = OUTPUT_PATH.get();
+        cg.setOutputPath(path);
+
+        // try to load first
+        String className = cg.getFullClassName();
+        Class<?> c = null;
+        try {
+            c = Class.forName(className, true, getClassLoader());
+        } catch (ClassNotFoundException e1) {
+            // if class not found so should generate a new java source class.
+            c = null;
+        }
+
+        if (c != null) {
             try {
-                c = Class.forName(className);
-            } catch (ClassNotFoundException e1) {
-                // if class not found so should generate a new java source class.
-                c = null;
-            }
-            
-            if (c != null) {
-                try {
-                    Codec<T> newInstance = (Codec<T>) c.newInstance();
-                    return newInstance;
-                } catch (InstantiationException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-            
-            String code = cg.getCode();
-            if (debug) {
-                CodePrinter.printCode(code, "generate protobuf proxy code");
-            }
-            String newClassName = cg.getClassName();
-            
-            OutputStream fos = prepareTargetClassFileOutputInstance(path, className, newClassName);
-            
-        Class<?> newClass =
-                JDKCompilerHelper.getJdkCompiler().compile(className, code, cls.getClassLoader(), fos, lastModify);
-            
-            closeOutputStream(fos);
-            
-            try {
-                Codec<T> newInstance = (Codec<T>) newClass.newInstance();
-                if (!CACHED.containsKey(uniClsName)) {
-                    CACHED.put(uniClsName, newInstance);
-                }
-                
-                try {
-                    // try to eagle load
-                    Set<Class<?>> relativeProxyClasses = cg.getRelativeProxyClasses();
-                    for (Class<?> relativeClass : relativeProxyClasses) {
-                        ProtobufProxy.create(relativeClass, debug, path);
-                    }
-                } catch (Exception e) {
-                    LOGGER.log(Level.FINE, e.getMessage(), e.getCause());
-                }
-                
+                Codec<T> newInstance = (Codec<T>) c.newInstance();
                 return newInstance;
             } catch (InstantiationException e) {
                 throw new RuntimeException(e.getMessage(), e);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
-        } finally  {
-            DEBUG_CONTROLLER.remove();
         }
-        
-    }
 
-    /**
-     * close target {@link OutputStream} instance.
-     * @param fos target {@link OutputStream} instance to be closed
-     */
-    private static void closeOutputStream(OutputStream fos) {
+        String code = cg.getCode();
+        if (debug) {
+            CodePrinter.printCode(code, "generate protobuf proxy code");
+        }
+
+        FileOutputStream fos = null;
+        if (path != null && path.isDirectory()) {
+            String pkg = "";
+            if (className.indexOf('.') != -1) {
+                pkg = StringUtils.substringBeforeLast(className, ".");
+            }
+
+            // mkdirs
+            String dir = path + File.separator + pkg.replace('.', File.separatorChar);
+            File f = new File(dir);
+            f.mkdirs();
+
+            try {
+                fos = new FileOutputStream(new File(f, cg.getClassName() + ".class"));
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+
+        }
+
+        Class<?> newClass =
+                JDKCompilerHelper.getJdkCompiler().compile(className, code, cls.getClassLoader(), fos, lastModify);
+
         if (fos != null) {
             try {
                 fos.close();
@@ -250,37 +256,29 @@ public final class ProtobufProxy {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-    }
 
-    /**
-     * To crate {@link FileOutputStream} of full file path for target java class to write out
-     * 
-     * @param path parent path
-     * @param className original class name
-     * @param newClassName new class name
-     * @return {@link FileOutputStream} instance.
-     */
-    private static OutputStream prepareTargetClassFileOutputInstance(File path, String className, String newClassName) {
-        FileOutputStream fos = null;
-        if (path != null) {
-            String pkg = "";
-            if (className.indexOf(ClassHelper.PACKAGE_SEPARATOR_CHAR) != -1) {
-                pkg = StringUtils.substringBeforeLast(className, ClassHelper.PACKAGE_SEPARATOR);
+        try {
+            Codec<T> newInstance = (Codec<T>) newClass.newInstance();
+            if (!CACHED.containsKey(uniClsName)) {
+                CACHED.put(uniClsName, newInstance);
             }
-
-            // mkdirs
-            String dir = path + File.separator + pkg.replace(ClassHelper.PACKAGE_SEPARATOR_CHAR, File.separatorChar);
-            File f = new File(dir);
-            f.mkdirs();
 
             try {
-                fos = new FileOutputStream(new File(f, newClassName + ".class"));
+                // try to eagle load
+                Set<Class<?>> relativeProxyClasses = cg.getRelativeProxyClasses();
+                for (Class<?> relativeClass : relativeProxyClasses) {
+                    ProtobufProxy.create(relativeClass, debug, path);
+                }
             } catch (Exception e) {
-                throw new RuntimeException(e.getMessage(), e);
+                LOGGER.log(Level.FINE, e.getMessage(), e.getCause());
             }
 
+            return newInstance;
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
-        return fos;
     }
 
     public static void clearCache() {

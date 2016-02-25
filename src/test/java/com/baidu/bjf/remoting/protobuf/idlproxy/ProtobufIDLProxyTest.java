@@ -125,7 +125,6 @@ public class ProtobufIDLProxyTest {
 
 	}
 
-	@Ignore
 	@Test
 	public void testInnerIncludingServiceIDLGenerateSource() {
 		StringBuilder idl = new StringBuilder();

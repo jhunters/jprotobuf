@@ -141,5 +141,14 @@ public class ProtobufProxyUtils {
 
         return ret;
     }
+    
+    public static String processProtobufType(Class<?> cls) {
+        FieldType fieldType = TYPE_MAPPING.get(cls);
+        if (fieldType != null) {
+            return fieldType.getType();
+        }
+        
+        return cls.getSimpleName();
+    }
 
 }
