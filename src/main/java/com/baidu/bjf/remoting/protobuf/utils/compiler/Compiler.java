@@ -26,7 +26,8 @@ import java.io.OutputStream;
 public interface Compiler {
 
     /**
-     * TODO
+     * do compile java source.
+     * 
      * @param code Java source code
      * @param classLoader current classloader
      * @param os target output compiled byte code
@@ -36,5 +37,11 @@ public interface Compiler {
     Class<?> compile(String className, String code, ClassLoader classLoader, OutputStream os, long timestamp);
 
     
+    /**
+     * do load java byte code by class name
+     * 
+     * @param className full class name
+     * @return byte code as byte array 
+     */
     byte[] loadBytes(String className);
 }
