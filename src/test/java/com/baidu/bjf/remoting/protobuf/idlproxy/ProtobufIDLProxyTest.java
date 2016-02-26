@@ -17,6 +17,7 @@ package com.baidu.bjf.remoting.protobuf.idlproxy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Ignore;
@@ -151,8 +152,23 @@ public class ProtobufIDLProxyTest {
 		idl.append("   optional DataInfo.SubDataInfo.Sub2DataInfo sub2DataInfo = 3;\n");
 		idl.append("}");
 		
-		System.out.println(idl.toString());
-		ProtobufIDLProxy.generateSource(idl.toString(), new File("D:/"));
+		Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(idl.toString());
+		
+		IDLProxyObject idlProxyObject = map.get("DataStatus");
+		
+		idlProxyObject.put("subDataInfo.name", "abc");
+		
+		try {
+			byte[] bytes = idlProxyObject.encode();
+			
+			System.out.println(Arrays.toString(bytes));
+			
+			IDLProxyObject idlProxyObject2 = idlProxyObject.decode(bytes);
+			Assert.assertEquals(idlProxyObject2.get("subDataInfo.name"), "abc");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
