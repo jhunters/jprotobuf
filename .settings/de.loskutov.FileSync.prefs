@@ -1,9 +1,0 @@
-#Thu May 28 11:54:54 CST 2015
-WARNING=DO NOT MODIFY THIS FILE IF YOU DON'T UNDERSTAND
-defaultDestination=D\:/develop/projects/github/jhunters/jprotobuf
-defaultVariables=
-eclipse.preferences.version=1
-includeTeamPrivateFiles=false
-map|0=github|D\:/develop/projects/github/jhunters/jprotobuf|*.xml|,|,
-map|1=src|D\:/develop/projects/github/jhunters/jprotobuf/src|,|,|,
-useCurrentDateForDestinationFiles=false
