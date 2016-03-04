@@ -364,6 +364,17 @@ public class ProtobufIDLProxy {
         if (!multi && count != 1) {
             throw new RuntimeException("Only one message defined allowed in '.proto' IDL");
         }
+        
+        String packageName = protoFile.getPackageName();
+        // to check if has "java_package" option and "java_outer_classname"
+        List<Option> options = protoFile.getOptions();
+        if (options != null) {
+            for (Option option : options) {
+                if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
+                    packageName = option.getValue().toString();
+                }
+            }
+        }
 
         List<Class> ret = new ArrayList<Class>(types.size());
 
@@ -382,9 +393,12 @@ public class ProtobufIDLProxy {
                 messageTypes.add((MessageType) type);
                 continue;
             } else {
-                cd = createCodeByType(protoFile, (EnumType) type, true);
+                cd = createCodeByType(protoFile, (EnumType) type, true, packageName);
                 enumNames.add(type.getName());
                 enumNames.add(type.getFullyQualifiedName());
+                if (!StringUtils.isEmpty(packageName)) {
+                	enumNames.add(StringUtils.removeStart(type.getFullyQualifiedName(), packageName + "."));
+                }
             }
 
             if (debug) {
@@ -524,22 +538,12 @@ public class ProtobufIDLProxy {
         return null;
     }
 
-    private static CodeDependent createCodeByType(ProtoFile protoFile, EnumType type, boolean topLevelClass) {
+    private static CodeDependent createCodeByType(ProtoFile protoFile, EnumType type, 
+    		boolean topLevelClass, String packageName) {
 
         CodeDependent cd = new CodeDependent();
 
-        String packageName = protoFile.getPackageName();
         String defaultClsName = type.getName();
-        // to check if has "java_package" option and "java_outer_classname"
-        List<Option> options = protoFile.getOptions();
-        if (options != null) {
-            for (Option option : options) {
-                if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
-                    packageName = option.getValue().toString();
-                }
-            }
-        }
-
         String simpleName = getProxyClassName(defaultClsName);
 
         // To generate class
@@ -641,6 +645,9 @@ public class ProtobufIDLProxy {
             if (t instanceof EnumType) {
                 enumNames.add(t.getName());
                 enumNames.add(t.getFullyQualifiedName());
+                if (!StringUtils.isEmpty(packageName)) {
+                	enumNames.add(StringUtils.removeStart(t.getFullyQualifiedName(), packageName + "."));
+                }
             }
         }
 
@@ -696,10 +703,13 @@ public class ProtobufIDLProxy {
             for (Type t : nestedTypes) {
                 CodeDependent nestedCd;
                 String fqname = t.getFullyQualifiedName();
+                if (!StringUtils.isEmpty(packageName)) {
+                	fqname = StringUtils.removeStart(t.getFullyQualifiedName(), packageName + ".");
+                }
                 String subClsName = getProxyClassName(fqname);
                 
                 if (t instanceof EnumType) {
-                    nestedCd = createCodeByType(protoFile, (EnumType) t, false);
+                    nestedCd = createCodeByType(protoFile, (EnumType) t, false, packageName);
                     enumNames.add(t.getName());
                 } else {
                     nestedCd = createCodeByType(protoFile, (MessageType) t, enumNames, false, checkNestedTypes);

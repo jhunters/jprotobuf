@@ -15,12 +15,10 @@
  */
 package com.baidu.bjf.remoting.protobuf.idlproxy;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
@@ -129,6 +127,7 @@ public class ProtobufIDLProxyTest {
 	@Test
 	public void testInnerIncludingServiceIDLGenerateSource() {
 		StringBuilder idl = new StringBuilder();
+		idl.append("package mypkg;\n");
 		idl.append("message DataInfo {\n");
 		idl.append("   enum DataVisibility {\n");
 		
