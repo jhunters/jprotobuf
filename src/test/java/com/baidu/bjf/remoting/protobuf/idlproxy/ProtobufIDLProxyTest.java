@@ -15,10 +15,12 @@
  */
 package com.baidu.bjf.remoting.protobuf.idlproxy;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
@@ -167,6 +169,16 @@ public class ProtobufIDLProxyTest {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	@Ignore
+	@Test
+	public void testFileImportWithDiffPackageIDLGenerateSource() {
+		try {
+		    ProtobufIDLProxy.generateSource(new File("D:/qq/Pk2.proto"), new File("D:/qq"));
+		} catch (IOException e) {
+		    e.printStackTrace();
 		}
 	}
 
