@@ -77,7 +77,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
   <version>1.2.1</version>
 </dependency>
 ```
-[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
+[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-precompile-plugin/)
 
 #####quick start：#####
 Compiling .proto files
