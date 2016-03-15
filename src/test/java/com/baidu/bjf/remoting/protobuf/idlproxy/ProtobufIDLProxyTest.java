@@ -172,11 +172,15 @@ public class ProtobufIDLProxyTest {
 		}
 	}
 	
-	@Ignore
 	@Test
 	public void testFileImportWithDiffPackageIDLGenerateSource() {
+		
+		File file = new File("D:/qq/Pk2.proto");
+		if (!file.exists()) {
+			return;
+		}
 		try {
-		    ProtobufIDLProxy.generateSource(new File("D:/qq/Pk2.proto"), new File("D:/qq"));
+			Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(file);
 		} catch (IOException e) {
 		    e.printStackTrace();
 		}
