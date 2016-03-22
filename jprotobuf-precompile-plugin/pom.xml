@@ -20,7 +20,7 @@
 		<junit.version>4.10</junit.version>
 		<mavenVersion>2.2.1</mavenVersion>
 	</properties>
-
+ 
 	<prerequisites>
 		<maven>${mavenVersion}</maven>
 	</prerequisites>
