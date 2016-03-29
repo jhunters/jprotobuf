@@ -73,13 +73,19 @@ public class JdkCompiler extends AbstractCompiler {
     private final JavaFileManagerImpl javaFileManager;
 
     private volatile List<String> options;
-
+    
+    private static final String DEFAULT_JDK_VERSION = "1.6";
+    
     public JdkCompiler(final ClassLoader loader) {
+    	this(loader, DEFAULT_JDK_VERSION);
+    }
+    
+	public JdkCompiler(final ClassLoader loader, final String jdkVersion) {
         options = new ArrayList<String>();
         options.add("-source");
-        options.add("1.6");
+        options.add(jdkVersion);
         options.add("-target");
-        options.add("1.6");
+        options.add(jdkVersion);
         if (compiler == null) {
             throw new RuntimeException(
                     "compiler is null maybe you are on JRE enviroment please change to JDK enviroment.");
