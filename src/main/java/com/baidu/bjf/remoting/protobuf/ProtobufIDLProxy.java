@@ -21,10 +21,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -146,8 +149,13 @@ public class ProtobufIDLProxy {
 	public static IDLProxyObject createSingle(String data, boolean debug, File path) {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
-		Map<String, IDLProxyObject> map = doCreate(protoFile, false, debug, path, false, null, cds);
-		return map.entrySet().iterator().next().getValue();
+		Map<String, IDLProxyObject> map;
+		try {
+			map = doCreate(protoFile, false, debug, path, false, null, cds);
+			return map.entrySet().iterator().next().getValue();
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
 	}
 
 	public static IDLProxyObject createSingle(InputStream is) throws IOException {
@@ -191,7 +199,11 @@ public class ProtobufIDLProxy {
 	public static Map<String, IDLProxyObject> create(String data, boolean debug, File path) {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
-		return doCreate(protoFile, true, debug, path, false, null, cds);
+		try {
+			return doCreate(protoFile, true, debug, path, false, null, cds);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
 	}
 
 	public static Map<String, IDLProxyObject> create(InputStream is) throws IOException {
@@ -237,33 +249,18 @@ public class ProtobufIDLProxy {
 
 	public static Map<String, IDLProxyObject> create(File file, boolean debug, File path, List<CodeDependent> cds,
 			Set<String> compiledClass) throws IOException {
-		ProtoFile protoFile = ProtoSchemaParser.parse(file);
 
-		Set<String> dependencyNames = new HashSet<String>();
-
-		Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
-		String parent = file.getParent();
-		// parse dependency
-		List<String> dependencies = protoFile.getDependencies();
-		if (dependencies != null && !dependencies.isEmpty()) {
-			for (String fn : dependencies) {
-				if (dependencyNames.contains(fn)) {
-					continue;
-				}
-				File dependencyFile = new File(parent, fn);
-				ret.putAll(create(dependencyFile, debug, path, cds, compiledClass));
-			}
-		}
-
-		ret.putAll(doCreate(protoFile, true, debug, path, false, null, cds, compiledClass));
-
-		return ret;
+		return doCreatePro(file, true, debug, path, false, null, cds, compiledClass);
 	}
 
 	public static void generateSource(String data, File sourceOutputPath) {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
-		doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
+		try {
+			doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
 	}
 
 	public static void generateSource(InputStream is, File sourceOutputPath) throws IOException {
@@ -285,35 +282,71 @@ public class ProtobufIDLProxy {
 
 	public static void generateSource(File file, File sourceOutputPath, List<CodeDependent> cds,
 			Set<String> compiledClass) throws IOException {
-		ProtoFile protoFile = ProtoSchemaParser.parse(file);
-		Set<String> dependencyNames = new HashSet<String>();
-		String parent = file.getParent();
-		// parse dependency
-		List<String> dependencies = protoFile.getDependencies();
-		if (dependencies != null && !dependencies.isEmpty()) {
-			for (String fn : dependencies) {
-				if (dependencyNames.contains(fn)) {
-					continue;
+
+		doCreatePro(file, true, false, null, true, sourceOutputPath, cds, compiledClass);
+	}
+
+	private static Map<String, IDLProxyObject> doCreatePro(List<ProtoFile> protoFiles, boolean multi, boolean debug,
+			File path, boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds,
+			Set<String> compiledClass) throws IOException {
+
+		int count = 0;
+
+		Map<String, EnumType> enumTypes = new HashMap<String, EnumType>();
+		// package mapping
+		Map<String, String> packageMapping = new HashMap<String, String>();
+
+		Set<String> packages = new HashSet<String>();
+		for (ProtoFile protoFile : protoFiles) {
+
+			List<Type> types = protoFile.getTypes();
+			if (types == null || types.isEmpty()) {
+				continue;
+			}
+
+			String packageName = protoFile.getPackageName();
+			// to check if option has "java_package"
+			List<Option> options = protoFile.getOptions();
+			if (options != null) {
+				for (Option option : options) {
+					if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
+						packageName = option.getValue().toString();
+					}
 				}
-				File dependencyFile = new File(parent, fn);
-				generateSource(dependencyFile, sourceOutputPath, cds, compiledClass);
+			}
+			packages.add(packageName);
+
+			for (Type type : types) {
+				packageMapping.put(type.getName(), packageName);
+				packageMapping.put(type.getFullyQualifiedName(), packageName);
+
+				if (type instanceof MessageType) {
+					count++;
+				} else {
+					enumTypes.put(type.getName(), (EnumType) type);
+					enumTypes.put(type.getFullyQualifiedName(), (EnumType) type);
+				}
 			}
 		}
 
-		doCreate(protoFile, true, false, null, true, sourceOutputPath, cds, compiledClass);
-	}
+		if (!multi && count != 1) {
+			throw new RuntimeException("Only one message defined allowed in '.proto' IDL");
+		}
 
-	private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug, File path,
-			boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds) {
-		return doCreate(protoFile, multi, debug, path, generateSouceOnly, sourceOutputDir, cds, new HashSet<String>());
-	}
+		// create enum type classes
+		List<Class<?>> clsList = createEnumClasses(enumTypes, packageMapping, generateSouceOnly, sourceOutputDir,
+				compiledClass);
 
-	private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug, File path,
-			boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds, Set<String> compiledClass) {
+		for (ProtoFile protoFile : protoFiles) {
+			// create message type classes
+			List<Class<?>> messageClasses = createMessageClass(protoFile, multi, debug, generateSouceOnly,
+					sourceOutputDir, cds, compiledClass, new HashSet<String>(enumTypes.keySet()), packages);
+			clsList.addAll(messageClasses);
 
-		List<Class> list = createClass(protoFile, multi, debug, generateSouceOnly, sourceOutputDir, cds, compiledClass);
+		}
+
 		Map<String, IDLProxyObject> ret = new HashMap<String, IDLProxyObject>();
-		for (Class cls : list) {
+		for (Class cls : clsList) {
 			Object newInstance;
 			try {
 				if (Enum.class.isAssignableFrom(cls)) {
@@ -337,37 +370,21 @@ public class ProtobufIDLProxy {
 		return ret;
 	}
 
-	private static Set<String> getPackages(List<CodeDependent> cds) {
-		Set<String> ret = new HashSet<String>();
-		if (cds == null) {
-			return ret;
-		}
-		for (CodeDependent cd : cds) {
-			ret.add(cd.pkg);
-		}
+	private static Map<String, IDLProxyObject> doCreatePro(File file, boolean multi, boolean debug, File path,
+			boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds, Set<String> compiledClass)
+					throws IOException {
 
-		return ret;
+		checkDirectory(generateSouceOnly, sourceOutputDir);
+
+		// to find all PROTO file if using import command
+		List<ProtoFile> protoFiles = findRelateProtoFiles(file, new HashSet<String>());
+		return doCreatePro(protoFiles, multi, debug, path, generateSouceOnly, sourceOutputDir, cds, compiledClass);
+
 	}
 
-	/**
-	 * @param protoFile
-	 * @param multi
-	 * @param debug
-	 * @param generateSouceOnly
-	 * @param sourceOutputDir
-	 * @return
-	 */
-	private static List<Class> createClass(ProtoFile protoFile, boolean multi, boolean debug, boolean generateSouceOnly,
-			File sourceOutputDir, List<CodeDependent> cds, Set<String> compiledClass) {
-		if (generateSouceOnly) {
-			if (sourceOutputDir == null) {
-				throw new RuntimeException("param 'sourceOutputDir' is null.");
-			}
-
-			if (!sourceOutputDir.isDirectory()) {
-				throw new RuntimeException("param 'sourceOutputDir' should be a exist file directory.");
-			}
-		}
+	private static List<Class<?>> createMessageClass(ProtoFile protoFile, boolean multi, boolean debug,
+			boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds, Set<String> compiledClass,
+			Set<String> enumNames, Set<String> packages) {
 
 		List<Type> types = protoFile.getTypes();
 		if (types == null || types.isEmpty()) {
@@ -388,21 +405,9 @@ public class ProtobufIDLProxy {
 			throw new RuntimeException("Only one message defined allowed in '.proto' IDL");
 		}
 
-		String packageName = protoFile.getPackageName();
-		// to check if has "java_package" option and "java_outer_classname"
-		List<Option> options = protoFile.getOptions();
-		if (options != null) {
-			for (Option option : options) {
-				if (option.getName().equals(JAVA_PACKAGE_OPTION)) {
-					packageName = option.getValue().toString();
-				}
-			}
-		}
-
-		List<Class> ret = new ArrayList<Class>(types.size());
+		List<Class<?>> ret = new ArrayList<Class<?>>(types.size());
 
 		List<MessageType> messageTypes = new ArrayList<MessageType>();
-		Set<String> enumNames = new HashSet<String>();
 		for (Type type : types) {
 			Class checkClass = checkClass(protoFile, type);
 			if (checkClass != null) {
@@ -414,34 +419,12 @@ public class ProtobufIDLProxy {
 			if (type instanceof MessageType) {
 				messageTypes.add((MessageType) type);
 				continue;
-			} else {
-				cd = createCodeByType(protoFile, (EnumType) type, true, packageName);
-				enumNames.add(type.getName());
-				enumNames.add(type.getFullyQualifiedName());
-				if (!StringUtils.isEmpty(packageName)) {
-					enumNames.add(
-							StringUtils.removeStart(type.getFullyQualifiedName(), packageName + PACKAGE_SPLIT_CHAR));
-				}
 			}
-
-			if (debug) {
-				CodePrinter.printCode(cd.code, "generate jprotobuf code");
-			}
-
-			if (!generateSouceOnly) {
-				JDKCompilerHelper.getJdkCompiler().compile(cd.getClassName(), cd.code,
-						ProtobufIDLProxy.class.getClassLoader(), null, -1);
-			} else {
-				// need to output source code to target path
-				writeSourceCode(cd, sourceOutputDir);
-			}
-			compiledClass.add(cd.name);
-			// all enum type class will be ignored to use directly
 		}
 
 		for (MessageType mt : messageTypes) {
 			CodeDependent cd;
-			cd = createCodeByType(protoFile, (MessageType) mt, enumNames, true, new ArrayList<Type>(), cds);
+			cd = createCodeByType(protoFile, (MessageType) mt, enumNames, true, new ArrayList<Type>(), cds, packages);
 
 			if (cd.isDepndency()) {
 				cds.add(cd);
@@ -464,6 +447,96 @@ public class ProtobufIDLProxy {
 				// need to output source code to target path
 				writeSourceCode(codeDependent, sourceOutputDir);
 			}
+		}
+
+		return ret;
+	}
+
+	private static List<Class<?>> createEnumClasses(Map<String, EnumType> enumTypes, Map<String, String> packageMapping,
+			boolean generateSouceOnly, File sourceOutputDir, Set<String> compiledClass) {
+
+		List<Class<?>> ret = new ArrayList<Class<?>>();
+		Set<String> enumNames = new HashSet<String>();
+		Collection<EnumType> enums = enumTypes.values();
+		for (EnumType enumType : enums) {
+			String name = enumType.getName();
+			if (enumNames.contains(name)) {
+				continue;
+			}
+			enumNames.add(name);
+			String packageName = packageMapping.get(name);
+			Class cls = checkClass(packageName, enumType);
+			if (cls != null) {
+				ret.add(cls);
+				continue;
+			}
+			CodeDependent codeDependent = createCodeByType(enumType, true, packageName);
+			compiledClass.add(codeDependent.name);
+			compiledClass.add(packageName + PACKAGE_SPLIT_CHAR + codeDependent.name);
+			if (!generateSouceOnly) {
+				Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.getClassName(),
+						codeDependent.code, ProtobufIDLProxy.class.getClassLoader(), null, -1);
+				ret.add(newClass);
+			} else {
+				// need to output source code to target path
+				writeSourceCode(codeDependent, sourceOutputDir);
+			}
+		}
+
+		return ret;
+	}
+
+	/**
+	 * TODO
+	 * 
+	 * @param generateSouceOnly
+	 * @param sourceOutputDir
+	 */
+	protected static void checkDirectory(boolean generateSouceOnly, File sourceOutputDir) {
+		if (generateSouceOnly) {
+			if (sourceOutputDir == null) {
+				throw new RuntimeException("param 'sourceOutputDir' is null.");
+			}
+
+			if (!sourceOutputDir.isDirectory()) {
+				throw new RuntimeException("param 'sourceOutputDir' should be a exist file directory.");
+			}
+		}
+	}
+
+	private static List<ProtoFile> findRelateProtoFiles(File file, Set<String> dependencyNames) throws IOException {
+		LinkedList<ProtoFile> protoFiles = new LinkedList<ProtoFile>();
+		ProtoFile protoFile = ProtoSchemaParser.parse(file);
+		protoFiles.addFirst(protoFile);
+
+		String parent = file.getParent();
+		// parse dependency, to find all PROTO file if using import command
+		List<String> dependencies = protoFile.getDependencies();
+		if (dependencies != null && !dependencies.isEmpty()) {
+			for (String fn : dependencies) {
+				if (dependencyNames.contains(fn)) {
+					continue;
+				}
+				File dependencyFile = new File(parent, fn);
+				protoFiles.addAll(findRelateProtoFiles(dependencyFile, dependencyNames));
+			}
+		}
+		return protoFiles;
+	}
+
+	private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug, File path,
+			boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds) throws IOException {
+		return doCreatePro(Arrays.asList(protoFile), multi, debug, path, generateSouceOnly, sourceOutputDir, cds,
+				new HashSet<String>());
+	}
+
+	private static Set<String> getPackages(List<CodeDependent> cds) {
+		Set<String> ret = new HashSet<String>();
+		if (cds == null) {
+			return ret;
+		}
+		for (CodeDependent cd : cds) {
+			ret.add(cd.pkg);
 		}
 
 		return ret;
@@ -529,8 +602,8 @@ public class ProtobufIDLProxy {
 
 		// if cds is not empty guess there is some message dependency is not
 		// available. so error idl protobuf defined?
+		Set<String> guessLoadedClass = new HashSet<String>(compiledClass);
 		if (!cds.isEmpty()) {
-			Set<String> guessLoadedClass = new HashSet<String>(compiledClass);
 			iterator = cds.iterator();
 			while (iterator.hasNext()) {
 				CodeDependent codeDependent = iterator.next();
@@ -563,8 +636,7 @@ public class ProtobufIDLProxy {
 		return null;
 	}
 
-	private static CodeDependent createCodeByType(ProtoFile protoFile, EnumType type, boolean topLevelClass,
-			String packageName) {
+	private static CodeDependent createCodeByType(EnumType type, boolean topLevelClass, String packageName) {
 
 		CodeDependent cd = new CodeDependent();
 
@@ -618,7 +690,7 @@ public class ProtobufIDLProxy {
 	}
 
 	private static CodeDependent createCodeByType(ProtoFile protoFile, MessageType type, Set<String> enumNames,
-			boolean topLevelClass, List<Type> parentNestedTypes, List<CodeDependent> cds) {
+			boolean topLevelClass, List<Type> parentNestedTypes, List<CodeDependent> cds, Set<String> packages) {
 
 		CodeDependent cd = new CodeDependent();
 
@@ -662,7 +734,7 @@ public class ProtobufIDLProxy {
 		List<Field> fields = type.getFields();
 
 		// get nested types
-		List<Type> nestedTypes = fetchAllNestedTypes(type, false);
+		List<Type> nestedTypes = fetchAllNestedTypes(type, true);
 		List<Type> checkNestedTypes = new ArrayList<Type>(nestedTypes);
 
 		// to check if has nested classes and check has Enum type
@@ -673,11 +745,14 @@ public class ProtobufIDLProxy {
 				if (!StringUtils.isEmpty(packageName)) {
 					enumNames.add(StringUtils.removeStart(t.getFullyQualifiedName(), packageName + PACKAGE_SPLIT));
 				}
+			} else {
+				checkNestedTypes.add(t);
 			}
 		}
 
 		checkNestedTypes.addAll(parentNestedTypes);
 
+		String suffix = "";
 		for (Field field : fields) {
 			// define annotation
 			generateProtobufDefinedForField(code, field, enumNames);
@@ -686,13 +761,14 @@ public class ProtobufIDLProxy {
 			String javaType = "";
 			if (fType == null) {
 				String jType = field.getType();
-				javaType = getProxyClassName(jType, getPackages(cds));
+				javaType = getProxyClassName(jType, packages);
 
 				if (!isNestedTypeDependency(field.getType(), checkNestedTypes)) {
 					cd.addDependency(javaType);
 				}
 			} else {
 				javaType = fType.getJavaType();
+				suffix = fType.getSuffix();
 			}
 
 			// check if repeated type
@@ -716,7 +792,7 @@ public class ProtobufIDLProxy {
 				} else if (defaultValue instanceof String) {
 					code.append("\"").append(defaultValue).append("\"");
 				} else {
-					code.append(String.valueOf(defaultValue));
+					code.append(String.valueOf(defaultValue) + suffix);
 				}
 			}
 
@@ -734,10 +810,11 @@ public class ProtobufIDLProxy {
 				String subClsName = getProxyClassName(fqname);
 
 				if (t instanceof EnumType) {
-					nestedCd = createCodeByType(protoFile, (EnumType) t, false, packageName);
+					nestedCd = createCodeByType((EnumType) t, false, packageName);
 					enumNames.add(t.getName());
 				} else {
-					nestedCd = createCodeByType(protoFile, (MessageType) t, enumNames, false, checkNestedTypes, cds);
+					nestedCd = createCodeByType(protoFile, (MessageType) t, enumNames, false, checkNestedTypes, cds,
+							getPackages(cds));
 				}
 				nestedCd.addSubClass(subClsName);
 				nestedCd.addSubClass(packageName + PACKAGE_SPLIT_CHAR + subClsName);
@@ -759,6 +836,19 @@ public class ProtobufIDLProxy {
 		// finally dependency should remove self
 		cd.dependencies.remove(cd.name);
 
+		// also remove parent include
+		if (!parentNestedTypes.isEmpty()) {
+			for (Type t : checkNestedTypes) {
+				Iterator<String> iterator = cd.dependencies.iterator();
+				while (iterator.hasNext()) {
+					String dependName = iterator.next().replaceAll(DEFAULT_SUFFIX_CLASSNAME, "");
+					if (t.getFullyQualifiedName().endsWith(dependName)) {
+						iterator.remove();
+					}
+				}
+			}
+		}
+
 		return cd;
 	}
 
@@ -774,7 +864,7 @@ public class ProtobufIDLProxy {
 		if (all) {
 			for (Type t : nestedTypes) {
 				if (t instanceof MessageType) {
-					List<Type> subNestedTypes = fetchAllNestedTypes((MessageType) t, false);
+					List<Type> subNestedTypes = fetchAllNestedTypes((MessageType) t, true);
 					ret.addAll(subNestedTypes);
 				}
 			}
@@ -829,6 +919,21 @@ public class ProtobufIDLProxy {
 		}
 		code.append(")\n");
 
+	}
+
+	private static Class checkClass(String packageName, Type type) {
+		String simpleName = getProxyClassName(type.getName());
+		String className = packageName + PACKAGE_SPLIT_CHAR + simpleName;
+
+		Class<?> c = null;
+		try {
+			c = Class.forName(className);
+		} catch (ClassNotFoundException e1) {
+			// if class not found so should generate a new java source class.
+			c = null;
+		}
+
+		return c;
 	}
 
 	private static Class checkClass(ProtoFile protoFile, Type type) {
@@ -910,6 +1015,7 @@ public class ProtobufIDLProxy {
 		}
 
 		private void addDependency(String name) {
+			System.out.println(name);
 			dependencies.add(name);
 		}
 
