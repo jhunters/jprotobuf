@@ -113,9 +113,9 @@ public final class ProtobufProxy {
     /**
      * To create a protobuf proxy class for target class.
      * 
-     * @param <T>
-     * @param cls
-     * @return
+     * @param <T> generic type
+     * @param cls target class to parse <code>@Protobuf</code> annotation
+     * @return {@link Codec} instance proxy
      */
     public static <T> Codec<T> create(Class<T> cls) {
         Boolean debug = DEBUG_CONTROLLER.get();

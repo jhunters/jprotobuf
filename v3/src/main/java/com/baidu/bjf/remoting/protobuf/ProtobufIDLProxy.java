@@ -386,7 +386,6 @@ public class ProtobufIDLProxy {
             } else {
                 cd = createCodeByType(protoFile, (EnumElement) type, true);
                 enumNames.add(type.name());
-                enumNames.add(type.qualifiedName());
             }
 
             if (debug) {
@@ -394,8 +393,9 @@ public class ProtobufIDLProxy {
             }
 
             if (!generateSouceOnly) {
-                JDKCompilerHelper.getJdkCompiler().compile(cd.getClassName(), cd.code,
-                        ProtobufIDLProxy.class.getClassLoader(), null, -1);
+                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(cd.name,
+                        cd.code, ProtobufIDLProxy.class.getClassLoader(), null, -1);
+                ret.add(newClass);
             } else {
                 // need to output source code to target path
                 writeSourceCode(cd, sourceOutputDir);
@@ -423,7 +423,7 @@ public class ProtobufIDLProxy {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
             if (!generateSouceOnly) {
-                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.getClassName(),
+                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.name,
                         codeDependent.code, ProtobufIDLProxy.class.getClassLoader(), null, -1);
                 ret.add(newClass);
             } else {
@@ -476,7 +476,6 @@ public class ProtobufIDLProxy {
         Iterator<CodeDependent> iterator = cds.iterator();
         while (iterator.hasNext()) {
             CodeDependent next = iterator.next();
-            compiledClass.addAll(next.subClasses);
             if (!next.isDepndency()) {
                 compiledClass.add(next.name);
                 iterator.remove();
@@ -496,8 +495,7 @@ public class ProtobufIDLProxy {
             Set<String> guessLoadedClass = new HashSet<String>(compiledClass);
             iterator = cds.iterator();
             while (iterator.hasNext()) {
-                CodeDependent codeDependent = iterator.next();
-                guessLoadedClass.add(codeDependent.name);
+                guessLoadedClass.add(iterator.next().name);
             }
 
             // to check while message's dependency is missed
@@ -516,7 +514,7 @@ public class ProtobufIDLProxy {
                     if (!guessLoadedClass.contains(dependClass)) {
                         throw new RuntimeException("Message '"
                                 + StringUtils.removeEnd(next.name, DEFAULT_SUFFIX_CLASSNAME) + "' depend on message '"
-                                + dependClass.replace(DEFAULT_SUFFIX_CLASSNAME, "") + "' is missed");
+                                + StringUtils.removeEnd(dependClass, DEFAULT_SUFFIX_CLASSNAME) + "' is missed");
                     }
                 }
             }
@@ -542,27 +540,20 @@ public class ProtobufIDLProxy {
             }
         }
 
-        String simpleName = getProxyClassName(defaultClsName);
+        String simpleName = defaultClsName + DEFAULT_SUFFIX_CLASSNAME;
 
         // To generate class
         StringBuilder code = new StringBuilder();
         if (topLevelClass) {
             // define package
-            if (!StringUtils.isEmpty(packageName)) {
-                code.append("package ").append(packageName).append(CODE_END);
-                code.append("\n");
-            }
+            code.append("package ").append(packageName).append(CODE_END);
+            code.append("\n");
             // add import;
             code.append("import com.baidu.bjf.remoting.protobuf.EnumReadable;\n");
         }
 
         // define class
-        if (topLevelClass) {
-            code.append("public enum ");
-        } else {
-            code.append("public static enum ");
-        }
-        code.append(simpleName).append(" implements EnumReadable {\n");
+        code.append("public enum ").append(simpleName).append(" implements EnumReadable {\n");
 
         Iterator<EnumConstantElement> iter = type.constants().iterator();
         while (iter.hasNext()) {
@@ -607,16 +598,14 @@ public class ProtobufIDLProxy {
             }
         }
 
-        String simpleName = getProxyClassName(defaultClsName);
+        String simpleName = defaultClsName + DEFAULT_SUFFIX_CLASSNAME;
 
         // To generate class
         StringBuilder code = new StringBuilder();
         if (topLevelClass) {
             // define package
-            if (!StringUtils.isEmpty(packageName)) {
-                code.append("package ").append(packageName).append(CODE_END);
-                code.append("\n");
-            }
+            code.append("package ").append(packageName).append(CODE_END);
+            code.append("\n");
             // add import;
             code.append("import com.baidu.bjf.remoting.protobuf.FieldType;\n");
             code.append("import com.baidu.bjf.remoting.protobuf.EnumReadable;\n");
@@ -635,14 +624,13 @@ public class ProtobufIDLProxy {
         List<FieldElement> fields = type.fields();
 
         // get nested types
-        List<TypeElement> nestedTypes = fetchAllNestedTypes(type, false);
+        List<TypeElement> nestedTypes = fetchAllNestedTypes(type);
         List<TypeElement> checkNestedTypes = new ArrayList<TypeElement>(nestedTypes);
 
         // to check if has nested classes and check has Enum type
         for (TypeElement t : nestedTypes) {
             if (t instanceof EnumElement) {
                 enumNames.add(t.name());
-                enumNames.add(t.qualifiedName());
             }
         }
 
@@ -663,8 +651,7 @@ public class ProtobufIDLProxy {
             FieldType fType = typeMapping.get(typeName);
             String javaType;
             if (fType == null) {
-                String jType = getTypeName(field);
-                javaType = getProxyClassName(jType);
+                javaType = getTypeName(field) + DEFAULT_SUFFIX_CLASSNAME;
                 if (!isNestedTypeDependency(field.type(), checkNestedTypes)) {
                     cd.addDependency(javaType);
                 }
@@ -683,7 +670,7 @@ public class ProtobufIDLProxy {
                 } else {
                     keyJavaType = subType.getJavaType();
                 }
-
+                
                 String valueType = mapType.valueType().toString();
                 subType = typeMapping.get(valueType);
                 String valueJavaType;
@@ -692,10 +679,11 @@ public class ProtobufIDLProxy {
                 } else {
                     valueJavaType = subType.getJavaType();
                 }
-
-                javaType = Map.class.getName() + "<" + keyJavaType + ", " + valueJavaType + ">";
+                
+                javaType = Map.class.getName() + "<" + keyJavaType + ", "
+                        + valueJavaType + ">";
             }
-
+            
             // check if repeated type
             if (Label.REPEATED == field.label()) {
                 javaType = List.class.getName() + "<" + javaType + ">";
@@ -724,7 +712,7 @@ public class ProtobufIDLProxy {
         }
 
         // to check if has nested classes
-        if (nestedTypes != null) {
+        if (nestedTypes != null && topLevelClass) {
             for (TypeElement t : nestedTypes) {
                 CodeDependent nestedCd;
                 if (t instanceof EnumElement) {
@@ -764,17 +752,15 @@ public class ProtobufIDLProxy {
      * @param type
      * @return
      */
-    private static List<TypeElement> fetchAllNestedTypes(MessageElement type, boolean all) {
+    private static List<TypeElement> fetchAllNestedTypes(MessageElement type) {
         List<TypeElement> ret = new ArrayList<TypeElement>();
 
         List<TypeElement> nestedTypes = type.nestedElements();
         ret.addAll(nestedTypes);
-        if (all) {
-            for (TypeElement t : nestedTypes) {
-                if (t instanceof MessageElement) {
-                    List<TypeElement> subNestedTypes = fetchAllNestedTypes((MessageElement) t, false);
-                    ret.addAll(subNestedTypes);
-                }
+        for (TypeElement t : nestedTypes) {
+            if (t instanceof MessageElement) {
+                List<TypeElement> subNestedTypes = fetchAllNestedTypes((MessageElement) t);
+                ret.addAll(subNestedTypes);
             }
         }
 
@@ -849,7 +835,7 @@ public class ProtobufIDLProxy {
             }
         }
 
-        String simpleName = getProxyClassName(defaultClsName);
+        String simpleName = defaultClsName + DEFAULT_SUFFIX_CLASSNAME;
         String className = packageName + "." + simpleName;
 
         Class<?> c = null;
@@ -861,21 +847,6 @@ public class ProtobufIDLProxy {
         }
 
         return c;
-    }
-
-    private static String getProxyClassName(String name) {
-
-        String ret = "";
-        if (name.indexOf('.') != -1) {
-            String[] split = name.split("\\.");
-            for (String string : split) {
-                ret += getProxyClassName(string) + ".";
-            }
-            ret = StringUtils.removeEnd(ret, ".");
-        } else {
-            ret = name + DEFAULT_SUFFIX_CLASSNAME;
-        }
-        return ret;
     }
 
     /**
@@ -891,25 +862,12 @@ public class ProtobufIDLProxy {
         private Set<String> dependencies = new HashSet<String>();
         private String code;
 
-        private Set<String> subClasses = new HashSet<String>();
-
         private boolean isDepndency() {
             return !dependencies.isEmpty();
         }
 
-        private void addSubClass(String name) {
-            subClasses.add(name);
-        }
-
         private void addDependency(String name) {
             dependencies.add(name);
-        }
-
-        public String getClassName() {
-            if (StringUtils.isEmpty(pkg)) {
-                return name;
-            }
-            return pkg + "." + name;
         }
     }
 }

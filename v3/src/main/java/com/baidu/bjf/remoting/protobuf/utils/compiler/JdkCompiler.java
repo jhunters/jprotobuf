@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.tools.DiagnosticCollector;
@@ -72,9 +73,19 @@ public class JdkCompiler extends AbstractCompiler {
     private final JavaFileManagerImpl javaFileManager;
 
     private volatile List<String> options;
-
+    
+    private static final String DEFAULT_JDK_VERSION = "1.6";
+    
     public JdkCompiler(final ClassLoader loader) {
+    	this(loader, DEFAULT_JDK_VERSION);
+    }
+    
+	public JdkCompiler(final ClassLoader loader, final String jdkVersion) {
         options = new ArrayList<String>();
+        options.add("-source");
+        options.add(jdkVersion);
+        options.add("-target");
+        options.add(jdkVersion);
         if (compiler == null) {
             throw new RuntimeException(
                     "compiler is null maybe you are on JRE enviroment please change to JDK enviroment.");
@@ -83,12 +94,12 @@ public class JdkCompiler extends AbstractCompiler {
         StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
-            
+
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<File>();
                 for (URL url : urlClassLoader.getURLs()) {
-                    
+
                     String file = url.getFile();
                     if (StringUtils.endsWith(file, "!/")) {
                         file = StringUtils.removeEnd(file, "!/");
@@ -96,7 +107,7 @@ public class JdkCompiler extends AbstractCompiler {
                     if (file.startsWith("file:")) {
                         file = StringUtils.removeStart(file, "file:");
                     }
-                    
+
                     files.add(new File(file));
                 }
                 manager.setLocation(StandardLocation.CLASS_PATH, files);
@@ -114,8 +125,10 @@ public class JdkCompiler extends AbstractCompiler {
 
     @Override
     public synchronized Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
-        
-        LOGGER.info("Begin to compile source code: class is '" + name + "'");
+         
+    	if (LOGGER.isLoggable(Level.FINE)) {
+    		LOGGER.fine("Begin to compile source code: class is '" + name + "'");
+    	}
         
         int i = name.lastIndexOf('.');
         String packageName = i < 0 ? "" : name.substring(0, i);
@@ -133,11 +146,15 @@ public class JdkCompiler extends AbstractCompiler {
                     + diagnosticCollector.getDiagnostics());
         }
         
-        LOGGER.info("compile source code done: class is '" + name + "'");
+        if (LOGGER.isLoggable(Level.FINE)) {
+        	LOGGER.fine("compile source code done: class is '" + name + "'");
+        	LOGGER.fine("loading class '" + name + "'");
+        }
         
-        LOGGER.info("loading class '" + name + "'");
         Class<?> retClass = classLoader.loadClass(name);
-        LOGGER.info("loading class done  '" + name + "'");
+        if (LOGGER.isLoggable(Level.FINE)) {
+        	LOGGER.fine("loading class done  '" + name + "'");
+        }
 
         if (os != null) {
             byte[] bytes = classLoader.loadClassBytes(name);
@@ -166,7 +183,7 @@ public class JdkCompiler extends AbstractCompiler {
         Collection<JavaFileObject> files() {
             return Collections.unmodifiableCollection(classes.values());
         }
-        
+
         public byte[] loadClassBytes(final String qualifiedClassName) {
             JavaFileObject file = classes.get(qualifiedClassName);
             if (file != null) {
@@ -283,7 +300,7 @@ public class JdkCompiler extends AbstractCompiler {
         }
 
         public void putFileForInput(StandardLocation location, String packageName, String relativeName,
-            JavaFileObject file) {
+                JavaFileObject file) {
             fileObjects.put(uri(location, packageName, relativeName), file);
         }
 

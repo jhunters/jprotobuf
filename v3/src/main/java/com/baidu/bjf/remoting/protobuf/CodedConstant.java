@@ -1025,7 +1025,6 @@ public class CodedConstant {
     public static Descriptor getDescriptor(Class<?> cls) throws IOException {
 
         String idl = ProtobufIDLGenerator.getIDL(cls);
-        System.out.println(idl);
         ProtoFile file = ProtoParser.parse(ProtobufIDLProxy.DEFAULT_FILE_NAME, idl);
 
         FileDescriptorProtoPOJO fileDescriptorProto = new FileDescriptorProtoPOJO();

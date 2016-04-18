@@ -45,6 +45,7 @@ public class ClassHelper {
 
     /**
      * get class internal name from Class.getName(). sub class like A$B to A.B
+     * 
      * @param clsName class name
      * @return internalname
      */
@@ -61,6 +62,7 @@ public class ClassHelper {
         }
 
         String clsName = cls.getName().replace('.', '/') + ".class";
+        
         ClassLoader classLoader = cls.getClassLoader();
         if (classLoader == null) {
         	return -1L;

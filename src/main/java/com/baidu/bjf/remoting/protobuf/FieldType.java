@@ -29,24 +29,24 @@ public enum FieldType {
     /**
      * types defined in .proto file.
      */
-    DOUBLE  ("Double", "double"     , "WIRETYPE_FIXED64", ".doubleValue()", WireFormat.FieldType.DOUBLE         ,"0d"),
-    FLOAT   ("Float", "float", "WIRETYPE_FIXED32"    ,    ".floatValue()",  WireFormat.FieldType.FLOAT ,"0f"),
-    INT64   ("Long", "int64"      , "WIRETYPE_VARINT"    ,    ".longValue()",  WireFormat.FieldType.INT64  ,"0L"    ),
-    UINT64  ("Long", "uInt64"      , "WIRETYPE_VARINT"   ,    ".longValue()",  WireFormat.FieldType.UINT64    ,"0L"  ),
-    INT32   ("Integer", "int32"   , "WIRETYPE_VARINT"    ,    ".intValue()" ,  WireFormat.FieldType.INT32   ,"0" ),
-    FIXED64 ("Long", "fixed64"       , "WIRETYPE_FIXED64"    ,    ".longValue()" ,  WireFormat.FieldType.FIXED64   ,"0L" ),
-    FIXED32 ("Integer", "fixed32"        , "WIRETYPE_FIXED32"   ,    ".intValue()",  WireFormat.FieldType.FIXED32  ,"0"  ),
-    BOOL    ("Boolean", "bool"     , "WIRETYPE_VARINT"      , ".booleanValue()",  WireFormat.FieldType.BOOL   ,"false" ),
-    STRING  ("String", "string"     , "WIRETYPE_LENGTH_DELIMITED", "",  WireFormat.FieldType.STRING ,"\"\""),
-    BYTES   ("byte[]", "bytes", "WIRETYPE_LENGTH_DELIMITED", "",  WireFormat.FieldType.BYTES,  "new byte[0]"),
-    UINT32  ("Integer", "uInt32"        , "WIRETYPE_VARINT"    ,    ".intValue()" ,  WireFormat.FieldType.UINT32 ,"0"    ),
-    SFIXED32("Integer", "sFixed32"       , "WIRETYPE_FIXED32"   ,    ".intValue()" ,  WireFormat.FieldType.SFIXED32  ,"0"  ),
-    SFIXED64("Long", "sFixed64"      , "WIRETYPE_FIXED64"   ,    ".longValue()" ,  WireFormat.FieldType.SFIXED64    ,"0L" ),
-    SINT32  ("Integer", "sInt32"        , "WIRETYPE_VARINT"     ,    ".intValue()" ,  WireFormat.FieldType.SINT32  ,"0"  ),
-    SINT64  ("Long", "sInt64"       , "WIRETYPE_VARINT"    ,    ".longValue()" ,  WireFormat.FieldType.SINT64   ,"0L"  ),
-    OBJECT  ("Object", "object"       , "WIRETYPE_LENGTH_DELIMITED"    ,    ""    ,  WireFormat.FieldType.MESSAGE ,null ),
-    ENUM ("Enum", "enum"       , "WIRETYPE_VARINT"    ,    ".ordinal()"    ,  WireFormat.FieldType.ENUM , null ),
-    DEFAULT("", ""       , ""    ,    ""    ,  WireFormat.FieldType.MESSAGE , null );
+    DOUBLE  ("Double", "double"     , "WIRETYPE_FIXED64", ".doubleValue()", WireFormat.FieldType.DOUBLE         ,"0d", "D"),
+    FLOAT   ("Float", "float", "WIRETYPE_FIXED32"    ,    ".floatValue()",  WireFormat.FieldType.FLOAT ,"0f", "F"),
+    INT64   ("Long", "int64"      , "WIRETYPE_VARINT"    ,    ".longValue()",  WireFormat.FieldType.INT64  ,"0L", ""  ),
+    UINT64  ("Long", "uInt64"      , "WIRETYPE_VARINT"   ,    ".longValue()",  WireFormat.FieldType.UINT64    ,"0L", "" ),
+    INT32   ("Integer", "int32"   , "WIRETYPE_VARINT"    ,    ".intValue()" ,  WireFormat.FieldType.INT32   ,"0", "" ),
+    FIXED64 ("Long", "fixed64"       , "WIRETYPE_FIXED64"    ,    ".longValue()" ,  WireFormat.FieldType.FIXED64   ,"0L", "L" ),
+    FIXED32 ("Integer", "fixed32"        , "WIRETYPE_FIXED32"   ,    ".intValue()",  WireFormat.FieldType.FIXED32  ,"0", ""  ),
+    BOOL    ("Boolean", "bool"     , "WIRETYPE_VARINT"      , ".booleanValue()",  WireFormat.FieldType.BOOL   ,"false", "" ),
+    STRING  ("String", "string"     , "WIRETYPE_LENGTH_DELIMITED", "",  WireFormat.FieldType.STRING ,"\"\"", ""),
+    BYTES   ("byte[]", "bytes", "WIRETYPE_LENGTH_DELIMITED", "",  WireFormat.FieldType.BYTES,  "new byte[0]", ""),
+    UINT32  ("Integer", "uInt32"        , "WIRETYPE_VARINT"    ,    ".intValue()" ,  WireFormat.FieldType.UINT32 ,"0", ""    ),
+    SFIXED32("Integer", "sFixed32"       , "WIRETYPE_FIXED32"   ,    ".intValue()" ,  WireFormat.FieldType.SFIXED32  ,"0", ""  ),
+    SFIXED64("Long", "sFixed64"      , "WIRETYPE_FIXED64"   ,    ".longValue()" ,  WireFormat.FieldType.SFIXED64    ,"0L", "L" ),
+    SINT32  ("Integer", "sInt32"        , "WIRETYPE_VARINT"     ,    ".intValue()" ,  WireFormat.FieldType.SINT32  ,"0", ""  ),
+    SINT64  ("Long", "sInt64"       , "WIRETYPE_VARINT"    ,    ".longValue()" ,  WireFormat.FieldType.SINT64   ,"0L", "L"  ),
+    OBJECT  ("Object", "object"       , "WIRETYPE_LENGTH_DELIMITED"    ,    ""    ,  WireFormat.FieldType.MESSAGE ,null, "" ),
+    ENUM ("Enum", "enum"       , "WIRETYPE_VARINT"    ,    ".ordinal()"    ,  WireFormat.FieldType.ENUM , null, "" ),
+    DEFAULT("", ""       , ""    ,    ""    ,  WireFormat.FieldType.MESSAGE , null, "" );
     
     /**
      * java original type
@@ -75,8 +75,18 @@ public enum FieldType {
      * default value
      */
     private String defaultValue;
+    
+    private String suffix;
 
     /**
+	 * getter method for property suffix
+	 * @return the suffix
+	 */
+	public String getSuffix() {
+		return suffix;
+	}
+
+	/**
      * get the defaultValue
      * @return the defaultValue
      */
@@ -151,13 +161,14 @@ public enum FieldType {
      * @param wireFormat protobuf wire format type
      */
     FieldType(String javaType, String type, String wireFormat,
-            String toPrimitiveType, WireFormat.FieldType internalFieldType, String defaultValue) {
+            String toPrimitiveType, WireFormat.FieldType internalFieldType, String defaultValue, String suffix) {
         this.javaType = javaType;
         this.type = type;
         this.wireFormat = wireFormat;
         this.toPrimitiveType = toPrimitiveType;
         this.internalFieldType = internalFieldType;
         this.defaultValue = defaultValue;
+        this.suffix = suffix;
     }
     
 }

@@ -57,24 +57,11 @@ public final class FieldUtils {
      */
     private static final Logger LOGGER = Logger.getLogger(FieldUtils.class.getName());
     
-    public static String getUnboxedFieldname(String name, String primitiveType) {
-        if (PRIMITIVE_TYPE_MAPPING.containsKey(primitiveType)) {
-            return PRIMITIVE_TYPE_MAPPING.get(primitiveType) + ".valueOf(" + name + ")";
-        }
-        return name;
-    }
-    
-    public static String getInBoxedFieldname(String name, String primitiveType) {
-        if (PRIMITIVE_TYPE_MAPPING.containsValue(primitiveType)) {
-            return primitiveType + ".valueOf(" + name + ")";
-        }
-        return name;
-    }
-    
     public static String toObjectType(String primitiveType) {
         if (PRIMITIVE_TYPE_MAPPING.containsKey(primitiveType)) {
             return PRIMITIVE_TYPE_MAPPING.get(primitiveType);
         }
+        
         return ClassHelper.getInternalName(primitiveType);
     }
 
@@ -133,78 +120,6 @@ public final class FieldUtils {
         } catch (Exception e) {
             LOGGER.log(Level.FINE, e.getMessage(), e);
         }
-    }
-    
-    public static void setField(Object t, String name, int value) {
-        setField(t, name, Integer.valueOf(value));
-    }
-    
-    public static void setField(Object t, String name, short value) {
-        setField(t, name, Short.valueOf(value));
-    }
-    
-    public static void setField(Object t, String name, double value) {
-        setField(t, name, Double.valueOf(value));
-    }
-    
-    public static void setField(Object t, String name, float value) {
-        setField(t, name, Float.valueOf(value));
-    }
-    
-    public static void setField(Object t, String name, byte value) {
-        setField(t, name, Byte.valueOf(value));
-    }
-    
-    public static void setField(Object t, String name, char value) {
-        setField(t, name, Character.valueOf(value));
-    }
-    
-    public static void setField(Object t, String name, long value) {
-        setField(t, name, Long.valueOf(value));
-    }
-    
-    public static void setField(Object t, String name, boolean value) {
-        setField(t, name, Boolean.valueOf(value));
-    }
-    
-    
-    public static void addList(List list, Object value) {
-        if (list != null) {
-            list.add(value);
-        }
-    }
-    
-    
-    public static void addList(List list, int value) {
-        addList(list, Integer.valueOf(value));
-    }
-    
-    public static void addList(List list, short value) {
-        addList(list, Short.valueOf(value));
-    }
-    
-    public static void addList(List list, double value) {
-        addList(list, Double.valueOf(value));
-    }
-    
-    public static void addList(List list, float value) {
-        addList(list, Float.valueOf(value));
-    }
-    
-    public static void addList(List list, byte value) {
-        addList(list, Byte.valueOf(value));
-    }
-    
-    public static void addList(List list, char value) {
-        addList(list, Character.valueOf(value));
-    }
-    
-    public static void addList(List list, long value) {
-        addList(list, Long.valueOf(value));
-    }
-    
-    public static void addList(List list, boolean value) {
-        addList(list, Boolean.valueOf(value));
     }
 
     /**

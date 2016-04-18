@@ -33,7 +33,6 @@ public abstract class CacheableJdkCompiler implements Compiler {
         this.compiler = compiler;
     }
 
-    @Override
     public Class<?> compile(String className, String code, ClassLoader classLoader, OutputStream os, long timestamp) {
         Class<?> cls = null;
         try {
