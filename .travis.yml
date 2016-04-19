@@ -1,4 +1,5 @@
 language: java
 jdk:
 - oraclejdk6
-mvn test
+sudo: false
+install: "mvn test"
