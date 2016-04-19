@@ -1,5 +1,5 @@
 language: java
 jdk:
-- oraclejdk6
+- oraclejdk7
 sudo: false
 install: "mvn test"
