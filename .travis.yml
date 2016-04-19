@@ -1,0 +1,4 @@
+language: java
+jdk:
+- oraclejdk6
+mvn test
