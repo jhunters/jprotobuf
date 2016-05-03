@@ -1015,7 +1015,6 @@ public class ProtobufIDLProxy {
 		}
 
 		private void addDependency(String name) {
-			System.out.println(name);
 			dependencies.add(name);
 		}
 
