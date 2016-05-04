@@ -51,6 +51,9 @@ import com.squareup.protoparser.TypeElement;
  * @since 1.0.2
  */
 public class ProtobufIDLProxy {
+    
+    
+    private static final char PACKAGE_SPLIT_CHAR = '.';
 
     /**
      * 
@@ -393,7 +396,7 @@ public class ProtobufIDLProxy {
             }
 
             if (!generateSouceOnly) {
-                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(cd.name,
+                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(cd.getClassName(),
                         cd.code, ProtobufIDLProxy.class.getClassLoader(), null, -1);
                 ret.add(newClass);
             } else {
@@ -423,7 +426,7 @@ public class ProtobufIDLProxy {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
             if (!generateSouceOnly) {
-                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.name,
+                Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.getClassName(),
                         codeDependent.code, ProtobufIDLProxy.class.getClassLoader(), null, -1);
                 ret.add(newClass);
             } else {
@@ -868,6 +871,13 @@ public class ProtobufIDLProxy {
 
         private void addDependency(String name) {
             dependencies.add(name);
+        }
+        
+        public String getClassName() {
+            if (StringUtils.isEmpty(pkg)) {
+                return name;
+            }
+            return pkg + PACKAGE_SPLIT_CHAR + name;
         }
     }
 }

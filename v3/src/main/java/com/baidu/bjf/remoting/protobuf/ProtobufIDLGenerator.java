@@ -194,6 +194,10 @@ public class ProtobufIDLGenerator {
                             enumTypes.add(c);
                         }
                     }
+                } else if (field.getFieldType() == FieldType.MAP) {
+                    type = type + "<" + ProtobufProxyUtils.processProtobufType(field.getGenericeValueType()) + ", ";
+                    type = type + ProtobufProxyUtils.processProtobufType(field.getGenericeValueType())  + ">";
+                    
                 }
 
                 String required = getFieldRequired(field.isRequired());
