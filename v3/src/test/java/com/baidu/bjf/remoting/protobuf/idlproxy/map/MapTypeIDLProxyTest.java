@@ -46,7 +46,7 @@ public class MapTypeIDLProxyTest {
         
         
         idlProxyMap.put("name", "hello");
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<String, String>();
         
         map.put("hello", "world");
         idlProxyMap.put("stringMap", map);

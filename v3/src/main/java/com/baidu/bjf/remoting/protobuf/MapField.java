@@ -41,221 +41,197 @@ import com.google.protobuf.Message;
 /**
  * Internal representation of map fields in generated messages.
  * 
- * This class supports accessing the map field as a {@link Map} to be used in
- * generated API and also supports accessing the field as a {@link List} to be
- * used in reflection API. It keeps track of where the data is currently stored
- * and do necessary conversions between map and list.  
+ * This class supports accessing the map field as a {@link Map} to be used in generated API and also supports accessing
+ * the field as a {@link List} to be used in reflection API. It keeps track of where the data is currently stored and do
+ * necessary conversions between map and list.
  * 
- * This class is a protobuf implementation detail. Users shouldn't use this
- * class directly.
+ * This class is a protobuf implementation detail. Users shouldn't use this class directly.
  * 
- * THREAD-SAFETY NOTE: Read-only access is thread-safe. Users can call getMap()
- * and getList() concurrently in multiple threads. If write-access is needed,
- * all access must be synchronized.
+ * THREAD-SAFETY NOTE: Read-only access is thread-safe. Users can call getMap() and getList() concurrently in multiple
+ * threads. If write-access is needed, all access must be synchronized.
  */
 public class MapField<K, V> {
-  /**
-   * Indicates where the data of this map field is currently stored.
-   * 
-   * MAP: Data is stored in mapData.
-   * LIST: Data is stored in listData.
-   * BOTH: mapData and listData have the same data.
-   *
-   * When the map field is accessed (through generated API or reflection API),
-   * it will shift between these 3 modes:
-   * 
-   *          getMap()   getList()   getMutableMap()   getMutableList()
-   *   MAP      MAP        BOTH          MAP               LIST
-   *   LIST     BOTH       LIST          MAP               LIST
-   *   BOTH     BOTH       BOTH          MAP               LIST
-   *   
-   * As the map field changes its mode, the list/map reference returned in a
-   * previous method call may be invalidated. 
-   */
-  private enum StorageMode {MAP, LIST, BOTH}
-
-  private volatile StorageMode mode;
-  private Map<K, V> mapData;
-  private List<Message> listData;
-  
-  // Convert between a map entry Message and a key-value pair.
-  private static interface Converter<K, V> {
-    Message convertKeyAndValueToMessage(K key, V value);
-    void convertMessageToKeyAndValue(Message message, Map<K, V> map);
-    
-    Message getMessageDefaultInstance();
-  }
-  
-  private static class ImmutableMessageConverter<K, V> implements Converter<K, V> {
-    private final MapEntry<K, V> defaultEntry;
-    public ImmutableMessageConverter(MapEntry<K, V> defaultEntry) {
-      this.defaultEntry = defaultEntry;
-    }
-    
-    public Message convertKeyAndValueToMessage(K key, V value) {
-      return defaultEntry.newBuilderForType().setKey(key).setValue(value).buildPartial();
-    }
-    
-    public void convertMessageToKeyAndValue(Message message, Map<K, V> map) {
-      MapEntry<K, V> entry = (MapEntry<K, V>) message;
-      map.put(entry.getKey(), entry.getValue());
+    /**
+     * Indicates where the data of this map field is currently stored.
+     * 
+     * MAP: Data is stored in mapData. LIST: Data is stored in listData. BOTH: mapData and listData have the same data.
+     *
+     * When the map field is accessed (through generated API or reflection API), it will shift between these 3 modes:
+     * 
+     * getMap() getList() getMutableMap() getMutableList() MAP MAP BOTH MAP LIST LIST BOTH LIST MAP LIST BOTH BOTH BOTH
+     * MAP LIST
+     * 
+     * As the map field changes its mode, the list/map reference returned in a previous method call may be invalidated.
+     */
+    private enum StorageMode {
+        MAP, LIST, BOTH
     }
 
-    public Message getMessageDefaultInstance() {
-      return defaultEntry;
-    }
-  }
-  
+    private volatile StorageMode mode;
+    private Map<K, V> mapData;
+    private List<Message> listData;
 
-  private final Converter<K, V> converter;
-  
-  private MapField(
-      Converter<K, V> converter,
-      StorageMode mode,
-      Map<K, V> mapData,
-      List<Message> listData) {
-    this.converter = converter;
-    this.mode = mode;
-    this.mapData = mapData;
-    this.listData = listData;
-  }
-    
-  private MapField(
-      MapEntry<K, V> defaultEntry,
-      StorageMode mode,
-      Map<K, V> mapData,
-      List<Message> listData) {
-    this(new ImmutableMessageConverter<K, V>(defaultEntry), mode, mapData, listData);
-  }
-  
-  
-  /** Returns an immutable empty MapField. */
-  public static <K, V> MapField<K, V> emptyMapField(
-      MapEntry<K, V> defaultEntry) {
-    return new MapField<K, V>(
-        defaultEntry, StorageMode.MAP, Collections.<K, V>emptyMap(), null);
-  }
-  
-  
-  /** Creates a new mutable empty MapField. */
-  public static <K, V> MapField<K, V> newMapField(MapEntry<K, V> defaultEntry) {
-    return new MapField<K, V>(
-        defaultEntry, StorageMode.MAP, new HashMap<K, V>(), null);
-  }
-  
-  
-  private Message convertKeyAndValueToMessage(K key, V value) {
-    return converter.convertKeyAndValueToMessage(key, value);
-  }
-  
-  @SuppressWarnings("unchecked")
-  private void convertMessageToKeyAndValue(Message message, Map<K, V> map) {
-    converter.convertMessageToKeyAndValue(message, map);
-  }
+    // Convert between a map entry Message and a key-value pair.
+    private static interface Converter<K, V> {
+        Message convertKeyAndValueToMessage(K key, V value);
 
-  private List<Message> convertMapToList(Map<K, V> mapData) {
-    List<Message> listData = new ArrayList<Message>();
-    for (Map.Entry<K, V> entry : mapData.entrySet()) {
-      listData.add(
-          convertKeyAndValueToMessage(
-              entry.getKey(), entry.getValue()));
-    }
-    return listData;
-  }
+        void convertMessageToKeyAndValue(Message message, Map<K, V> map);
 
-  private Map<K, V> convertListToMap(List<Message> listData) {
-    Map<K, V> mapData = new HashMap<K, V>();
-    for (Message item : listData) {
-      convertMessageToKeyAndValue(item, mapData);
+        Message getMessageDefaultInstance();
     }
-    return mapData;
-  }
-  
-  /** Returns the content of this MapField as a read-only Map. */
-  public Map<K, V> getMap() {
-    if (mode == StorageMode.LIST) {
-      synchronized (this) {
+
+    private static class ImmutableMessageConverter<K, V> implements Converter<K, V> {
+        private final MapEntry<K, V> defaultEntry;
+
+        public ImmutableMessageConverter(MapEntry<K, V> defaultEntry) {
+            this.defaultEntry = defaultEntry;
+        }
+
+        public Message convertKeyAndValueToMessage(K key, V value) {
+            return defaultEntry.newBuilderForType().setKey(key).setValue(value).buildPartial();
+        }
+
+        public void convertMessageToKeyAndValue(Message message, Map<K, V> map) {
+            MapEntry<K, V> entry = (MapEntry<K, V>) message;
+            map.put(entry.getKey(), entry.getValue());
+        }
+
+        public Message getMessageDefaultInstance() {
+            return defaultEntry;
+        }
+    }
+
+    private final Converter<K, V> converter;
+
+    private MapField(Converter<K, V> converter, StorageMode mode, Map<K, V> mapData, List<Message> listData) {
+        this.converter = converter;
+        this.mode = mode;
+        this.mapData = mapData;
+        this.listData = listData;
+    }
+
+    private MapField(MapEntry<K, V> defaultEntry, StorageMode mode, Map<K, V> mapData, List<Message> listData) {
+        this(new ImmutableMessageConverter<K, V>(defaultEntry), mode, mapData, listData);
+    }
+
+    /** Returns an immutable empty MapField. */
+    public static <K, V> MapField<K, V> emptyMapField(MapEntry<K, V> defaultEntry) {
+        return new MapField<K, V>(defaultEntry, StorageMode.MAP, Collections.<K, V> emptyMap(), null);
+    }
+
+    /** Creates a new mutable empty MapField. */
+    public static <K, V> MapField<K, V> newMapField(MapEntry<K, V> defaultEntry) {
+        return new MapField<K, V>(defaultEntry, StorageMode.MAP, new HashMap<K, V>(), null);
+    }
+
+    private Message convertKeyAndValueToMessage(K key, V value) {
+        return converter.convertKeyAndValueToMessage(key, value);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void convertMessageToKeyAndValue(Message message, Map<K, V> map) {
+        converter.convertMessageToKeyAndValue(message, map);
+    }
+
+    private List<Message> convertMapToList(Map<K, V> mapData) {
+        List<Message> listData = new ArrayList<Message>();
+        for (Map.Entry<K, V> entry : mapData.entrySet()) {
+            listData.add(convertKeyAndValueToMessage(entry.getKey(), entry.getValue()));
+        }
+        return listData;
+    }
+
+    private Map<K, V> convertListToMap(List<Message> listData) {
+        Map<K, V> mapData = new HashMap<K, V>();
+        for (Message item : listData) {
+            convertMessageToKeyAndValue(item, mapData);
+        }
+        return mapData;
+    }
+
+    /** Returns the content of this MapField as a read-only Map. */
+    public Map<K, V> getMap() {
         if (mode == StorageMode.LIST) {
-          mapData = convertListToMap(listData);
-          mode = StorageMode.BOTH;
+            synchronized (this) {
+                if (mode == StorageMode.LIST) {
+                    mapData = convertListToMap(listData);
+                    mode = StorageMode.BOTH;
+                }
+            }
         }
-      }
+        return Collections.unmodifiableMap(mapData);
     }
-    return Collections.unmodifiableMap(mapData);
-  }
-  
-  /** Gets a mutable Map view of this MapField. */
-  public Map<K, V> getMutableMap() {
-    if (mode != StorageMode.MAP) {
-      if (mode == StorageMode.LIST) {
-        mapData = convertListToMap(listData);
-      }
-      listData = null;
-      mode = StorageMode.MAP; 
+
+    /** Gets a mutable Map view of this MapField. */
+    public Map<K, V> getMutableMap() {
+        if (mode != StorageMode.MAP) {
+            if (mode == StorageMode.LIST) {
+                mapData = convertListToMap(listData);
+            }
+            listData = null;
+            mode = StorageMode.MAP;
+        }
+        return mapData;
     }
-    return mapData;
-  }
-  
-  public void mergeFrom(MapField<K, V> other) {
-    getMutableMap().putAll(MapFieldLite.copy(other.getMap()));
-  }
-  
-  public void clear() {
-    mapData = new HashMap<K, V>();
-    mode = StorageMode.MAP;
-  }
-  
-  @SuppressWarnings("unchecked")
-  @Override
-  public boolean equals(Object object) {
-    if (!(object instanceof MapField)) {
-      return false;
+
+    public void mergeFrom(MapField<K, V> other) {
+        getMutableMap().putAll(MapFieldLite.copy(other.getMap()));
     }
-    MapField<K, V> other = (MapField<K, V>) object;
-    return MapFieldLite.<K, V>equals(getMap(), other.getMap());
-  }
-  
-  @Override
-  public int hashCode() {
-    return MapFieldLite.<K, V>calculateHashCodeForMap(getMap());
-  }
-  
-  /** Returns a deep copy of this MapField. */
-  public MapField<K, V> copy() {
-    return new MapField<K, V>(
-        converter, StorageMode.MAP, MapFieldLite.copy(getMap()), null);
-  }
-  
-  /** Gets the content of this MapField as a read-only List. */
-  List<Message> getList() {
-    if (mode == StorageMode.MAP) {
-      synchronized (this) {
+
+    public void clear() {
+        mapData = new HashMap<K, V>();
+        mode = StorageMode.MAP;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof MapField)) {
+            return false;
+        }
+        MapField<K, V> other = (MapField<K, V>) object;
+        return MapFieldLite.<K, V> equals(getMap(), other.getMap());
+    }
+
+    @Override
+    public int hashCode() {
+        return MapFieldLite.<K, V> calculateHashCodeForMap(getMap());
+    }
+
+    /** Returns a deep copy of this MapField. */
+    public MapField<K, V> copy() {
+        return new MapField<K, V>(converter, StorageMode.MAP, MapFieldLite.copy(getMap()), null);
+    }
+
+    /** Gets the content of this MapField as a read-only List. */
+    List<Message> getList() {
         if (mode == StorageMode.MAP) {
-          listData = convertMapToList(mapData);
-          mode = StorageMode.BOTH;
+            synchronized (this) {
+                if (mode == StorageMode.MAP) {
+                    listData = convertMapToList(mapData);
+                    mode = StorageMode.BOTH;
+                }
+            }
         }
-      }
+        return Collections.unmodifiableList(listData);
     }
-    return Collections.unmodifiableList(listData);
-  }
-  
-  /** Gets a mutable List view of this MapField. */
-  List<Message> getMutableList() {
-    if (mode != StorageMode.LIST) {
-      if (mode == StorageMode.MAP) {
-        listData = convertMapToList(mapData);
-      }
-      mapData = null;
-      mode = StorageMode.LIST;
+
+    /** Gets a mutable List view of this MapField. */
+    List<Message> getMutableList() {
+        if (mode != StorageMode.LIST) {
+            if (mode == StorageMode.MAP) {
+                listData = convertMapToList(mapData);
+            }
+            mapData = null;
+            mode = StorageMode.LIST;
+        }
+        return listData;
     }
-    return listData;
-  }
-  
-  /**
-   * Gets the default instance of the message stored in the list view of this
-   * map field.
-   */
-  Message getMapEntryMessageDefaultInstance() {
-    return converter.getMessageDefaultInstance();
-  }
+
+    /**
+     * Gets the default instance of the message stored in the list view of this map field.
+     */
+    Message getMapEntryMessageDefaultInstance() {
+        return converter.getMessageDefaultInstance();
+    }
 }

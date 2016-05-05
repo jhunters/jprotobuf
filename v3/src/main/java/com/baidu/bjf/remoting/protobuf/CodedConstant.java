@@ -29,9 +29,13 @@ import com.baidu.bjf.remoting.protobuf.descriptor.DescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.EnumDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.EnumOptionsPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.EnumValueDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.ExtensionRangePOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.FieldDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.FileDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.Label;
+import com.baidu.bjf.remoting.protobuf.descriptor.MessageOptionsPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.OneofDescriptorProtoPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.ServiceDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.Type;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
@@ -1035,9 +1039,9 @@ public class CodedConstant {
         fileDescriptorProto.publicDependency = convertList(file.publicDependencies());
         fileDescriptorProto.weakDependency = null; // XXX
 
-        fileDescriptorProto.messageTypes = new ArrayList<>();
-        fileDescriptorProto.enumTypes = new ArrayList<>();
-        fileDescriptorProto.services = new ArrayList<>();
+        fileDescriptorProto.messageTypes = new ArrayList<DescriptorProtoPOJO>();
+        fileDescriptorProto.enumTypes = new ArrayList<EnumDescriptorProtoPOJO>();
+        fileDescriptorProto.services = new ArrayList<ServiceDescriptorProtoPOJO>();
 
         Set<String> messageSet = new HashSet<String>();
         Set<String> enumSet = new HashSet<String>();
@@ -1121,13 +1125,13 @@ public class CodedConstant {
 
         DescriptorProtoPOJO ret = new DescriptorProtoPOJO();
         ret.name = typeElement.name();
-        ret.fields = new ArrayList<>();
-        ret.nestedTypes = new ArrayList<>();
-        ret.enumTypes = new ArrayList<>();
-        ret.extensionRanges = new ArrayList<>();
-        ret.extensions = new ArrayList<>();
-        ret.options = new ArrayList<>();
-        ret.oneofDecls = new ArrayList<>();
+        ret.fields = new ArrayList<FieldDescriptorProtoPOJO>();
+        ret.nestedTypes = new ArrayList<DescriptorProtoPOJO>();
+        ret.enumTypes = new ArrayList<EnumDescriptorProtoPOJO>();
+        ret.extensionRanges = new ArrayList<ExtensionRangePOJO>();
+        ret.extensions = new ArrayList<FieldDescriptorProtoPOJO>();
+        ret.options = new ArrayList<MessageOptionsPOJO>();
+        ret.oneofDecls = new ArrayList<OneofDescriptorProtoPOJO>();
 
         List<FieldElement> fields = typeElement.fields();
         if (fields != null) {
@@ -1217,7 +1221,7 @@ public class CodedConstant {
         if (list == null) {
             return null;
         }
-        List<Integer> ret = new ArrayList<>(list.size());
+        List<Integer> ret = new ArrayList<Integer>(list.size());
         for (String v : list) {
             ret.add(StringUtils.toInt(v));
         }
