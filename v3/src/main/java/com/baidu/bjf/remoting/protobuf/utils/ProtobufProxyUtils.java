@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
@@ -34,6 +36,11 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class ProtobufProxyUtils {
 
     public static final Map<Class<?>, FieldType> TYPE_MAPPING;
+    
+    /**
+     * Logger for this class
+     */
+    private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
 
     static {
         TYPE_MAPPING = new HashMap<Class<?>, FieldType>();
@@ -137,6 +144,11 @@ public class ProtobufProxyUtils {
         for (FieldInfo fieldInfo : unorderFields) {
             maxOrder++;
             fieldInfo.setOrder(maxOrder);
+            
+            LOGGER.warning("Field '" + fieldInfo.getField().getName() + "' from "
+                    + fieldInfo.getField().getDeclaringClass().getName()
+                    + " with @Protobuf annotation but not set order or order is 0," + " It will set order value to "
+                    + maxOrder);
         }
 
         return ret;
