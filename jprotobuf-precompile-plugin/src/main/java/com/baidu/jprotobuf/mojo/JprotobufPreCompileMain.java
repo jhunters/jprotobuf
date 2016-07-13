@@ -60,6 +60,7 @@ public class JprotobufPreCompileMain {
 						ProtobufProxy.create(c, false, outputPath);
 					}
 				} catch (Throwable e) {
+				    throw new Exception(e.getMessage(), e);
 				}
 			}
 		};
