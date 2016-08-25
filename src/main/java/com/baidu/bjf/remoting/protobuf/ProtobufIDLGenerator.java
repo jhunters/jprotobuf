@@ -28,9 +28,8 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 
 /**
- * 
- * Utility class for generate protobuf IDL content from @{@link Protobuf}
- * 
+ * Utility class for generate protobuf IDL content from @{@link Protobuf}.
+ *
  * @author xiemalin
  * @since 1.0.1
  */
@@ -106,8 +105,12 @@ public class ProtobufIDLGenerator {
     }
 
     /**
-     * @param code
-     * @param cls
+     * Generate idl.
+     *
+     * @param code the code
+     * @param cls the cls
+     * @param cachedTypes the cached types
+     * @param cachedEnumTypes the cached enum types
      * @return sub message class list
      */
     private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes,
@@ -224,6 +227,12 @@ public class ProtobufIDLGenerator {
 
     }
 
+    /**
+     * Generate enum idl.
+     *
+     * @param code the code
+     * @param cls the cls
+     */
     private static void generateEnumIDL(StringBuilder code, Class<Enum> cls) {
         code.append("enum ").append(cls.getSimpleName()).append(" {  \n");
 
@@ -249,8 +258,10 @@ public class ProtobufIDLGenerator {
     }
 
     /**
-     * @param protobuf
-     * @return
+     * Gets the field required.
+     *
+     * @param required the required
+     * @return the field required
      */
     private static String getFieldRequired(boolean required) {
         if (required) {

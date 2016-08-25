@@ -55,42 +55,31 @@ import com.squareup.protoparser.Type;
  */
 public class ProtobufIDLProxy {
 
+	/** The Constant PACKAGE_SPLIT_CHAR. */
 	private static final char PACKAGE_SPLIT_CHAR = '.';
 
+	/** The Constant PACKAGE_SPLIT. */
 	private static final String PACKAGE_SPLIT = PACKAGE_SPLIT_CHAR + "";
-	/**
-	 * 
-	 */
+	
+	/** The Constant UTF_8. */
 	private static final String UTF_8 = "utf-8";
 
-	/**
-	 * java outer class name
-	 */
+	/** java outer class name. */
 	private static final String JAVA_OUTER_CLASSNAME_OPTION = "java_outer_classname";
 
-	/**
-	 * java package
-	 */
+	/** java package. */
 	private static final String JAVA_PACKAGE_OPTION = "java_package";
 
-	/**
-	 * code line end wrap
-	 */
+	/** code line end wrap. */
 	private static final String CODE_END = ";\n";
 
-	/**
-	 * default proto file name
-	 */
+	/** default proto file name. */
 	public static final String DEFAULT_FILE_NAME = "jprotobuf_autogenerate";
 
-	/**
-	 * type mapping of field type
-	 */
+	/** type mapping of field type. */
 	private static final Map<String, FieldType> typeMapping;
 
-	/**
-	 * type mapping of field type in string
-	 */
+	/** type mapping of field type in string. */
 	private static final Map<String, String> fieldTypeMapping;
 
 	static {
@@ -133,19 +122,38 @@ public class ProtobufIDLProxy {
 		fieldTypeMapping.put("enum", "FieldType.ENUM");
 	}
 
-	/**
-	 * auto proxied suffix class name
-	 */
+	/** auto proxied suffix class name. */
 	private static final String DEFAULT_SUFFIX_CLASSNAME = "JProtoBufProtoClass";
 
+	/**
+     * Creates the single.
+     *
+     * @param data the data
+     * @return the IDL proxy object
+     */
 	public static IDLProxyObject createSingle(String data) {
 		return createSingle(data, false);
 	}
 
+	/**
+     * Creates the single.
+     *
+     * @param data the data
+     * @param debug the debug
+     * @return the IDL proxy object
+     */
 	public static IDLProxyObject createSingle(String data, boolean debug) {
 		return createSingle(data, debug, null);
 	}
 
+	/**
+     * Creates the single.
+     *
+     * @param data the data
+     * @param debug the debug
+     * @param path the path
+     * @return the IDL proxy object
+     */
 	public static IDLProxyObject createSingle(String data, boolean debug, File path) {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
@@ -158,14 +166,38 @@ public class ProtobufIDLProxy {
 		}
 	}
 
+	/**
+     * Creates the single.
+     *
+     * @param is the is
+     * @return the IDL proxy object
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static IDLProxyObject createSingle(InputStream is) throws IOException {
 		return createSingle(is, false);
 	}
 
+	/**
+     * Creates the single.
+     *
+     * @param is the is
+     * @param debug the debug
+     * @return the IDL proxy object
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static IDLProxyObject createSingle(InputStream is, boolean debug) throws IOException {
 		return createSingle(is, debug, null);
 	}
 
+	/**
+     * Creates the single.
+     *
+     * @param is the is
+     * @param debug the debug
+     * @param path the path
+     * @return the IDL proxy object
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static IDLProxyObject createSingle(InputStream is, boolean debug, File path) throws IOException {
 		ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
@@ -173,14 +205,38 @@ public class ProtobufIDLProxy {
 		return map.entrySet().iterator().next().getValue();
 	}
 
+	/**
+     * Creates the single.
+     *
+     * @param reader the reader
+     * @return the IDL proxy object
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static IDLProxyObject createSingle(Reader reader) throws IOException {
 		return createSingle(reader, false);
 	}
 
+	/**
+     * Creates the single.
+     *
+     * @param reader the reader
+     * @param debug the debug
+     * @return the IDL proxy object
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static IDLProxyObject createSingle(Reader reader, boolean debug) throws IOException {
 		return createSingle(reader, debug, null);
 	}
 
+	/**
+     * Creates the single.
+     *
+     * @param reader the reader
+     * @param debug the debug
+     * @param path the path
+     * @return the IDL proxy object
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static IDLProxyObject createSingle(Reader reader, boolean debug, File path) throws IOException {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
@@ -188,14 +244,35 @@ public class ProtobufIDLProxy {
 		return map.entrySet().iterator().next().getValue();
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param data the data
+     * @return the map
+     */
 	public static Map<String, IDLProxyObject> create(String data) {
 		return create(data, false);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param data the data
+     * @param debug the debug
+     * @return the map
+     */
 	public static Map<String, IDLProxyObject> create(String data, boolean debug) {
 		return create(data, debug, null);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param data the data
+     * @param debug the debug
+     * @param path the path
+     * @return the map
+     */
 	public static Map<String, IDLProxyObject> create(String data, boolean debug, File path) {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
@@ -206,53 +283,142 @@ public class ProtobufIDLProxy {
 		}
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param is the is
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(InputStream is) throws IOException {
 		return create(is, false);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param is the is
+     * @param debug the debug
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(InputStream is, boolean debug) throws IOException {
 		return create(is, debug, null);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param is the is
+     * @param debug the debug
+     * @param path the path
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(InputStream is, boolean debug, File path) throws IOException {
 		ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
 		return doCreate(protoFile, true, debug, path, false, null, cds);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param reader the reader
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(Reader reader) throws IOException {
 		return create(reader, false);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param reader the reader
+     * @param debug the debug
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(Reader reader, boolean debug) throws IOException {
 		return create(reader, debug, null);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param reader the reader
+     * @param debug the debug
+     * @param path the path
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(Reader reader, boolean debug, File path) throws IOException {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
 		return doCreate(protoFile, true, debug, path, false, null, cds);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param file the file
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(File file) throws IOException {
 		return create(file, false);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param file the file
+     * @param debug the debug
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(File file, boolean debug) throws IOException {
 		return create(file, debug, null);
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param file the file
+     * @param debug the debug
+     * @param path the path
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(File file, boolean debug, File path) throws IOException {
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
 		return create(file, debug, path, cds, new HashSet<String>());
 	}
 
+	/**
+     * Creates the.
+     *
+     * @param file the file
+     * @param debug the debug
+     * @param path the path
+     * @param cds the cds
+     * @param compiledClass the compiled class
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static Map<String, IDLProxyObject> create(File file, boolean debug, File path, List<CodeDependent> cds,
 			Set<String> compiledClass) throws IOException {
 
 		return doCreatePro(file, true, debug, path, false, null, cds, compiledClass);
 	}
 
+	/**
+     * Generate source.
+     *
+     * @param data the data
+     * @param sourceOutputPath the source output path
+     */
 	public static void generateSource(String data, File sourceOutputPath) {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, data);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
@@ -263,29 +429,73 @@ public class ProtobufIDLProxy {
 		}
 	}
 
+	/**
+     * Generate source.
+     *
+     * @param is the is
+     * @param sourceOutputPath the source output path
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static void generateSource(InputStream is, File sourceOutputPath) throws IOException {
 		ProtoFile protoFile = ProtoSchemaParser.parseUtf8(DEFAULT_FILE_NAME, is);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
 		doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
 	}
 
+	/**
+     * Generate source.
+     *
+     * @param reader the reader
+     * @param sourceOutputPath the source output path
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static void generateSource(Reader reader, File sourceOutputPath) throws IOException {
 		ProtoFile protoFile = ProtoSchemaParser.parse(DEFAULT_FILE_NAME, reader);
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
 		doCreate(protoFile, true, false, null, true, sourceOutputPath, cds);
 	}
 
+	/**
+     * Generate source.
+     *
+     * @param file the file
+     * @param sourceOutputPath the source output path
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static void generateSource(File file, File sourceOutputPath) throws IOException {
 		List<CodeDependent> cds = new ArrayList<CodeDependent>();
 		generateSource(file, sourceOutputPath, cds, new HashSet<String>());
 	}
 
+	/**
+     * Generate source.
+     *
+     * @param file the file
+     * @param sourceOutputPath the source output path
+     * @param cds the cds
+     * @param compiledClass the compiled class
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	public static void generateSource(File file, File sourceOutputPath, List<CodeDependent> cds,
 			Set<String> compiledClass) throws IOException {
 
 		doCreatePro(file, true, false, null, true, sourceOutputPath, cds, compiledClass);
 	}
 
+	/**
+     * Do create pro.
+     *
+     * @param protoFiles the proto files
+     * @param multi the multi
+     * @param debug the debug
+     * @param path the path
+     * @param generateSouceOnly the generate souce only
+     * @param sourceOutputDir the source output dir
+     * @param cds the cds
+     * @param compiledClass the compiled class
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	private static Map<String, IDLProxyObject> doCreatePro(List<ProtoFile> protoFiles, boolean multi, boolean debug,
 			File path, boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds,
 			Set<String> compiledClass) throws IOException {
@@ -370,6 +580,20 @@ public class ProtobufIDLProxy {
 		return ret;
 	}
 
+	/**
+     * Do create pro.
+     *
+     * @param file the file
+     * @param multi the multi
+     * @param debug the debug
+     * @param path the path
+     * @param generateSouceOnly the generate souce only
+     * @param sourceOutputDir the source output dir
+     * @param cds the cds
+     * @param compiledClass the compiled class
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	private static Map<String, IDLProxyObject> doCreatePro(File file, boolean multi, boolean debug, File path,
 			boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds, Set<String> compiledClass)
 					throws IOException {
@@ -382,6 +606,20 @@ public class ProtobufIDLProxy {
 
 	}
 
+	/**
+     * Creates the message class.
+     *
+     * @param protoFile the proto file
+     * @param multi the multi
+     * @param debug the debug
+     * @param generateSouceOnly the generate souce only
+     * @param sourceOutputDir the source output dir
+     * @param cds the cds
+     * @param compiledClass the compiled class
+     * @param enumNames the enum names
+     * @param packages the packages
+     * @return the list
+     */
 	private static List<Class<?>> createMessageClass(ProtoFile protoFile, boolean multi, boolean debug,
 			boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds, Set<String> compiledClass,
 			Set<String> enumNames, Set<String> packages) {
@@ -452,6 +690,16 @@ public class ProtobufIDLProxy {
 		return ret;
 	}
 
+	/**
+     * Creates the enum classes.
+     *
+     * @param enumTypes the enum types
+     * @param packageMapping the package mapping
+     * @param generateSouceOnly the generate souce only
+     * @param sourceOutputDir the source output dir
+     * @param compiledClass the compiled class
+     * @return the list
+     */
 	private static List<Class<?>> createEnumClasses(Map<String, EnumType> enumTypes, Map<String, String> packageMapping,
 			boolean generateSouceOnly, File sourceOutputDir, Set<String> compiledClass) {
 
@@ -487,11 +735,11 @@ public class ProtobufIDLProxy {
 	}
 
 	/**
-	 * TODO
-	 * 
-	 * @param generateSouceOnly
-	 * @param sourceOutputDir
-	 */
+     * TODO.
+     *
+     * @param generateSouceOnly the generate souce only
+     * @param sourceOutputDir the source output dir
+     */
 	protected static void checkDirectory(boolean generateSouceOnly, File sourceOutputDir) {
 		if (generateSouceOnly) {
 			if (sourceOutputDir == null) {
@@ -504,6 +752,14 @@ public class ProtobufIDLProxy {
 		}
 	}
 
+	/**
+     * Find relate proto files.
+     *
+     * @param file the file
+     * @param dependencyNames the dependency names
+     * @return the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	private static List<ProtoFile> findRelateProtoFiles(File file, Set<String> dependencyNames) throws IOException {
 		LinkedList<ProtoFile> protoFiles = new LinkedList<ProtoFile>();
 		ProtoFile protoFile = ProtoSchemaParser.parse(file);
@@ -524,12 +780,31 @@ public class ProtobufIDLProxy {
 		return protoFiles;
 	}
 
+	/**
+     * Do create.
+     *
+     * @param protoFile the proto file
+     * @param multi the multi
+     * @param debug the debug
+     * @param path the path
+     * @param generateSouceOnly the generate souce only
+     * @param sourceOutputDir the source output dir
+     * @param cds the cds
+     * @return the map
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	private static Map<String, IDLProxyObject> doCreate(ProtoFile protoFile, boolean multi, boolean debug, File path,
 			boolean generateSouceOnly, File sourceOutputDir, List<CodeDependent> cds) throws IOException {
 		return doCreatePro(Arrays.asList(protoFile), multi, debug, path, generateSouceOnly, sourceOutputDir, cds,
 				new HashSet<String>());
 	}
 
+	/**
+     * Gets the packages.
+     *
+     * @param cds the cds
+     * @return the packages
+     */
 	private static Set<String> getPackages(List<CodeDependent> cds) {
 		Set<String> ret = new HashSet<String>();
 		if (cds == null) {
@@ -543,9 +818,11 @@ public class ProtobufIDLProxy {
 	}
 
 	/**
-	 * @param cd
-	 * @param sourceOutputDir
-	 */
+     * Write source code.
+     *
+     * @param cd the cd
+     * @param sourceOutputDir the source output dir
+     */
 	private static void writeSourceCode(CodeDependent cd, File sourceOutputDir) {
 		if (cd.pkg == null) {
 			cd.pkg = "";
@@ -575,6 +852,13 @@ public class ProtobufIDLProxy {
 
 	}
 
+	/**
+     * Checks for dependency.
+     *
+     * @param cds the cds
+     * @param compiledClass the compiled class
+     * @return the code dependent
+     */
 	private static CodeDependent hasDependency(List<CodeDependent> cds, Set<String> compiledClass) {
 		if (cds.isEmpty()) {
 			return null;
@@ -636,6 +920,14 @@ public class ProtobufIDLProxy {
 		return null;
 	}
 
+	/**
+     * Creates the code by type.
+     *
+     * @param type the type
+     * @param topLevelClass the top level class
+     * @param packageName the package name
+     * @return the code dependent
+     */
 	private static CodeDependent createCodeByType(EnumType type, boolean topLevelClass, String packageName) {
 
 		CodeDependent cd = new CodeDependent();
@@ -689,6 +981,18 @@ public class ProtobufIDLProxy {
 		return cd;
 	}
 
+	/**
+     * Creates the code by type.
+     *
+     * @param protoFile the proto file
+     * @param type the type
+     * @param enumNames the enum names
+     * @param topLevelClass the top level class
+     * @param parentNestedTypes the parent nested types
+     * @param cds the cds
+     * @param packages the packages
+     * @return the code dependent
+     */
 	private static CodeDependent createCodeByType(ProtoFile protoFile, MessageType type, Set<String> enumNames,
 			boolean topLevelClass, List<Type> parentNestedTypes, List<CodeDependent> cds, Set<String> packages) {
 
@@ -853,9 +1157,12 @@ public class ProtobufIDLProxy {
 	}
 
 	/**
-	 * @param type
-	 * @return
-	 */
+     * Fetch all nested types.
+     *
+     * @param type the type
+     * @param all the all
+     * @return the list
+     */
 	private static List<Type> fetchAllNestedTypes(MessageType type, boolean all) {
 		List<Type> ret = new ArrayList<Type>();
 
@@ -874,10 +1181,12 @@ public class ProtobufIDLProxy {
 	}
 
 	/**
-	 * @param type
-	 * @param nestedTypes
-	 * @return
-	 */
+     * Checks if is nested type dependency.
+     *
+     * @param type the type
+     * @param nestedTypes the nested types
+     * @return true, if is nested type dependency
+     */
 	private static boolean isNestedTypeDependency(String type, List<Type> nestedTypes) {
 		if (nestedTypes == null) {
 			return false;
@@ -893,11 +1202,12 @@ public class ProtobufIDLProxy {
 	}
 
 	/**
-	 * to generate @Protobuf defined code for target field.
-	 * 
-	 * @param code
-	 * @param field
-	 */
+     * to generate @Protobuf defined code for target field.
+     *
+     * @param code the code
+     * @param field the field
+     * @param enumNames the enum names
+     */
 	private static void generateProtobufDefinedForField(StringBuilder code, Field field, Set<String> enumNames) {
 		code.append("@").append(Protobuf.class.getSimpleName()).append("(");
 
@@ -921,6 +1231,13 @@ public class ProtobufIDLProxy {
 
 	}
 
+	/**
+     * Check class.
+     *
+     * @param packageName the package name
+     * @param type the type
+     * @return the class
+     */
 	private static Class checkClass(String packageName, Type type) {
 		String simpleName = getProxyClassName(type.getName());
 		String className = packageName + PACKAGE_SPLIT_CHAR + simpleName;
@@ -936,6 +1253,13 @@ public class ProtobufIDLProxy {
 		return c;
 	}
 
+	/**
+     * Check class.
+     *
+     * @param protoFile the proto file
+     * @param type the type
+     * @return the class
+     */
 	private static Class checkClass(ProtoFile protoFile, Type type) {
 		String packageName = protoFile.getPackageName();
 		String defaultClsName = type.getName();
@@ -965,11 +1289,24 @@ public class ProtobufIDLProxy {
 		return c;
 	}
 
+	/**
+     * Gets the proxy class name.
+     *
+     * @param name the name
+     * @return the proxy class name
+     */
 	private static String getProxyClassName(String name) {
 		Set<String> emptyPkgs = Collections.emptySet();
 		return getProxyClassName(name, emptyPkgs);
 	}
 
+	/**
+     * Gets the proxy class name.
+     *
+     * @param name the name
+     * @param pkgs the pkgs
+     * @return the proxy class name
+     */
 	private static String getProxyClassName(String name, Set<String> pkgs) {
 
 		String ret = "";
@@ -992,32 +1329,60 @@ public class ProtobufIDLProxy {
 	}
 
 	/**
-	 * google Protobuf IDL message dependency result
-	 * 
-	 * 
-	 * @author xiemalin
-	 * @since 1.0
-	 */
+     * google Protobuf IDL message dependency result.
+     *
+     * @author xiemalin
+     * @since 1.0
+     */
 	private static class CodeDependent {
+		
+		/** The name. */
 		private String name;
+		
+		/** The pkg. */
 		private String pkg;
+		
+		/** The dependencies. */
 		private Set<String> dependencies = new HashSet<String>();
+		
+		/** The code. */
 		private String code;
 
+		/** The sub classes. */
 		private Set<String> subClasses = new HashSet<String>();
 
+		/**
+         * Checks if is depndency.
+         *
+         * @return true, if is depndency
+         */
 		private boolean isDepndency() {
 			return !dependencies.isEmpty();
 		}
 
+		/**
+         * Adds the sub class.
+         *
+         * @param name the name
+         */
 		private void addSubClass(String name) {
 			subClasses.add(name);
 		}
 
+		/**
+         * Adds the dependency.
+         *
+         * @param name the name
+         */
 		private void addDependency(String name) {
 			dependencies.add(name);
 		}
 
+		/**
+         * Gets the class name.
+         *
+         * @return the class name
+         */
 		public String getClassName() {
 			if (StringUtils.isEmpty(pkg)) {
 				return name;

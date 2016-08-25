@@ -24,13 +24,16 @@ import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 
 /**
- * IDLProxyObjectTest
+ * IDLProxyObjectTest.
  *
  * @author xiemalin
  * @since 1.0.6
  */
 public class IDLProxyObjectTest {
 
+    /**
+     * Test simple pojo.
+     */
     @Test
     public void testSimplePOJO() {
         
@@ -52,6 +55,9 @@ public class IDLProxyObjectTest {
         Assert.assertEquals(100, ((SimplePOJO) idlProxyObject.getTarget()).getAge());
     }
     
+    /**
+     * Test complex pojo.
+     */
     @Test
     public void testComplexPOJO() {
         Codec<ComplexPOJO> codec = ProtobufProxy.create(ComplexPOJO.class);

@@ -30,15 +30,21 @@ import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJOWithDefault;
 
 /**
- * Test class for {@link ProtobufIDLProxy}
- * 
+ * Test class for {@link ProtobufIDLProxy}.
+ *
  * @author xiemalin
  * @since 1.0.8
  */
 public class ProtobufIDLProxyPressureTest {
 
+    /** The times. */
     int times = 500;
 
+    /**
+     * Test pressure with cached.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testPressureWithCached() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJOWithDefault.class);
@@ -49,6 +55,11 @@ public class ProtobufIDLProxyPressureTest {
         testPressureOfCacheControl(idlProxyObject, true);
     }
 
+    /**
+     * Test pressure without cached.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testPressureWithoutCached() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
@@ -59,6 +70,11 @@ public class ProtobufIDLProxyPressureTest {
         testPressureOfCacheControl(idlProxyObject, false);
     }
 
+    /**
+     * Test simple pressure with cached.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testSimplePressureWithCached() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(PersonPOJOWithDefault.class);
@@ -69,6 +85,11 @@ public class ProtobufIDLProxyPressureTest {
         testSimpleObjectPressureOfCacheControl(idlProxyObject, true);
     }
 
+    /**
+     * Test simple pressure without cached.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testSimplePressureWithoutCached() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(PersonPOJO.class);
@@ -79,12 +100,17 @@ public class ProtobufIDLProxyPressureTest {
         testSimpleObjectPressureOfCacheControl(idlProxyObject, false);
     }
 
+    /**
+     * Test simple object pressure of cache control.
+     *
+     * @param idlProxyObject the idl proxy object
+     * @param cached the cached
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void testSimpleObjectPressureOfCacheControl(IDLProxyObject idlProxyObject, boolean cached)
             throws IOException {
 
         idlProxyObject.setCached(cached);
-        long averageDecode = 0;
-        long averageEncode = 0;
         for (int i = 0; i < times; i++) {
             idlProxyObject.put("name", "hello");
             idlProxyObject.put("id", i);
@@ -96,12 +122,8 @@ public class ProtobufIDLProxyPressureTest {
                 Assert.assertNotNull(e);
             }
 
-            long time = System.currentTimeMillis();
             byte[] bb = idlProxyObject.encode();
-            averageEncode += System.currentTimeMillis() - time;
-            time = System.currentTimeMillis();
             IDLProxyObject newObject = idlProxyObject.decode(bb);
-            averageDecode += System.currentTimeMillis() - time;
 
             Assert.assertEquals("hello", newObject.get("name"));
             Assert.assertEquals(i, newObject.get("id"));
@@ -110,11 +132,16 @@ public class ProtobufIDLProxyPressureTest {
 
     }
 
+    /**
+     * Test pressure of cache control.
+     *
+     * @param idlProxyObject the idl proxy object
+     * @param cached the cached
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private void testPressureOfCacheControl(IDLProxyObject idlProxyObject, boolean cached) throws IOException {
 
         idlProxyObject.setCached(cached);
-        long averageDecode = 0;
-        long averageEncode = 0;
         for (int i = 0; i < times; i++) {
             idlProxyObject.put("name", "hello");
             idlProxyObject.put("list.name", "yes");
@@ -124,12 +151,8 @@ public class ProtobufIDLProxyPressureTest {
              * try { idlProxyObject.put("notexitfield", null); Assert.fail(); }
              * catch (Exception e) { Assert.assertNotNull(e); }
              */
-            long time = System.currentTimeMillis();
             byte[] bb = idlProxyObject.encode();
-            averageEncode += System.currentTimeMillis() - time;
-            time = System.currentTimeMillis();
             IDLProxyObject newObject = idlProxyObject.decode(bb);
-            averageDecode += System.currentTimeMillis() - time;
 
             Assert.assertEquals("hello", newObject.get("name"));
             Assert.assertEquals("yes", newObject.get("list.name"));

@@ -26,17 +26,21 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class ComplexPOJO {
 
+    /** The name. */
     @Protobuf(fieldType = FieldType.STRING, order = 1, required = false)
     private String name;
     
+    /** The age. */
     @Protobuf(fieldType = FieldType.INT32, order = 2, required = false)
     private int age;
     
+    /** The simple pojo. */
     @Protobuf(fieldType = FieldType.OBJECT, order = 3, required = false)
     private SimplePOJO simplePOJO;
 
     /**
-     * get the name
+     * Gets the name.
+     *
      * @return the name
      */
     public String getName() {
@@ -44,15 +48,17 @@ public class ComplexPOJO {
     }
 
     /**
-     * set name value to name
-     * @param name the name to set
+     * Sets the name.
+     *
+     * @param name the new name
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * get the age
+     * Gets the age.
+     *
      * @return the age
      */
     public int getAge() {
@@ -60,24 +66,27 @@ public class ComplexPOJO {
     }
 
     /**
-     * set age value to age
-     * @param age the age to set
+     * Sets the age.
+     *
+     * @param age the new age
      */
     public void setAge(int age) {
         this.age = age;
     }
 
     /**
-     * get the simplePOJO
-     * @return the simplePOJO
+     * Gets the simple pojo.
+     *
+     * @return the simple pojo
      */
     public SimplePOJO getSimplePOJO() {
         return simplePOJO;
     }
 
     /**
-     * set simplePOJO value to simplePOJO
-     * @param simplePOJO the simplePOJO to set
+     * Sets the simple pojo.
+     *
+     * @param simplePOJO the new simple pojo
      */
     public void setSimplePOJO(SimplePOJO simplePOJO) {
         this.simplePOJO = simplePOJO;

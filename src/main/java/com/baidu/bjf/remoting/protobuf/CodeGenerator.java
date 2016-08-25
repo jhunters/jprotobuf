@@ -38,46 +38,31 @@ import com.google.protobuf.Descriptors.Descriptor;
  */
 public class CodeGenerator {
 
-	/**
-	 * line break for editor
-	 */
+	/** line break for editor. */
 	public static final String LINE_BREAK = "\n";
 
-	/**
-	 * java line end
-	 */
+	/** java line end. */
 	public static final String JAVA_END = ";";
 
-	/**
-	 * line break for JAVA
-	 */
+	/** line break for JAVA. */
 	public static final String JAVA_LINE_BREAK = JAVA_END + LINE_BREAK;
 
-	/**
-	 * auto proxied suffix class name
-	 */
+	/** auto proxied suffix class name. */
 	private static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
 
+	/** The Constant PACKAGE_SPLIT. */
 	public static final String PACKAGE_SPLIT = ".";
 
-	/**
-	 * 
-	 */
+	/** The Constant JAVA_CLASS_FILE_SUFFIX. */
 	public static final String JAVA_CLASS_FILE_SUFFIX = ".class";
 
-	/**
-	 * Logger for this class
-	 */
+	/** Logger for this class. */
 	private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class.getName());
 
-	/**
-	 * target fields which marked <code> @Protofuf </code> annotation
-	 */
+	/** target fields which marked <code> @Protofuf </code> annotation. */
 	private List<FieldInfo> fields;
 
-	/**
-	 * enable debug mode
-	 */
+	/** enable debug mode. */
 	private boolean debug = false;
 
 	/**
@@ -85,59 +70,54 @@ public class CodeGenerator {
 	 */
 	private File outputPath;
 
+	/** The relative proxy classes. */
 	private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
 
 	/**
-	 * get relativeProxyClasses
-	 * 
-	 * @return relativeProxyClasses
-	 */
+     * Gets the relative proxy classes.
+     *
+     * @return the relative proxy classes
+     */
 	public Set<Class<?>> getRelativeProxyClasses() {
 		return relativeProxyClasses;
 	}
 
 	/**
-	 * set outputPath value to outputPath
-	 * 
-	 * @param outputPath
-	 *            the outputPath to set
-	 */
+     * Sets the static path for output dynamic compiled class file.
+     *
+     * @param outputPath the new static path for output dynamic compiled class file
+     */
 	public void setOutputPath(File outputPath) {
 		this.outputPath = outputPath;
 	}
 
 	/**
-	 * get the debug
-	 * 
-	 * @return the debug
-	 */
+     * Checks if is enable debug mode.
+     *
+     * @return the enable debug mode
+     */
 	public boolean isDebug() {
 		return debug;
 	}
 
 	/**
-	 * set debug value to debug
-	 * 
-	 * @param debug
-	 *            the debug to set
-	 */
+     * Sets the enable debug mode.
+     *
+     * @param debug the new enable debug mode
+     */
 	public void setDebug(boolean debug) {
 		this.debug = debug;
 	}
 
-	/**
-	 * target class to parse <code>@Protobuf</code> annotation to generate code
-	 */
+	/** target class to parse <code>@Protobuf</code> annotation to generate code. */
 	private Class<?> cls;
 
 	/**
-	 * Constructor method
-	 * 
-	 * @param fields
-	 *            protobuf mapped fields
-	 * @param cls
-	 *            protobuf mapped class
-	 */
+     * Constructor method.
+     *
+     * @param fields protobuf mapped fields
+     * @param cls protobuf mapped class
+     */
 	public CodeGenerator(List<FieldInfo> fields, Class<?> cls) {
 		super();
 		this.fields = fields;
@@ -145,23 +125,28 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * get new class name
-	 * 
-	 * @return class name
-	 */
+     * Gets the class name.
+     *
+     * @return the class name
+     */
 	public String getClassName() {
 		return ClassHelper.getClassName(cls) + DEFAULT_SUFFIX_CLASSNAME;
 	}
 
+	/**
+     * Gets the package.
+     *
+     * @return the package
+     */
 	public String getPackage() {
 		return ClassHelper.getPackage(cls);
 	}
 
 	/**
-	 * get new class name with full package
-	 * 
-	 * @return class name
-	 */
+     * Gets the full class name.
+     *
+     * @return the full class name
+     */
 	public String getFullClassName() {
 		if (StringUtils.isEmpty(getPackage())) {
 			return getClassName();
@@ -171,10 +156,10 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * generate package code
-	 * 
-	 * @param code
-	 */
+     * generate package code.
+     *
+     * @param code the code
+     */
 	private void genPackageCode(StringBuilder code) {
 		if (getPackage().length() > 0) {
 			code.append("package " + getPackage() + JAVA_LINE_BREAK);
@@ -183,10 +168,10 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * get full java class code.
-	 * 
-	 * @return full java class code
-	 */
+     * Gets the code.
+     *
+     * @return the code
+     */
 	public String getCode() {
 		StringBuilder code = new StringBuilder();
 
@@ -214,10 +199,10 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * generate import code
-	 * 
-	 * @param code
-	 */
+     * generate import code.
+     *
+     * @param code the code
+     */
 	private void genImportCode(StringBuilder code) {
 		code.append("import com.google.protobuf.*").append(JAVA_LINE_BREAK);
 		code.append("import java.io.IOException").append(JAVA_LINE_BREAK);
@@ -232,11 +217,11 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * To generate parse google protocol buffer byte array parser code.
-	 * 
-	 * @param code
-	 *            add new generated code to the builder.
-	 */
+     * To generate parse google protocol buffer byte array parser code.
+     *
+     * @param code add new generated code to the builder.
+     * @return the parses the bytes method code
+     */
 	private void getParseBytesMethodCode(StringBuilder code) {
 		code.append(ClassHelper.getInternalName(cls.getName())).append(" ret = new ");
 		code.append(ClassHelper.getInternalName(cls.getName())).append("()" + JAVA_LINE_BREAK);
@@ -371,10 +356,10 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * generate <code>decode</code> method source code
-	 * 
-	 * @return
-	 */
+     * Gets the decode method code.
+     *
+     * @return the decode method code
+     */
 	private String getDecodeMethodCode() {
 		StringBuilder code = new StringBuilder();
 
@@ -386,10 +371,10 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * generate <code>getDescriptor</code> method code
-	 * 
-	 * @return source code
-	 */
+     * Gets the gets the descriptor method code.
+     *
+     * @return the gets the descriptor method code
+     */
 	private Object getGetDescriptorMethodCode() {
 		StringBuilder code = new StringBuilder();
 
@@ -409,10 +394,10 @@ public class CodeGenerator {
 
 
 	/**
-	 * generate <code>readFrom</code> method source code
-	 * 
-	 * @return
-	 */
+     * Gets the read from method code.
+     *
+     * @return the read from method code
+     */
 	private String getReadFromMethodCode() {
 		StringBuilder code = new StringBuilder();
 
@@ -425,11 +410,11 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * Check {@link FieldType} is validate to class type of {@link Field}
-	 * 
-	 * @param type
-	 * @param field
-	 */
+     * Check {@link FieldType} is validate to class type of {@link Field}.
+     *
+     * @param type the type
+     * @param field the field
+     */
 	private void checkType(FieldType type, Field field) {
 		Class<?> cls = field.getType();
 
@@ -450,12 +435,12 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * get error message info by type not matched
-	 * 
-	 * @param type
-	 * @param field
-	 * @return error message for mismatch type
-	 */
+     * get error message info by type not matched.
+     *
+     * @param type the type
+     * @param field the field
+     * @return error message for mismatch type
+     */
 	private String getMismatchTypeErroMessage(FieldType type, Field field) {
 		return "Type mismatch. @Protobuf required type '" + type.getJavaType() + "' but field type is '"
 				+ field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
@@ -463,10 +448,10 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * generate <code>encode</code> method source code
-	 * 
-	 * @return encode method code
-	 */
+     * Gets the encode method code.
+     *
+     * @return the encode method code
+     */
 	private String getEncodeMethodCode() {
 		StringBuilder code = new StringBuilder();
 		Set<Integer> orders = new HashSet<Integer>();
@@ -513,10 +498,10 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * generate <code>writeTo</code> method source code
-	 * 
-	 * @return
-	 */
+     * Gets the write to method code.
+     *
+     * @return the write to method code
+     */
 	private String getWriteToMethodCode() {
 		StringBuilder code = new StringBuilder();
 		Set<Integer> orders = new HashSet<Integer>();
@@ -557,10 +542,10 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * generate <code>size</code> method source code
-	 * 
-	 * @return
-	 */
+     * Gets the size method code.
+     *
+     * @return the size method code
+     */
 	private String getSizeMethodCode() {
 		StringBuilder code = new StringBuilder();
 		Set<Integer> orders = new HashSet<Integer>();
@@ -603,16 +588,13 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * get field access code
-	 * 
-	 * @param target
-	 *            target instance name
-	 * @param field
-	 *            java field instance
-	 * @param cls
-	 *            mapped class
-	 * @return full field access java code
-	 */
+     * get field access code.
+     *
+     * @param target target instance name
+     * @param field java field instance
+     * @param cls mapped class
+     * @return full field access java code
+     */
 	protected String getAccessByField(String target, Field field, Class<?> cls) {
 		if (field.getModifiers() == Modifier.PUBLIC) {
 			return target + ClassHelper.PACKAGE_SEPARATOR + field.getName();
@@ -645,16 +627,17 @@ public class CodeGenerator {
 	}
 
 	/**
-	 * generate access {@link Field} value source code. support public field
-	 * access, getter method access and reflection access.
-	 * 
-	 * @param target
-	 * @param field
-	 * @param cls
-	 * @param express
-	 * @param isList
-	 * @return
-	 */
+     * generate access {@link Field} value source code. support public field access, getter method access and reflection
+     * access.
+     *
+     * @param target the target
+     * @param field the field
+     * @param cls the cls
+     * @param express the express
+     * @param isList the is list
+     * @param isMap the is map
+     * @return the sets the to field
+     */
 	protected String getSetToField(String target, Field field, Class<?> cls, String express, boolean isList,
 			boolean isMap) {
 		StringBuilder ret = new StringBuilder();

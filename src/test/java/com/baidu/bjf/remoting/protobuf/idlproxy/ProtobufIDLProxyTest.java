@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
@@ -33,13 +32,18 @@ import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
 import junit.framework.Assert;
 
 /**
- * Test class for {@link ProtobufIDLProxy}
- * 
+ * Test class for {@link ProtobufIDLProxy}.
+ *
  * @author xiemalin
  * @since 1.0.2
  */
 public class ProtobufIDLProxyTest {
 
+	/**
+	 * Test decode.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void testDecode() throws Exception {
 
@@ -59,6 +63,11 @@ public class ProtobufIDLProxyTest {
 		Assert.assertEquals("hello你好", newObject.get("message"));
 	}
 
+	/**
+	 * Test decode complex.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void testDecodeComplex() throws Exception {
 		String code = ProtobufIDLGenerator.getIDL(AllTypesDojoClass.class);
@@ -101,6 +110,11 @@ public class ProtobufIDLProxyTest {
 		Assert.assertEquals(10L, icn.getUint64F());
 	}
 
+	/**
+	 * Test multi decode.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	@Test
 	public void testMultiDecode() throws IOException {
 		String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
@@ -126,6 +140,9 @@ public class ProtobufIDLProxyTest {
 
 	}
 
+	/**
+	 * Test inner including service idl generate source.
+	 */
 	@Test
 	public void testInnerIncludingServiceIDLGenerateSource() {
 		StringBuilder idl = new StringBuilder();
@@ -172,16 +189,19 @@ public class ProtobufIDLProxyTest {
 		}
 	}
 	
+	/**
+	 * Test file import with diff package idl generate source.
+	 */
 	@Test
 	public void testFileImportWithDiffPackageIDLGenerateSource() {
 		
-		File file = new File("D:/qq/dmp_service.proto");
+		File file = new File("D:/adapter.proto.txt");
 		if (!file.exists()) {
 			return;
 		}
 		try {
 			
-			ProtobufIDLProxy.generateSource(file, new File("D:\\qq"));
+			ProtobufIDLProxy.generateSource(file, new File("D:\\BaiduYunDownload"));
 			
 			//Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(file);
 		} catch (IOException e) {

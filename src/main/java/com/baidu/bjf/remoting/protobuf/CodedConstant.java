@@ -61,11 +61,12 @@ import com.squareup.protoparser.ProtoSchemaParser;
  */
 public class CodedConstant {
 
+    /** The descriptor codec. */
     private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
 
     /**
-     * get field name
-     * 
+     * get field name.
+     *
      * @param order field order
      * @return field name
      */
@@ -115,12 +116,14 @@ public class CodedConstant {
     }
 
     /**
+     * Gets the mapped type size.
+     *
      * @param field field
      * @param order field order
      * @param type field type
      * @param isList is field type is a {@link List}
      * @param debug debug mode if true enable debug.
-     * @param path
+     * @param path the path
      * @return full java expression
      */
     public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, boolean debug,
@@ -162,11 +165,13 @@ public class CodedConstant {
     }
 
     /**
+     * Compute list size.
+     *
      * @param order field order
      * @param list field value
      * @param type field type of list obj
-     * @param debug
-     * @param path
+     * @param debug the debug
+     * @param path the path
      * @return full java expression
      */
     public static int computeListSize(int order, List list, FieldType type, boolean debug, File path) {
@@ -185,23 +190,29 @@ public class CodedConstant {
     }
 
     /**
-     * get object size by {@link FieldType}
-     * 
-     * @param order
-     * @param o
-     * @param type
-     * @return
+     * get object size by {@link FieldType}.
+     *
+     * @param order the order
+     * @param o the o
+     * @param type the type
+     * @param debug the debug
+     * @param path the path
+     * @return the int
      */
     public static int computeSize(int order, Object o, FieldType type, boolean debug, File path) {
         return computeSize(order, o, type, false, debug, path);
     }
 
     /**
-     * get object size by {@link FieldType}
-     * 
-     * @param o
-     * @param type
-     * @return
+     * get object size by {@link FieldType}.
+     *
+     * @param order the order
+     * @param o the o
+     * @param type the type
+     * @param list the list
+     * @param debug the debug
+     * @param path the path
+     * @return the int
      */
     public static int computeSize(int order, Object o, FieldType type, boolean list, boolean debug, File path) {
         int size = 0;
@@ -250,10 +261,13 @@ public class CodedConstant {
     }
 
     /**
-     * get mapped object byte write java expression
-     * 
+     * get mapped object byte write java expression.
+     *
+     * @param field the field
+     * @param prefix the prefix
      * @param order field order
      * @param type field type
+     * @param isList the is list
      * @return full java expression
      */
     public static String getMappedWriteCode(FieldInfo field, String prefix, int order, FieldType type, boolean isList) {
@@ -311,11 +325,12 @@ public class CodedConstant {
 
     /**
      * write list to {@link CodedOutputStream} object.
-     * 
+     *
      * @param out target output stream to write
      * @param order field order
      * @param type field type
      * @param list target list object to be serialized
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void writeToList(CodedOutputStream out, int order, FieldType type, List list) throws IOException {
         if (list == null) {
@@ -328,13 +343,14 @@ public class CodedConstant {
     }
 
     /**
-     * Write object to byte array by {@link FieldType}
-     * 
-     * @param out
-     * @param order
-     * @param type
-     * @param o
-     * @throws IOException
+     * Write object to byte array by {@link FieldType}.
+     *
+     * @param out the out
+     * @param order the order
+     * @param type the type
+     * @param o the o
+     * @param list the list
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void writeObject(CodedOutputStream out, int order, FieldType type, Object o, boolean list)
             throws IOException {
@@ -397,8 +413,8 @@ public class CodedConstant {
     }
 
     /**
-     * get required field check java expression
-     * 
+     * get required field check java expression.
+     *
      * @param order field order
      * @param field java field
      * @return full java expression
@@ -413,8 +429,8 @@ public class CodedConstant {
     }
 
     /**
-     * get return required field check java expression
-     * 
+     * get return required field check java expression.
+     *
      * @param express java expression
      * @param field java field
      * @return full java expression
@@ -428,8 +444,8 @@ public class CodedConstant {
     }
 
     /**
-     * check object is null
-     * 
+     * check object is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -438,8 +454,8 @@ public class CodedConstant {
     }
 
     /**
-     * check double is null
-     * 
+     * check double is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -448,8 +464,8 @@ public class CodedConstant {
     }
 
     /**
-     * check int is null
-     * 
+     * check int is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -458,8 +474,8 @@ public class CodedConstant {
     }
 
     /**
-     * check byte is null
-     * 
+     * check byte is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -468,8 +484,8 @@ public class CodedConstant {
     }
 
     /**
-     * check short is null
-     * 
+     * check short is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -478,8 +494,8 @@ public class CodedConstant {
     }
 
     /**
-     * check long is null
-     * 
+     * check long is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -488,8 +504,8 @@ public class CodedConstant {
     }
 
     /**
-     * check float is null
-     * 
+     * check float is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -498,8 +514,8 @@ public class CodedConstant {
     }
 
     /**
-     * check char is null
-     * 
+     * check char is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -507,6 +523,12 @@ public class CodedConstant {
         return false;
     }
 
+    /**
+     * As list.
+     *
+     * @param value the value
+     * @return the list
+     */
     public static List asList(String value) {
         return Arrays.asList(value);
     }
@@ -529,14 +551,12 @@ public class CodedConstant {
                 .toString();
     }
 
-    /**
-     * bit type tag value
-     */
+    /** bit type tag value. */
     static final int TAG_TYPE_BITS = 3;
 
     /**
-     * make protobuf tag
-     * 
+     * make protobuf tag.
+     *
      * @param fieldNumber field number order
      * @param wireType wireformat type
      * @return tag id
@@ -545,6 +565,13 @@ public class CodedConstant {
         return (fieldNumber << TAG_TYPE_BITS) | wireType;
     }
 
+    /**
+     * Gets the enum name.
+     *
+     * @param e the e
+     * @param value the value
+     * @return the enum name
+     */
     public static String getEnumName(Enum[] e, int value) {
         if (e != null) {
             int toCompareValue;
@@ -562,6 +589,13 @@ public class CodedConstant {
         return "";
     }
 
+    /**
+     * Gets the descriptor.
+     *
+     * @param cls the cls
+     * @return the descriptor
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static Descriptor getDescriptor(Class<?> cls) throws IOException {
 
         String idl = ProtobufIDLGenerator.getIDL(cls);
@@ -626,6 +660,15 @@ public class CodedConstant {
         return fileDescriptor.getMessageTypes().get(0);
     }
 
+    /**
+     * Gets the descritor proto pojo.
+     *
+     * @param fileDescriptorProto the file descriptor proto
+     * @param typeElement the type element
+     * @param messageSet the message set
+     * @param enumSet the enum set
+     * @return the descritor proto pojo
+     */
     private static DescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
             MessageType typeElement, Set<String> messageSet, Set<String> enumSet) {
 
@@ -692,6 +735,15 @@ public class CodedConstant {
         return ret;
     }
 
+    /**
+     * Gets the descritor proto pojo.
+     *
+     * @param fileDescriptorProto the file descriptor proto
+     * @param typeElement the type element
+     * @param messageSet the message set
+     * @param enumSet the enum set
+     * @return the descritor proto pojo
+     */
     private static EnumDescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
             EnumType typeElement, Set<String> messageSet, Set<String> enumSet) {
 
@@ -725,6 +777,12 @@ public class CodedConstant {
         return ret;
     }
 
+    /**
+     * Convert list.
+     *
+     * @param list the list
+     * @return the list
+     */
     private static List<Integer> convertList(List<String> list) {
         if (list == null) {
             return null;

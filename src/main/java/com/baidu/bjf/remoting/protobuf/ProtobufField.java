@@ -28,13 +28,26 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class ProtobufField {
 
+    /** The annotation. */
     private Protobuf annotation;
+    
+    /** The name. */
     private String name;
+    
+    /** The type. */
     private Class<?> type;
     
+    /** The declared class. */
     private Class<?> declaredClass;
+    
+    /** The generic type. */
     private Type genericType;
     
+    /**
+     * Instantiates a new protobuf field.
+     *
+     * @param field the field
+     */
     public ProtobufField(Field field) {
         annotation = field.getAnnotation(Protobuf.class);
         name = field.getName();
@@ -44,7 +57,8 @@ public class ProtobufField {
     }
 
     /**
-     * get the annotation
+     * Gets the annotation.
+     *
      * @return the annotation
      */
     public Protobuf getAnnotation() {
@@ -52,7 +66,8 @@ public class ProtobufField {
     }
 
     /**
-     * get the name
+     * Gets the name.
+     *
      * @return the name
      */
     public String getName() {
@@ -60,7 +75,8 @@ public class ProtobufField {
     }
 
     /**
-     * get the type
+     * Gets the type.
+     *
      * @return the type
      */
     public Class<?> getType() {
@@ -68,16 +84,18 @@ public class ProtobufField {
     }
 
     /**
-     * get the declaredClass
-     * @return the declaredClass
+     * Gets the declared class.
+     *
+     * @return the declared class
      */
     public Class<?> getDeclaredClass() {
         return declaredClass;
     }
 
     /**
-     * get the genericType
-     * @return the genericType
+     * Gets the generic type.
+     *
+     * @return the generic type
      */
     public Type getGenericType() {
         return genericType;

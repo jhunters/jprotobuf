@@ -16,12 +16,14 @@
 package com.baidu.bjf.remoting.protobuf.bytestest;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
  * Test all single field class encode and decode
@@ -30,6 +32,30 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
  * @since 1.0.9
  */
 public class ByteTypeTest {
+    
+    public static class A {
+        
+        @Protobuf
+        private int a;
+        @Protobuf
+        private long b;
+    }
+    
+    public static void main(String[] args) {
+        A a = new A();
+        a.a = 100;
+        a.b = 200;
+        
+        Codec<A> codec = ProtobufProxy.create(A.class);
+        try {
+            byte[] encode = codec.encode(a);
+            System.out.println(Arrays.toString(encode));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+    }
 
     @Test
     public void testTypeClass1() throws IOException  {

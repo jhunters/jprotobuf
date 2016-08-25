@@ -1,3 +1,4 @@
+
 jprotobuf
 =========
 
@@ -171,7 +172,7 @@ message InterClassName {
 b 使用protoc.exe 编译.proto文件
 ```cmd
  protoc --java_out=src  test.proto
-``` 
+```
 
 c 编译生成的Java文件，利用protobuf API进行序列化与反序化操作<br>
 序列化操作：
@@ -180,13 +181,13 @@ InterClassName icn = InterClassName.newBuilder().setName("abc")
 		.setValue(100).build();
 		
 		byte[] bb = icn.toByteArray();
-``` 
+```
 
 反序化操作<br>
 ```java
 byte[] bb = ...;
 InterClassName icn = InterClassName.parseFrom(bb);
-``` 
+```
 
 
 ### 使用jprotobuf API 简化开发 ###
@@ -220,7 +221,7 @@ public class SimpleTypeTest {
     }
     
 }
-``` 
+```
 
 b 使用jprotobuf API进行序列化与反序列化操作
 ```java
@@ -239,7 +240,7 @@ b 使用jprotobuf API进行序列化与反序列化操作
             e.printStackTrace();
         }
 
-``` 
+```
 
 
 
@@ -283,8 +284,7 @@ public class Person {
     public Boolean boolF;    
 }
 
-
-``` 
+```
 
 ### 由注解对象动态生成Protobuf的IDL描述文件内容 ###
 JProtobuf提供一个非常实用的功能，可以动态生成Protobuf的IDL描述文件内容
@@ -313,7 +313,7 @@ public class SimpleTypeTest {
 }
 
 
-``` 
+```
 
 
 ###  增加由.proto 描述文件动态生成Protobuf操作对象的支持 ###
@@ -349,7 +349,7 @@ public void testDecode() throws Exception {
 }
 
 
-``` 
+```
 
 
 ###  @Protubuf注解支持全部属性默认设置 ###
@@ -379,7 +379,7 @@ public class AddressBookProtosPOJOWithDefault {
     public String name;
 }
 ```
- 
+
 ###  @Protubuf注解支持枚举类型 ###
 
 

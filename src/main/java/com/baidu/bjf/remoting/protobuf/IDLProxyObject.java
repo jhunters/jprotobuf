@@ -25,44 +25,52 @@ import java.util.Map;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 
 /**
- * IDL parsed proxy object
- * 
+ * IDL parsed proxy object.
+ *
  * @author xiemalin
  * @since 1.0.2
  */
 public class IDLProxyObject {
 
+    /** The codec. */
     private Codec codec;
 
+    /** The target. */
     private Object target;
 
+    /** The cls. */
     private Class<?> cls;
 
+    /** The cached fields. */
     private final Map<String, ReflectInfo> cachedFields = new HashMap<String, ReflectInfo>();
     
+    /** The cached. */
     private boolean cached = true;
 
     /**
-     * get the cached
-     * 
-     * @return the cached
+     * Checks if is cached.
+     *
+     * @return true, if is cached
      */
     public boolean isCached() {
         return cached;
     }
 
     /**
-     * set cached value to cached
-     * 
-     * @param cached
-     *            the cached to set
+     * Sets the cached.
+     *
+     * @param cached the new cached
      */
     public void setCached(boolean cached) {
         this.cached = cached;
     }
 
     /**
-     * default construtor to set {@link Codec} target
+     * default construtor to set {@link Codec} target.
+     *
+     * @param codec the codec
+     * @param target the target
+     * @param cls the cls
      */
     public IDLProxyObject(Codec codec, Object target, Class<?> cls) {
         super();
@@ -81,6 +89,11 @@ public class IDLProxyObject {
 
     }
 
+    /**
+     * New instnace.
+     *
+     * @return the IDL proxy object
+     */
     public IDLProxyObject newInstnace() {
         try {
             Object object = cls.newInstance();
@@ -90,6 +103,17 @@ public class IDLProxyObject {
         }
     }
     
+    /**
+     * Do set field value.
+     *
+     * @param fullField the full field
+     * @param field the field
+     * @param value the value
+     * @param object the object
+     * @param useCache the use cache
+     * @param cachedFields the cached fields
+     * @return the IDL proxy object
+     */
     private IDLProxyObject doSetFieldValue(String fullField, String field, 
             Object value, Object object, boolean useCache, Map<String, ReflectInfo> cachedFields) {
         Field f;
@@ -149,21 +173,38 @@ public class IDLProxyObject {
         return this;
     }
 
+    /**
+     * Put.
+     *
+     * @param fullField the full field
+     * @param field the field
+     * @param value the value
+     * @param object the object
+     * @return the IDL proxy object
+     */
     private IDLProxyObject put(String fullField, String field, Object value, Object object) {
         return doSetFieldValue(fullField, field, value, object, this.cached, this.cachedFields);
     }
     
+    /**
+     * Put.
+     *
+     * @param field the field
+     * @param value the value
+     * @return the IDL proxy object
+     */
     public IDLProxyObject put(String field, Object value) {
         return put(field, field, value, target);
     }
 
     /**
-     * @param value
-     * @param object
-     * @param f
-     * @throws SecurityException
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
+     * Sets the field.
+     *
+     * @param value the value
+     * @param object the object
+     * @param f the f
+     * @throws SecurityException the security exception
+     * @throws IllegalArgumentException the illegal argument exception
      */
     private void setField(Object value, Object object, Field f) {
         f.setAccessible(true);
@@ -182,6 +223,12 @@ public class IDLProxyObject {
         }
     }
 
+    /**
+     * Gets the.
+     *
+     * @param field the field
+     * @return the object
+     */
     public Object get(String field) {
         if (target == null) {
             return null;
@@ -190,6 +237,16 @@ public class IDLProxyObject {
         return get(field, field, target);
     }
     
+    /**
+     * Do get field value.
+     *
+     * @param fullField the full field
+     * @param field the field
+     * @param object the object
+     * @param useCache the use cache
+     * @param cachedFields the cached fields
+     * @return the object
+     */
     private Object doGetFieldValue(String fullField, String field, 
             Object object, boolean useCache, Map<String, ReflectInfo> cachedFields) {
      // check cache
@@ -234,9 +291,12 @@ public class IDLProxyObject {
     }
 
     /**
-     * @param field
-     * @param target2
-     * @return
+     * Gets the.
+     *
+     * @param fullField the full field
+     * @param field the field
+     * @param object the object
+     * @return the object
      */
     private Object get(String fullField, String field, Object object) {
         return doGetFieldValue(fullField, field, object, this.cached, this.cachedFields);
@@ -244,10 +304,11 @@ public class IDLProxyObject {
     }
 
     /**
-     * @param object
-     * @param f
-     * @return
-     * @throws IllegalAccessException
+     * Gets the field.
+     *
+     * @param object the object
+     * @param f the f
+     * @return the field
      */
     private Object getField(Object object, Field f) {
         f.setAccessible(true);
@@ -258,10 +319,23 @@ public class IDLProxyObject {
         }
     }
 
+    /**
+     * Encode.
+     *
+     * @return the byte[]
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public byte[] encode() throws IOException {
         return codec.encode(target);
     }
 
+    /**
+     * Decode.
+     *
+     * @param bb the bb
+     * @return the IDL proxy object
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public IDLProxyObject decode(byte[] bb) throws IOException {
         if (bb == null) {
             throw new IllegalArgumentException("param 'bb' is null");
@@ -271,27 +345,39 @@ public class IDLProxyObject {
 
     }
     
+    /**
+     * Clear field cache.
+     */
     public void clearFieldCache() {
         cachedFields.clear();
     }
     
     
     /**
-     * get the target
-     * 
+     * Gets the target.
+     *
      * @return the target
      */
     public Object getTarget() {
         return target;
     }
 
+    /**
+     * The Class ReflectInfo.
+     */
     private static class ReflectInfo {
+        
+        /** The field. */
         private Field field;
+        
+        /** The target. */
         private Object target;
 
         /**
-         * @param field
-         * @param target
+         * Instantiates a new reflect info.
+         *
+         * @param field the field
+         * @param target the target
          */
         public ReflectInfo(Field field, Object target) {
             super();

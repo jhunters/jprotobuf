@@ -45,11 +45,10 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  */
 public final class ProtobufProxy {
 
+    /** The Constant DEBUG_CONTROLLER. */
     public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
 
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
 
     /**
@@ -57,6 +56,7 @@ public final class ProtobufProxy {
      */
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
     
+    /** The Constant OUTPUT_PATH. */
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
 
     /**
@@ -84,6 +84,12 @@ public final class ProtobufProxy {
         os.write(code.getBytes(charset));
     }
 
+    /**
+     * Gets the code generator.
+     *
+     * @param cls the cls
+     * @return the code generator
+     */
     private static CodeGenerator getCodeGenerator(Class cls) {
         // check if has default constructor
 
@@ -127,6 +133,8 @@ public final class ProtobufProxy {
     }
 
     /**
+     * Compile.
+     *
      * @param cls target class to be compiled
      * @param outputPath compile byte files output stream
      */
@@ -140,16 +148,25 @@ public final class ProtobufProxy {
 
     }
 
+    /**
+     * Creates the.
+     *
+     * @param <T> the generic type
+     * @param cls the cls
+     * @param debug the debug
+     * @return the codec
+     */
     public static <T> Codec<T> create(Class<T> cls, boolean debug) {
         return create(cls, debug, null);
     }
 
     /**
      * To create a protobuf proxy class for target class.
-     * 
+     *
      * @param <T> target object type to be proxied.
      * @param cls target object class
      * @param debug true will print generate java source code
+     * @param path the path
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
@@ -164,6 +181,11 @@ public final class ProtobufProxy {
 
     }
     
+    /**
+     * Gets the class loader.
+     *
+     * @return the class loader
+     */
     private static ClassLoader getClassLoader() {
     	ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     	if (contextClassLoader != null) {
@@ -281,6 +303,9 @@ public final class ProtobufProxy {
         }
     }
 
+    /**
+     * Clear cache.
+     */
     public static void clearCache() {
         CACHED.clear();
     }

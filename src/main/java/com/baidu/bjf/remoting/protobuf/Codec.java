@@ -23,15 +23,16 @@ import com.google.protobuf.Descriptors.Descriptor;
 
 /**
  * Codec interface include encode and decode support.
- * 
+ *
  * @author xiemalin
+ * @param <T> the generic type
  * @since 1.0.0
  */
 public interface Codec<T> {
 
     /**
-     * Do byte encode action
-     * 
+     * Do byte encode action.
+     *
      * @param t generic target object
      * @return encoded byte array
      * @throws IOException if target object is invalid
@@ -39,8 +40,8 @@ public interface Codec<T> {
     byte[] encode(T t) throws IOException;
 
     /**
-     * Do decode action from byte array
-     * 
+     * Do decode action from byte array.
+     *
      * @param bytes encoded byte array
      * @return parse byte array to target object
      * @throws IOException if byte array is invalid
@@ -48,26 +49,26 @@ public interface Codec<T> {
     T decode(byte[] bytes) throws IOException;
     
     /**
-     * Calculate size of target object
-     * 
+     * Calculate size of target object.
+     *
      * @param t target object
-     * @return size of 
+     * @return size of
      * @throws IOException if target object is invalid
      */
     int size(T t) throws IOException;
     
     /**
-     * Write target object to byte array
-     * 
+     * Write target object to byte array.
+     *
      * @param t target object
-     * @param out target {@link CodedOutputStream} 
+     * @param out target {@link CodedOutputStream}
      * @throws IOException if target object is invalid
      */
     void writeTo(T t, CodedOutputStream out) throws IOException;
     
     /**
-     * Read object from target byte array input stream
-     * 
+     * Read object from target byte array input stream.
+     *
      * @param intput target input stream object
      * @return unserialize object
      * @throws IOException if byte array is invalid
@@ -75,9 +76,10 @@ public interface Codec<T> {
     T readFrom(CodedInputStream intput) throws IOException;
     
     /**
-     * Get {@code Descriptor} to support dynamic mesage call for protocol buffer
-     * @return  {@link Descriptor} instance
-     * @throws IOException in case of create {@link Descriptor} failed
+     * Gets the descriptor.
+     *
+     * @return the descriptor
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     Descriptor getDescriptor() throws IOException;
     
