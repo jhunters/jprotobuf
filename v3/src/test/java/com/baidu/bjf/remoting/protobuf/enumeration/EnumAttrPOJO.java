@@ -17,7 +17,7 @@ import com.baidu.bjf.remoting.protobuf.EnumReadable;
  */
 public enum EnumAttrPOJO implements EnumReadable {
 
-    STRING(100), INT(50);
+    STRING(0), INT(1);
     
     private final int value;
 
