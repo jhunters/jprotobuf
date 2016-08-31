@@ -40,11 +40,14 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedOutputStream;
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.Descriptors.FileDescriptor;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message;
+import com.google.protobuf.MessageLite;
 import com.google.protobuf.WireFormat;
 import com.squareup.protoparser.EnumType;
 import com.squareup.protoparser.EnumType.Value;
@@ -341,6 +344,7 @@ public class CodedConstant {
         }
 
     }
+    
 
     /**
      * Write object to byte array by {@link FieldType}.

@@ -8,6 +8,7 @@
 package com.baidu.bjf.remoting.protobuf.v3.complexmap;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.junit.Assert;
@@ -16,6 +17,7 @@ import org.junit.Test;
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person;
+import com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType;
 
 /**
  * Complex map usage test for encode/decode
@@ -24,6 +26,38 @@ import com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person;
  * @since 2.0.0
  */
 public class ComplexMapTest {
+
+    @Test
+    public void testOriginalMap() {
+        java.util.Map<java.lang.String, AddressBookProtos.Person.PhoneNumber> personMap;
+        personMap = new HashMap<java.lang.String, AddressBookProtos.Person.PhoneNumber>();
+
+        personMap.put("a", AddressBookProtos.Person.PhoneNumber.newBuilder().setNumber("10000000000")
+                .setType(PhoneType.HOME).build());
+
+        java.util.Map<java.lang.String, AddressBookProtos.Person.PhoneType> personTypeMap;
+        personTypeMap = new HashMap<java.lang.String, AddressBookProtos.Person.PhoneType>();
+
+        personTypeMap.put("key1", AddressBookProtos.Person.PhoneType.MOBILE);
+
+        Person person = AddressBookProtos.Person.newBuilder().putAllPhoneNumberObjectValueMap(personMap)
+                .setName("xiemalin").putAllPhoneTypeEnumValueMap(personTypeMap).build();
+        
+        byte[] bytes = person.toByteArray();
+        System.out.println(Arrays.toString(bytes));
+        
+        Codec<ComplexMapPOJO> complexMapPOJOCodec = ProtobufProxy.create(ComplexMapPOJO.class, false);
+        
+        try {
+            ComplexMapPOJO decode = complexMapPOJOCodec.decode(bytes);
+            Assert.assertEquals("xiemalin", decode.name);
+            Assert.assertEquals(1, decode.phoneNumberObjectValueMap.size());
+            Assert.assertEquals("10000000000", decode.phoneNumberObjectValueMap.get("a").number);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+    }
 
     @Test
     public void testPOJOEncode() throws IOException {
@@ -54,12 +88,12 @@ public class ComplexMapTest {
         Assert.assertEquals(pojo.name, person.getName());
 
         Assert.assertEquals(pojo.phoneTypeEnumValueMap.size(), person.getPhoneTypeEnumValueMap().size());
-        Assert.assertEquals(pojo.phoneTypeEnumValueMap.get("a").name(), person.getPhoneTypeEnumValueMap().get("a")
-                .name());
+        Assert.assertEquals(pojo.phoneTypeEnumValueMap.get("a").name(),
+                person.getPhoneTypeEnumValueMap().get("a").name());
 
         Assert.assertEquals(pojo.phoneNumberObjectValueMap.size(), person.getPhoneNumberObjectValueMap().size());
 
-        Assert.assertEquals(pojo.phoneNumberObjectValueMap.get("key1").number, 
+        Assert.assertEquals(pojo.phoneNumberObjectValueMap.get("key1").number,
                 person.getPhoneNumberObjectValueMap().get("key1").getNumber());
     }
 

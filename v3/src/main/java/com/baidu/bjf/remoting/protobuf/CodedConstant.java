@@ -76,16 +76,19 @@ import com.squareup.protoparser.TypeElement;
  */
 public class CodedConstant {
 
+    /** The Constant MAP_ENTRY_SUFFIX. */
     private static final String MAP_ENTRY_SUFFIX = "Entry";
 
+    /** The Constant WIREFORMAT_CLSNAME. */
     private static final String WIREFORMAT_CLSNAME =
             ClassHelper.getInternalName(com.google.protobuf.WireFormat.FieldType.class.getName());
 
+    /** The descriptor codec. */
     private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
 
     /**
-     * get field name
-     * 
+     * get field name.
+     *
      * @param order field order
      * @return field name
      */
@@ -93,6 +96,31 @@ public class CodedConstant {
         String fieldName = "f_" + order;
         return fieldName;
     }
+    
+    /**
+     * Compute the number of bytes that would be needed to encode a
+     * single tag/value pair of arbitrary type.
+     *
+     * @param type   The field's type.
+     * @param number The field's number.
+     * @param value  Object representing the field's value.  Must be of the exact
+     *               type which would be returned by
+     *               {@link Message#getField(Descriptors.FieldDescriptor)} for
+     *               this field.
+     * @return the int
+     */
+    public static int computeElementSize(
+        final WireFormat.FieldType type, final int number, final Object value) {
+      int tagSize = CodedOutputStream.computeTagSize(number);
+      if (type == WireFormat.FieldType.GROUP) {
+        // Only count the end group tag for proto2 messages as for proto1 the end
+        // group tag will be counted as a part of getSerializedSize().
+          tagSize *= 2;
+      }
+      return tagSize + computeElementSizeNoTag(type, value);
+    }
+    
+    
 
     /**
      * get mapped type defined java expression.
@@ -139,12 +167,15 @@ public class CodedConstant {
     }
 
     /**
+     * Gets the mapped type size.
+     *
      * @param field field
      * @param order field order
      * @param type field type
      * @param isList is field type is a {@link List}
+     * @param isMap the is map
      * @param debug debug mode if true enable debug.
-     * @param path
+     * @param path the path
      * @return full java expression
      */
     public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, boolean isMap,
@@ -195,8 +226,10 @@ public class CodedConstant {
     }
 
     /**
-     * @param field
-     * @return
+     * Gets the map field generic parameter string.
+     *
+     * @param field the field
+     * @return the map field generic parameter string
      */
     public static String getMapFieldGenericParameterString(FieldInfo field) {
         FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(field.getGenericKeyType());
@@ -265,11 +298,13 @@ public class CodedConstant {
     }
 
     /**
+     * Compute list size.
+     *
      * @param order field order
      * @param list field value
      * @param type field type of list obj
-     * @param debug
-     * @param path
+     * @param debug the debug
+     * @param path the path
      * @return full java expression
      */
     public static int computeListSize(int order, List<?> list, FieldType type, boolean debug, File path) {
@@ -287,6 +322,19 @@ public class CodedConstant {
         return size;
     }
 
+    /**
+     * Compute map size.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param order the order
+     * @param map the map
+     * @param keyType the key type
+     * @param defaultKey the default key
+     * @param valueType the value type
+     * @param defalutValue the defalut value
+     * @return the int
+     */
     public static <K, V> int computeMapSize(int order, Map<K, V> map, com.google.protobuf.WireFormat.FieldType keyType,
             K defaultKey, com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) {
         int size = 0;
@@ -303,8 +351,17 @@ public class CodedConstant {
     }
 
     /**
-     * @throws IOException
-     * 
+     * Put map value.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param input the input
+     * @param map the map
+     * @param keyType the key type
+     * @param defaultKey the default key
+     * @param valueType the value type
+     * @param defalutValue the defalut value
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
             com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
@@ -318,6 +375,20 @@ public class CodedConstant {
 
     }
 
+    /**
+     * Write to map.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param output the output
+     * @param order the order
+     * @param map the map
+     * @param keyType the key type
+     * @param defaultKey the default key
+     * @param valueType the value type
+     * @param defalutValue the defalut value
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static <K, V> void writeToMap(CodedOutputStream output, int order, Map<K, V> map,
             com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
             com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) throws IOException {
@@ -331,17 +402,25 @@ public class CodedConstant {
     }
 
     /**
-     * get object size by {@link FieldType}
-     * 
-     * @param order
-     * @param o
-     * @param type
-     * @return
+     * get object size by {@link FieldType}.
+     *
+     * @param order the order
+     * @param o the o
+     * @param type the type
+     * @param debug the debug
+     * @param path the path
+     * @return the int
      */
     public static int computeSize(int order, Object o, FieldType type, boolean debug, File path) {
         return computeSize(order, o, type, false, debug, path);
     }
 
+    /**
+     * Compute object size no tag.
+     *
+     * @param o the o
+     * @return the int
+     */
     public static int computeObjectSizeNoTag(Object o) {
         int size = 0;
         if (o == null) {
@@ -360,11 +439,15 @@ public class CodedConstant {
     }
 
     /**
-     * get object size by {@link FieldType}
-     * 
-     * @param o
-     * @param type
-     * @return
+     * get object size by {@link FieldType}.
+     *
+     * @param order the order
+     * @param o the o
+     * @param type the type
+     * @param list the list
+     * @param debug the debug
+     * @param path the path
+     * @return the int
      */
     public static int computeSize(int order, Object o, FieldType type, boolean list, boolean debug, File path) {
         int size = 0;
@@ -413,10 +496,14 @@ public class CodedConstant {
     }
 
     /**
-     * get mapped object byte write java expression
-     * 
+     * get mapped object byte write java expression.
+     *
+     * @param field the field
+     * @param prefix the prefix
      * @param order field order
      * @param type field type
+     * @param isList the is list
+     * @param isMap the is map
      * @return full java expression
      */
     public static String getMappedWriteCode(FieldInfo field, String prefix, int order, FieldType type, boolean isList,
@@ -486,11 +573,12 @@ public class CodedConstant {
 
     /**
      * write list to {@link CodedOutputStream} object.
-     * 
+     *
      * @param out target output stream to write
      * @param order field order
      * @param type field type
      * @param list target list object to be serialized
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void writeToList(CodedOutputStream out, int order, FieldType type, List list) throws IOException {
         if (list == null) {
@@ -502,19 +590,31 @@ public class CodedConstant {
 
     }
 
+    /**
+     * Write object.
+     *
+     * @param out the out
+     * @param order the order
+     * @param type the type
+     * @param o the o
+     * @param list the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static void writeObject(CodedOutputStream out, int order, FieldType type, Object o, boolean list)
             throws IOException {
         writeObject(out, order, type, o, list, true);
     }
 
     /**
-     * Write object to byte array by {@link FieldType}
-     * 
-     * @param out
-     * @param order
-     * @param type
-     * @param o
-     * @throws IOException
+     * Write object to byte array by {@link FieldType}.
+     *
+     * @param out the out
+     * @param order the order
+     * @param type the type
+     * @param o the o
+     * @param list the list
+     * @param withTag the with tag
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void writeObject(CodedOutputStream out, int order, FieldType type, Object o, boolean list,
             boolean withTag) throws IOException {
@@ -644,8 +744,8 @@ public class CodedConstant {
     }
 
     /**
-     * get required field check java expression
-     * 
+     * get required field check java expression.
+     *
      * @param order field order
      * @param field java field
      * @return full java expression
@@ -660,8 +760,8 @@ public class CodedConstant {
     }
 
     /**
-     * get return required field check java expression
-     * 
+     * get return required field check java expression.
+     *
      * @param express java expression
      * @param field java field
      * @return full java expression
@@ -675,8 +775,8 @@ public class CodedConstant {
     }
 
     /**
-     * check object is null
-     * 
+     * check object is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -685,8 +785,8 @@ public class CodedConstant {
     }
 
     /**
-     * check double is null
-     * 
+     * check double is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -695,8 +795,8 @@ public class CodedConstant {
     }
 
     /**
-     * check int is null
-     * 
+     * check int is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -705,8 +805,8 @@ public class CodedConstant {
     }
 
     /**
-     * check byte is null
-     * 
+     * check byte is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -715,8 +815,8 @@ public class CodedConstant {
     }
 
     /**
-     * check short is null
-     * 
+     * check short is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -725,8 +825,8 @@ public class CodedConstant {
     }
 
     /**
-     * check long is null
-     * 
+     * check long is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -735,8 +835,8 @@ public class CodedConstant {
     }
 
     /**
-     * check float is null
-     * 
+     * check float is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -745,8 +845,8 @@ public class CodedConstant {
     }
 
     /**
-     * check char is null
-     * 
+     * check char is null.
+     *
      * @param o to check
      * @return true if is null
      */
@@ -754,6 +854,12 @@ public class CodedConstant {
         return false;
     }
 
+    /**
+     * As list.
+     *
+     * @param value the value
+     * @return the list
+     */
     public static List asList(String value) {
         return Arrays.asList(value);
     }
@@ -776,14 +882,12 @@ public class CodedConstant {
                 .toString();
     }
 
-    /**
-     * bit type tag value
-     */
+    /** bit type tag value. */
     static final int TAG_TYPE_BITS = 3;
 
     /**
-     * make protobuf tag
-     * 
+     * make protobuf tag.
+     *
      * @param fieldNumber field number order
      * @param wireType wireformat type
      * @return tag id
@@ -792,6 +896,13 @@ public class CodedConstant {
         return (fieldNumber << TAG_TYPE_BITS) | wireType;
     }
 
+    /**
+     * Gets the enum name.
+     *
+     * @param e the e
+     * @param value the value
+     * @return the enum name
+     */
     public static String getEnumName(Enum[] e, int value) {
         if (e != null) {
             int toCompareValue;
@@ -812,12 +923,13 @@ public class CodedConstant {
     /**
      * Read a field of any primitive type for immutable messages from a CodedInputStream. Enums, groups, and embedded
      * messages are not handled by this method.
-     * 
+     *
      * @param input The stream from which to read.
      * @param type Declared type of the field.
      * @param checkUtf8 When true, check that the input is valid utf8.
      * @return An object representing the field's value, of the exact type which would be returned by
      *         {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static Object readPrimitiveField(CodedInputStream input, final WireFormat.FieldType type, boolean checkUtf8)
             throws IOException {
@@ -871,12 +983,51 @@ public class CodedConstant {
     }
 
     /**
+     * Write a single tag-value pair to the stream.
+     *
+     * @param output The output stream.
+     * @param type The field's type.
+     * @param number The field's number.
+     * @param value Object representing the field's value. Must be of the exact type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static void writeElement(final CodedOutputStream output, final WireFormat.FieldType type, final int number,
+            final Object value) throws IOException {
+        // Special case for groups, which need a start and end tag; other fields
+        // can just use writeTag() and writeFieldNoTag().
+        if (type == WireFormat.FieldType.GROUP) {
+            output.writeGroup(number, (MessageLite) value);
+        } else {
+            output.writeTag(number, getWireFormatForFieldType(type, false));
+            writeElementNoTag(output, type, value);
+        }
+    }
+
+    /**
+     * Given a field type, return the wire type.
+     *
+     * @param type the type
+     * @param isPacked the is packed
+     * @return the wire format for field type
+     * @returns One of the {@code WIRETYPE_} constants defined in {@link WireFormat}.
+     */
+    static int getWireFormatForFieldType(final WireFormat.FieldType type, boolean isPacked) {
+        if (isPacked) {
+            return WireFormat.WIRETYPE_LENGTH_DELIMITED;
+        } else {
+            return type.getWireType();
+        }
+    }
+
+    /**
      * Write a field of arbitrary type, without its tag, to the stream.
-     * 
+     *
      * @param output The output stream.
      * @param type The field's type.
      * @param value Object representing the field's value. Must be of the exact type which would be returned by
      *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void writeElementNoTag(final CodedOutputStream output, final WireFormat.FieldType type,
             final Object value) throws IOException {
@@ -955,11 +1106,22 @@ public class CodedConstant {
     }
 
     /**
+     * Compute length delimited field size.
+     *
+     * @param fieldLength the field length
+     * @return the int
+     */
+    public static int computeLengthDelimitedFieldSize(int fieldLength) {
+        return CodedOutputStream.computeUInt32SizeNoTag(fieldLength) + fieldLength;
+    }
+
+    /**
      * Compute the number of bytes that would be needed to encode a particular value of arbitrary type, excluding tag.
-     * 
+     *
      * @param type The field's type.
      * @param value Object representing the field's value. Must be of the exact type which would be returned by
      *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @return the int
      */
     public static int computeElementSizeNoTag(final WireFormat.FieldType type, final Object value) {
         switch (type) {
@@ -1026,6 +1188,13 @@ public class CodedConstant {
         throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
     }
 
+    /**
+     * Gets the descriptor.
+     *
+     * @param cls the cls
+     * @return the descriptor
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public static Descriptor getDescriptor(Class<?> cls) throws IOException {
 
         String idl = ProtobufIDLGenerator.getIDL(cls);
@@ -1088,6 +1257,15 @@ public class CodedConstant {
         return fileDescriptor.getMessageTypes().get(0);
     }
 
+    /**
+     * Gets the descritor proto pojo.
+     *
+     * @param fileDescriptorProto the file descriptor proto
+     * @param typeElement the type element
+     * @param messageSet the message set
+     * @param enumSet the enum set
+     * @return the descritor proto pojo
+     */
     private static EnumDescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
             EnumElement typeElement, Set<String> messageSet, Set<String> enumSet) {
 
@@ -1120,6 +1298,15 @@ public class CodedConstant {
         return ret;
     }
 
+    /**
+     * Gets the descritor proto pojo.
+     *
+     * @param fileDescriptorProto the file descriptor proto
+     * @param typeElement the type element
+     * @param messageSet the message set
+     * @param enumSet the enum set
+     * @return the descritor proto pojo
+     */
     private static DescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
             MessageElement typeElement, Set<String> messageSet, Set<String> enumSet) {
 
@@ -1191,8 +1378,8 @@ public class CodedConstant {
                     ret.nestedTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (MessageElement) nestedTypeElement,
                             messageSet, enumSet));
                 } else if (nestedTypeElement instanceof EnumElement) {
-                    ret.enumTypes.add(
-                            getDescritorProtoPOJO(fileDescriptorProto, (EnumElement) nestedTypeElement, messageSet, enumSet));
+                    ret.enumTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (EnumElement) nestedTypeElement,
+                            messageSet, enumSet));
                 }
             }
         }
@@ -1200,6 +1387,13 @@ public class CodedConstant {
         return ret;
     }
 
+    /**
+     * Gets the map kv message elements.
+     *
+     * @param name the name
+     * @param mapType the map type
+     * @return the map kv message elements
+     */
     private static MessageElement getMapKVMessageElements(String name, MapType mapType) {
         MessageElement.Builder ret = MessageElement.builder();
         ret.name(name);
@@ -1217,6 +1411,12 @@ public class CodedConstant {
         return ret.build();
     }
 
+    /**
+     * Convert list.
+     *
+     * @param list the list
+     * @return the list
+     */
     private static List<Integer> convertList(List<String> list) {
         if (list == null) {
             return null;

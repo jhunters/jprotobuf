@@ -6,7 +6,13 @@ package com.baidu.bjf.remoting.protobuf.v3.complexmap;
 public final class AddressBookProtos {
   private AddressBookProtos() {}
   public static void registerAllExtensions(
+      com.google.protobuf.ExtensionRegistryLite registry) {
+  }
+
+  public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
+    registerAllExtensions(
+        (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   public interface PersonOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.baidu.bjf.remoting.protobuf.v3.Person)
@@ -29,24 +35,78 @@ public final class AddressBookProtos {
     /**
      * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
      */
+    int getPhoneTypeEnumValueMapCount();
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+     */
+    boolean containsPhoneTypeEnumValueMap(
+        java.lang.String key);
+    /**
+     * Use {@link #getPhoneTypeEnumValueMapMap()} instead.
+     */
+    @java.lang.Deprecated
     java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType>
     getPhoneTypeEnumValueMap();
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+     */
+    java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType>
+    getPhoneTypeEnumValueMapMap();
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+     */
+    com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType getPhoneTypeEnumValueMapOrDefault(
+        java.lang.String key,
+        com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType defaultValue);
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+     */
+    com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType getPhoneTypeEnumValueMapOrThrow(
+        java.lang.String key);
 
     /**
      * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
      */
+    int getPhoneNumberObjectValueMapCount();
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+     */
+    boolean containsPhoneNumberObjectValueMap(
+        java.lang.String key);
+    /**
+     * Use {@link #getPhoneNumberObjectValueMapMap()} instead.
+     */
+    @java.lang.Deprecated
     java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
     getPhoneNumberObjectValueMap();
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+     */
+    java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
+    getPhoneNumberObjectValueMapMap();
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+     */
+
+    com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber getPhoneNumberObjectValueMapOrDefault(
+        java.lang.String key,
+        com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber defaultValue);
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+     */
+
+    com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber getPhoneNumberObjectValueMapOrThrow(
+        java.lang.String key);
   }
   /**
    * Protobuf type {@code com.baidu.bjf.remoting.protobuf.v3.Person}
    */
   public  static final class Person extends
-      com.google.protobuf.GeneratedMessage implements
+      com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:com.baidu.bjf.remoting.protobuf.v3.Person)
       PersonOrBuilder {
     // Use Person.newBuilder() to construct.
-    private Person(com.google.protobuf.GeneratedMessage.Builder builder) {
+    private Person(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
     private Person() {
@@ -90,13 +150,13 @@ public final class AddressBookProtos {
             case 18: {
               if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
                 phoneTypeEnumValueMap_ = com.google.protobuf.MapField.newMapField(
-                    phoneTypeEnumValueMapDefaultEntry);
+                    PhoneTypeEnumValueMapDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000002;
               }
               com.google.protobuf.ByteString bytes = input.readBytes();
               com.google.protobuf.MapEntry<java.lang.String, java.lang.Integer>
-              phoneTypeEnumValueMap = phoneTypeEnumValueMapDefaultEntry.getParserForType().parseFrom(bytes);
-              if (com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType.valueOf(phoneTypeEnumValueMap.getValue()) == null) {
+              phoneTypeEnumValueMap = PhoneTypeEnumValueMapDefaultEntryHolder.defaultEntry.getParserForType().parseFrom(bytes);
+              if (com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType.forNumber(phoneTypeEnumValueMap.getValue()) == null) {
                 unknownFields.mergeLengthDelimitedField(2, bytes);
               } else {
                 phoneTypeEnumValueMap_.getMutableMap().put(phoneTypeEnumValueMap.getKey(), phoneTypeEnumValueMap.getValue());
@@ -106,12 +166,12 @@ public final class AddressBookProtos {
             case 26: {
               if (!((mutable_bitField0_ & 0x00000004) == 0x00000004)) {
                 phoneNumberObjectValueMap_ = com.google.protobuf.MapField.newMapField(
-                    phoneNumberObjectValueMapDefaultEntry);
+                    PhoneNumberObjectValueMapDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000004;
               }
               com.google.protobuf.MapEntry<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
               phoneNumberObjectValueMap = input.readMessage(
-                  phoneNumberObjectValueMapDefaultEntry.getParserForType(), extensionRegistry);
+                  PhoneNumberObjectValueMapDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               phoneNumberObjectValueMap_.getMutableMap().put(phoneNumberObjectValueMap.getKey(), phoneNumberObjectValueMap.getValue());
               break;
             }
@@ -121,7 +181,7 @@ public final class AddressBookProtos {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
         throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+            e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -137,34 +197,19 @@ public final class AddressBookProtos {
         int number) {
       switch (number) {
         case 2:
-          return phoneTypeEnumValueMap_;
+          return internalGetPhoneTypeEnumValueMap();
         case 3:
-          return phoneNumberObjectValueMap_;
+          return internalGetPhoneNumberObjectValueMap();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
       }
     }
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.class, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.Builder.class);
-    }
-
-    public static final com.google.protobuf.Parser<Person> PARSER =
-        new com.google.protobuf.AbstractParser<Person>() {
-      public Person parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Person(input, extensionRegistry);
-      }
-    };
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<Person> getParserForType() {
-      return PARSER;
     }
 
     /**
@@ -175,15 +220,15 @@ public final class AddressBookProtos {
       /**
        * <code>MOBILE = 0;</code>
        */
-      MOBILE(0, 0),
+      MOBILE(0),
       /**
        * <code>HOME = 1;</code>
        */
-      HOME(1, 1),
+      HOME(1),
       /**
        * <code>WORK = 2;</code>
        */
-      WORK(2, 2),
+      WORK(2),
       ;
 
       /**
@@ -204,7 +249,15 @@ public final class AddressBookProtos {
         return value;
       }
 
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
       public static PhoneType valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static PhoneType forNumber(int value) {
         switch (value) {
           case 0: return MOBILE;
           case 1: return HOME;
@@ -217,17 +270,17 @@ public final class AddressBookProtos {
           internalGetValueMap() {
         return internalValueMap;
       }
-      private static com.google.protobuf.Internal.EnumLiteMap<PhoneType>
-          internalValueMap =
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          PhoneType> internalValueMap =
             new com.google.protobuf.Internal.EnumLiteMap<PhoneType>() {
               public PhoneType findValueByNumber(int number) {
-                return PhoneType.valueOf(number);
+                return PhoneType.forNumber(number);
               }
             };
 
       public final com.google.protobuf.Descriptors.EnumValueDescriptor
           getValueDescriptor() {
-        return getDescriptor().getValues().get(index);
+        return getDescriptor().getValues().get(ordinal());
       }
       public final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptorForType() {
@@ -249,11 +302,9 @@ public final class AddressBookProtos {
         return VALUES[desc.getIndex()];
       }
 
-      private final int index;
       private final int value;
 
-      private PhoneType(int index, int value) {
-        this.index = index;
+      private PhoneType(int value) {
         this.value = value;
       }
 
@@ -291,11 +342,11 @@ public final class AddressBookProtos {
      * Protobuf type {@code com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber}
      */
     public  static final class PhoneNumber extends
-        com.google.protobuf.GeneratedMessage implements
+        com.google.protobuf.GeneratedMessageV3 implements
         // @@protoc_insertion_point(message_implements:com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber)
         PhoneNumberOrBuilder {
       // Use PhoneNumber.newBuilder() to construct.
-      private PhoneNumber(com.google.protobuf.GeneratedMessage.Builder builder) {
+      private PhoneNumber(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
         super(builder);
       }
       private PhoneNumber() {
@@ -354,7 +405,7 @@ public final class AddressBookProtos {
           throw e.setUnfinishedMessage(this);
         } catch (java.io.IOException e) {
           throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+              e).setUnfinishedMessage(this);
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -365,31 +416,16 @@ public final class AddressBookProtos {
         return com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
                 com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber.class, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber.Builder.class);
       }
 
-      public static final com.google.protobuf.Parser<PhoneNumber> PARSER =
-          new com.google.protobuf.AbstractParser<PhoneNumber>() {
-        public PhoneNumber parsePartialFrom(
-            com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          return new PhoneNumber(input, extensionRegistry);
-        }
-      };
-
-      @java.lang.Override
-      public com.google.protobuf.Parser<PhoneNumber> getParserForType() {
-        return PARSER;
-      }
-
       private int bitField0_;
       public static final int NUMBER_FIELD_NUMBER = 1;
-      private java.lang.Object number_;
+      private volatile java.lang.Object number_;
       /**
        * <code>required string number = 1;</code>
        */
@@ -462,9 +498,8 @@ public final class AddressBookProtos {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          output.writeBytes(1, getNumberBytes());
+          com.google.protobuf.GeneratedMessageV3.writeString(output, 1, number_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           output.writeEnum(2, type_);
@@ -472,26 +507,68 @@ public final class AddressBookProtos {
         unknownFields.writeTo(output);
       }
 
-      private int memoizedSerializedSize = -1;
       public int getSerializedSize() {
-        int size = memoizedSerializedSize;
+        int size = memoizedSize;
         if (size != -1) return size;
 
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          size += com.google.protobuf.CodedOutputStream
-            .computeBytesSize(1, getNumberBytes());
+          size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, number_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
             .computeEnumSize(2, type_);
         }
         size += unknownFields.getSerializedSize();
-        memoizedSerializedSize = size;
+        memoizedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
+      @java.lang.Override
+      public boolean equals(final java.lang.Object obj) {
+        if (obj == this) {
+         return true;
+        }
+        if (!(obj instanceof com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber)) {
+          return super.equals(obj);
+        }
+        com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber other = (com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber) obj;
+
+        boolean result = true;
+        result = result && (hasNumber() == other.hasNumber());
+        if (hasNumber()) {
+          result = result && getNumber()
+              .equals(other.getNumber());
+        }
+        result = result && (hasType() == other.hasType());
+        if (hasType()) {
+          result = result && type_ == other.type_;
+        }
+        result = result && unknownFields.equals(other.unknownFields);
+        return result;
+      }
+
+      @java.lang.Override
+      public int hashCode() {
+        if (memoizedHashCode != 0) {
+          return memoizedHashCode;
+        }
+        int hash = 41;
+        hash = (19 * hash) + getDescriptorForType().hashCode();
+        if (hasNumber()) {
+          hash = (37 * hash) + NUMBER_FIELD_NUMBER;
+          hash = (53 * hash) + getNumber().hashCode();
+        }
+        if (hasType()) {
+          hash = (37 * hash) + TYPE_FIELD_NUMBER;
+          hash = (53 * hash) + type_;
+        }
+        hash = (29 * hash) + unknownFields.hashCode();
+        memoizedHashCode = hash;
+        return hash;
+      }
+
       public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber parseFrom(
           com.google.protobuf.ByteString data)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -515,46 +592,57 @@ public final class AddressBookProtos {
       }
       public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber parseFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input);
       }
       public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber parseFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber parseDelimitedFrom(java.io.InputStream input)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input);
+        return com.google.protobuf.GeneratedMessageV3
+            .parseDelimitedWithIOException(PARSER, input);
       }
       public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber parseDelimitedFrom(
           java.io.InputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessageV3
+            .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
       }
       public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber parseFrom(
           com.google.protobuf.CodedInputStream input)
           throws java.io.IOException {
-        return PARSER.parseFrom(input);
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input);
       }
       public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber parseFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        return PARSER.parseFrom(input, extensionRegistry);
+        return com.google.protobuf.GeneratedMessageV3
+            .parseWithIOException(PARSER, input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return new Builder(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return DEFAULT_INSTANCE.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber prototype) {
+        return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == DEFAULT_INSTANCE
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         Builder builder = new Builder(parent);
         return builder;
       }
@@ -562,7 +650,7 @@ public final class AddressBookProtos {
        * Protobuf type {@code com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber}
        */
       public static final class Builder extends
-          com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+          com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
           // @@protoc_insertion_point(builder_implements:com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber)
           com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumberOrBuilder {
         public static final com.google.protobuf.Descriptors.Descriptor
@@ -570,7 +658,7 @@ public final class AddressBookProtos {
           return com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_descriptor;
         }
 
-        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
             internalGetFieldAccessorTable() {
           return com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_fieldAccessorTable
               .ensureFieldAccessorsInitialized(
@@ -583,12 +671,13 @@ public final class AddressBookProtos {
         }
 
         private Builder(
-            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+            com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
           super(parent);
           maybeForceBuilderInitialization();
         }
         private void maybeForceBuilderInitialization() {
-          if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          if (com.google.protobuf.GeneratedMessageV3
+                  .alwaysUseFieldBuilders) {
           }
         }
         public Builder clear() {
@@ -634,6 +723,32 @@ public final class AddressBookProtos {
           return result;
         }
 
+        public Builder clone() {
+          return (Builder) super.clone();
+        }
+        public Builder setField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            Object value) {
+          return (Builder) super.setField(field, value);
+        }
+        public Builder clearField(
+            com.google.protobuf.Descriptors.FieldDescriptor field) {
+          return (Builder) super.clearField(field);
+        }
+        public Builder clearOneof(
+            com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+          return (Builder) super.clearOneof(oneof);
+        }
+        public Builder setRepeatedField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            int index, Object value) {
+          return (Builder) super.setRepeatedField(field, index, value);
+        }
+        public Builder addRepeatedField(
+            com.google.protobuf.Descriptors.FieldDescriptor field,
+            Object value) {
+          return (Builder) super.addRepeatedField(field, value);
+        }
         public Builder mergeFrom(com.google.protobuf.Message other) {
           if (other instanceof com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber) {
             return mergeFrom((com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber)other);
@@ -660,7 +775,6 @@ public final class AddressBookProtos {
 
         public final boolean isInitialized() {
           if (!hasNumber()) {
-            
             return false;
           }
           return true;
@@ -675,7 +789,7 @@ public final class AddressBookProtos {
             parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
             parsedMessage = (com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber) e.getUnfinishedMessage();
-            throw e;
+            throw e.unwrapIOException();
           } finally {
             if (parsedMessage != null) {
               mergeFrom(parsedMessage);
@@ -796,28 +910,58 @@ public final class AddressBookProtos {
           onChanged();
           return this;
         }
+        public final Builder setUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
+          return super.setUnknownFields(unknownFields);
+        }
+
+        public final Builder mergeUnknownFields(
+            final com.google.protobuf.UnknownFieldSet unknownFields) {
+          return super.mergeUnknownFields(unknownFields);
+        }
+
 
         // @@protoc_insertion_point(builder_scope:com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber)
       }
 
       // @@protoc_insertion_point(class_scope:com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber)
-      private static final com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber defaultInstance;static {
-        defaultInstance = new com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber();
+      private static final com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber DEFAULT_INSTANCE;
+      static {
+        DEFAULT_INSTANCE = new com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber();
       }
 
       public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber getDefaultInstance() {
-        return defaultInstance;
+        return DEFAULT_INSTANCE;
+      }
+
+      @java.lang.Deprecated public static final com.google.protobuf.Parser<PhoneNumber>
+          PARSER = new com.google.protobuf.AbstractParser<PhoneNumber>() {
+        public PhoneNumber parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+            return new PhoneNumber(input, extensionRegistry);
+        }
+      };
+
+      public static com.google.protobuf.Parser<PhoneNumber> parser() {
+        return PARSER;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<PhoneNumber> getParserForType() {
+        return PARSER;
       }
 
       public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber getDefaultInstanceForType() {
-        return defaultInstance;
+        return DEFAULT_INSTANCE;
       }
 
     }
 
     private int bitField0_;
     public static final int NAME_FIELD_NUMBER = 1;
-    private java.lang.Object name_;
+    private volatile java.lang.Object name_;
     /**
      * <code>required string name = 1;</code>
      */
@@ -859,58 +1003,168 @@ public final class AddressBookProtos {
     }
 
     public static final int PHONETYPEENUMVALUEMAP_FIELD_NUMBER = 2;
-    private static final com.google.protobuf.MapEntry<
-        java.lang.String, java.lang.Integer> phoneTypeEnumValueMapDefaultEntry =
-            com.google.protobuf.MapEntry
-            .<java.lang.String, java.lang.Integer>newDefaultInstance(
-                com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneTypeEnumValueMapEntry_descriptor, 
-                com.google.protobuf.WireFormat.FieldType.STRING,
-                "",
-                com.google.protobuf.WireFormat.FieldType.ENUM,
-                com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType.MOBILE.getNumber());
+    private static final class PhoneTypeEnumValueMapDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.Integer> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.Integer>newDefaultInstance(
+                  com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneTypeEnumValueMapEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.ENUM,
+                  com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType.MOBILE.getNumber());
+    }
     private com.google.protobuf.MapField<
-        java.lang.String, java.lang.Integer> phoneTypeEnumValueMap_ =
-            com.google.protobuf.MapField.emptyMapField(
-                phoneTypeEnumValueMapDefaultEntry);
-
+        java.lang.String, java.lang.Integer> phoneTypeEnumValueMap_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.Integer>
+    internalGetPhoneTypeEnumValueMap() {
+      if (phoneTypeEnumValueMap_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            PhoneTypeEnumValueMapDefaultEntryHolder.defaultEntry);
+      }
+      return phoneTypeEnumValueMap_;
+    }
     private static final
     com.google.protobuf.Internal.MapAdapter.Converter<
         java.lang.Integer, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType> phoneTypeEnumValueMapValueConverter =
             com.google.protobuf.Internal.MapAdapter.newEnumConverter(
                 com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType.internalGetValueMap(),
                 com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType.MOBILE);
+
+    public int getPhoneTypeEnumValueMapCount() {
+      return internalGetPhoneTypeEnumValueMap().getMap().size();
+    }
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+     */
+
+    public boolean containsPhoneTypeEnumValueMap(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetPhoneTypeEnumValueMap().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getPhoneTypeEnumValueMapMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType>
+    getPhoneTypeEnumValueMap() {
+      return getPhoneTypeEnumValueMapMap();
+    }
     /**
      * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
      */
 
     public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType>
-    getPhoneTypeEnumValueMap() {
+    getPhoneTypeEnumValueMapMap() {
       return new com.google.protobuf.Internal.MapAdapter<
           java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType, java.lang.Integer>(
-              phoneTypeEnumValueMap_.getMap(), phoneTypeEnumValueMapValueConverter);
+              internalGetPhoneTypeEnumValueMap().getMap(),
+              phoneTypeEnumValueMapValueConverter);
+    }
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+     */
+
+    public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType getPhoneTypeEnumValueMapOrDefault(
+        java.lang.String key,
+        com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.Integer> map =
+          internalGetPhoneTypeEnumValueMap().getMap();
+      return map.containsKey(key)
+             ? phoneTypeEnumValueMapValueConverter.doForward(map.get(key))
+             : defaultValue;
+    }
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+     */
+
+    public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType getPhoneTypeEnumValueMapOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.Integer> map =
+          internalGetPhoneTypeEnumValueMap().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return phoneTypeEnumValueMapValueConverter.doForward(map.get(key));
     }
 
     public static final int PHONENUMBEROBJECTVALUEMAP_FIELD_NUMBER = 3;
-    private static final com.google.protobuf.MapEntry<
-        java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> phoneNumberObjectValueMapDefaultEntry =
-            com.google.protobuf.MapEntry
-            .<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>newDefaultInstance(
-                com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumberObjectValueMapEntry_descriptor, 
-                com.google.protobuf.WireFormat.FieldType.STRING,
-                "",
-                com.google.protobuf.WireFormat.FieldType.MESSAGE,
-                com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber.getDefaultInstance());
+    private static final class PhoneNumberObjectValueMapDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>newDefaultInstance(
+                  com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumberObjectValueMapEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.MESSAGE,
+                  com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber.getDefaultInstance());
+    }
     private com.google.protobuf.MapField<
-        java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> phoneNumberObjectValueMap_ =
-            com.google.protobuf.MapField.emptyMapField(
-                phoneNumberObjectValueMapDefaultEntry);
+        java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> phoneNumberObjectValueMap_;
+    private com.google.protobuf.MapField<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
+    internalGetPhoneNumberObjectValueMap() {
+      if (phoneNumberObjectValueMap_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            PhoneNumberObjectValueMapDefaultEntryHolder.defaultEntry);
+      }
+      return phoneNumberObjectValueMap_;
+    }
 
+    public int getPhoneNumberObjectValueMapCount() {
+      return internalGetPhoneNumberObjectValueMap().getMap().size();
+    }
     /**
      * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
      */
 
+    public boolean containsPhoneNumberObjectValueMap(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetPhoneNumberObjectValueMap().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getPhoneNumberObjectValueMapMap()} instead.
+     */
+    @java.lang.Deprecated
     public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> getPhoneNumberObjectValueMap() {
-      return phoneNumberObjectValueMap_.getMap();
+      return getPhoneNumberObjectValueMapMap();
+    }
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+     */
+
+    public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> getPhoneNumberObjectValueMapMap() {
+      return internalGetPhoneNumberObjectValueMap().getMap();
+    }
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+     */
+
+    public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber getPhoneNumberObjectValueMapOrDefault(
+        java.lang.String key,
+        com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> map =
+          internalGetPhoneNumberObjectValueMap().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+     */
+
+    public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber getPhoneNumberObjectValueMapOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> map =
+          internalGetPhoneNumberObjectValueMap().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -935,23 +1189,22 @@ public final class AddressBookProtos {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getNameBytes());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
       }
       for (java.util.Map.Entry<java.lang.String, java.lang.Integer> entry
-           : phoneTypeEnumValueMap_.getMap().entrySet()) {
+           : internalGetPhoneTypeEnumValueMap().getMap().entrySet()) {
         com.google.protobuf.MapEntry<java.lang.String, java.lang.Integer>
-        phoneTypeEnumValueMap = phoneTypeEnumValueMapDefaultEntry.newBuilderForType()
+        phoneTypeEnumValueMap = PhoneTypeEnumValueMapDefaultEntryHolder.defaultEntry.newBuilderForType()
             .setKey(entry.getKey())
             .setValue(entry.getValue())
             .build();
         output.writeMessage(2, phoneTypeEnumValueMap);
       }
       for (java.util.Map.Entry<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> entry
-           : phoneNumberObjectValueMap_.getMap().entrySet()) {
+           : internalGetPhoneNumberObjectValueMap().getMap().entrySet()) {
         com.google.protobuf.MapEntry<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
-        phoneNumberObjectValueMap = phoneNumberObjectValueMapDefaultEntry.newBuilderForType()
+        phoneNumberObjectValueMap = PhoneNumberObjectValueMapDefaultEntryHolder.defaultEntry.newBuilderForType()
             .setKey(entry.getKey())
             .setValue(entry.getValue())
             .build();
@@ -960,20 +1213,18 @@ public final class AddressBookProtos {
       unknownFields.writeTo(output);
     }
 
-    private int memoizedSerializedSize = -1;
     public int getSerializedSize() {
-      int size = memoizedSerializedSize;
+      int size = memoizedSize;
       if (size != -1) return size;
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getNameBytes());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
       }
       for (java.util.Map.Entry<java.lang.String, java.lang.Integer> entry
-           : phoneTypeEnumValueMap_.getMap().entrySet()) {
+           : internalGetPhoneTypeEnumValueMap().getMap().entrySet()) {
         com.google.protobuf.MapEntry<java.lang.String, java.lang.Integer>
-        phoneTypeEnumValueMap = phoneTypeEnumValueMapDefaultEntry.newBuilderForType()
+        phoneTypeEnumValueMap = PhoneTypeEnumValueMapDefaultEntryHolder.defaultEntry.newBuilderForType()
             .setKey(entry.getKey())
             .setValue(entry.getValue())
             .build();
@@ -981,9 +1232,9 @@ public final class AddressBookProtos {
             .computeMessageSize(2, phoneTypeEnumValueMap);
       }
       for (java.util.Map.Entry<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> entry
-           : phoneNumberObjectValueMap_.getMap().entrySet()) {
+           : internalGetPhoneNumberObjectValueMap().getMap().entrySet()) {
         com.google.protobuf.MapEntry<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
-        phoneNumberObjectValueMap = phoneNumberObjectValueMapDefaultEntry.newBuilderForType()
+        phoneNumberObjectValueMap = PhoneNumberObjectValueMapDefaultEntryHolder.defaultEntry.newBuilderForType()
             .setKey(entry.getKey())
             .setValue(entry.getValue())
             .build();
@@ -991,11 +1242,59 @@ public final class AddressBookProtos {
             .computeMessageSize(3, phoneNumberObjectValueMap);
       }
       size += unknownFields.getSerializedSize();
-      memoizedSerializedSize = size;
+      memoizedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person)) {
+        return super.equals(obj);
+      }
+      com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person other = (com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person) obj;
+
+      boolean result = true;
+      result = result && (hasName() == other.hasName());
+      if (hasName()) {
+        result = result && getName()
+            .equals(other.getName());
+      }
+      result = result && internalGetPhoneTypeEnumValueMap().equals(
+          other.internalGetPhoneTypeEnumValueMap());
+      result = result && internalGetPhoneNumberObjectValueMap().equals(
+          other.internalGetPhoneNumberObjectValueMap());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptorForType().hashCode();
+      if (hasName()) {
+        hash = (37 * hash) + NAME_FIELD_NUMBER;
+        hash = (53 * hash) + getName().hashCode();
+      }
+      if (!internalGetPhoneTypeEnumValueMap().getMap().isEmpty()) {
+        hash = (37 * hash) + PHONETYPEENUMVALUEMAP_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetPhoneTypeEnumValueMap().hashCode();
+      }
+      if (!internalGetPhoneNumberObjectValueMap().getMap().isEmpty()) {
+        hash = (37 * hash) + PHONENUMBEROBJECTVALUEMAP_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetPhoneNumberObjectValueMap().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
     public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1019,46 +1318,57 @@ public final class AddressBookProtos {
     }
     public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
     }
     public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
-      return PARSER.parseFrom(input);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
     }
     public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return PARSER.parseFrom(input, extensionRegistry);
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -1066,7 +1376,7 @@ public final class AddressBookProtos {
      * Protobuf type {@code com.baidu.bjf.remoting.protobuf.v3.Person}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:com.baidu.bjf.remoting.protobuf.v3.Person)
         com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.PersonOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
@@ -1079,15 +1389,28 @@ public final class AddressBookProtos {
           int number) {
         switch (number) {
           case 2:
-            return phoneTypeEnumValueMap_;
+            return internalGetPhoneTypeEnumValueMap();
           case 3:
-            return phoneNumberObjectValueMap_;
+            return internalGetPhoneNumberObjectValueMap();
           default:
             throw new RuntimeException(
                 "Invalid map field number: " + number);
         }
       }
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 2:
+            return internalGetMutablePhoneTypeEnumValueMap();
+          case 3:
+            return internalGetMutablePhoneNumberObjectValueMap();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -1100,20 +1423,21 @@ public final class AddressBookProtos {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
         }
       }
       public Builder clear() {
         super.clear();
         name_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        phoneTypeEnumValueMap_.clear();
-        phoneNumberObjectValueMap_.clear();
+        internalGetMutablePhoneTypeEnumValueMap().clear();
+        internalGetMutablePhoneNumberObjectValueMap().clear();
         return this;
       }
 
@@ -1142,13 +1466,41 @@ public final class AddressBookProtos {
           to_bitField0_ |= 0x00000001;
         }
         result.name_ = name_;
-        result.phoneTypeEnumValueMap_ = phoneTypeEnumValueMap_.copy();
-        result.phoneNumberObjectValueMap_ = phoneNumberObjectValueMap_.copy();
+        result.phoneTypeEnumValueMap_ = internalGetPhoneTypeEnumValueMap();
+        result.phoneTypeEnumValueMap_.makeImmutable();
+        result.phoneNumberObjectValueMap_ = internalGetPhoneNumberObjectValueMap();
+        result.phoneNumberObjectValueMap_.makeImmutable();
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
 
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person) {
           return mergeFrom((com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person)other);
@@ -1165,8 +1517,10 @@ public final class AddressBookProtos {
           name_ = other.name_;
           onChanged();
         }
-        phoneTypeEnumValueMap_.mergeFrom(other.phoneTypeEnumValueMap_);
-        phoneNumberObjectValueMap_.mergeFrom(other.phoneNumberObjectValueMap_);
+        internalGetMutablePhoneTypeEnumValueMap().mergeFrom(
+            other.internalGetPhoneTypeEnumValueMap());
+        internalGetMutablePhoneNumberObjectValueMap().mergeFrom(
+            other.internalGetPhoneNumberObjectValueMap());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -1174,12 +1528,10 @@ public final class AddressBookProtos {
 
       public final boolean isInitialized() {
         if (!hasName()) {
-          
           return false;
         }
         for (com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber item : getPhoneNumberObjectValueMap().values()) {
           if (!item.isInitialized()) {
-            
             return false;
           }
         }
@@ -1195,7 +1547,7 @@ public final class AddressBookProtos {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person) e.getUnfinishedMessage();
-          throw e;
+          throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
             mergeFrom(parsedMessage);
@@ -1282,96 +1634,326 @@ public final class AddressBookProtos {
       }
 
       private com.google.protobuf.MapField<
-          java.lang.String, java.lang.Integer> phoneTypeEnumValueMap_ =
-              com.google.protobuf.MapField.newMapField(
-                  phoneTypeEnumValueMapDefaultEntry);
+          java.lang.String, java.lang.Integer> phoneTypeEnumValueMap_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.Integer>
+      internalGetPhoneTypeEnumValueMap() {
+        if (phoneTypeEnumValueMap_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              PhoneTypeEnumValueMapDefaultEntryHolder.defaultEntry);
+        }
+        return phoneTypeEnumValueMap_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.Integer>
+      internalGetMutablePhoneTypeEnumValueMap() {
+        onChanged();;
+        if (phoneTypeEnumValueMap_ == null) {
+          phoneTypeEnumValueMap_ = com.google.protobuf.MapField.newMapField(
+              PhoneTypeEnumValueMapDefaultEntryHolder.defaultEntry);
+        }
+        if (!phoneTypeEnumValueMap_.isMutable()) {
+          phoneTypeEnumValueMap_ = phoneTypeEnumValueMap_.copy();
+        }
+        return phoneTypeEnumValueMap_;
+      }
 
+      public int getPhoneTypeEnumValueMapCount() {
+        return internalGetPhoneTypeEnumValueMap().getMap().size();
+      }
       /**
        * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
        */
 
+      public boolean containsPhoneTypeEnumValueMap(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetPhoneTypeEnumValueMap().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getPhoneTypeEnumValueMapMap()} instead.
+       */
+      @java.lang.Deprecated
       public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType>
       getPhoneTypeEnumValueMap() {
-        return new com.google.protobuf.Internal.MapAdapter<
-            java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType, java.lang.Integer>(
-                phoneTypeEnumValueMap_.getMap(), phoneTypeEnumValueMapValueConverter);
+        return getPhoneTypeEnumValueMapMap();
       }
       /**
        * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
        */
 
       public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType>
-      getMutablePhoneTypeEnumValueMap() {
-        onChanged();
+      getPhoneTypeEnumValueMapMap() {
         return new com.google.protobuf.Internal.MapAdapter<
             java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType, java.lang.Integer>(
-                phoneTypeEnumValueMap_.getMutableMap(), phoneTypeEnumValueMapValueConverter);
+                internalGetPhoneTypeEnumValueMap().getMap(),
+                phoneTypeEnumValueMapValueConverter);
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+       */
+
+      public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType getPhoneTypeEnumValueMapOrDefault(
+          java.lang.String key,
+          com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.Integer> map =
+            internalGetPhoneTypeEnumValueMap().getMap();
+        return map.containsKey(key)
+               ? phoneTypeEnumValueMapValueConverter.doForward(map.get(key))
+               : defaultValue;
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+       */
+
+      public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType getPhoneTypeEnumValueMapOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.Integer> map =
+            internalGetPhoneTypeEnumValueMap().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return phoneTypeEnumValueMapValueConverter.doForward(map.get(key));
+      }
+
+      public Builder clearPhoneTypeEnumValueMap() {
+        getMutablePhoneTypeEnumValueMap().clear();
+        return this;
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+       */
+
+      public Builder removePhoneTypeEnumValueMap(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        getMutablePhoneTypeEnumValueMap().remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType>
+      getMutablePhoneTypeEnumValueMap() {
+        return new com.google.protobuf.Internal.MapAdapter<
+            java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType, java.lang.Integer>(
+                internalGetMutablePhoneTypeEnumValueMap().getMutableMap(),
+                phoneTypeEnumValueMapValueConverter);
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+       */
+      public Builder putPhoneTypeEnumValueMap(
+          java.lang.String key,
+          com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        getMutablePhoneTypeEnumValueMap().put(key, value);
+        return this;
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneType&gt; phoneTypeEnumValueMap = 2;</code>
+       */
+      public Builder putAllPhoneTypeEnumValueMap(
+          java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneType> values) {
+        getMutablePhoneTypeEnumValueMap().putAll(values);
+        return this;
       }
 
       private com.google.protobuf.MapField<
-          java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> phoneNumberObjectValueMap_ =
-              com.google.protobuf.MapField.newMapField(
-                  phoneNumberObjectValueMapDefaultEntry);
+          java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> phoneNumberObjectValueMap_;
+      private com.google.protobuf.MapField<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
+      internalGetPhoneNumberObjectValueMap() {
+        if (phoneNumberObjectValueMap_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              PhoneNumberObjectValueMapDefaultEntryHolder.defaultEntry);
+        }
+        return phoneNumberObjectValueMap_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
+      internalGetMutablePhoneNumberObjectValueMap() {
+        onChanged();;
+        if (phoneNumberObjectValueMap_ == null) {
+          phoneNumberObjectValueMap_ = com.google.protobuf.MapField.newMapField(
+              PhoneNumberObjectValueMapDefaultEntryHolder.defaultEntry);
+        }
+        if (!phoneNumberObjectValueMap_.isMutable()) {
+          phoneNumberObjectValueMap_ = phoneNumberObjectValueMap_.copy();
+        }
+        return phoneNumberObjectValueMap_;
+      }
 
-      /**
-       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
-       */
-      public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> getPhoneNumberObjectValueMap() {
-        return phoneNumberObjectValueMap_.getMap();
+      public int getPhoneNumberObjectValueMapCount() {
+        return internalGetPhoneNumberObjectValueMap().getMap().size();
       }
       /**
        * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
        */
+
+      public boolean containsPhoneNumberObjectValueMap(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetPhoneNumberObjectValueMap().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getPhoneNumberObjectValueMapMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> getPhoneNumberObjectValueMap() {
+        return getPhoneNumberObjectValueMapMap();
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+       */
+
+      public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> getPhoneNumberObjectValueMapMap() {
+        return internalGetPhoneNumberObjectValueMap().getMap();
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+       */
+
+      public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber getPhoneNumberObjectValueMapOrDefault(
+          java.lang.String key,
+          com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> map =
+            internalGetPhoneNumberObjectValueMap().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+       */
+
+      public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber getPhoneNumberObjectValueMapOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> map =
+            internalGetPhoneNumberObjectValueMap().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearPhoneNumberObjectValueMap() {
+        getMutablePhoneNumberObjectValueMap().clear();
+        return this;
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+       */
+
+      public Builder removePhoneNumberObjectValueMap(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        getMutablePhoneNumberObjectValueMap().remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
       public java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber>
       getMutablePhoneNumberObjectValueMap() {
-        onChanged();
-        return phoneNumberObjectValueMap_.getMutableMap();
+        return internalGetMutablePhoneNumberObjectValueMap().getMutableMap();
       }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+       */
+      public Builder putPhoneNumberObjectValueMap(
+          java.lang.String key,
+          com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        getMutablePhoneNumberObjectValueMap().put(key, value);
+        return this;
+      }
+      /**
+       * <code>map&lt;string, .com.baidu.bjf.remoting.protobuf.v3.Person.PhoneNumber&gt; phoneNumberObjectValueMap = 3;</code>
+       */
+
+      public Builder putAllPhoneNumberObjectValueMap(
+          java.util.Map<java.lang.String, com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person.PhoneNumber> values) {
+        getMutablePhoneNumberObjectValueMap().putAll(values);
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
 
       // @@protoc_insertion_point(builder_scope:com.baidu.bjf.remoting.protobuf.v3.Person)
     }
 
     // @@protoc_insertion_point(class_scope:com.baidu.bjf.remoting.protobuf.v3.Person)
-    private static final com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person defaultInstance;static {
-      defaultInstance = new com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person();
+    private static final com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person();
     }
 
     public static com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person getDefaultInstance() {
-      return defaultInstance;
+      return DEFAULT_INSTANCE;
+    }
+
+    @java.lang.Deprecated public static final com.google.protobuf.Parser<Person>
+        PARSER = new com.google.protobuf.AbstractParser<Person>() {
+      public Person parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new Person(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Person> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Person> getParserForType() {
+      return PARSER;
     }
 
     public com.baidu.bjf.remoting.protobuf.v3.complexmap.AddressBookProtos.Person getDefaultInstanceForType() {
-      return defaultInstance;
+      return DEFAULT_INSTANCE;
     }
 
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneTypeEnumValueMapEntry_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneTypeEnumValueMapEntry_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumberObjectValueMapEntry_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumberObjectValueMapEntry_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_descriptor;
-  private static
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
     return descriptor;
   }
-  private static com.google.protobuf.Descriptors.FileDescriptor
+  private static  com.google.protobuf.Descriptors.FileDescriptor
       descriptor;
   static {
     java.lang.String[] descriptorData = {
@@ -1410,25 +1992,25 @@ public final class AddressBookProtos {
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_descriptor,
         new java.lang.String[] { "Name", "PhoneTypeEnumValueMap", "PhoneNumberObjectValueMap", });
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneTypeEnumValueMapEntry_descriptor =
       internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_descriptor.getNestedTypes().get(0);
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneTypeEnumValueMapEntry_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneTypeEnumValueMapEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumberObjectValueMapEntry_descriptor =
       internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_descriptor.getNestedTypes().get(1);
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumberObjectValueMapEntry_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumberObjectValueMapEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_descriptor =
       internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_descriptor.getNestedTypes().get(2);
     internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_baidu_bjf_remoting_protobuf_v3_Person_PhoneNumber_descriptor,
         new java.lang.String[] { "Number", "Type", });
   }
