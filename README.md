@@ -34,7 +34,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
 
 #####Which version#####
 1. jprotobuf-1.x supports google protocol buffer v2.5.x<br>
-2. jprotobuf-2.x supports google protocol buffer v3.0.0-alpha-2. 实现对MAP结构的支持. [文档](https://github.com/jhunters/jprotobuf/tree/master/v3)<br>
+2. jprotobuf-2.x supports google protocol buffer v3.0.0. 实现对MAP结构的支持. [文档](https://github.com/jhunters/jprotobuf/tree/master/v3)<br>
 3. jprotobuf-android Android development supports
 
 #####关联项目：#####
@@ -61,7 +61,7 @@ jprotobuf-2.x  JDK 7 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>2.0.1</version>
 </dependency>
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
