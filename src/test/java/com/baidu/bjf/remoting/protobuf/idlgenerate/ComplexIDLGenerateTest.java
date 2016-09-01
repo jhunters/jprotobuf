@@ -42,13 +42,20 @@ import com.squareup.protoparser.ProtoSchemaParser;
 import com.squareup.protoparser.Type;
 
 /**
- * Test IDL script generate tool
+ * Test IDL script generate tool.
  *
  * @author xiemalin
  * @since 1.0.1
  */
 public class ComplexIDLGenerateTest {
     
+    /**
+     * Gets the by name.
+     *
+     * @param name the name
+     * @param types the types
+     * @return the by name
+     */
     protected Type getByName(String name, List<Type> types) {
         for (Type type : types) {
             String typeName = type.getName();
@@ -59,6 +66,11 @@ public class ComplexIDLGenerateTest {
         return null;
     }
 
+    /**
+     * Test generate idl complex list.
+     *
+     * @throws InvalidProtocolBufferException the invalid protocol buffer exception
+     */
     @Test
     public void TestGenerateIDLComplexList() throws InvalidProtocolBufferException {
         
@@ -101,6 +113,11 @@ public class ComplexIDLGenerateTest {
         }
     }
   
+    /**
+     * Test generate idl complex list with defalut.
+     *
+     * @throws InvalidProtocolBufferException the invalid protocol buffer exception
+     */
     @Test
     public void TestGenerateIDLComplexListWithDefalut() throws InvalidProtocolBufferException {
         
@@ -143,6 +160,9 @@ public class ComplexIDLGenerateTest {
         }
     }
     
+    /**
+     * Test default value.
+     */
     @Test
     public void testDefaultValue() {
         
@@ -166,6 +186,9 @@ public class ComplexIDLGenerateTest {
         
     }
     
+    /**
+     * Test message dependency miss exception.
+     */
     @Test
     public void testMessageDependencyMissException() {
         
@@ -188,6 +211,11 @@ public class ComplexIDLGenerateTest {
     }
     
     
+    /**
+     * Test generate idl simple type.
+     *
+     * @throws InvalidProtocolBufferException the invalid protocol buffer exception
+     */
     @Test
     public void testGenerateIDLSimpleType() throws InvalidProtocolBufferException {
         String code = ProtobufIDLGenerator.getIDL(AllTypesDojoClass.class);
@@ -195,6 +223,9 @@ public class ComplexIDLGenerateTest {
         
     }
     
+    /**
+     * Test generate idl enum type and types returns.
+     */
     @Test
     public void testGenerateIDLEnumTypeAndTypesReturns() {
         final Set<Class<?>> cachedTypes = new HashSet<Class<?>>();
@@ -207,22 +238,34 @@ public class ComplexIDLGenerateTest {
         Assert.assertEquals(1, cachedEnumTypes.size());
     }
     
+    /**
+     * Test list idl generate.
+     */
     @Test
     public void testListIDLGenerate() {
         String code = ProtobufIDLGenerator.getIDL(RequrieRepeatedNumberTypePOJOClass2.class);
         Assert.assertTrue(code.indexOf("repeated int32") != -1);
     }
     
+    /**
+     * Test empty class.
+     */
     @Test
     public void testEmptyClass() {
         String code = ProtobufIDLGenerator.getIDL(EmptyClass.class);
         Assert.assertTrue(code.indexOf("message") !=  -1);
     }
     
+    /**
+     * The Class EmptyClass.
+     */
     private static class EmptyClass {
         
     }
     
+    /**
+     * Test protobuf idl generator get idl types returns.
+     */
     @Test
     public void testProtobufIDLGeneratorGetIDLTypesReturns() {
         

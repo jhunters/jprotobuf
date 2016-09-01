@@ -25,14 +25,21 @@ import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.google.protobuf.ByteString;
 
 /**
- * Performance test for encode and decode
+ * Performance test for encode and decode.
  *
  * @author xiemalin
  * @since 1.0.8
  */
 public class AllTypesPressureTest {
+    
+    /** The times. */
     int times = 5000;
 
+    /**
+     * Test dynamice encode.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testDynamiceEncode() throws IOException {
         long time = System.currentTimeMillis();
@@ -65,6 +72,11 @@ public class AllTypesPressureTest {
         System.out.println("dynamic encode average time:" + (averageEncode / times));
     }
     
+    /**
+     * Test dynamice decode.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testDynamiceDecode() throws IOException {
         long time = System.currentTimeMillis();
@@ -97,6 +109,11 @@ public class AllTypesPressureTest {
         System.out.println("dynamic decode average time:" + (averageEncode / times));
     }
     
+    /**
+     * Test common encode.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testCommonEncode() throws IOException {
         long time = System.currentTimeMillis();
@@ -128,6 +145,11 @@ public class AllTypesPressureTest {
         System.out.println("common encode average time:" + (averageEncode / times));
     }
     
+    /**
+     * Test common decode.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testCommonDecode() throws IOException {
         long time = System.currentTimeMillis();

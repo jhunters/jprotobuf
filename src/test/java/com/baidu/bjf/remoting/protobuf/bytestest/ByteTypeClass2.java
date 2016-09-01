@@ -18,12 +18,14 @@ package com.baidu.bjf.remoting.protobuf.bytestest;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * Test single public byte array field
- * 
+ * Test single public byte array field.
+ *
  * @author xiemalin
  * @since 1.0.9
  */
 public class ByteTypeClass2 {
+    
+    /** The bytes. */
     @Protobuf
     public byte[] bytes;
 }

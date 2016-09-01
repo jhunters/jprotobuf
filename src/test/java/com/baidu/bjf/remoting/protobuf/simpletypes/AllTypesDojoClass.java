@@ -19,41 +19,73 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
+ * The Class AllTypesDojoClass.
+ *
  * @author xiemalin
- * 
  */
 public class AllTypesDojoClass {
 
+    /** The double f. */
     @Protobuf(fieldType = FieldType.DOUBLE, order = 1, required = false)
     public Double doubleF;
+    
+    /** The float f. */
     @Protobuf(fieldType = FieldType.FLOAT, order = 2, required = false)
     public Float floatF;
+    
+    /** The int32 f. */
     @Protobuf(fieldType = FieldType.INT32, order = 3, required = false)
     public Integer int32F;
+    
+    /** The int64 f. */
     @Protobuf(fieldType = FieldType.INT64, order = 4, required = false)
     public Long int64F;
+    
+    /** The uint32 f. */
     @Protobuf(fieldType = FieldType.UINT32, order = 5, required = false)
     public Integer uint32F;
+    
+    /** The uint64 f. */
     @Protobuf(fieldType = FieldType.UINT64, order = 6, required = false)
     public Long uint64F;
+    
+    /** The sint32 f. */
     @Protobuf(fieldType = FieldType.SINT32, order = 7, required = false)
     public Integer sint32F;
+    
+    /** The sint64 f. */
     @Protobuf(fieldType = FieldType.SINT64, order = 8, required = false)
     public Long sint64F;
+    
+    /** The fixed32 f. */
     @Protobuf(fieldType = FieldType.FIXED32, order = 9, required = false)
     public Integer fixed32F;
+    
+    /** The fixed64 f. */
     @Protobuf(fieldType = FieldType.FIXED64, order = 10, required = false)
     public Long fixed64F;
+    
+    /** The sfixed32 f. */
     @Protobuf(fieldType = FieldType.SFIXED32, order = 11, required = false)
     public Integer sfixed32F;
+    
+    /** The sfixed64 f. */
     @Protobuf(fieldType = FieldType.SFIXED64, order = 12, required = false)
     public Long sfixed64F;
+    
+    /** The bool f. */
     @Protobuf(fieldType = FieldType.BOOL, order = 13, required = false)
     public Boolean boolF;
+    
+    /** The string f. */
     @Protobuf(fieldType = FieldType.STRING, order = 14, required = false)
     public String stringF;
+    
+    /** The bytes f. */
     @Protobuf(fieldType = FieldType.BYTES, order = 15, required = false)
     public byte[] bytesF;
+    
+    /** The type def enum. */
     @Protobuf(fieldType = FieldType.ENUM, order = 16, required = false)
     public TypeDefEnum typeDefEnum;
 

@@ -40,10 +40,17 @@ import com.google.protobuf.DynamicMessage;
  */
 public class DescritporTest {
 
+    /** The codec. */
     Codec<DescriptorProtoPOJO> codec = ProtobufProxy.create(DescriptorProtoPOJO.class);
 
+    /** The codec2. */
     Codec<FileDescriptorProtoPOJO> codec2 = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
 
+    /**
+     * Test pojo descriptor works well.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testPOJODescriptorWorksWell() throws IOException {
         Descriptor descriptor2 =
@@ -59,6 +66,12 @@ public class DescritporTest {
 
     }
 
+    /**
+     * Gets the proto bytes2.
+     *
+     * @return the proto bytes2
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private byte[] getProtoBytes2() throws IOException {
         Codec<AddressBookProtosPOJO> simpleMapPojoCodec = ProtobufProxy.create(AddressBookProtosPOJO.class);
 
@@ -77,6 +90,11 @@ public class DescritporTest {
         return bytes;
     }
 
+    /**
+     * Test get descriptor.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testGetDescriptor() throws IOException {
         Descriptor descriptor2 = AddressBookProtos.AddressBook.getDescriptor();

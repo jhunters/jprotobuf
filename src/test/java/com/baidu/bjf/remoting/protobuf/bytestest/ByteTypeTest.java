@@ -26,21 +26,32 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * Test all single field class encode and decode
- * 
+ * Test all single field class encode and decode.
+ *
  * @author xiemalin
  * @since 1.0.9
  */
 public class ByteTypeTest {
     
+    /**
+     * The Class A.
+     */
     public static class A {
         
+        /** The a. */
         @Protobuf
         private int a;
+        
+        /** The b. */
         @Protobuf
         private long b;
     }
     
+    /**
+     * The main method.
+     *
+     * @param args the arguments
+     */
     public static void main(String[] args) {
         A a = new A();
         a.a = 100;
@@ -57,6 +68,11 @@ public class ByteTypeTest {
         
     }
 
+    /**
+     * Test type class1.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testTypeClass1() throws IOException  {
         Codec<ByteTypeClass1> codec = ProtobufProxy.create(ByteTypeClass1.class);
@@ -67,6 +83,11 @@ public class ByteTypeTest {
         ByteTypeClass1 class1 = codec.decode(bb);
     }
     
+    /**
+     * Test type class4.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testTypeClass4() throws IOException  {
         Codec<ByteTypeClass4> codec = ProtobufProxy.create(ByteTypeClass4.class);
@@ -77,6 +98,11 @@ public class ByteTypeTest {
         ByteTypeClass4 class1 = codec.decode(bb);
     }
     
+    /**
+     * Test type class2.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testTypeClass2() throws IOException  {
         Codec<ByteTypeClass2> codec = ProtobufProxy.create(ByteTypeClass2.class);
@@ -89,6 +115,11 @@ public class ByteTypeTest {
         Assert.assertArrayEquals(o.bytes, class1.bytes);
     }
     
+    /**
+     * Test type class3.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testTypeClass3() throws IOException  {
         Codec<ByteTypeClass3> codec = ProtobufProxy.create(ByteTypeClass3.class);

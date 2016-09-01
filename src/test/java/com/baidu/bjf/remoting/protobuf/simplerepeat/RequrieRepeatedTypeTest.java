@@ -29,8 +29,16 @@ import com.baidu.bjf.remoting.protobuf.simplerepeat.RequrieRepeatedType.InterCla
 
 
 
+/**
+ * The Class RequrieRepeatedTypeTest.
+ */
 public class RequrieRepeatedTypeTest {
     
+    /**
+     * Test decode list fields2.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testDecodeListFields2() throws IOException {
         InterClassName icn = InterClassName.newBuilder().addList("abc").build();
@@ -43,6 +51,11 @@ public class RequrieRepeatedTypeTest {
         Assert.assertEquals("abc", decode.getList().get(0)); 
     }
     
+    /**
+     * Test encode list fields2.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testEncodeListFields2() throws IOException {
         
@@ -65,6 +78,11 @@ public class RequrieRepeatedTypeTest {
         
     }
  
+    /**
+     * Test decode list fields3.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testDecodeListFields3() throws IOException {
         InterClassName icn = InterClassName.newBuilder().addList("abc").build();
@@ -77,6 +95,11 @@ public class RequrieRepeatedTypeTest {
         Assert.assertEquals("abc", decode.getList().get(0)); 
     }
     
+    /**
+     * Test encode list fields3.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testEncodeListFields3() throws IOException {
         
@@ -100,6 +123,11 @@ public class RequrieRepeatedTypeTest {
     }
     
     
+    /**
+     * Test decode list fields.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testDecodeListFields() throws IOException {
         InterClassName icn = InterClassName.newBuilder().addList("abc").build();
@@ -113,6 +141,11 @@ public class RequrieRepeatedTypeTest {
     }
 
     
+    /**
+     * Test encode list fields.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     public void testEncodeListFields() throws IOException {
         

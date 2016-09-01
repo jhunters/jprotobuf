@@ -1,9 +1,17 @@
-/**
- * Copyright 2014 the original author or authors.
+/*
+ * Copyright 2002-2007 the original author or authors.
  *
- * Licensed under the Baidu company (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.baidu.bjf.remoting.protobuf.complex;
 
@@ -21,15 +29,15 @@ import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtos.Person;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
+ * The Class ComplextIncludeTest.
  *
  * @author xiemalin
- *
  */
 public class ComplextIncludeTest {
 
  
     /**
-     * test encode and decode with JProtobuf and Protobuf java
+     * test encode and decode with JProtobuf and Protobuf java.
      */
     @Test
     public void testEncodeDecode() {

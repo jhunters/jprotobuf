@@ -29,11 +29,17 @@ import com.google.protobuf.ByteString;
 
 
 /**
- * @author xiemalin
+ * The Class AllTypesTest.
  *
+ * @author xiemalin
  */
 public class AllTypesTest {
 	
+	/**
+     * Test required mutli type encode.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	@Test
 	public void  testRequiredMutliTypeEncode() throws IOException {
 		Codec<AllTypesDojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClass.class);
@@ -81,6 +87,11 @@ public class AllTypesTest {
         Assert.assertEquals(TypeDefEnum.DECIMAL.value(), icn.getEnumT().getNumber());
 	}
 	
+	/**
+     * Test required mutli type decode.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	@Test
 	public void  testRequiredMutliTypeDecode() throws IOException {
 		InterClassName icn = InterClassName.newBuilder()
@@ -138,6 +149,11 @@ public class AllTypesTest {
         
 	}
 	
+	/**
+     * Test mutli type default type encode decode.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
 	@Test
     public void  testMutliTypeDefaultTypeEncodeDecode() throws IOException {
         Codec<AllTypesDojoClassWithDefault> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClassWithDefault.class);

@@ -21,20 +21,31 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * RequrieRepeatedDojoClass3
- * 
+ * RequrieRepeatedDojoClass3.
+ *
  * @author xiemalin
  * @since 1.0
  */
 public class RequrieRepeatedDojoClass3 {
 
+    /** The list. */
     @Protobuf(fieldType = FieldType.STRING, order = 1, required = false)
     private List<String> list;
 
+    /**
+     * Gets the list.
+     *
+     * @return the list
+     */
     protected List<String> getList() {
         return list;
     }
 
+    /**
+     * Sets the list.
+     *
+     * @param list the new list
+     */
     protected void setList(List<String> list) {
         this.list = list;
     }

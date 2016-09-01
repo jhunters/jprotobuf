@@ -24,11 +24,14 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  * @since 1.0.9
  */
 public class ByteTypeClass3 {
+    
+    /** The bytes. */
     @Protobuf
     private byte[] bytes;
 
     /**
-     * get the bytes
+     * Gets the bytes.
+     *
      * @return the bytes
      */
     public byte[] getBytes() {
@@ -36,8 +39,9 @@ public class ByteTypeClass3 {
     }
 
     /**
-     * set bytes value to bytes
-     * @param bytes the bytes to set
+     * Sets the bytes.
+     *
+     * @param bytes the new bytes
      */
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
