@@ -208,14 +208,14 @@ public final class ProtobufProxy {
             throw new NullPointerException("Parameter cls is null");
         }
 
-        // get last modify time
-        long lastModify = ClassHelper.getLastModifyTime(cls);
-
         String uniClsName = cls.getName();
         Codec codec = CACHED.get(uniClsName);
         if (codec != null) {
             return codec;
         }
+        
+        // get last modify time
+        long lastModify = ClassHelper.getLastModifyTime(cls);
 
         CodeGenerator cg = getCodeGenerator(cls);
         cg.setDebug(debug);
