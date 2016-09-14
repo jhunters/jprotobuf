@@ -34,7 +34,10 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
  * @since 1.0.1
  */
 public class ProtobufIDLGenerator {
-    
+
+    /** The Constant JPROTOBUF_CLASS_NAME_SUFFIX. */
+    public static final String JPROTOBUF_CLASS_NAME_SUFFIX = "$$ByJProtobuf";
+
     /**
      * get IDL content from class.
      * 
@@ -45,7 +48,7 @@ public class ProtobufIDLGenerator {
      * @return protobuf IDL content in string
      * @see Protobuf
      */
-    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
             final Set<Class<?>> cachedEnumTypes, boolean ignoreJava) {
         Set<Class<?>> types = cachedTypes;
         if (types == null) {
@@ -56,17 +59,18 @@ public class ProtobufIDLGenerator {
         if (enumTypes == null) {
             enumTypes = new HashSet<Class<?>>();
         }
-        
+
         if (types.contains(cls)) {
             return null;
         }
 
         StringBuilder code = new StringBuilder();
-        
+
         if (!ignoreJava) {
             // define package
             code.append("package ").append(cls.getPackage().getName()).append(";\n");
-            code.append("option java_outer_classname = \"").append(cls.getSimpleName()).append("$$ByJProtobuf\";\n");
+            code.append("option java_outer_classname = \"").append(cls.getSimpleName())
+                    .append(JPROTOBUF_CLASS_NAME_SUFFIX + "\";\n");
         }
 
         // define outer name class
@@ -87,7 +91,7 @@ public class ProtobufIDLGenerator {
      * @return protobuf IDL content in string
      * @see Protobuf
      */
-    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
             final Set<Class<?>> cachedEnumTypes) {
 
         return getIDL(cls, cachedTypes, cachedEnumTypes, false);
@@ -137,33 +141,33 @@ public class ProtobufIDLGenerator {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
                                 Class c = (Class) targetType;
-                                
+
                                 String fieldTypeName;
                                 if (ProtobufProxyUtils.isScalarType(c)) {
-                                    
+
                                     FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(c);
                                     fieldTypeName = fieldType.getType();
-                                    
+
                                 } else {
                                     if (field.getFieldType() == FieldType.ENUM) {
                                         if (!cachedEnumTypes.contains(c)) {
                                             cachedEnumTypes.add(c);
                                             enumTypes.add(c);
                                         }
-                                    } else  {
-                                        
+                                    } else {
+
                                         if (!cachedTypes.contains(c)) {
                                             cachedTypes.add(c);
                                             subTypes.add(c);
                                         }
                                     }
-                                    
+
                                     fieldTypeName = c.getSimpleName();
                                 }
-                                
+
                                 code.append("repeated ").append(fieldTypeName).append(" ")
-                                .append(field.getField().getName()).append("=").append(field.getOrder())
-                                .append(";\n");
+                                        .append(field.getField().getName()).append("=").append(field.getOrder())
+                                        .append(";\n");
                             }
                         }
                     }
@@ -176,8 +180,8 @@ public class ProtobufIDLGenerator {
                             cachedEnumTypes.add(c);
                             enumTypes.add(c);
                         }
-                    } else  {
-                        
+                    } else {
+
                         if (!cachedTypes.contains(c)) {
                             cachedTypes.add(c);
                             subTypes.add(c);
@@ -238,7 +242,7 @@ public class ProtobufIDLGenerator {
 
         Field[] fields = cls.getFields();
         for (Field field : fields) {
-            
+
             String name = field.getName();
             code.append(name).append("=");
             try {
