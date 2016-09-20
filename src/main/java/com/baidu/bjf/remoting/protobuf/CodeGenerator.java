@@ -48,7 +48,7 @@ public class CodeGenerator {
 	public static final String JAVA_LINE_BREAK = JAVA_END + LINE_BREAK;
 
 	/** auto proxied suffix class name. */
-	private static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
+	public static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
 
 	/** The Constant PACKAGE_SPLIT. */
 	public static final String PACKAGE_SPLIT = ".";
@@ -180,7 +180,7 @@ public class CodeGenerator {
 		genImportCode(code);
 
 		// define class code
-		code.append("public class " + className + " implements com.baidu.bjf.remoting.protobuf.Codec");
+		code.append("public class " + className + " implements ").append(Codec.class.getName());
 		code.append("<").append(ClassHelper.getInternalName(cls.getName())).append("> {" + LINE_BREAK);
 
 		// define Descriptor field

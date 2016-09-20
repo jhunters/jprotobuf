@@ -36,6 +36,7 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
 
 /**
  * Proxy tools for protobuf.
@@ -55,7 +56,7 @@ public final class ProtobufProxy {
      * cached {@link Codec} instance by class full name.
      */
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
-    
+
     /** The Constant OUTPUT_PATH. */
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
 
@@ -180,21 +181,21 @@ public final class ProtobufProxy {
         }
 
     }
-    
+
     /**
      * Gets the class loader.
      *
      * @return the class loader
      */
     private static ClassLoader getClassLoader() {
-    	ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    	if (contextClassLoader != null) {
-    		return contextClassLoader;
-    	}
-    	
-    	return null;
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        if (contextClassLoader != null) {
+            return contextClassLoader;
+        }
+
+        return null;
     }
-    
+
     /**
      * To create a protobuf proxy class for target class.
      * 
@@ -213,7 +214,7 @@ public final class ProtobufProxy {
         if (codec != null) {
             return codec;
         }
-        
+
         // get last modify time
         long lastModify = ClassHelper.getLastModifyTime(cls);
 
@@ -267,9 +268,21 @@ public final class ProtobufProxy {
             }
 
         }
+        
+        Compiler compiler = JDKCompilerHelper.getJdkCompiler(cls.getClassLoader());
+        Class<?> newClass;
+        try {
+            newClass = compiler.compile(className,
+                    code, cls.getClassLoader(), fos, lastModify);
+        } catch (Exception e) {
+            
+            compiler = JDKCompilerHelper.getJdkCompiler();
+            
+            newClass = compiler.compile(className,
+                    code, cls.getClassLoader(), fos, lastModify);
+        }
+        
 
-        Class<?> newClass =
-                JDKCompilerHelper.getJdkCompiler().compile(className, code, cls.getClassLoader(), fos, lastModify);
 
         if (fos != null) {
             try {

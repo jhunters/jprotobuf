@@ -29,8 +29,7 @@ public class JDKCompilerHelper {
     /**
      * singleton instance for {@link JdkCompiler}
      */
-    public static Compiler COMPILER =
-            new JdkCompiler(JdkCompiler.class.getClassLoader());
+    public static Compiler COMPILER = new JdkCompiler(JdkCompiler.class.getClassLoader());
 
     public static Compiler getJdkCompiler() {
         return COMPILER;
@@ -38,5 +37,9 @@ public class JDKCompilerHelper {
 
     public static void setCompiler(Compiler compiler) {
         COMPILER = compiler;
+    }
+
+    public static Compiler getJdkCompiler(ClassLoader cl) {
+        return  new JdkCompiler(cl);
     }
 }
