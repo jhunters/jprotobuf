@@ -263,7 +263,8 @@ public final class FieldUtils {
     /**
      * To find out matched {@link Field} marked as {@link Protobuf} annotation
      * 
-     * @param targetClass taget class
+     * @param targetClass target class
+     * @param ann target annotation class
      * @return found {@link Field} list
      */
     public static List<Field> findMatchedFields(Class targetClass, Class ann) {

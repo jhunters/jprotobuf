@@ -524,9 +524,6 @@ public class StringUtils {
      * <p>Capitalizes a String changing the first letter to title case as
      * per {@link Character#toTitleCase(char)}. No other letters are changed.</p>
      *
-     * <p>For a word based algorithm, see {@link WordUtils#capitalize(String)}.
-     * A <code>null</code> input String returns <code>null</code>.</p>
-     *
      * <pre>
      * StringUtils.capitalize(null)  = null
      * StringUtils.capitalize("")    = ""
@@ -534,10 +531,8 @@ public class StringUtils {
      * StringUtils.capitalize("cAt") = "CAt"
      * </pre>
      *
-     * @param str  the String to capitalize, may be null
+     * @param str  the String to capitalize, may be nullW
      * @return the capitalized String, <code>null</code> if null String input
-     * @see WordUtils#capitalize(String)
-     * @see #uncapitalize(String)
      * @since 2.0
      */
     public static String capitalize(String str) {
@@ -569,15 +564,12 @@ public class StringUtils {
      * escaped.
      * </p>
      * 
-     * <p>
      * Example:
      * 
      * <pre>
      * input string: He didn't say, "Stop!"
      * output string: He didn't say, \"Stop!\"
      * </pre>
-     * 
-     * </p>
      * 
      * @param str String to escape values in, may be null
      * @return String with escaped values, <code>null</code> if null string input
@@ -607,7 +599,7 @@ public class StringUtils {
 
     /**
      * <p>
-     * Worker method for the {@link #escapeJavaScript(String)} method.
+     * Worker method for the {@link #escapeJava(String)} method.
      * </p>
      * 
      * @param str String to escape values in, may be null
@@ -631,7 +623,7 @@ public class StringUtils {
 
     /**
      * <p>
-     * Worker method for the {@link #escapeJavaScript(String)} method.
+     * Worker method for the {@link #escapeJava(String)} method.
      * </p>
      * 
      * @param out write to receieve the escaped string
@@ -1340,7 +1332,10 @@ public class StringUtils {
     
     
     /**
-     * Like {@link #escapeBytes(ByteString)}, but used for byte array.
+     * Like {@link #escapeBytes(ByteSequence)}, but used for byte array.
+     * 
+     * @param input the source string
+     * @return escaped string
      */
     public static String escapeBytes(final byte[] input) {
       return escapeBytes(new ByteSequence() {
