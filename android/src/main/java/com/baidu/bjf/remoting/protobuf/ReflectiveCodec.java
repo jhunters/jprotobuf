@@ -468,7 +468,12 @@ public class ReflectiveCodec<T> implements Codec<T> {
 		case UINT64:
 			return input.readUInt64();
 		case ENUM:
-			Class<?> type = fieldInfo.getField().getType();
+                        Class<?> type = null;
+                        if(fieldInfo.isList()) {
+                           type = fieldInfo.getGenericKeyType();
+                        } else{
+                            type = fieldInfo.getField().getType();
+                        }
 			try {
 				Method method = type.getMethod("values");
 				Enum[] inter = (Enum[]) method.invoke(null, null);
@@ -484,6 +489,17 @@ public class ReflectiveCodec<T> implements Codec<T> {
 		case FLOAT:
 			return input.readFloat();
 		case OBJECT:
+                        if(fieldInfo.isList()) {
+                            Class<?> c = fieldInfo.getGenericKeyType();
+                            ReflectiveCodec codec = new ReflectiveCodec(c);
+
+                            int length = input.readRawVarint32();
+                            final int oldLimit = input.pushLimit(length);
+                            Object o = codec.readFrom(input);
+                            input.checkLastTagWas(0);
+                            input.popLimit(oldLimit);
+                            return o;
+                        }
 			Class<?> c = fieldInfo.getField().getType();
 			ReflectiveCodec codec = new ReflectiveCodec(c);
 
