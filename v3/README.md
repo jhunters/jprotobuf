@@ -40,7 +40,7 @@ JDK 7 或以上版本 google protocol buffer v3版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>2.0.2</version>
 </dependency>
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
