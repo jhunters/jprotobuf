@@ -213,6 +213,9 @@ public final class ProtobufProxy {
         if (c != null) {
             try {
                 Codec<T> newInstance = (Codec<T>) c.newInstance();
+                if (!CACHED.containsKey(uniClsName)) {
+                    CACHED.put(uniClsName, newInstance);
+                }
                 return newInstance;
             } catch (InstantiationException e) {
                 throw new RuntimeException(e.getMessage(), e);
