@@ -81,7 +81,6 @@ public class JdkCompiler extends AbstractCompiler {
     }
     
 	public JdkCompiler(final ClassLoader loader, final String jdkVersion) {
-	    System.out.println(loader);
         options = new ArrayList<String>();
         options.add("-source");
         options.add(jdkVersion);
