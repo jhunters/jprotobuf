@@ -42,17 +42,17 @@ public final class EnumClass {
       implements com.google.protobuf.ProtocolMessageEnum {
     
     /** <code>STRING = 100;</code>. */
-    STRING(0, 100),
+    STRING(0, 0),
     
     /** <code>INT = 50;</code>. */
-    INT(1, 50),
+    INT(1, 1),
     ;
 
     /** <code>STRING = 100;</code>. */
-    public static final int STRING_VALUE = 100;
+    public static final int STRING_VALUE = 0;
     
     /** <code>INT = 50;</code>. */
-    public static final int INT_VALUE = 50;
+    public static final int INT_VALUE = 1;
 
 
     /* (non-Javadoc)
@@ -68,8 +68,8 @@ public final class EnumClass {
      */
     public static EnumAttr valueOf(int value) {
       switch (value) {
-        case 100: return STRING;
-        case 50: return INT;
+        case 0: return STRING;
+        case 1: return INT;
         default: return null;
       }
     }

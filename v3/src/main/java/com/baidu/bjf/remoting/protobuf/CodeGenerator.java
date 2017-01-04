@@ -57,9 +57,9 @@ public class CodeGenerator {
      * auto proxied suffix class name
      */
     private static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
-    
+
     public static final String PACKAGE_SPLIT = ".";
-    
+
     /**
      * 
      */
@@ -84,11 +84,12 @@ public class CodeGenerator {
      * static path for output dynamic compiled class file.
      */
     private File outputPath;
-    
+
     private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
 
     /**
      * get relativeProxyClasses
+     * 
      * @return relativeProxyClasses
      */
     public Set<Class<?>> getRelativeProxyClasses() {
@@ -188,7 +189,7 @@ public class CodeGenerator {
         // define class code
         code.append("public class " + className + " implements com.baidu.bjf.remoting.protobuf.Codec");
         code.append("<").append(ClassHelper.getInternalName(cls.getName())).append("> {" + LINE_BREAK);
-        
+
         // define Descriptor field
         String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
         code.append("private ").append(descriptorClsName).append(" descriptor").append(JAVA_LINE_BREAK);
@@ -230,6 +231,20 @@ public class CodeGenerator {
     private void getParseBytesMethodCode(StringBuilder code) {
         code.append(ClassHelper.getInternalName(cls.getName())).append(" ret = new ");
         code.append(ClassHelper.getInternalName(cls.getName())).append("()" + JAVA_LINE_BREAK);
+
+        // 执行初始化，主要针对枚举类型
+        for (FieldInfo field : fields) {
+            boolean isList = field.isList();
+            if (field.getFieldType() == FieldType.ENUM) {
+                String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
+                if (!isList) {
+                    String express = "java.lang.Enum.valueOf(" + clsName + ".class, " + clsName + ".values()[0].name())";
+                    code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap()))
+                    .append(JAVA_LINE_BREAK);
+                }
+            }
+        }
+
         code.append("try {").append(LINE_BREAK);
         code.append("boolean done = false").append(JAVA_LINE_BREAK);
         code.append("Codec codec = null").append(JAVA_LINE_BREAK);
@@ -241,9 +256,8 @@ public class CodeGenerator {
             boolean isList = field.isList();
 
             if (field.getFieldType() != FieldType.DEFAULT) {
-                code.append("if (tag == ").append(
-                        CodedConstant.makeTag(field.getOrder(), field.getFieldType().getInternalFieldType()
-                                .getWireType()));
+                code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(),
+                        field.getFieldType().getInternalFieldType().getWireType()));
                 code.append(") {").append(LINE_BREAK);
             } else {
                 code.append("if (tag == CodedConstant.makeTag(").append(field.getOrder());
@@ -265,9 +279,8 @@ public class CodeGenerator {
                         clsName = ClassHelper.getInternalName(cls.getName());
                     }
                 }
-                express =
-                        "java.lang.Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName + ".values(),"
-                                + "input.read" + t + "()))";
+                express = "java.lang.Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName
+                        + ".values()," + "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";
             }
@@ -380,10 +393,10 @@ public class CodeGenerator {
         getParseBytesMethodCode(code);
         return code.toString();
     }
-    
-    
+
     /**
      * generate <code>getDescriptor</code> method code
+     * 
      * @return source code
      */
     private Object getGetDescriptorMethodCode() {
@@ -500,8 +513,8 @@ public class CodeGenerator {
             code.append(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(),
                     getAccessByField("t", field.getField(), cls), isList, field.isMap()));
             // compute size
-            code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
-                    .append("))").append("{").append(LINE_BREAK);
+            code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls)).append("))")
+                    .append("{").append(LINE_BREAK);
             code.append("size += ");
             code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList,
                     field.isMap(), debug, outputPath)).append(LINE_BREAK);
@@ -513,10 +526,10 @@ public class CodeGenerator {
 
         code.append("final byte[] result = new byte[size]").append(JAVA_LINE_BREAK);
         code.append("final CodedOutputStream output = CodedOutputStream.newInstance(result)").append(JAVA_LINE_BREAK);
-        
+
         // call writeTo method
         code.append("writeTo(t, output)").append(JAVA_LINE_BREAK);
-        
+
         code.append("return result").append(JAVA_LINE_BREAK);
         code.append("}").append(LINE_BREAK);
 
@@ -596,8 +609,8 @@ public class CodeGenerator {
             code.append(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(),
                     getAccessByField("t", field.getField(), cls), isList, field.isMap()));
             // compute size
-            code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls))
-                    .append("))").append("{").append(LINE_BREAK);
+            code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls)).append("))")
+                    .append("{").append(LINE_BREAK);
             code.append("size += ");
             code.append(CodedConstant.getMappedTypeSize(field, field.getOrder(), field.getFieldType(), isList,
                     field.isMap(), debug, outputPath));

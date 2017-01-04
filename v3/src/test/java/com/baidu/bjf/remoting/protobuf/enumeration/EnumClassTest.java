@@ -8,6 +8,7 @@
 package com.baidu.bjf.remoting.protobuf.enumeration;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,7 +35,7 @@ public class EnumClassTest {
         ec.enumAttr = EnumAttrPOJO.INT;
         
         byte[] bytes = codec.encode(ec);
-        
+        System.out.println(Arrays.toString(bytes));
         EnumPOJOClass decode = codec.decode(bytes);
         Assert.assertEquals(EnumAttrPOJO.INT, decode.enumAttr);
         

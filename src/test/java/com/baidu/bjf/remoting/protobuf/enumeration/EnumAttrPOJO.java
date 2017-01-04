@@ -26,32 +26,41 @@ import com.baidu.bjf.remoting.protobuf.EnumReadable;
 public enum EnumAttrPOJO implements EnumReadable {
 
     /** The string. */
-    STRING(100), /** The int. */
- INT(50);
-    
+    STRING(0), /** The int. */
+    INT(1);
+
     /** The value. */
     private final int value;
-
 
     /**
      * Instantiates a new enum attr pojo.
      *
      * @param value the value
      */
-    EnumAttrPOJO(int value) { this.value = value; }
+    EnumAttrPOJO(int value) {
+        this.value = value;
+    }
 
     /**
      * To value.
      *
      * @return the int
      */
-    public int toValue() { return this.value; }
+    public int toValue() {
+        return this.value;
+    }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.bjf.remoting.protobuf.Enumable#value()
      */
     public int value() {
         return toValue();
     }
-    
+
+    public static void main(String[] args) {
+        EnumAttrPOJO valueOf = Enum.valueOf(EnumAttrPOJO.class, EnumAttrPOJO.values()[0].name());
+        System.out.println(valueOf);
+    }
 }

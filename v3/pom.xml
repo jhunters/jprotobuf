@@ -12,7 +12,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf</artifactId>
-	<version>2.0.3</version>  
+	<version>2.0.4</version>
 
 	<name>jprotobuf</name>
 	<description>A very useful utility library for java programmer using google protobuf.</description>
@@ -23,6 +23,7 @@
 
 		<java.version>1.7</java.version>
 		<junit.version>4.10</junit.version>
+		<auto.value.version>1.0-rc2</auto.value.version>
 	</properties>
 
 	<issueManagement>
@@ -73,7 +74,13 @@
 			<groupId>javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.12.1.GA</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>com.google.auto.value</groupId>
+			<artifactId>auto-value</artifactId>
+			<version>${auto.value.version}</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -103,7 +110,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>			
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -144,7 +151,7 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
-				</configuration>				
+				</configuration>
 			</plugin>
 
 			<plugin>

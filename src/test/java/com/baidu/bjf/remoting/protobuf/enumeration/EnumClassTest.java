@@ -16,6 +16,7 @@
 package com.baidu.bjf.remoting.protobuf.enumeration;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,6 +49,8 @@ public class EnumClassTest {
         
         byte[] bytes = codec.encode(ec);
         
+        System.out.println(Arrays.toString(bytes));
+        
         EnumPOJOClass decode = codec.decode(bytes);
         Assert.assertEquals(EnumAttrPOJO.INT, decode.enumAttr);
         
@@ -58,6 +61,10 @@ public class EnumClassTest {
         EnumClassInternal enumClass = com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumClassInternal.parseFrom(bytes);
  
         Assert.assertEquals(com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumAttr.INT, enumClass.getStatus());
+        
+        // process default
+        decode = codec.decode(new byte[0]);
+        Assert.assertEquals(EnumAttrPOJO.STRING, decode.enumAttr);
     }
     
     /**
@@ -69,7 +76,7 @@ public class EnumClassTest {
     public void testEnum2() throws IOException {
         
         
-        Codec<EnumPOJOClass2> codec = ProtobufProxy.create(EnumPOJOClass2.class);
+        Codec<EnumPOJOClass2> codec = ProtobufProxy.create(EnumPOJOClass2.class, true);
         EnumPOJOClass2 ec = new EnumPOJOClass2();
         ec.setEnumAttr(EnumAttrPOJO.INT);
         
