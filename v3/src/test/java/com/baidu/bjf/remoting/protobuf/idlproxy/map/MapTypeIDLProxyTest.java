@@ -42,7 +42,7 @@ public class MapTypeIDLProxyTest {
     @Test
     public void testSimpleMap() throws IOException {
         InputStream is = MapTypeIDLProxyTest.class.getResourceAsStream("simple-map.proto");
-        IDLProxyObject idlProxyMap = ProtobufIDLProxy.createSingle(is, true);
+        IDLProxyObject idlProxyMap = ProtobufIDLProxy.createSingle(is);
         
         
         idlProxyMap.put("name", "hello");

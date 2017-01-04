@@ -25,7 +25,7 @@ public class MapTest {
     @Test
     public void testMap() throws Exception {
 
-        Codec<AddressBookPOJO> codec = ProtobufProxy.create(AddressBookPOJO.class, true);
+        Codec<AddressBookPOJO> codec = ProtobufProxy.create(AddressBookPOJO.class);
 
         Builder builder = AddressBookProtos.Person.newBuilder();
 

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
-
+ 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
@@ -149,7 +149,7 @@ public class ComplexIDLGenerateTest {
             "option java_package = \"com.example.tutorial\";" +
             "option java_outer_classname = \"AddressBookProtos\";" +
             "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
-            " message PhoneNumber {" +
+            " message PhoneNumberAA {" +
                 "optional PhoneType type = 1 [default = HOME];" +
                 "optional int32 name = 2 [default = 10];" +
                 "optional string vName = 3 [default = \"hello world\"];" +
@@ -168,21 +168,23 @@ public class ComplexIDLGenerateTest {
     @Test
     public void testMessageDependencyMissException() {
         
-        String idl = "package tutorial;" +
+        String idl = "syntax = \"proto3\";package tutorial;" +
             "option java_package = \"com.example.tutorial\";" +
             "option java_outer_classname = \"AddressBookProtos\";" +
             "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
             " message PhoneNumber {" +
-                "optional PhoneType type = 1 [default = HOME];" +
+                " int32 type = 1; " +
                 "optional int32 name = 2 [default = 10];" +
-                "optional String vName = 3 [default = \"hello world\"];" +
+                "optional string vName = 3 [default = \"hello world\"];" +
           "}"; 
         
         try {
-            ProtobufIDLProxy.createSingle(idl);
+           ProtobufIDLProxy.createSingle(idl);
+            
             Assert.fail();
         } catch (Exception e) {
             Assert.assertNotNull(e);
+            e.printStackTrace();
         }
     }
     

@@ -76,7 +76,7 @@ public class EnumClassTest {
     public void testEnum2() throws IOException {
         
         
-        Codec<EnumPOJOClass2> codec = ProtobufProxy.create(EnumPOJOClass2.class, true);
+        Codec<EnumPOJOClass2> codec = ProtobufProxy.create(EnumPOJOClass2.class);
         EnumPOJOClass2 ec = new EnumPOJOClass2();
         ec.setEnumAttr(EnumAttrPOJO.INT);
         
