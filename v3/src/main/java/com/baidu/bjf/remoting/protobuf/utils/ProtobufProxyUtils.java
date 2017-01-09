@@ -26,7 +26,6 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Packed;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister.Pack;
 
 /**
  * 
