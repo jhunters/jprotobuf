@@ -40,7 +40,7 @@ JDK 7 或以上版本 google protocol buffer v3版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.0.2</version>
+  <version>2.0.5</version>
 </dependency>
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
@@ -155,6 +155,7 @@ public class AddressBookProtosPOJO {
     @Protobuf(fieldType = FieldType.String, order=3, required = false)
     public List<String> stringList;
 
+    @Packed(false) //关闭v3开启的自动pack功能
     @Protobuf(fieldType = FieldType.INT32, order=3, required = false)
     public List<Integer> intList;
 
