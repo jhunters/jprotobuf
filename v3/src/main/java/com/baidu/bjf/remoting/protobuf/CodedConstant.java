@@ -55,18 +55,18 @@ import com.google.protobuf.LazyField;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageLite;
 import com.google.protobuf.WireFormat;
-import com.squareup.protoparser.DataType;
-import com.squareup.protoparser.DataType.Kind;
-import com.squareup.protoparser.DataType.MapType;
-import com.squareup.protoparser.EnumConstantElement;
-import com.squareup.protoparser.EnumElement;
-import com.squareup.protoparser.FieldElement;
-import com.squareup.protoparser.FieldElement.Builder;
-import com.squareup.protoparser.MessageElement;
-import com.squareup.protoparser.OptionElement;
-import com.squareup.protoparser.ProtoFile;
-import com.squareup.protoparser.ProtoParser;
-import com.squareup.protoparser.TypeElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType.Kind;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType.MapType;
+import com.baidu.jprotobuf.com.squareup.protoparser.EnumConstantElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.EnumElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement.Builder;
+import com.baidu.jprotobuf.com.squareup.protoparser.MessageElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.OptionElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoFile;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoParser;
+import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
 
 /**
  * Utility class for codec.
@@ -96,31 +96,25 @@ public class CodedConstant {
         String fieldName = "f_" + order;
         return fieldName;
     }
-    
+
     /**
-     * Compute the number of bytes that would be needed to encode a
-     * single tag/value pair of arbitrary type.
+     * Compute the number of bytes that would be needed to encode a single tag/value pair of arbitrary type.
      *
-     * @param type   The field's type.
+     * @param type The field's type.
      * @param number The field's number.
-     * @param value  Object representing the field's value.  Must be of the exact
-     *               type which would be returned by
-     *               {@link Message#getField(Descriptors.FieldDescriptor)} for
-     *               this field.
+     * @param value Object representing the field's value. Must be of the exact type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
      * @return the int
      */
-    public static int computeElementSize(
-        final WireFormat.FieldType type, final int number, final Object value) {
-      int tagSize = CodedOutputStream.computeTagSize(number);
-      if (type == WireFormat.FieldType.GROUP) {
-        // Only count the end group tag for proto2 messages as for proto1 the end
-        // group tag will be counted as a part of getSerializedSize().
-          tagSize *= 2;
-      }
-      return tagSize + computeElementSizeNoTag(type, value);
+    public static int computeElementSize(final WireFormat.FieldType type, final int number, final Object value) {
+        int tagSize = CodedOutputStream.computeTagSize(number);
+        if (type == WireFormat.FieldType.GROUP) {
+            // Only count the end group tag for proto2 messages as for proto1 the end
+            // group tag will be counted as a part of getSerializedSize().
+            tagSize *= 2;
+        }
+        return tagSize + computeElementSizeNoTag(type, value);
     }
-    
-    
 
     /**
      * get mapped type defined java expression.
@@ -190,7 +184,8 @@ public class CodedConstant {
         String typeString = type.getType().toUpperCase();
         if (isList) {
             return "CodedConstant.computeListSize(" + order + ", " + fieldName + ", FieldType." + typeString + ", "
-                    + Boolean.valueOf(debug) + ", " + spath + ")" + CodeGenerator.JAVA_LINE_BREAK;
+                    + Boolean.valueOf(debug) + ", " + spath + "," + Boolean.valueOf(field.isPacked()) + ")"
+                    + CodeGenerator.JAVA_LINE_BREAK;
         } else if (isMap) {
 
             String joinedSentence = getMapFieldGenericParameterString(field);
@@ -308,6 +303,21 @@ public class CodedConstant {
      * @return full java expression
      */
     public static int computeListSize(int order, List<?> list, FieldType type, boolean debug, File path) {
+        return computeListSize(order, list, type, debug, path, false);
+    }
+
+    /**
+     * Compute list size.
+     *
+     * @param order the order
+     * @param list the list
+     * @param type the type
+     * @param debug the debug
+     * @param path the path
+     * @param packed the packed
+     * @return the int
+     */
+    public static int computeListSize(int order, List list, FieldType type, boolean debug, File path, boolean packed) {
         int size = 0;
         if (list == null) {
             return size;
@@ -317,7 +327,12 @@ public class CodedConstant {
             size += computeSize(order, object, type, debug, path);
         }
         if (type != FieldType.OBJECT) {
-            size += list.size() * CodedOutputStream.computeTagSize(order);
+            if (packed) {
+                size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(size);
+                size += 1;
+            } else {
+                size += list.size() * CodedOutputStream.computeTagSize(order);
+            }
         }
         return size;
     }
@@ -516,8 +531,8 @@ public class CodedConstant {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeToList(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
-                    .append(CodeGenerator.LINE_BREAK);
+            ret.append(",").append(fieldName).append(",").append(Boolean.valueOf(field.isPacked())).append(")")
+                    .append(CodeGenerator.JAVA_LINE_BREAK).append("}").append(CodeGenerator.LINE_BREAK);
             return ret.toString();
         } else if (isMap) {
             ret.append("CodedConstant.writeToMap(").append(prefix).append(",");
@@ -572,20 +587,42 @@ public class CodedConstant {
     }
 
     /**
+     * Write to list.
+     *
+     * @param out the out
+     * @param order the order
+     * @param type the type
+     * @param list the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static void writeToList(CodedOutputStream out, int order, FieldType type, List list) throws IOException {
+        writeToList(out, order, type, list, false);
+    }
+
+    /**
      * write list to {@link CodedOutputStream} object.
      *
      * @param out target output stream to write
      * @param order field order
      * @param type field type
      * @param list target list object to be serialized
+     * @param packed the packed
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public static void writeToList(CodedOutputStream out, int order, FieldType type, List list) throws IOException {
+    public static void writeToList(CodedOutputStream out, int order, FieldType type, List list, boolean packed)
+            throws IOException {
         if (list == null) {
             return;
         }
+
+        if (packed) {
+            out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
+            out.writeUInt32NoTag(computeListSize(order, list, type, false, null, packed) - 2);
+        }
+
         for (Object object : list) {
-            writeObject(out, order, type, object, true, true);
+            writeObject(out, order, type, object, true, !packed);
+
         }
 
     }
@@ -1329,12 +1366,12 @@ public class CodedConstant {
                 fieldDescriptorProto.extendee = null; // XXX
                 fieldDescriptorProto.number = fieldElement.tag();
 
-                com.squareup.protoparser.FieldElement.Label label = fieldElement.label();
-                if (label == com.squareup.protoparser.FieldElement.Label.OPTIONAL) {
+                FieldElement.Label label = fieldElement.label();
+                if (label == FieldElement.Label.OPTIONAL) {
                     fieldDescriptorProto.label = Label.LABEL_OPTIONAL;
-                } else if (label == com.squareup.protoparser.FieldElement.Label.REQUIRED) {
+                } else if (label == FieldElement.Label.REQUIRED) {
                     fieldDescriptorProto.label = Label.LABEL_REQUIRED;
-                } else if (label == com.squareup.protoparser.FieldElement.Label.REPEATED) {
+                } else if (label == FieldElement.Label.REPEATED) {
                     fieldDescriptorProto.label = Label.LABEL_REPEATED;
                 }
 
@@ -1400,12 +1437,12 @@ public class CodedConstant {
 
         DataType keyType = mapType.keyType();
         Builder fieldBuilder = FieldElement.builder().name("key").tag(1);
-        fieldBuilder.type(keyType).label(com.squareup.protoparser.FieldElement.Label.OPTIONAL);
+        fieldBuilder.type(keyType).label(FieldElement.Label.OPTIONAL);
         ret.addField(fieldBuilder.build());
 
         DataType valueType = mapType.valueType();
         fieldBuilder = FieldElement.builder().name("value").tag(2);
-        fieldBuilder.type(valueType).label(com.squareup.protoparser.FieldElement.Label.OPTIONAL);
+        fieldBuilder.type(valueType).label(FieldElement.Label.OPTIONAL);
         ret.addField(fieldBuilder.build());
 
         return ret.build();

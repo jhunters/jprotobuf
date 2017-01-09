@@ -10,6 +10,7 @@ package com.baidu.bjf.remoting.protobuf.simplerepeat;
 import java.util.List;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.Packed;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
@@ -19,6 +20,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class RequrieRepeatedNumberTypePOJOClass3 {
 
+    @Packed(false)
     @Protobuf(fieldType = FieldType.DOUBLE, order = 2, required = false)
     public List<Double> list2;
 }

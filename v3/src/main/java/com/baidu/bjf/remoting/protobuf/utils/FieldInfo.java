@@ -66,6 +66,8 @@ public class FieldInfo {
 
     private boolean isList;
     private boolean isMap;
+    
+    private boolean packed;
 
     /**
      * To check if type of {@link Field} is assignable from {@link List}
@@ -301,4 +303,19 @@ public class FieldInfo {
         this.genericeValueType = genericeValueType;
     }
 
+    /**
+     * @return the packed
+     */
+    public boolean isPacked() {
+        return packed;
+    }
+
+    /**
+     * @param packed the packed to set
+     */
+    public void setPacked(boolean packed) {
+        this.packed = packed;
+    }
+
+    
 }

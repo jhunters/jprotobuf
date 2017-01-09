@@ -1,0 +1,17 @@
+// See README.txt for information and build instructions.
+syntax = "proto3";
+package tutorial;
+
+option java_package = "com.baidu.bjf.remoting.protobuf.packed";
+option java_outer_classname = "PackedProtos";
+
+message Person {
+  repeated string name = 1;
+  repeated int32 id = 2;        // Unique ID number for this person.
+  repeated string email = 3;
+  repeated double doubleF = 4;  
+  repeated float  floatF = 5;
+  repeated bytes bytesF = 6;
+  repeated bool boolF = 7;
+
+}

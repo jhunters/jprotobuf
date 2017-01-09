@@ -20,7 +20,6 @@ import java.io.IOException;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Descriptors.DescriptorValidationException;
 
 /**
  * Codec interface include encode and decode support.

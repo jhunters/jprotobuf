@@ -28,6 +28,7 @@ import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.google.protobuf.WireFormat;
 import com.google.protobuf.Descriptors.Descriptor;
 
 /**
@@ -238,9 +239,10 @@ public class CodeGenerator {
             if (field.getFieldType() == FieldType.ENUM) {
                 String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
                 if (!isList) {
-                    String express = "java.lang.Enum.valueOf(" + clsName + ".class, " + clsName + ".values()[0].name())";
-                    code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap()))
-                    .append(JAVA_LINE_BREAK);
+                    String express =
+                            "java.lang.Enum.valueOf(" + clsName + ".class, " + clsName + ".values()[0].name())";
+                    code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), false))
+                            .append(JAVA_LINE_BREAK);
                 }
             }
         }
@@ -264,6 +266,7 @@ public class CodeGenerator {
                 code.append(",WireFormat.").append(field.getFieldType().getWireFormat()).append(")) {")
                         .append(LINE_BREAK);
             }
+
             String t = field.getFieldType().getType();
             t = CodedConstant.capitalize(t);
 
@@ -344,8 +347,7 @@ public class CodeGenerator {
             if (field.getFieldType() == FieldType.BYTES) {
                 express += ".toByteArray()";
             }
-
-            code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap()));
+            code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), false));
 
             code.append(JAVA_LINE_BREAK);
 
@@ -356,6 +358,27 @@ public class CodeGenerator {
 
             code.append("continue").append(JAVA_LINE_BREAK);
             code.append("}").append(LINE_BREAK);
+
+            // read packed type
+            if (isList) {
+                FieldType fieldType = field.getFieldType();
+                if (fieldType.isPrimitive()) {
+                    code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(),
+                            WireFormat.WIRETYPE_LENGTH_DELIMITED));
+                    code.append(") {").append(LINE_BREAK);
+                    
+                    
+                    code.append("int length = input.readRawVarint32()").append(JAVA_LINE_BREAK);
+                    code.append("int limit = input.pushLimit(length)").append(JAVA_LINE_BREAK);
+                    
+                    code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), true));
+                    
+                    code.append("input.popLimit(limit)").append(JAVA_LINE_BREAK);
+                    
+                    code.append("continue").append(JAVA_LINE_BREAK);
+                    code.append("}").append(LINE_BREAK);
+                }
+            }
 
         }
 
@@ -677,7 +700,7 @@ public class CodeGenerator {
      * @return
      */
     protected String getSetToField(String target, Field field, Class<?> cls, String express, boolean isList,
-            boolean isMap) {
+            boolean isMap, boolean packed) {
         StringBuilder ret = new StringBuilder();
         if (isList || isMap) {
             ret.append("if ((").append(getAccessByField(target, field, cls)).append(") == null) {").append(LINE_BREAK);
@@ -689,8 +712,14 @@ public class CodeGenerator {
                 ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName())
                         .append("= new ArrayList()").append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
                 if (express != null) {
+                    if (packed) {
+                        ret.append("while (input.getBytesUntilLimit() > 0) {").append(LINE_BREAK);
+                    }
                     ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName()).append(".add(")
                             .append(express).append(")");
+                    if (packed) {
+                        ret.append(";}").append(LINE_BREAK);
+                    }
                 }
                 return ret.toString();
             } else if (isMap) {
@@ -710,8 +739,14 @@ public class CodeGenerator {
                         .append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
 
                 if (express != null) {
+                    if (packed) {
+                        ret.append("while (input.getBytesUntilLimit() > 0) {").append(LINE_BREAK);
+                    }
                     ret.append("(").append(getAccessByField(target, field, cls)).append(").add(").append(express)
                             .append(")");
+                    if (packed) {
+                        ret.append(";}").append(LINE_BREAK);
+                    }
                 }
                 return ret.toString();
             } else if (isMap) {
@@ -730,8 +765,14 @@ public class CodeGenerator {
             ret.append("FieldUtils.setField(").append(target).append(", \"").append(field.getName())
                     .append("\", __list)").append(JAVA_LINE_BREAK).append("}").append(LINE_BREAK);
             if (express != null) {
+                if (packed) {
+                    ret.append("while (input.getBytesUntilLimit() > 0) {").append(LINE_BREAK);
+                }
                 ret.append("(").append(getAccessByField(target, field, cls)).append(").add(").append(express)
                         .append(")");
+                if (packed) {
+                    ret.append(";}").append(LINE_BREAK);
+                }
             }
             return ret.toString();
         } else if (isMap) {

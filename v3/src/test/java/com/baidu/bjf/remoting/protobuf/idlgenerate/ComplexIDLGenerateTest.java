@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
- 
+
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
@@ -32,12 +32,12 @@ import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
 import com.baidu.bjf.remoting.protobuf.simplerepeat.RequrieRepeatedNumberTypePOJOClass2;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.squareup.protoparser.FieldElement;
-import com.squareup.protoparser.MessageElement;
-import com.squareup.protoparser.ProtoFile;
-import com.squareup.protoparser.ProtoParser;
-import com.squareup.protoparser.TypeElement;
 
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.MessageElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoFile;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoParser;
+import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
 import junit.framework.Assert;
 
 /**
@@ -86,7 +86,7 @@ public class ComplexIDLGenerateTest {
         
         Assert.assertEquals("list", fields.get(0).name());
         Assert.assertEquals(PersonPOJO.class.getSimpleName(), fields.get(0).type().toString());
-        Assert.assertEquals(com.squareup.protoparser.FieldElement.Label.OPTIONAL, fields.get(0).label());
+        Assert.assertEquals(FieldElement.Label.OPTIONAL, fields.get(0).label());
         
         type = getByName(PersonPOJO.class.getSimpleName(), types);
         Assert.assertNotNull(type);
@@ -128,7 +128,7 @@ public class ComplexIDLGenerateTest {
         
         Assert.assertEquals("list", fields.get(0).name());
         Assert.assertEquals(PersonPOJOWithDefault.class.getSimpleName(), fields.get(0).type().toString());
-        Assert.assertEquals(com.squareup.protoparser.FieldElement.Label.OPTIONAL, fields.get(0).label());
+        Assert.assertEquals(FieldElement.Label.OPTIONAL, fields.get(0).label());
         
         type = getByName(PersonPOJOWithDefault.class.getSimpleName(), types);
         Assert.assertNotNull(type);
@@ -166,7 +166,7 @@ public class ComplexIDLGenerateTest {
     }
     
     @Test
-    public void testMessageDependencyMissException() {
+    public void testNoOptionalMark() {
         
         String idl = "syntax = \"proto3\";package tutorial;" +
             "option java_package = \"com.example.tutorial\";" +
@@ -174,17 +174,14 @@ public class ComplexIDLGenerateTest {
             "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
             " message PhoneNumber {" +
                 " int32 type = 1; " +
-                "optional int32 name = 2 [default = 10];" +
-                "optional string vName = 3 [default = \"hello world\"];" +
+                " int32 name = 2 [default = 10];" +
+                " string vName = 3 [default = \"hello world\"];" +
           "}"; 
         
         try {
            ProtobufIDLProxy.createSingle(idl);
-            
-            Assert.fail();
         } catch (Exception e) {
-            Assert.assertNotNull(e);
-            e.printStackTrace();
+            Assert.fail(e.getMessage());
         }
     }
     

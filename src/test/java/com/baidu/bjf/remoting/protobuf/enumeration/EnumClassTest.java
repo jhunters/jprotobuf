@@ -49,8 +49,6 @@ public class EnumClassTest {
         
         byte[] bytes = codec.encode(ec);
         
-        System.out.println(Arrays.toString(bytes));
-        
         EnumPOJOClass decode = codec.decode(bytes);
         Assert.assertEquals(EnumAttrPOJO.INT, decode.enumAttr);
         

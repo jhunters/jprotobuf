@@ -36,17 +36,17 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.squareup.protoparser.DataType;
-import com.squareup.protoparser.EnumConstantElement;
-import com.squareup.protoparser.EnumElement;
-import com.squareup.protoparser.FieldElement;
-import com.squareup.protoparser.FieldElement.Label;
-import com.squareup.protoparser.MessageElement;
-import com.squareup.protoparser.OptionElement;
-import com.squareup.protoparser.OptionElement.Kind;
-import com.squareup.protoparser.ProtoFile;
-import com.squareup.protoparser.ProtoParser;
-import com.squareup.protoparser.TypeElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType;
+import com.baidu.jprotobuf.com.squareup.protoparser.EnumConstantElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.EnumElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement.Label;
+import com.baidu.jprotobuf.com.squareup.protoparser.MessageElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.OptionElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.OptionElement.Kind;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoFile;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoParser;
+import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
 
 /**
  * This class is for dynamic create protobuf utility class directly from .proto file
@@ -922,7 +922,7 @@ public class ProtobufIDLProxy {
 
         code.append("fieldType=").append(fieldType);
         code.append(", order=").append(field.tag());
-        if (com.squareup.protoparser.FieldElement.Label.OPTIONAL == field.label()) {
+        if (FieldElement.Label.OPTIONAL == field.label()) {
             code.append(", required=false");
         } else if (Label.REQUIRED == field.label()) {
             code.append(", required=true");

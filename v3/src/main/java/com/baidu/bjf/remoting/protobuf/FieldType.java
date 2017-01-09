@@ -161,4 +161,21 @@ public enum FieldType {
         this.defaultValue = defaultValue;
     }
     
+    /**
+     * Checks if is primitive.
+     *
+     * @return true, if is primitive
+     */
+    public boolean isPrimitive() {
+        if (this == INT32 || this == DOUBLE || this == FIXED32
+                || this == FIXED64 || this == FLOAT
+                || this == INT64 || this == SFIXED32
+                || this == SFIXED64 || this == SINT32
+                || this == SINT64 || this == BOOL) {
+            return true;
+        }
+        
+        return false;
+    }
+    
 }

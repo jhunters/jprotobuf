@@ -24,7 +24,9 @@ import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.baidu.bjf.remoting.protobuf.annotation.Packed;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister.Pack;
 
 /**
  * 
@@ -93,7 +95,7 @@ public class ProtobufProxyUtils {
             if (protobuf == null) {
                 throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
             }
-
+            
             // check field is support for protocol buffer
             // any array except byte array is not support
             String simpleName = field.getType().getName();
@@ -132,6 +134,15 @@ public class ProtobufProxyUtils {
                 }
             } else {
                 unorderFields.add(fieldInfo);
+            }
+            
+            if (fieldInfo.isList() && fieldInfo.getFieldType().isPrimitive()) {
+                Packed packed = field.getAnnotation(Packed.class);
+                if (packed == null) {
+                    fieldInfo.setPacked(true);
+                } else {
+                    fieldInfo.setPacked(packed.value());
+                }
             }
 
             ret.add(fieldInfo);

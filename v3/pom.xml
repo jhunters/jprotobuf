@@ -12,7 +12,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf</artifactId>
-	<version>2.0.4</version>
+	<version>2.0.5</version>
 
 	<name>jprotobuf</name>
 	<description>A very useful utility library for java programmer using google protobuf.</description>
@@ -60,14 +60,7 @@
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>3.0.0</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup</groupId>
-			<artifactId>protoparser</artifactId>
-			<version>4.0.3</version>
-			<type>jar</type>
+			<version>3.0.2</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -81,6 +74,14 @@
 			<version>${auto.value.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.baidu</groupId>
+			<artifactId>jprotobuf-protoparser</artifactId>
+			<version>1.0.0</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
