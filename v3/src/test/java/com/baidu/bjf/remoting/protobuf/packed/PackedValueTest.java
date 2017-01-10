@@ -16,6 +16,8 @@
 package com.baidu.bjf.remoting.protobuf.packed;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,6 +36,33 @@ import com.google.protobuf.ByteString;
  */
 public class PackedValueTest {
 
+    @Test
+    public void testIncludeEmptyList() {
+        PackedProtosPOJO pojo = new PackedProtosPOJO();
+        Codec<PackedProtosPOJO> codec = ProtobufProxy.create(PackedProtosPOJO.class, true);
+
+        List<Integer> list = Arrays.asList(62, 218, 254, 849, 288, 591, 277, 374, 318, 263, 244, 944, 220, 310, 751,
+                323, 317, 497, 55, 635, 58, 962, 426, 597, 778, 685, 652, 614, 467, 554, 306, 581, 426, 831, 789, 613,
+                879, 75, 312, 35, 710, 811, 200, 388, 16, 275, 386, 892, 554, 136, 163, 334, 475, 756, 579, 554, 977,
+                271, 551, 547, 229, 62, 363, 22, 586, 622, 195, 168, 224, 837, 928, 857, 680, 880, 753, 500, 511, 610,
+                268, 408, 298, 643, 500, 586, 220, 857, 525, 2, 892, 852, 824, 593, 846, 687, 283, 625, 984, 450, 468,
+                110);
+        pojo.setId(list);
+
+        Builder b1 = Person.newBuilder();
+        b1.addAllId(list);
+        Person person = b1.build();
+
+        System.out.println(Arrays.toString(person.toByteArray()));
+
+        try {
+            PackedProtosPOJO pojo2 = codec.decode(person.toByteArray());
+            Assert.assertEquals(pojo.getId(), pojo2.getId());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Test float value encode.
      */
@@ -48,15 +77,15 @@ public class PackedValueTest {
         PackedProtosPOJO2 pojo2 = new PackedProtosPOJO2();
         for (int i = 0; i < 10; i++) {
             b1.addId(i);
-            b1.addName("name" + i);
+            b1.addName("name中文" + i);
             b1.addBoolF(i % 2 == 0);
             b1.addBytesF(ByteString.copyFrom(new byte[] { 'a', 'b', 'c' }));
             b1.addDoubleF(101.1d * i);
             b1.addEmail("xiemalin" + i + "@baidu.com");
             b1.addFloatF(102.1f * i);
-            
+
             b2.addId(i);
-            b2.addName("name" + i);
+            b2.addName("name中文" + i);
             b2.addBoolF(i % 2 == 0);
             b2.addBytesF(ByteString.copyFrom(new byte[] { 'a', 'b', 'c' }));
             b2.addDoubleF(101.1d * i);
@@ -64,15 +93,15 @@ public class PackedValueTest {
             b2.addFloatF(102.1f * i);
 
             pojo.getId().add(i);
-            pojo.getName().add("name" + i);
+            pojo.getName().add("name中文" + i);
             pojo.getBoolF().add(i % 2 == 0);
             pojo.getBytesF().add(new byte[] { 'a', 'b', 'c' });
             pojo.getDoubleF().add(101.1d * i);
             pojo.getEmail().add("xiemalin" + i + "@baidu.com");
             pojo.getFloatF().add(102.1f * i);
-            
+
             pojo2.getId().add(i);
-            pojo2.getName().add("name" + i);
+            pojo2.getName().add("name中文" + i);
             pojo2.getBoolF().add(i % 2 == 0);
             pojo2.getBytesF().add(new byte[] { 'a', 'b', 'c' });
             pojo2.getDoubleF().add(101.1d * i);
@@ -84,7 +113,7 @@ public class PackedValueTest {
         person2 = b2.build();
         Codec<PackedProtosPOJO> codec = ProtobufProxy.create(PackedProtosPOJO.class);
         Codec<PackedProtosPOJO2> codec2 = ProtobufProxy.create(PackedProtosPOJO2.class);
-        
+
         try {
             byte[] bytes = codec.encode(pojo); // packed bytes
             Assert.assertArrayEquals(person.toByteArray(), bytes);

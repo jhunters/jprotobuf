@@ -1,3 +1,4 @@
+
 jprotobuf
 =========
 
@@ -25,7 +26,8 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
    完整支持proto文件所有功能，包括内联对象，匿名对象，枚举类型<br>
 3. 提供从POJO对象的注解方式自动生成proto文件的功能， 方便proto描述文件的管理与维护
 4. Map数据结构支持.  @Protobuf(fieldType = FieldType.MAP)
-<br>
+   <br>
+5. 完整支持V3针对 repeated primitive类型自动进行packed压缩处理. 如需要手工关闭该功能，需设置@Packed(false)
 
 
 #####关联项目：#####
@@ -52,7 +54,7 @@ JDK 7 或以上版本 google protocol buffer v3版本
 
 a 定义.proto说明文件. test.proto
 
-```property
+```properties
 package pkg;  
 
 option java_package = "com.baidu.bjf.remoting.protobuf";
@@ -68,9 +70,9 @@ message InterClassName {
 ```
 
 b 使用protoc.exe 编译.proto文件
-```cmd
+```properties
  protoc --java_out=src  test.proto
-``` 
+```
 
 c 编译生成的Java文件，利用protobuf API进行序列化与反序化操作<br>
 序列化操作：
@@ -79,13 +81,13 @@ InterClassName icn = InterClassName.newBuilder().setName("abc")
 		.setValue(100).build();
 		
 		byte[] bb = icn.toByteArray();
-``` 
+```
 
 反序化操作<br>
 ```java
 byte[] bb = ...;
 InterClassName icn = InterClassName.parseFrom(bb);
-``` 
+```
 
 
 ### 使用jprotobuf API 简化开发 ###
@@ -119,7 +121,7 @@ public class SimpleTypeTest {
     }
     
 }
-``` 
+```
 
 b 使用jprotobuf API进行序列化与反序列化操作
 ```java
@@ -138,9 +140,21 @@ b 使用jprotobuf API进行序列化与反序列化操作
             e.printStackTrace();
         }
 
-``` 
+```
 
 
+
+### 手工关闭packed功能
+
+v3版本开启，针对repeated primitive类会自动开启packed功能，如需要手工关闭，操作如下
+
+```java
+public class AddressBookProtosPOJO {
+    @Packed(false) //关闭v3开启的自动pack功能
+    @Protobuf(fieldType = FieldType.INT32, order=3, required = false)
+    public List<Integer> intList;
+}    
+```
 
 ### 嵌套对象与MAP的开发示例 ###
 ```java
@@ -189,8 +203,7 @@ public class Person {
     public Boolean boolF;    
 }
 
-
-``` 
+```
 注：如同google protocol buffer v3规范要求，MAP结构的key，不允许为 float, double和Message对象。
 
 ### 由注解对象动态生成Protobuf的IDL描述文件内容 ###
@@ -220,7 +233,7 @@ public class SimpleTypeTest {
 }
 
 
-``` 
+```
 
 
 ###  增加由.proto 描述文件动态生成Protobuf操作对象的支持 ###
@@ -256,7 +269,7 @@ public void testDecode() throws Exception {
 }
 
 
-``` 
+```
 
 
 ###  @Protubuf注解支持全部属性默认设置 ###
@@ -286,7 +299,7 @@ public class AddressBookProtosPOJOWithDefault {
     public String name;
 }
 ```
- 
+
 ###  @Protubuf注解支持枚举类型 ###
 
 
@@ -325,7 +338,6 @@ public enum EnumAttrPOJO implements EnumReadable {
     }
     
 }
-
 
 ```
 

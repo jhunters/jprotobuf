@@ -319,7 +319,7 @@ public class CodedConstant {
      */
     public static int computeListSize(int order, List list, FieldType type, boolean debug, File path, boolean packed) {
         int size = 0;
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             return size;
         }
 
@@ -611,7 +611,7 @@ public class CodedConstant {
      */
     public static void writeToList(CodedOutputStream out, int order, FieldType type, List list, boolean packed)
             throws IOException {
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             return;
         }
 
