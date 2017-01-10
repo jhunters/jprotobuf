@@ -303,7 +303,22 @@ public class CodedConstant {
      * @return full java expression
      */
     public static int computeListSize(int order, List<?> list, FieldType type, boolean debug, File path) {
-        return computeListSize(order, list, type, debug, path, false);
+        return computeListSize(order, list, type, debug, path, false, false);
+    }
+    
+    /**
+     * Compute list size.
+     *
+     * @param order the order
+     * @param list the list
+     * @param type the type
+     * @param debug the debug
+     * @param path the path
+     * @param packed the packed
+     * @return the int
+     */
+    public static int computeListSize(int order, List list, FieldType type, boolean debug, File path, boolean packed) {
+        return computeListSize(order, list, type, debug, path, packed, false);
     }
 
     /**
@@ -317,7 +332,8 @@ public class CodedConstant {
      * @param packed the packed
      * @return the int
      */
-    public static int computeListSize(int order, List list, FieldType type, boolean debug, File path, boolean packed) {
+    public static int computeListSize(int order, List list, FieldType type, boolean debug, File path, boolean packed,
+            boolean sizeOnly) {
         int size = 0;
         if (list == null || list.isEmpty()) {
             return size;
@@ -328,8 +344,10 @@ public class CodedConstant {
         }
         if (type != FieldType.OBJECT) {
             if (packed) {
-                size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(size);
-                size += 1;
+                if (!sizeOnly) {
+                    size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(size);
+                    size += 1;
+                }
             } else {
                 size += list.size() * CodedOutputStream.computeTagSize(order);
             }
@@ -617,7 +635,7 @@ public class CodedConstant {
 
         if (packed) {
             out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
-            out.writeUInt32NoTag(computeListSize(order, list, type, false, null, packed) - 2);
+            out.writeUInt32NoTag(computeListSize(order, list, type, false, null, packed, true));
         }
 
         for (Object object : list) {

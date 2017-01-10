@@ -176,7 +176,7 @@ public class CodedConstant {
      */
     public static int computeListSize(int order, List list, FieldType type, boolean debug, File path) {
         int size = 0;
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             return size;
         }
 
@@ -333,7 +333,7 @@ public class CodedConstant {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void writeToList(CodedOutputStream out, int order, FieldType type, List list) throws IOException {
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             return;
         }
         for (Object object : list) {

@@ -53,11 +53,18 @@ public class PackedValueTest {
         b1.addAllId(list);
         Person person = b1.build();
 
-        System.out.println(Arrays.toString(person.toByteArray()));
 
         try {
+            byte[] byteArray1 = person.toByteArray();
+            byte[] byteArray2 = codec.encode(pojo);
+            System.out.println(Arrays.toString(byteArray1));
+            System.out.println(Arrays.toString(byteArray2));
+            Assert.assertArrayEquals(byteArray1, byteArray2);
+            
             PackedProtosPOJO pojo2 = codec.decode(person.toByteArray());
             Assert.assertEquals(pojo.getId(), pojo2.getId());
+            
+            codec.decode(person.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
         }
