@@ -330,6 +330,7 @@ public class CodedConstant {
      * @param debug the debug
      * @param path the path
      * @param packed the packed
+     * @param sizeOnly the size only if true will not include order size and tag size
      * @return the int
      */
     public static int computeListSize(int order, List list, FieldType type, boolean debug, File path, boolean packed,
