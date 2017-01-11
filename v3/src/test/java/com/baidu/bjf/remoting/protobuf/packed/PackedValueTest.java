@@ -17,9 +17,7 @@ package com.baidu.bjf.remoting.protobuf.packed;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -87,7 +85,7 @@ public class PackedValueTest {
             b1.addBoolF(i % 2 == 0);
             b1.addBytesF(ByteString.copyFrom(new byte[] { 'a', 'b', 'c' }));
             b1.addDoubleF(101.1d * i);
-            b1.addEmail("xiemalin" + i + "@baidu.com");
+            b1.addEmail("xiemalin" + i + "@test.com");
             b1.addFloatF(102.1f * i);
 
             b2.addId(i);
@@ -95,7 +93,7 @@ public class PackedValueTest {
             b2.addBoolF(i % 2 == 0);
             b2.addBytesF(ByteString.copyFrom(new byte[] { 'a', 'b', 'c' }));
             b2.addDoubleF(101.1d * i);
-            b2.addEmail("xiemalin" + i + "@baidu.com");
+            b2.addEmail("xiemalin" + i + "@test.com");
             b2.addFloatF(102.1f * i);
 
             pojo.getId().add(i);
@@ -103,7 +101,7 @@ public class PackedValueTest {
             pojo.getBoolF().add(i % 2 == 0);
             pojo.getBytesF().add(new byte[] { 'a', 'b', 'c' });
             pojo.getDoubleF().add(101.1d * i);
-            pojo.getEmail().add("xiemalin" + i + "@baidu.com");
+            pojo.getEmail().add("xiemalin" + i + "@test.com");
             pojo.getFloatF().add(102.1f * i);
 
             pojo2.getId().add(i);
@@ -111,7 +109,7 @@ public class PackedValueTest {
             pojo2.getBoolF().add(i % 2 == 0);
             pojo2.getBytesF().add(new byte[] { 'a', 'b', 'c' });
             pojo2.getDoubleF().add(101.1d * i);
-            pojo2.getEmail().add("xiemalin" + i + "@baidu.com");
+            pojo2.getEmail().add("xiemalin" + i + "@test.com");
             pojo2.getFloatF().add(102.1f * i);
         }
         Person person = b1.build();
