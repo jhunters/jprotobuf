@@ -16,8 +16,10 @@
 package com.baidu.bjf.remoting.protobuf.packed;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,14 +41,13 @@ public class PackedValueTest {
     @Test
     public void testIncludeEmptyList() {
         PackedProtosPOJO pojo = new PackedProtosPOJO();
-        Codec<PackedProtosPOJO> codec = ProtobufProxy.create(PackedProtosPOJO.class, true);
+        Codec<PackedProtosPOJO> codec = ProtobufProxy.create(PackedProtosPOJO.class);
 
-        List<Integer> list = Arrays.asList(62, 218, 254, 849, 288, 591, 277, 374, 318, 263, 244, 944, 220, 310, 751,
-                323, 317, 497, 55, 635, 58, 962, 426, 597, 778, 685, 652, 614, 467, 554, 306, 581, 426, 831, 789, 613,
-                879, 75, 312, 35, 710, 811, 200, 388, 16, 275, 386, 892, 554, 136, 163, 334, 475, 756, 579, 554, 977,
-                271, 551, 547, 229, 62, 363, 22, 586, 622, 195, 168, 224, 837, 928, 857, 680, 880, 753, 500, 511, 610,
-                268, 408, 298, 643, 500, 586, 220, 857, 525, 2, 892, 852, 824, 593, 846, 687, 283, 625, 984, 450, 468,
-                110);
+        List<Integer> list = new ArrayList<Integer>(10000);
+        int begin = Integer.MAX_VALUE - 10000;
+        for (int i = 0; i < 10000; i++) {
+            list.add(i + begin);
+        }
         pojo.setId(list);
 
         Builder b1 = Person.newBuilder();
@@ -57,8 +58,6 @@ public class PackedValueTest {
         try {
             byte[] byteArray1 = person.toByteArray();
             byte[] byteArray2 = codec.encode(pojo);
-            System.out.println(Arrays.toString(byteArray1));
-            System.out.println(Arrays.toString(byteArray2));
             Assert.assertArrayEquals(byteArray1, byteArray2);
             
             PackedProtosPOJO pojo2 = codec.decode(person.toByteArray());
