@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.code;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +24,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.baidu.bjf.remoting.protobuf.Codec;
+import com.baidu.bjf.remoting.protobuf.EnumReadable;
+import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
+import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.descriptor.DescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.EnumDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.EnumOptionsPOJO;
@@ -89,7 +95,7 @@ public class CodedConstant {
         String fieldName = getFieldName(order);
         if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
             // add null check
-            String code = "com.google.protobuf.ByteString " + fieldName + "=null;\n";
+            String code = "com.google.protobuf.ByteString " + fieldName + "=null" + ClassCode.JAVA_LINE_BREAK;
             code += "if (!CodedConstant.isNull(" + express + ")) {\n";
 
             String method = "copyFromUtf8";
@@ -97,7 +103,8 @@ public class CodedConstant {
                 method = "copyFrom";
             }
 
-            code += fieldName + " = com.google.protobuf.ByteString." + method + "(" + express + ");\n";
+            code += fieldName + " = com.google.protobuf.ByteString." + method + "(" + express + ")"
+                    + ClassCode.JAVA_LINE_BREAK;
             code += "}";
             return code;
         }
@@ -107,10 +114,10 @@ public class CodedConstant {
             defineType = "List";
         }
 
-        String code = defineType + " " + fieldName + "=null;\n";
+        String code = defineType + " " + fieldName + "=null" + ClassCode.JAVA_LINE_BREAK;
         code += "if (!CodedConstant.isNull(" + express + ")) {\n";
 
-        code += fieldName + "=" + express + ";\n";
+        code += fieldName + "=" + express + ClassCode.JAVA_LINE_BREAK;
         code += "}";
         return code;
     }
@@ -161,7 +168,8 @@ public class CodedConstant {
             fieldName = fieldName + type.getToPrimitiveType();
         }
 
-        return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ");\n";
+        return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ")"
+                + ClassCode.JAVA_LINE_BREAK;
     }
 
     /**
@@ -300,16 +308,16 @@ public class CodedConstant {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeObject(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(", false)").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
-                    .append(CodeGenerator.LINE_BREAK);
+            ret.append(",").append(fieldName).append(", false)").append(ClassCode.JAVA_LINE_BREAK).append("}")
+                    .append(ClassCode.LINE_BREAK);
             ;
             return ret.toString();
         }
 
         if (type == FieldType.STRING || type == FieldType.BYTES) {
             ret.append(prefix).append(".writeBytes(").append(order);
-            ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
-                    .append(CodeGenerator.LINE_BREAK);
+            ret.append(", ").append(fieldName).append(")").append(ClassCode.JAVA_LINE_BREAK).append("}")
+                    .append(ClassCode.LINE_BREAK);
             ;
             return ret.toString();
         }
@@ -317,8 +325,8 @@ public class CodedConstant {
         t = capitalize(t);
 
         ret.append(prefix).append(".write").append(t).append("(").append(order);
-        ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
-                .append(CodeGenerator.LINE_BREAK);
+        ret.append(", ").append(fieldName).append(")").append(ClassCode.JAVA_LINE_BREAK).append("}")
+                .append(ClassCode.LINE_BREAK);
         ;
         return ret.toString();
     }
@@ -341,7 +349,6 @@ public class CodedConstant {
         }
 
     }
-    
 
     /**
      * Write object to byte array by {@link FieldType}.
@@ -423,7 +430,8 @@ public class CodedConstant {
     public static String getRequiredCheck(int order, Field field) {
         String fieldName = getFieldName(order);
         String code = "if (" + fieldName + "== null) {\n";
-        code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() + "\"));\n";
+        code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() + "\"))"
+                + ClassCode.JAVA_LINE_BREAK;
         code += "}\n";
 
         return code;
@@ -438,7 +446,8 @@ public class CodedConstant {
      */
     public static String getRetRequiredCheck(String express, Field field) {
         String code = "if (CodedConstant.isNull(" + express + ")) {\n";
-        code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() + "\"));\n";
+        code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() + "\"))"
+                + ClassCode.JAVA_LINE_BREAK;
         code += "}\n";
 
         return code;
@@ -760,11 +769,11 @@ public class CodedConstant {
                 fieldDescriptorProto = new EnumValueDescriptorProtoPOJO();
                 fieldDescriptorProto.name = fieldElement.getName();
                 fieldDescriptorProto.number = fieldElement.getTag();
-                
+
                 ret.values.add(fieldDescriptorProto);
             }
         }
-        
+
         List<Option> options = typeElement.getOptions();
         if (options != null) {
             EnumOptionsPOJO fieldDescriptorProto;
@@ -773,7 +782,6 @@ public class CodedConstant {
                 ret.options.add(fieldDescriptorProto);
             }
         }
-        
 
         return ret;
     }

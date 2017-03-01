@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.code.CodeGenerator;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
@@ -53,11 +54,11 @@ public final class ProtobufProxy {
     private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
 
     /**
-     * cached {@link Codec} instance by class full name.
+     * cached {@link Codec} instance by class name. 
      */
     private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
 
-    /** The Constant OUTPUT_PATH. */
+    /** The Constant OUTPUT_PATH for target directory to create generated source code out. */
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
 
     /**
@@ -70,10 +71,10 @@ public final class ProtobufProxy {
      */
     public static void dynamicCodeGenerate(OutputStream os, Class cls, Charset charset) throws IOException {
         if (cls == null) {
-            throw new NullPointerException("Parameter cls is null");
+            throw new NullPointerException("Parameter 'cls' is null");
         }
         if (os == null) {
-            throw new NullPointerException("Parameter os is null");
+            throw new NullPointerException("Parameter 'os' is null");
         }
         if (charset == null) {
             charset = Charset.defaultCharset();
@@ -127,7 +128,7 @@ public final class ProtobufProxy {
     public static <T> Codec<T> create(Class<T> cls) {
         Boolean debug = DEBUG_CONTROLLER.get();
         if (debug == null) {
-            debug = false;
+            debug = false; // set default to close debug info
         }
 
         return create(cls, debug, null);
@@ -144,7 +145,7 @@ public final class ProtobufProxy {
             throw new NullPointerException("Param 'outputPath' is null.");
         }
         if (!outputPath.isDirectory()) {
-            throw new RuntimeException("Param 'outputPath' value should be a path directory.");
+            throw new RuntimeException("Param 'outputPath' value should be a path directory. path=" + outputPath);
         }
 
     }
@@ -215,9 +216,7 @@ public final class ProtobufProxy {
             return codec;
         }
 
-        // get last modify time
-        long lastModify = ClassHelper.getLastModifyTime(cls);
-
+        // crate code generator
         CodeGenerator cg = getCodeGenerator(cls);
         cg.setDebug(debug);
         File path = OUTPUT_PATH.get();
@@ -274,6 +273,10 @@ public final class ProtobufProxy {
         
         Compiler compiler = JDKCompilerHelper.getJdkCompiler(cls.getClassLoader());
         Class<?> newClass;
+        
+        // get last modify time
+        long lastModify = ClassHelper.getLastModifyTime(cls);
+        
         try {
             newClass = compiler.compile(className,
                     code, cls.getClassLoader(), fos, lastModify);
@@ -284,8 +287,6 @@ public final class ProtobufProxy {
             newClass = compiler.compile(className,
                     code, cls.getClassLoader(), fos, lastModify);
         }
-        
-
 
         if (fos != null) {
             try {

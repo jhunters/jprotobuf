@@ -964,7 +964,7 @@ public class ProtobufIDLProxy {
 
             code.append(name).append("(").append(tag).append(")");
             if (iter.hasNext()) {
-                code.append(",");
+                code.append(",").append("\n");
             } else {
                 code.append(";\n");
             }
@@ -978,7 +978,7 @@ public class ProtobufIDLProxy {
         cd.name = simpleName;
         cd.pkg = packageName;
         cd.code = code.toString();
-
+        
         return cd;
     }
 

@@ -24,7 +24,7 @@ import java.io.OutputStream;
  * @since 1.0.0
  */
 public abstract class AbstractCompiler implements Compiler {
-
+    
     /*
      * (non-Javadoc)
      * 
