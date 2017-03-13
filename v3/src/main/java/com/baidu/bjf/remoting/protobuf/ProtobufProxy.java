@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,7 +55,7 @@ public final class ProtobufProxy {
     /**
      * cached {@link Codec} instance by class full name.
      */
-    private static final Map<String, Codec> CACHED = new HashMap<String, Codec>();
+    private static final Map<String, Codec> CACHED = new ConcurrentHashMap<String, Codec>();
     
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
 
