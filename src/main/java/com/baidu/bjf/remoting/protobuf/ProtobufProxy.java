@@ -38,6 +38,8 @@ import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
+import com.google.googlejavaformat.java.Formatter;
+import com.google.googlejavaformat.java.FormatterException;
 
 /**
  * Proxy tools for protobuf.
@@ -60,6 +62,9 @@ public final class ProtobufProxy {
 
     /** The Constant OUTPUT_PATH for target directory to create generated source code out. */
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
+    
+    /** The Constant formatter. */
+    private static final Formatter formatter = new Formatter();
 
     /**
      * To generate a protobuf proxy java source code for target class.
@@ -248,7 +253,15 @@ public final class ProtobufProxy {
 
         String code = cg.getCode();
         if (debug) {
-            CodePrinter.printCode(code, "generate protobuf proxy code");
+            String printCode = code;
+            // here format code 
+            try {
+                printCode = formatter.formatSource(printCode);
+            } catch (FormatterException e) {
+                LOGGER.warning("format source code failed. " + e.getMessage());
+            }
+            
+            CodePrinter.printCode(printCode, "generate protobuf proxy code");
         }
 
         FileOutputStream fos = null;

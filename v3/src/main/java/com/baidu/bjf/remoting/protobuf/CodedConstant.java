@@ -305,7 +305,7 @@ public class CodedConstant {
     public static int computeListSize(int order, List<?> list, FieldType type, boolean debug, File path) {
         return computeListSize(order, list, type, debug, path, false, false);
     }
-    
+
     /**
      * Compute list size.
      *
