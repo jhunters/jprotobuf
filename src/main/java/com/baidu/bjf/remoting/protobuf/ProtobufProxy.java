@@ -42,7 +42,21 @@ import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
 
 /**
- * Proxy tools for protobuf.
+ * A simple protocol buffer encode and decode utility tool.
+ * 
+ * <pre>
+ *   example code as follow:
+ *   
+ *   User user = new User();
+ *   ...
+ *   Codec<User> codec = ProtobufProxy.create(User.class);
+ *   
+ *   // do encode
+ *   byte[] result = codec.encode(user);
+ *   // do decode
+ *   User user2 = codec.decode(result);
+ *   
+ * </pre>
  * 
  * @author xiemalin
  * @since 1.0.0
@@ -195,11 +209,7 @@ public final class ProtobufProxy {
      */
     private static ClassLoader getClassLoader() {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        if (contextClassLoader != null) {
-            return contextClassLoader;
-        }
-
-        return null;
+        return contextClassLoader;
     }
 
     /**

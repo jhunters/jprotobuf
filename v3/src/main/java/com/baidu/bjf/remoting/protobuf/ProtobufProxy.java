@@ -40,7 +40,21 @@ import com.google.googlejavaformat.java.Formatter;
 import com.google.googlejavaformat.java.FormatterException;
 
 /**
- * Proxy tools for protobuf.
+ * A simple protocol buffer encode and decode utility tool.
+ * 
+ * <pre>
+ *   example code as follow:
+ *   
+ *   User user = new User();
+ *   ...
+ *   Codec<User> codec = ProtobufProxy.create(User.class);
+ *   
+ *   // do encode
+ *   byte[] result = codec.encode(user);
+ *   // do decode
+ *   User user2 = codec.decode(result);
+ *   
+ * </pre>
  * 
  * @author xiemalin
  * @since 1.0.0
@@ -169,13 +183,14 @@ public final class ProtobufProxy {
 
     }
     
+    /**
+     * Gets the class loader.
+     *
+     * @return the class loader
+     */
     private static ClassLoader getClassLoader() {
     	ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    	if (contextClassLoader != null) {
-    		return contextClassLoader;
-    	}
-    	
-    	return null;
+    	return contextClassLoader;
     }
     
     /**
@@ -190,9 +205,6 @@ public final class ProtobufProxy {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
-
-        // get last modify time
-        long lastModify = ClassHelper.getLastModifyTime(cls);
 
         String uniClsName = cls.getName();
         Codec codec = CACHED.get(uniClsName);
@@ -261,6 +273,9 @@ public final class ProtobufProxy {
             }
 
         }
+
+        // get last modify time
+        long lastModify = ClassHelper.getLastModifyTime(cls);
 
         Class<?> newClass =
                 JDKCompilerHelper.getJdkCompiler().compile(className, code, cls.getClassLoader(), fos, lastModify);
