@@ -36,8 +36,6 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.google.googlejavaformat.java.Formatter;
-import com.google.googlejavaformat.java.FormatterException;
 
 /**
  * A simple protocol buffer encode and decode utility tool.
@@ -75,9 +73,6 @@ public final class ProtobufProxy {
     
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
     
-    /** The Constant formatter. */
-    private static final Formatter formatter = new Formatter();
-
     /**
      * To generate a protobuf proxy java source code for target class.
      * 
@@ -244,13 +239,6 @@ public final class ProtobufProxy {
         String code = cg.getCode();
         if (debug) {
             String printCode = code;
-            // here format code 
-            try {
-                printCode = formatter.formatSource(printCode);
-            } catch (FormatterException e) {
-                LOGGER.warning("format source code failed. " + e.getMessage());
-            }
-            
             CodePrinter.printCode(printCode, "generate protobuf proxy code");
         }
 
