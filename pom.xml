@@ -91,7 +91,7 @@
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
-			<plugin>
+<!-- 			<plugin>
 				<groupId>com.baidu</groupId>
 				<artifactId>jprotobuf-precompile-plugin</artifactId>
 				<version>1.2.3</version>
@@ -107,7 +107,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
