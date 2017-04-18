@@ -184,13 +184,13 @@ public class CodeGenerator {
      * @param code the code
      */
     private void genImportCode(ClassCode code) {
-        code.importClass("com.google.protobuf.*");
-        code.importClass("com.baidu.bjf.remoting.protobuf.code.*");
-        code.importClass("java.io.IOException");
-        code.importClass("com.baidu.bjf.remoting.protobuf.utils.*");
-        code.importClass("java.lang.reflect.*");
-        code.importClass("com.baidu.bjf.remoting.protobuf.*");
         code.importClass("java.util.*");
+        code.importClass("java.io.IOException");
+        code.importClass("java.lang.reflect.*");
+        code.importClass("com.baidu.bjf.remoting.protobuf.code.*");
+        code.importClass("com.baidu.bjf.remoting.protobuf.utils.*");
+        code.importClass("com.baidu.bjf.remoting.protobuf.*");
+        code.importClass("com.google.protobuf.*");
 
         if (!StringUtils.isEmpty(getPackage())) {
             code.importClass(ClassHelper.getInternalName(cls.getName()));
@@ -399,17 +399,9 @@ public class CodeGenerator {
         mc.setScope(ClassCode.SCOPE_PUBLIC);
         mc.addException("IOException");
 
-        mc.appendLineCode0("if (this.descriptor != null) {");
-        mc.appendLineCode1("return this.descriptor");
-        mc.appendLineCode0("}");
+        String methodSource = CodeTemplate.descriptorMethodSource(cls);
 
-        StringBuilder code = new StringBuilder();
-        code.append(descriptorClsName).append(" descriptor = ");
-        code.append("CodedConstant.getDescriptor(").append(ClassHelper.getInternalName(cls.getName()))
-                .append(JAVA_CLASS_FILE_SUFFIX).append(")");
-        mc.appendLineCode1(code.toString());
-
-        mc.appendLineCode1("return (this.descriptor = descriptor)");
+        mc.appendLineCode0(methodSource);
         return mc;
     }
 
@@ -760,6 +752,5 @@ public class CodeGenerator {
         }
         return code;
     }
-
 
 }

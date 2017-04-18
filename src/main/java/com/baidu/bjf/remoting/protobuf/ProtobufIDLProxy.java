@@ -601,6 +601,7 @@ public class ProtobufIDLProxy {
 
         // to find all PROTO file if using import command
         List<ProtoFile> protoFiles = findRelateProtoFiles(file, new HashSet<String>());
+        Collections.reverse(protoFiles);
         return doCreatePro(protoFiles, multi, debug, path, generateSouceOnly, sourceOutputDir, cds, compiledClass);
 
     }

@@ -15,6 +15,8 @@
  */
 package com.baidu.bjf.remoting.protobuf.bytestest;
 
+import java.lang.reflect.Method;
+
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
@@ -28,4 +30,17 @@ public class ByteTypeClass2 {
     /** The bytes. */
     @Protobuf
     public byte[] bytes;
+    
+    public String abc() {
+        return "";
+    }
+    
+    
+    public static void main(String[] args) throws Exception {
+        
+        
+        Method method = ByteTypeClass2.class.getMethod("abc", new Class[0]);     
+        
+        method.getReturnType();
+    }
 }
