@@ -261,12 +261,4 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(2, map.size());
     }
 
-    @Ignore
-    @Test
-    public void testIDLImportReferenceProxy2() throws IOException {
-
-        ProtobufIDLProxy.generateSource(new File(EnumIDLGeneratorTest.class.getResource("PlayerInfo.proto").getFile()),
-                new File("D:/test"));
-
-    }
 }
