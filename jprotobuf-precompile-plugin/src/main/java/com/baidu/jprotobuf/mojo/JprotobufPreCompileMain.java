@@ -31,6 +31,7 @@ public class JprotobufPreCompileMain {
 		try {
 			FileUtils.deleteDirectory(outputPath);
 		} catch (Exception e) {
+		    // dummy exception
 		}
 		outputPath.mkdirs();
 		
