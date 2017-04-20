@@ -195,7 +195,7 @@ public class ProtobufIDLGenerator {
                         }
                     }
                 } else if (field.getFieldType() == FieldType.MAP) {
-                    type = type + "<" + ProtobufProxyUtils.processProtobufType(field.getGenericeValueType()) + ", ";
+                    type = type + "<" + ProtobufProxyUtils.processProtobufType(field.getGenericKeyType()) + ", ";
                     type = type + ProtobufProxyUtils.processProtobufType(field.getGenericeValueType())  + ">";
                     
                 }
