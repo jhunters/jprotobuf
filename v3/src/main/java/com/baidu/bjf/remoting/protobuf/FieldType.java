@@ -171,7 +171,7 @@ public enum FieldType {
                 || this == FIXED64 || this == FLOAT
                 || this == INT64 || this == SFIXED32
                 || this == SFIXED64 || this == SINT32
-                || this == SINT64 || this == BOOL) {
+                || this == SINT64 || this == BOOL || this == FieldType.UINT32 || this == FieldType.UINT64) {
             return true;
         }
         
