@@ -164,6 +164,16 @@ public class ProtobufProxyUtils {
         return ret;
     }
     
+    public static boolean isObjectType(Class<?> cls) {
+        FieldType fieldType = TYPE_MAPPING.get(cls);
+        if (fieldType != null) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    
     public static String processProtobufType(Class<?> cls) {
         FieldType fieldType = TYPE_MAPPING.get(cls);
         if (fieldType != null) {

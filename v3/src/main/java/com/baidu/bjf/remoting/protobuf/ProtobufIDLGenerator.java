@@ -195,8 +195,27 @@ public class ProtobufIDLGenerator {
                         }
                     }
                 } else if (field.getFieldType() == FieldType.MAP) {
-                    type = type + "<" + ProtobufProxyUtils.processProtobufType(field.getGenericKeyType()) + ", ";
-                    type = type + ProtobufProxyUtils.processProtobufType(field.getGenericeValueType())  + ">";
+                    Class keyClass = field.getGenericKeyType();
+                    Class valueClass = field.getGenericeValueType();
+                    type = type + "<" + ProtobufProxyUtils.processProtobufType(keyClass) + ", ";
+                    type = type + ProtobufProxyUtils.processProtobufType(valueClass)  + ">";
+                    
+                    // check map key or value is object type
+                    if (ProtobufProxyUtils.isObjectType(keyClass)) {
+                        if (Enum.class.isAssignableFrom(keyClass)) {
+                            enumTypes.add(keyClass);
+                        } else {
+                            subTypes.add(keyClass);
+                        }
+                    }
+                    
+                    if (ProtobufProxyUtils.isObjectType(valueClass)) {
+                        if (Enum.class.isAssignableFrom(valueClass)) {
+                            enumTypes.add(valueClass);
+                        } else {
+                            subTypes.add(valueClass);
+                        }
+                    }
                     
                 }
 
