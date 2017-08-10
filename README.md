@@ -367,7 +367,7 @@ public void testDecode() throws Exception {
 public class AddressBookProtosPOJOWithDefault {
 
     @Protobuf
-    public PersonPOJOWithDefault list;
+    public PersonPOJO list;
 
     @Protobuf
     public String name;
