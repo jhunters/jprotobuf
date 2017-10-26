@@ -564,6 +564,8 @@ public class CodeGenerator {
             mc.appendLineCode0(
                     CodedConstant.getMappedWriteCode(field, "output", field.getOrder(), field.getFieldType(), isList));
         }
+        
+        mc.appendLineCode1("output.flush()");
 
         return mc;
     }

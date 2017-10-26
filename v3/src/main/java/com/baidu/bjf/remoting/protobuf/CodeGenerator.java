@@ -598,6 +598,7 @@ public class CodeGenerator {
                     isList, field.isMap()));
         }
 
+        code.append("output.flush()").append(JAVA_LINE_BREAK);
         code.append("}").append(LINE_BREAK);
 
         return code.toString();
