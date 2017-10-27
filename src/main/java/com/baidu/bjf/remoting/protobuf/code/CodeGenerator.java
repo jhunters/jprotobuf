@@ -38,7 +38,7 @@ import com.google.protobuf.Descriptors.Descriptor;
  * @author xiemalin
  * @since 1.0.0
  */
-public class CodeGenerator {
+public class CodeGenerator implements ICodeGenerator {
 
     /** auto proxied suffix class name. */
     public static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
@@ -72,29 +72,26 @@ public class CodeGenerator {
         return relativeProxyClasses;
     }
 
-    /**
-     * Sets the static path for output dynamic compiled class file.
-     *
-     * @param outputPath the new static path for output dynamic compiled class file
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#setOutputPath(java.io.File)
      */
+    @Override
     public void setOutputPath(File outputPath) {
         this.outputPath = outputPath;
     }
 
-    /**
-     * Checks if is enable debug mode.
-     *
-     * @return the enable debug mode
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#isDebug()
      */
+    @Override
     public boolean isDebug() {
         return debug;
     }
 
-    /**
-     * Sets the enable debug mode.
-     *
-     * @param debug the new enable debug mode
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#setDebug(boolean)
      */
+    @Override
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
@@ -114,29 +111,26 @@ public class CodeGenerator {
         this.cls = cls;
     }
 
-    /**
-     * Gets the class name.
-     *
-     * @return the class name
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getClassName()
      */
+    @Override
     public String getClassName() {
         return ClassHelper.getClassName(cls) + DEFAULT_SUFFIX_CLASSNAME;
     }
 
-    /**
-     * Gets the package.
-     *
-     * @return the package
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getPackage()
      */
+    @Override
     public String getPackage() {
         return ClassHelper.getPackage(cls);
     }
 
-    /**
-     * Gets the full class name.
-     *
-     * @return the full class name
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getFullClassName()
      */
+    @Override
     public String getFullClassName() {
         if (StringUtils.isEmpty(getPackage())) {
             return getClassName();
@@ -145,11 +139,10 @@ public class CodeGenerator {
         return getPackage() + ClassHelper.PACKAGE_SEPARATOR + getClassName();
     }
 
-    /**
-     * Gets the code.
-     *
-     * @return the code
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getCode()
      */
+    @Override
     public String getCode() {
 
         String className = getClassName();

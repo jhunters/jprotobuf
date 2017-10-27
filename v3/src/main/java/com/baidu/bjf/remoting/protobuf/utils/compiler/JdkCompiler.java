@@ -61,25 +61,39 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  */
 public class JdkCompiler extends AbstractCompiler {
     
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(JdkCompiler.class.getName());
 
+    /** The compiler. */
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
+    /** The class loader. */
     private final ClassLoaderImpl classLoader;
 
+    /** The java file manager. */
     private final JavaFileManagerImpl javaFileManager;
 
+    /** The options. */
     private volatile List<String> options;
     
+    /** The Constant DEFAULT_JDK_VERSION. */
     private static final String DEFAULT_JDK_VERSION = "1.6";
     
+    /**
+     * Instantiates a new jdk compiler.
+     *
+     * @param loader the loader
+     */
     public JdkCompiler(final ClassLoader loader) {
     	this(loader, DEFAULT_JDK_VERSION);
     }
     
+	/**
+     * Instantiates a new jdk compiler.
+     *
+     * @param loader the loader
+     * @param jdkVersion the jdk version
+     */
 	public JdkCompiler(final ClassLoader loader, final String jdkVersion) {
         options = new ArrayList<String>();
         options.add("-source");
@@ -123,6 +137,9 @@ public class JdkCompiler extends AbstractCompiler {
         javaFileManager = new JavaFileManagerImpl(manager, classLoader);
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.utils.compiler.AbstractCompiler#doCompile(java.lang.String, java.lang.String, java.io.OutputStream)
+     */
     @Override
     public synchronized Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
          
@@ -166,24 +183,47 @@ public class JdkCompiler extends AbstractCompiler {
         return retClass;
     }
     
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler#loadBytes(java.lang.String)
+     */
     @Override
     public byte[] loadBytes(String className) {
         byte[] bytes = classLoader.loadClassBytes(className);
         return bytes;
     }
 
+    /**
+     * The Class ClassLoaderImpl.
+     */
     private final class ClassLoaderImpl extends ClassLoader {
 
+        /** The classes. */
         private final Map<String, JavaFileObject> classes = new HashMap<String, JavaFileObject>();
 
+        /**
+         * Instantiates a new class loader impl.
+         *
+         * @param parentClassLoader the parent class loader
+         */
         ClassLoaderImpl(final ClassLoader parentClassLoader) {
             super(parentClassLoader);
         }
 
+        /**
+         * Files.
+         *
+         * @return the collection
+         */
         Collection<JavaFileObject> files() {
             return Collections.unmodifiableCollection(classes.values());
         }
 
+        /**
+         * Load class bytes.
+         *
+         * @param qualifiedClassName the qualified class name
+         * @return the byte[]
+         */
         public byte[] loadClassBytes(final String qualifiedClassName) {
             JavaFileObject file = classes.get(qualifiedClassName);
             if (file != null) {
@@ -193,6 +233,9 @@ public class JdkCompiler extends AbstractCompiler {
             return null;
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.ClassLoader#findClass(java.lang.String)
+         */
         @Override
         protected Class<?> findClass(final String qualifiedClassName) throws ClassNotFoundException {
             JavaFileObject file = classes.get(qualifiedClassName);
@@ -207,16 +250,28 @@ public class JdkCompiler extends AbstractCompiler {
             }
         }
 
+        /**
+         * Adds the.
+         *
+         * @param qualifiedClassName the qualified class name
+         * @param javaFile the java file
+         */
         void add(final String qualifiedClassName, final JavaFileObject javaFile) {
             classes.put(qualifiedClassName, javaFile);
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.ClassLoader#loadClass(java.lang.String, boolean)
+         */
         @Override
         protected synchronized Class<?> loadClass(final String name, final boolean resolve)
                 throws ClassNotFoundException {
             return super.loadClass(name, resolve);
         }
 
+        /* (non-Javadoc)
+         * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
+         */
         @Override
         public InputStream getResourceAsStream(final String name) {
             if (name.endsWith(ClassUtils.CLASS_EXTENSION)) {
@@ -231,27 +286,53 @@ public class JdkCompiler extends AbstractCompiler {
         }
     }
 
+    /**
+     * The Class JavaFileObjectImpl.
+     */
     private static final class JavaFileObjectImpl extends SimpleJavaFileObject {
 
+        /** The bytecode. */
         private ByteArrayOutputStream bytecode;
 
+        /** The source. */
         private final CharSequence source;
 
+        /**
+         * Instantiates a new java file object impl.
+         *
+         * @param baseName the base name
+         * @param source the source
+         */
         public JavaFileObjectImpl(final String baseName, final CharSequence source) {
             super(ClassUtils.toURI(baseName + ClassUtils.JAVA_EXTENSION), Kind.SOURCE);
             this.source = source;
         }
 
+        /**
+         * Instantiates a new java file object impl.
+         *
+         * @param name the name
+         * @param kind the kind
+         */
         JavaFileObjectImpl(final String name, final Kind kind) {
             super(ClassUtils.toURI(name), kind);
             source = null;
         }
 
+        /**
+         * Instantiates a new java file object impl.
+         *
+         * @param uri the uri
+         * @param kind the kind
+         */
         public JavaFileObjectImpl(URI uri, Kind kind) {
             super(uri, kind);
             source = null;
         }
 
+        /* (non-Javadoc)
+         * @see javax.tools.SimpleJavaFileObject#getCharContent(boolean)
+         */
         @Override
         public CharSequence getCharContent(final boolean ignoreEncodingErrors) throws UnsupportedOperationException {
             if (source == null) {
@@ -260,16 +341,27 @@ public class JdkCompiler extends AbstractCompiler {
             return source;
         }
 
+        /* (non-Javadoc)
+         * @see javax.tools.SimpleJavaFileObject#openInputStream()
+         */
         @Override
         public InputStream openInputStream() {
             return new ByteArrayInputStream(getByteCode());
         }
 
+        /* (non-Javadoc)
+         * @see javax.tools.SimpleJavaFileObject#openOutputStream()
+         */
         @Override
         public OutputStream openOutputStream() {
             return bytecode = new ByteArrayOutputStream();
         }
 
+        /**
+         * Gets the byte code.
+         *
+         * @return the byte code
+         */
         public byte[] getByteCode() {
             if (bytecode == null) {
                 return null;
@@ -278,17 +370,31 @@ public class JdkCompiler extends AbstractCompiler {
         }
     }
 
+    /**
+     * The Class JavaFileManagerImpl.
+     */
     private static final class JavaFileManagerImpl extends ForwardingJavaFileManager<JavaFileManager> {
 
+        /** The class loader. */
         private final ClassLoaderImpl classLoader;
 
+        /** The file objects. */
         private final Map<URI, JavaFileObject> fileObjects = new HashMap<URI, JavaFileObject>();
 
+        /**
+         * Instantiates a new java file manager impl.
+         *
+         * @param fileManager the file manager
+         * @param classLoader the class loader
+         */
         public JavaFileManagerImpl(JavaFileManager fileManager, ClassLoaderImpl classLoader) {
             super(fileManager);
             this.classLoader = classLoader;
         }
 
+        /* (non-Javadoc)
+         * @see javax.tools.ForwardingJavaFileManager#getFileForInput(javax.tools.JavaFileManager.Location, java.lang.String, java.lang.String)
+         */
         @Override
         public FileObject getFileForInput(Location location, String packageName, String relativeName)
                 throws IOException {
@@ -299,15 +405,34 @@ public class JdkCompiler extends AbstractCompiler {
             return super.getFileForInput(location, packageName, relativeName);
         }
 
+        /**
+         * Put file for input.
+         *
+         * @param location the location
+         * @param packageName the package name
+         * @param relativeName the relative name
+         * @param file the file
+         */
         public void putFileForInput(StandardLocation location, String packageName, String relativeName,
                 JavaFileObject file) {
             fileObjects.put(uri(location, packageName, relativeName), file);
         }
 
+        /**
+         * Uri.
+         *
+         * @param location the location
+         * @param packageName the package name
+         * @param relativeName the relative name
+         * @return the uri
+         */
         private URI uri(Location location, String packageName, String relativeName) {
             return ClassUtils.toURI(location.getName() + '/' + packageName + '/' + relativeName);
         }
 
+        /* (non-Javadoc)
+         * @see javax.tools.ForwardingJavaFileManager#getJavaFileForOutput(javax.tools.JavaFileManager.Location, java.lang.String, javax.tools.JavaFileObject.Kind, javax.tools.FileObject)
+         */
         @Override
         public JavaFileObject getJavaFileForOutput(Location location, String qualifiedName, Kind kind,
                 FileObject outputFile) throws IOException {
@@ -316,11 +441,17 @@ public class JdkCompiler extends AbstractCompiler {
             return file;
         }
 
+        /* (non-Javadoc)
+         * @see javax.tools.ForwardingJavaFileManager#getClassLoader(javax.tools.JavaFileManager.Location)
+         */
         @Override
         public ClassLoader getClassLoader(JavaFileManager.Location location) {
             return classLoader;
         }
 
+        /* (non-Javadoc)
+         * @see javax.tools.ForwardingJavaFileManager#inferBinaryName(javax.tools.JavaFileManager.Location, javax.tools.JavaFileObject)
+         */
         @Override
         public String inferBinaryName(Location loc, JavaFileObject file) {
             if (file instanceof JavaFileObjectImpl) {
@@ -329,6 +460,9 @@ public class JdkCompiler extends AbstractCompiler {
             return super.inferBinaryName(loc, file);
         }
 
+        /* (non-Javadoc)
+         * @see javax.tools.ForwardingJavaFileManager#list(javax.tools.JavaFileManager.Location, java.lang.String, java.util.Set, boolean)
+         */
         @Override
         public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse)
                 throws IOException {

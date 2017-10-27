@@ -37,7 +37,7 @@ import com.google.protobuf.Descriptors.Descriptor;
  * @author xiemalin
  * @since 1.0.0
  */
-public class CodeGenerator {
+public class CodeGenerator implements ICodeGenerator {
 
     /**
      * line break for editor
@@ -88,38 +88,34 @@ public class CodeGenerator {
 
     private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
 
-    /**
-     * get relativeProxyClasses
-     * 
-     * @return relativeProxyClasses
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.ICodeGenerator#getRelativeProxyClasses()
      */
+    @Override
     public Set<Class<?>> getRelativeProxyClasses() {
         return relativeProxyClasses;
     }
 
-    /**
-     * set outputPath value to outputPath
-     * 
-     * @param outputPath the outputPath to set
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.ICodeGenerator#setOutputPath(java.io.File)
      */
+    @Override
     public void setOutputPath(File outputPath) {
         this.outputPath = outputPath;
     }
 
-    /**
-     * get the debug
-     * 
-     * @return the debug
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.ICodeGenerator#isDebug()
      */
+    @Override
     public boolean isDebug() {
         return debug;
     }
 
-    /**
-     * set debug value to debug
-     * 
-     * @param debug the debug to set
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.ICodeGenerator#setDebug(boolean)
      */
+    @Override
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
@@ -141,24 +137,26 @@ public class CodeGenerator {
         this.cls = cls;
     }
 
-    /**
-     * get new class name
-     * 
-     * @return class name
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.ICodeGenerator#getClassName()
      */
+    @Override
     public String getClassName() {
         return ClassHelper.getClassName(cls) + DEFAULT_SUFFIX_CLASSNAME;
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.ICodeGenerator#getPackage()
+     */
+    @Override
     public String getPackage() {
         return ClassHelper.getPackage(cls);
     }
 
-    /**
-     * get new class name with full package
-     * 
-     * @return class name
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.ICodeGenerator#getFullClassName()
      */
+    @Override
     public String getFullClassName() {
         return getPackage() + ClassHelper.PACKAGE_SEPARATOR + getClassName();
     }
@@ -175,11 +173,10 @@ public class CodeGenerator {
 
     }
 
-    /**
-     * get full java class code.
-     * 
-     * @return full java class code
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.ICodeGenerator#getCode()
      */
+    @Override
     public String getCode() {
         StringBuilder code = new StringBuilder();
 

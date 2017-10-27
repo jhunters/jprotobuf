@@ -24,7 +24,13 @@ import java.io.OutputStream;
  * @since 1.0.0
  */
 public abstract class AbstractCompiler implements Compiler {
-
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler#compile(java.lang.String, java.lang.String,
+     * java.lang.ClassLoader, java.io.OutputStream, long)
+     */
     public Class<?> compile(String className, String code, ClassLoader classLoader, OutputStream os, long lastModify) {
         code = code.trim();
         try {
@@ -44,6 +50,15 @@ public abstract class AbstractCompiler implements Compiler {
         }
     }
 
+    /**
+     * Do compile action.
+     *
+     * @param name the name
+     * @param source the java source code to compile
+     * @param os the {@link OutputStream} instance
+     * @return the class
+     * @throws Throwable the throwable
+     */
     protected abstract Class<?> doCompile(String name, String source, OutputStream os) throws Throwable;
 
 }

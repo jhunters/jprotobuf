@@ -27,12 +27,25 @@ import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
  */
 public abstract class CacheableJdkCompiler implements Compiler {
 
+    /** The compiler. */
     protected Compiler compiler;
 
+    /**
+     * Instantiates a new cacheable jdk compiler.
+     *
+     * @param compiler the compiler
+     */
     public CacheableJdkCompiler(Compiler compiler) {
         this.compiler = compiler;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler#compile(java.lang.String, java.lang.String,
+     * java.lang.ClassLoader, java.io.OutputStream, long)
+     */
+    @Override
     public Class<?> compile(String className, String code, ClassLoader classLoader, OutputStream os, long timestamp) {
         Class<?> cls = null;
         try {
@@ -52,7 +65,7 @@ public abstract class CacheableJdkCompiler implements Compiler {
         if (bytes != null) {
             LoadableClassLoader loadableClassLoader = new LoadableClassLoader(classLoader);
             loadableClassLoader.defineNewClass(className, bytes, 0, bytes.length);
-            
+
             try {
                 return loadableClassLoader.loadClass(className);
             } catch (ClassNotFoundException e) {
@@ -61,20 +74,51 @@ public abstract class CacheableJdkCompiler implements Compiler {
         }
 
         cls = compiler.compile(className, code, classLoader, os, timestamp);
-        
+
         cache(className, compiler.loadBytes(className), timestamp);
         return cls;
     }
 
+    /**
+     * Cached.
+     *
+     * @param className the class name
+     * @param timestamp the timestamp
+     * @return the byte[]
+     */
     protected abstract byte[] cached(String className, long timestamp);
 
+    /**
+     * Cache.
+     *
+     * @param className the class name
+     * @param bytes the bytes
+     * @param timestamp the timestamp
+     */
     protected abstract void cache(String className, byte[] bytes, long timestamp);
 
+    /**
+     * The Class LoadableClassLoader.
+     */
     protected static class LoadableClassLoader extends ClassLoader {
+
+        /**
+         * Instantiates a new loadable class loader.
+         *
+         * @param parent the parent
+         */
         protected LoadableClassLoader(ClassLoader parent) {
             super(parent);
         }
 
+        /**
+         * Define new class.
+         *
+         * @param name the name
+         * @param b the b
+         * @param off the off
+         * @param len the len
+         */
         public void defineNewClass(String name, byte[] b, int off, int len) {
             defineClass(name, b, off, len);
         }

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.code.CodeGenerator;
+import com.baidu.bjf.remoting.protobuf.code.ICodeGenerator;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
@@ -53,7 +54,7 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
  *   byte[] result = codec.encode(user);
  *   // do decode
  *   User user2 = codec.decode(result);
- *   
+ * 
  * </pre>
  * 
  * @author xiemalin
@@ -68,13 +69,13 @@ public final class ProtobufProxy {
     private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
 
     /**
-     * cached {@link Codec} instance by class name. 
+     * cached {@link Codec} instance by class name.
      */
     private static final Map<String, Codec> CACHED = new ConcurrentHashMap<String, Codec>();
 
     /** The Constant OUTPUT_PATH for target directory to create generated source code out. */
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
-    
+
     /**
      * To generate a protobuf proxy java source code for target class.
      * 
@@ -84,6 +85,20 @@ public final class ProtobufProxy {
      * @throws IOException in case of any io relative exception.
      */
     public static void dynamicCodeGenerate(OutputStream os, Class cls, Charset charset) throws IOException {
+        dynamicCodeGenerate(os, cls, charset, getCodeGenerator(cls));
+    }
+
+    /**
+     * To generate a protobuf proxy java source code for target class.
+     *
+     * @param os to generate java source code
+     * @param cls target class
+     * @param charset charset type
+     * @param codeGenerator the code generator
+     * @throws IOException in case of any io relative exception.
+     */
+    public static void dynamicCodeGenerate(OutputStream os, Class cls, Charset charset, ICodeGenerator codeGenerator)
+            throws IOException {
         if (cls == null) {
             throw new NullPointerException("Parameter 'cls' is null");
         }
@@ -93,9 +108,7 @@ public final class ProtobufProxy {
         if (charset == null) {
             charset = Charset.defaultCharset();
         }
-
-        CodeGenerator cg = getCodeGenerator(cls);
-        String code = cg.getCode();
+        String code = codeGenerator.getCode();
 
         os.write(code.getBytes(charset));
     }
@@ -145,7 +158,24 @@ public final class ProtobufProxy {
             debug = false; // set default to close debug info
         }
 
-        return create(cls, debug, null);
+        return create(cls, debug, null, JDKCompilerHelper.getJdkCompiler(), getCodeGenerator(cls));
+    }
+
+    /**
+     * To create a protobuf proxy class for target class.
+     *
+     * @param <T> generic type
+     * @param cls target class to parse <code>@Protobuf</code> annotation
+     * @param compiler the compiler
+     * @return {@link Codec} instance proxy
+     */
+    public static <T> Codec<T> create(Class<T> cls, Compiler compiler, ICodeGenerator codeGenerator) {
+        Boolean debug = DEBUG_CONTROLLER.get();
+        if (debug == null) {
+            debug = false; // set default to close debug info
+        }
+
+        return create(cls, debug, null, compiler, getCodeGenerator(cls));
     }
 
     /**
@@ -173,7 +203,7 @@ public final class ProtobufProxy {
      * @return the codec
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug) {
-        return create(cls, debug, null);
+        return create(cls, debug, null, JDKCompilerHelper.getJdkCompiler(), getCodeGenerator(cls));
     }
 
     /**
@@ -186,10 +216,26 @@ public final class ProtobufProxy {
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
+        return create(cls, debug, path, JDKCompilerHelper.getJdkCompiler(), getCodeGenerator(cls));
+    }
+
+    /**
+     * To create a protobuf proxy class for target class.
+     *
+     * @param <T> target object type to be proxied.
+     * @param cls target object class
+     * @param debug true will print generate java source code
+     * @param path the path
+     * @param compiler the compiler
+     * @param codeGenerator the code generator
+     * @return proxy instance object.
+     */
+    public static <T> Codec<T> create(Class<T> cls, boolean debug, File path, Compiler compiler,
+            ICodeGenerator codeGenerator) {
         DEBUG_CONTROLLER.set(debug);
         OUTPUT_PATH.set(path);
         try {
-            return doCreate(cls, debug);
+            return doCreate(cls, debug, compiler, codeGenerator);
         } finally {
             DEBUG_CONTROLLER.remove();
             OUTPUT_PATH.remove();
@@ -209,16 +255,20 @@ public final class ProtobufProxy {
 
     /**
      * To create a protobuf proxy class for target class.
-     * 
+     *
      * @param <T> target object type to be proxied.
      * @param cls target object class
      * @param debug true will print generate java source code
+     * @param compiler the compiler
+     * @param cg the cg
      * @return proxy instance object.
      */
-    protected static <T> Codec<T> doCreate(Class<T> cls, boolean debug) {
+    protected static <T> Codec<T> doCreate(Class<T> cls, boolean debug, Compiler compiler,
+            ICodeGenerator cg) {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
+        
 
         String uniClsName = cls.getName();
         Codec codec = CACHED.get(uniClsName);
@@ -227,7 +277,6 @@ public final class ProtobufProxy {
         }
 
         // crate code generator
-        CodeGenerator cg = getCodeGenerator(cls);
         cg.setDebug(debug);
         File path = OUTPUT_PATH.get();
         cg.setOutputPath(path);
@@ -255,7 +304,7 @@ public final class ProtobufProxy {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-
+        
         String code = cg.getCode();
         if (debug) {
             String printCode = code;
@@ -281,22 +330,22 @@ public final class ProtobufProxy {
             }
 
         }
-        
-        Compiler compiler = JDKCompilerHelper.getJdkCompiler(cls.getClassLoader());
+
+        if (compiler == null) {
+            compiler = JDKCompilerHelper.getJdkCompiler();
+        }
         Class<?> newClass;
-        
+
         // get last modify time
         long lastModify = ClassHelper.getLastModifyTime(cls);
-        
+
         try {
-            newClass = compiler.compile(className,
-                    code, cls.getClassLoader(), fos, lastModify);
+            newClass = compiler.compile(className, code, cls.getClassLoader(), fos, lastModify);
         } catch (Exception e) {
-            
+
             compiler = JDKCompilerHelper.getJdkCompiler();
-            
-            newClass = compiler.compile(className,
-                    code, cls.getClassLoader(), fos, lastModify);
+
+            newClass = compiler.compile(className, code, cls.getClassLoader(), fos, lastModify);
         }
 
         if (fos != null) {
@@ -317,7 +366,7 @@ public final class ProtobufProxy {
                 // try to eagle load
                 Set<Class<?>> relativeProxyClasses = cg.getRelativeProxyClasses();
                 for (Class<?> relativeClass : relativeProxyClasses) {
-                    ProtobufProxy.create(relativeClass, debug, path);
+                    ProtobufProxy.create(relativeClass, debug, path, compiler, cg);
                 }
             } catch (Exception e) {
                 LOGGER.log(Level.FINE, e.getMessage(), e.getCause());
