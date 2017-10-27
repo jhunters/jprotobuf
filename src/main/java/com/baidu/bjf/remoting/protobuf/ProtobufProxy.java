@@ -167,6 +167,7 @@ public final class ProtobufProxy {
      * @param <T> generic type
      * @param cls target class to parse <code>@Protobuf</code> annotation
      * @param compiler the compiler
+     * @param codeGenerator the code generator
      * @return {@link Codec} instance proxy
      */
     public static <T> Codec<T> create(Class<T> cls, Compiler compiler, ICodeGenerator codeGenerator) {
