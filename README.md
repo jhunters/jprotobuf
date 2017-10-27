@@ -463,7 +463,6 @@ ProtobufIDLProxy.generateSource(fis, new File("D:\\test"));
 ```java
 ICodeGenerator codeGenerator = new ...;
 Compiler compiler = new ...;
-Class<T> cls, Compiler compiler, ICodeGenerator codeGenerator
 ProtobufProxy.create(clazz, compiler, codeGenerator);
 
 ```
