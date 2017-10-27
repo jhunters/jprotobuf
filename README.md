@@ -456,8 +456,18 @@ ProtobufIDLProxy.generateSource(fis, new File("D:\\test"));
 ```
 上面的示例，则会直接把生成的源码文件生成到D盘test目录下。
 
+
+###   开放 Compiler接口与ICodeGenerator接口，方便外部实现 代码生成与代码编译能力  ###
+使用示例：
+
+```java
+ICodeGenerator codeGenerator = new ...;
+Compiler compiler = new ...;
+Class<T> cls, Compiler compiler, ICodeGenerator codeGenerator
+ProtobufProxy.create(clazz, compiler, codeGenerator);
+
+```
+上面的示例，会开放Compiler与ICodeGenerator实现自定能力
+
 更多使用示例请参见testcase代码。
-
-
-
 
