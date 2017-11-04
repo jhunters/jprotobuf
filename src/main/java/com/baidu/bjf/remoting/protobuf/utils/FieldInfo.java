@@ -133,7 +133,7 @@ public class FieldInfo {
     }
 
     /**
-     * @param field
+     * @param field target field
      */
     public FieldInfo(Field field) {
         super();

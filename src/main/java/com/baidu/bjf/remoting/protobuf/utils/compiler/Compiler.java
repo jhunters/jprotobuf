@@ -28,6 +28,7 @@ public interface Compiler {
     /**
      * do compile java source.
      * 
+     * @param className full class name
      * @param code Java source code
      * @param classLoader current classloader
      * @param os target output compiled byte code

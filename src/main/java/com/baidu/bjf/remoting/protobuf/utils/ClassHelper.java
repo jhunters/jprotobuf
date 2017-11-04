@@ -147,6 +147,10 @@ public class ClassHelper {
 
     /**
      * Same as <code>Class.forName()</code>, except that it works for primitive types.
+     * 
+     * @param name the name of the Class
+     * @return Class instance for the supplied name
+     * @throws ClassNotFoundException if the class was not found
      */
     public static Class<?> forName(String name) throws ClassNotFoundException {
         return forName(name, getClassLoader());
@@ -324,6 +328,7 @@ public class ClassHelper {
     /**
      * get new class name with full package
      * 
+     * @param cls target class
      * @return class name
      */
     public static String getFullClassName(Class<?> cls) {
