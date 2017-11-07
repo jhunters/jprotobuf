@@ -15,7 +15,6 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
@@ -38,7 +37,7 @@ import com.google.protobuf.Descriptors.Descriptor;
  * @author xiemalin
  * @since 1.0.0
  */
-public class CodeGenerator implements ICodeGenerator {
+public class CodeGenerator extends AbstractCodeGenerator {
 
     /** auto proxied suffix class name. */
     public static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
@@ -48,17 +47,6 @@ public class CodeGenerator implements ICodeGenerator {
 
     /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class.getName());
-
-    /** target fields which marked <code> @Protofuf </code> annotation. */
-    private List<FieldInfo> fields;
-
-    /** enable debug mode. */
-    private boolean debug = false;
-
-    /**
-     * static path for output dynamic compiled class file.
-     */
-    private File outputPath;
 
     /** The relative proxy classes. */
     private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
@@ -72,33 +60,6 @@ public class CodeGenerator implements ICodeGenerator {
         return relativeProxyClasses;
     }
 
-    /* (non-Javadoc)
-     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#setOutputPath(java.io.File)
-     */
-    @Override
-    public void setOutputPath(File outputPath) {
-        this.outputPath = outputPath;
-    }
-
-    /* (non-Javadoc)
-     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#isDebug()
-     */
-    @Override
-    public boolean isDebug() {
-        return debug;
-    }
-
-    /* (non-Javadoc)
-     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#setDebug(boolean)
-     */
-    @Override
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
-
-    /** target class to parse <code>@Protobuf</code> annotation to generate code. */
-    private Class<?> cls;
-
     /**
      * Constructor method.
      *
@@ -106,9 +67,7 @@ public class CodeGenerator implements ICodeGenerator {
      * @param cls protobuf mapped class
      */
     public CodeGenerator(List<FieldInfo> fields, Class<?> cls) {
-        super();
-        this.fields = fields;
-        this.cls = cls;
+        super(fields, cls);
     }
 
     /* (non-Javadoc)
@@ -119,25 +78,6 @@ public class CodeGenerator implements ICodeGenerator {
         return ClassHelper.getClassName(cls) + DEFAULT_SUFFIX_CLASSNAME;
     }
 
-    /* (non-Javadoc)
-     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getPackage()
-     */
-    @Override
-    public String getPackage() {
-        return ClassHelper.getPackage(cls);
-    }
-
-    /* (non-Javadoc)
-     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getFullClassName()
-     */
-    @Override
-    public String getFullClassName() {
-        if (StringUtils.isEmpty(getPackage())) {
-            return getClassName();
-        }
-
-        return getPackage() + ClassHelper.PACKAGE_SEPARATOR + getClassName();
-    }
 
     /* (non-Javadoc)
      * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getCode()

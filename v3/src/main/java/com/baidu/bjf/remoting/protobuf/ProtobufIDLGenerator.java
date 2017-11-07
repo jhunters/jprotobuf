@@ -119,6 +119,7 @@ public class ProtobufIDLGenerator {
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
 
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
+        boolean isMap = false;
         for (FieldInfo field : fieldInfos) {
             if (field.hasDescription()) {
                 code.append("// ").append(field.getDescription()).append("\n");
@@ -195,6 +196,7 @@ public class ProtobufIDLGenerator {
                         }
                     }
                 } else if (field.getFieldType() == FieldType.MAP) {
+                    isMap = true;
                     Class keyClass = field.getGenericKeyType();
                     Class valueClass = field.getGenericeValueType();
                     type = type + "<" + ProtobufProxyUtils.processProtobufType(keyClass) + ", ";
@@ -220,6 +222,9 @@ public class ProtobufIDLGenerator {
                 }
 
                 String required = getFieldRequired(field.isRequired());
+                if (isMap) {
+                    required = "";
+                }
 
                 if (field.isList()) {
                     required = "repeated";
