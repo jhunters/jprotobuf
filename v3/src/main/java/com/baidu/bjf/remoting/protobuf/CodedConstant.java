@@ -41,6 +41,18 @@ import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType.Kind;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType.MapType;
+import com.baidu.jprotobuf.com.squareup.protoparser.EnumConstantElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.EnumElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement.Builder;
+import com.baidu.jprotobuf.com.squareup.protoparser.MessageElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.OptionElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoFile;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoParser;
+import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
@@ -55,18 +67,6 @@ import com.google.protobuf.LazyField;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageLite;
 import com.google.protobuf.WireFormat;
-import com.baidu.jprotobuf.com.squareup.protoparser.DataType;
-import com.baidu.jprotobuf.com.squareup.protoparser.DataType.Kind;
-import com.baidu.jprotobuf.com.squareup.protoparser.DataType.MapType;
-import com.baidu.jprotobuf.com.squareup.protoparser.EnumConstantElement;
-import com.baidu.jprotobuf.com.squareup.protoparser.EnumElement;
-import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
-import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement.Builder;
-import com.baidu.jprotobuf.com.squareup.protoparser.MessageElement;
-import com.baidu.jprotobuf.com.squareup.protoparser.OptionElement;
-import com.baidu.jprotobuf.com.squareup.protoparser.ProtoFile;
-import com.baidu.jprotobuf.com.squareup.protoparser.ProtoParser;
-import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
 
 /**
  * Utility class for codec.

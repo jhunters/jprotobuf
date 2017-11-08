@@ -180,9 +180,9 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
-						<configuration>
+<!-- 						<configuration>
 							<additionalparam>-Xdoclint:none</additionalparam>
-						</configuration>
+						</configuration> -->
 					</execution>
 				</executions>
 			</plugin>
