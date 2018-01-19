@@ -717,8 +717,10 @@ public class ProtobufIDLProxy {
         StringBuilder code = new StringBuilder();
         if (topLevelClass) {
             // define package
-            code.append("package ").append(packageName).append(CODE_END);
-            code.append("\n");
+            if (!StringUtils.isEmpty(packageName)) {
+                code.append("package ").append(packageName).append(CODE_END);
+                code.append("\n");
+            }
             // add import;
             code.append("import com.baidu.bjf.remoting.protobuf.FieldType;\n");
             code.append("import com.baidu.bjf.remoting.protobuf.EnumReadable;\n");
@@ -744,6 +746,12 @@ public class ProtobufIDLProxy {
         for (TypeElement t : nestedTypes) {
             if (t instanceof EnumElement) {
                 enumNames.add(t.name());
+                enumNames.add(t.qualifiedName());
+                if (!StringUtils.isEmpty(packageName)) {
+                    enumNames.add(StringUtils.removeStart(t.qualifiedName(), packageName + PACKAGE_SPLIT));
+                }
+            } else {
+                checkNestedTypes.add(t);
             }
         }
 
@@ -765,7 +773,7 @@ public class ProtobufIDLProxy {
             String javaType;
             if (fType == null) {
                 javaType = getTypeName(field) + DEFAULT_SUFFIX_CLASSNAME;
-                if (!isNestedTypeDependency(field.type(), checkNestedTypes)) {
+                if (!isNestedTypeDependency(javaType, checkNestedTypes)) {
                     cd.addDependency(javaType);
                 }
             } else {
@@ -824,9 +832,14 @@ public class ProtobufIDLProxy {
         }
 
         // to check if has nested classes
-        if (nestedTypes != null && topLevelClass) {
+        if (nestedTypes != null) {
             for (TypeElement t : nestedTypes) {
                 CodeDependent nestedCd;
+                String fqname = t.qualifiedName();
+                if (!StringUtils.isEmpty(packageName)) {
+                    fqname = StringUtils.removeStart(t.qualifiedName(), packageName + PACKAGE_SPLIT_CHAR);
+                }
+                String subClsName = getProxyClassName(fqname);
                 if (t instanceof EnumElement) {
                     nestedCd = createCodeByType((EnumElement) t, false, packageName);
                     enumNames.add(t.name());
@@ -834,10 +847,14 @@ public class ProtobufIDLProxy {
                     nestedCd = createCodeByType(protoFile, (MessageElement) t, enumNames, false, checkNestedTypes, cds,
                             getPackages(cds));
                 }
+                nestedCd.addSubClass(subClsName);
+                nestedCd.addSubClass(packageName + PACKAGE_SPLIT_CHAR + subClsName);
 
                 code.append(nestedCd.code);
                 // merge dependency
                 cd.dependencies.addAll(nestedCd.dependencies);
+                
+                cd.subClasses.addAll(nestedCd.subClasses);
             }
         }
 
@@ -849,6 +866,20 @@ public class ProtobufIDLProxy {
 
         // finally dependency should remove self
         cd.dependencies.remove(cd.name);
+        
+        // also remove parent include
+        if (!parentNestedTypes.isEmpty()) {
+            for (TypeElement t : checkNestedTypes) {
+                Iterator<String> iterator = cd.dependencies.iterator();
+                while (iterator.hasNext()) {
+                    String dependName = iterator.next().replaceAll(DEFAULT_SUFFIX_CLASSNAME, "");
+                    if (t.qualifiedName().endsWith(dependName)) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+        
         return cd;
     }
 
@@ -879,24 +910,28 @@ public class ProtobufIDLProxy {
         return ret;
     }
 
+    
     /**
-     * @param type
-     * @param nestedTypes
-     * @return
+     * Checks if is nested type dependency.
+     *
+     * @param type the type
+     * @param nestedTypes the nested types
+     * @return true, if is nested type dependency
      */
-    private static boolean isNestedTypeDependency(DataType type, List<TypeElement> nestedTypes) {
+    private static boolean isNestedTypeDependency(String type, List<TypeElement> nestedTypes) {
         if (nestedTypes == null) {
             return false;
         }
 
         for (TypeElement t : nestedTypes) {
-            if (type.kind().name().equals(t.name())) {
+            if (type.equals(t.name()) || type.equals(getProxyClassName(t.name()))) {
                 return true;
             }
         }
 
         return false;
     }
+    
 
     /**
      * to generate @Protobuf defined code for target field.

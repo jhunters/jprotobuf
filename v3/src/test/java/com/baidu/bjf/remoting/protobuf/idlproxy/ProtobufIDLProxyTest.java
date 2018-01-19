@@ -122,5 +122,38 @@ public class ProtobufIDLProxyTest {
         Assert.assertEquals("yes", newObject.get("list.name"));
 
     }
+    /**
+     * Test inner including service idl generate source.
+     */
+    @Test
+    public void testInnerIncludingServiceIDLGenerateSource2() {
+        String protoCotent = "package so_rtrs_req_res; " +
+                "option java_package = \"com.rtrs.proto\"; " +
+                "option java_outer_classname = \"ReqRes\"; " +
+                " " +
+                "message Http " +
+                "{ " +
+                "message KeyVal " +
+                "{ " +
+                " optional string key = 1; " +
+                " optional string val = 2; " +
+                "} " +
+                " " +
+                " " +
+                " optional string uri = 1; " +
+                " optional uint32 type = 2; " +
+                " optional KeyVal param_addon = 3; " +
+                " optional string name = 4; " +
+                "} " +
+                " " +
+                " "
+                ;
+        
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(protoCotent);
+        System.out.println(idlProxyObjects);
+        
+        idlProxyObjects.get("Http").put("param_addon.key", "abc");
+        Assert.assertEquals("abc", idlProxyObjects.get("Http").get("param_addon.key"));
+    }
 
 }
