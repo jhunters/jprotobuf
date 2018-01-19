@@ -43,14 +43,14 @@ public class IDLProxyObject {
 
     /** The cached fields. */
     private final Map<String, ReflectInfo> cachedFields = new HashMap<String, ReflectInfo>();
-    
+
     /** The cached. */
     private boolean cached = true;
 
     /**
      * Checks if is cached.
      *
-     * @return true, if is cached
+     * @return the cached
      */
     public boolean isCached() {
         return cached;
@@ -102,7 +102,7 @@ public class IDLProxyObject {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     /**
      * Do set field value.
      *
@@ -114,8 +114,8 @@ public class IDLProxyObject {
      * @param cachedFields the cached fields
      * @return the IDL proxy object
      */
-    private IDLProxyObject doSetFieldValue(String fullField, String field, 
-            Object value, Object object, boolean useCache, Map<String, ReflectInfo> cachedFields) {
+    private IDLProxyObject doSetFieldValue(String fullField, String field, Object value, Object object,
+            boolean useCache, Map<String, ReflectInfo> cachedFields) {
         Field f;
         // check cache
         if (useCache) {
@@ -134,8 +134,8 @@ public class IDLProxyObject {
             try {
                 f = FieldUtils.findField(object.getClass(), parent);
                 if (f == null) {
-                    throw new RuntimeException("No field '" + parent + "' found at class "
-                            + object.getClass().getName());
+                    throw new RuntimeException(
+                            "No field '" + parent + "' found at class " + object.getClass().getName());
                 }
                 Class<?> type = f.getType();
                 f.setAccessible(true);
@@ -147,9 +147,9 @@ public class IDLProxyObject {
                         constructor.setAccessible(true);
                         o = constructor.newInstance(new Object[0]);
                     } else if (memberClass) {
-                        Constructor<?> constructor = type.getConstructor(new Class[]{object.getClass()});
+                        Constructor<?> constructor = type.getConstructor(new Class[] { object.getClass() });
                         constructor.setAccessible(true);
-                        o = constructor.newInstance(new Object[]{object});
+                        o = constructor.newInstance(new Object[] { object });
                     } else {
                         o = type.newInstance();
                     }
@@ -185,7 +185,7 @@ public class IDLProxyObject {
     private IDLProxyObject put(String fullField, String field, Object value, Object object) {
         return doSetFieldValue(fullField, field, value, object, this.cached, this.cachedFields);
     }
-    
+
     /**
      * Put.
      *
@@ -208,14 +208,13 @@ public class IDLProxyObject {
      */
     private void setField(Object value, Object object, Field f) {
         f.setAccessible(true);
-        
+
         Object valueToSet = value;
         try {
             // check if field type is enum
             if (Enum.class.isAssignableFrom(f.getType())) {
-                Enum v = Enum.valueOf((Class<Enum>) f.getType(), String.valueOf(value)); {
-                    valueToSet = v;
-                }
+                Enum v = Enum.valueOf((Class<Enum>) f.getType(), String.valueOf(value));
+                valueToSet = v;
             }
             f.set(object, valueToSet);
         } catch (Exception e) {
@@ -236,7 +235,7 @@ public class IDLProxyObject {
 
         return get(field, field, target);
     }
-    
+
     /**
      * Do get field value.
      *
@@ -247,9 +246,9 @@ public class IDLProxyObject {
      * @param cachedFields the cached fields
      * @return the object
      */
-    private Object doGetFieldValue(String fullField, String field, 
-            Object object, boolean useCache, Map<String, ReflectInfo> cachedFields) {
-     // check cache
+    private Object doGetFieldValue(String fullField, String field, Object object, boolean useCache,
+            Map<String, ReflectInfo> cachedFields) {
+        // check cache
         Field f;
         if (useCache) {
             ReflectInfo info = cachedFields.get(fullField);
@@ -266,8 +265,8 @@ public class IDLProxyObject {
             try {
                 f = FieldUtils.findField(object.getClass(), parent);
                 if (f == null) {
-                    throw new RuntimeException("No field '" + parent + "' found at class "
-                            + object.getClass().getName());
+                    throw new RuntimeException(
+                            "No field '" + parent + "' found at class " + object.getClass().getName());
                 }
                 f.setAccessible(true);
                 Object o = f.get(object);
@@ -344,15 +343,14 @@ public class IDLProxyObject {
         return new IDLProxyObject(codec, object, cls);
 
     }
-    
+
     /**
      * Clear field cache.
      */
     public void clearFieldCache() {
         cachedFields.clear();
     }
-    
-    
+
     /**
      * Gets the target.
      *
@@ -366,10 +364,10 @@ public class IDLProxyObject {
      * The Class ReflectInfo.
      */
     private static class ReflectInfo {
-        
+
         /** The field. */
         private Field field;
-        
+
         /** The target. */
         private Object target;
 
