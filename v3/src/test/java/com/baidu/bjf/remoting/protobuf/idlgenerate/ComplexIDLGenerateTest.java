@@ -155,7 +155,7 @@ public class ComplexIDLGenerateTest {
                 "optional string vName = 3 [default = \"hello world\"];" +
           "}"; 
         
-        IDLProxyObject idlProxyObject = ProtobufIDLProxy.createSingle(idl);
+        IDLProxyObject idlProxyObject = ProtobufIDLProxy.createSingle(idl, true);
         
         Object type = idlProxyObject.get("type"); 
         

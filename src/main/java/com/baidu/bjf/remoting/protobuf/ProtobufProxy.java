@@ -76,6 +76,32 @@ public final class ProtobufProxy {
     /** The Constant OUTPUT_PATH for target directory to create generated source code out. */
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
 
+    /** The Constant OUTPUT_PATH for target directory to create generated source code out. */
+    public static final ThreadLocal<Boolean> CACHE_ENABLED = new ThreadLocal<Boolean>();
+
+    /**
+     * Enable cache.
+     *
+     * @param enabled the enabled
+     */
+    public static void enableCache(boolean enabled) {
+        CACHE_ENABLED.set(enabled);
+    }
+
+    /**
+     * Checks if is cache enabled.
+     *
+     * @return true, if is cache enabled
+     */
+    public static boolean isCacheEnabled() {
+        Boolean b = CACHE_ENABLED.get();
+        if (b == null) {
+            return true;
+        }
+
+        return b;
+    }
+
     /**
      * To generate a protobuf proxy java source code for target class.
      * 
@@ -264,17 +290,17 @@ public final class ProtobufProxy {
      * @param cg the cg
      * @return proxy instance object.
      */
-    protected static <T> Codec<T> doCreate(Class<T> cls, boolean debug, Compiler compiler,
-            ICodeGenerator cg) {
+    protected static <T> Codec<T> doCreate(Class<T> cls, boolean debug, Compiler compiler, ICodeGenerator cg) {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
-        
 
         String uniClsName = cls.getName();
-        Codec codec = CACHED.get(uniClsName);
-        if (codec != null) {
-            return codec;
+        if (isCacheEnabled()) {
+            Codec codec = CACHED.get(uniClsName);
+            if (codec != null) {
+                return codec;
+            }
         }
 
         // crate code generator
@@ -305,7 +331,7 @@ public final class ProtobufProxy {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        
+
         String code = cg.getCode();
         if (debug) {
             String printCode = code;

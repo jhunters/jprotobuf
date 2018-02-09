@@ -1,17 +1,5 @@
-/*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
  */
 package com.baidu.bjf.remoting.protobuf;
 
@@ -60,11 +48,10 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
  */
 public final class ProtobufProxy {
 
+    /** The Constant DEBUG_CONTROLLER. */
     public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
 
-    /**
-     * Logger for this class
-     */
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
 
     /**
@@ -72,7 +59,35 @@ public final class ProtobufProxy {
      */
     private static final Map<String, Codec> CACHED = new ConcurrentHashMap<String, Codec>();
 
+    /** The Constant OUTPUT_PATH. */
     public static final ThreadLocal<File> OUTPUT_PATH = new ThreadLocal<File>();
+    
+    /** The Constant OUTPUT_PATH for target directory to create generated source code out. */
+    public static final ThreadLocal<Boolean> CACHE_ENABLED = new ThreadLocal<Boolean>();
+
+    /**
+     * Enable cache.
+     *
+     * @param enabled the enabled
+     */
+    public static void enableCache(boolean enabled) {
+        CACHE_ENABLED.set(enabled);
+    }
+
+    /**
+     * Checks if is cache enabled.
+     *
+     * @return true, if is cache enabled
+     */
+    public static boolean isCacheEnabled() {
+        Boolean b = CACHE_ENABLED.get();
+        if (b == null) {
+            return true;
+        }
+
+        return b;
+    }
+    
 
     /**
      * To generate a protobuf proxy java source code for target class.
@@ -99,6 +114,12 @@ public final class ProtobufProxy {
         os.write(code.getBytes(charset));
     }
 
+    /**
+     * Gets the code generator.
+     *
+     * @param cls the cls
+     * @return the code generator
+     */
     private static ICodeGenerator getCodeGenerator(Class cls) {
         // check if has default constructor
 
@@ -160,6 +181,8 @@ public final class ProtobufProxy {
     }
 
     /**
+     * Compile.
+     *
      * @param cls target class to be compiled
      * @param outputPath compile byte files output stream
      */
@@ -173,6 +196,14 @@ public final class ProtobufProxy {
 
     }
 
+    /**
+     * Creates the.
+     *
+     * @param <T> the generic type
+     * @param cls the cls
+     * @param debug the debug
+     * @return the codec
+     */
     public static <T> Codec<T> create(Class<T> cls, boolean debug) {
         return create(cls, debug, null);
     }
@@ -240,9 +271,11 @@ public final class ProtobufProxy {
         }
 
         String uniClsName = cls.getName();
-        Codec codec = CACHED.get(uniClsName);
-        if (codec != null) {
-            return codec;
+        if (isCacheEnabled()) {
+            Codec codec = CACHED.get(uniClsName);
+            if (codec != null) {
+                return codec;
+            }
         }
 
         cg.setDebug(debug);
@@ -340,6 +373,9 @@ public final class ProtobufProxy {
         }
     }
 
+    /**
+     * Clear cache.
+     */
     public static void clearCache() {
         CACHED.clear();
     }

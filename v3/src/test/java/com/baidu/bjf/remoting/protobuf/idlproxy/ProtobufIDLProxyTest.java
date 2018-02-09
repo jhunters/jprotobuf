@@ -97,6 +97,36 @@ public class ProtobufIDLProxyTest {
         Assert.assertEquals(9, icn.getUint32F());
         Assert.assertEquals(10L, icn.getUint64F());
     }
+    
+    @Test
+    public void testDyanmicIDLChange() throws Exception {
+
+        String protoCotent =
+                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
+                        + "  required string message = 1; }";
+        IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
+
+        String expected = "hello你好";
+        // 动态设置字段值
+        object.put("message", expected);
+        
+        Object result = object.get("message");
+        Assert.assertEquals(expected, result);
+        
+        protoCotent =
+                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
+                        + "  required string message1 = 1; }";
+  
+        object = ProtobufIDLProxy.createSingle(protoCotent);
+
+        // 动态设置字段值
+        object.put("message1", expected);
+        
+        result = object.get("message1");
+        Assert.assertEquals(expected, result);
+    }
 
     @Test
     public void testMultiDecode() throws IOException {

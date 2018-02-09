@@ -62,6 +62,36 @@ public class ProtobufIDLProxyTest {
         IDLProxyObject newObject = object.decode(bb);
         Assert.assertEquals("hello你好", newObject.get("message"));
     }
+    
+    @Test
+    public void testDyanmicIDLChange() throws Exception {
+
+        String protoCotent =
+                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
+                        + "  required string message = 1; }";
+        IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
+
+        String expected = "hello你好";
+        // 动态设置字段值
+        object.put("message", expected);
+        
+        Object result = object.get("message");
+        Assert.assertEquals(expected, result);
+        
+        protoCotent =
+                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
+                        + "  required string message1 = 1; }";
+  
+        object = ProtobufIDLProxy.createSingle(protoCotent);
+
+        // 动态设置字段值
+        object.put("message1", expected);
+        
+        result = object.get("message1");
+        Assert.assertEquals(expected, result);
+    }
 
     /**
      * Test decode complex.
@@ -167,7 +197,7 @@ public class ProtobufIDLProxyTest {
                 " "
                 ;
         
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(protoCotent);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(protoCotent, true);
         System.out.println(idlProxyObjects);
         
         idlProxyObjects.get("Http").put("param_addon.key", "abc");
@@ -202,7 +232,7 @@ public class ProtobufIDLProxyTest {
         idl.append("   optional DataInfo.SubDataInfo.Sub2DataInfo sub2DataInfo = 3;\n");
         idl.append("}");
 
-        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(idl.toString());
+        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(idl.toString(), true);
 
         IDLProxyObject idlProxyObject = map.get("DataStatus");
 

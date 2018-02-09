@@ -42,7 +42,7 @@ public class ProtobufIDLProxyPressureTest {
     @Test
     public void testPressureWithCached() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJOWithDefault.class);
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code, false);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code, false, null, false);
 
         IDLProxyObject idlProxyObject = idlProxyObjects.get(AddressBookProtosPOJOWithDefault.class.getSimpleName());
 
@@ -52,7 +52,7 @@ public class ProtobufIDLProxyPressureTest {
     @Test
     public void testPressureWithoutCached() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code, false, null, false);
 
         IDLProxyObject idlProxyObject = idlProxyObjects.get(AddressBookProtosPOJO.class.getSimpleName());
 
@@ -62,7 +62,7 @@ public class ProtobufIDLProxyPressureTest {
     @Test
     public void testSimplePressureWithCached() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(PersonPOJOWithDefault.class);
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code, false, null, false);
 
         IDLProxyObject idlProxyObject = idlProxyObjects.get(PersonPOJOWithDefault.class.getSimpleName());
 
