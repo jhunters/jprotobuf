@@ -46,7 +46,7 @@ JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本�
 ## 环境要求 ##
 jprotobuf-1.x  JDK 6 或以上版本
 
-```xml
+```xml 
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
@@ -61,7 +61,7 @@ jprotobuf-2.x  JDK 7 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.1.5</version> 
+  <version>2.1.7</version> 
 </dependency>
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
@@ -469,4 +469,6 @@ ProtobufProxy.create(clazz, compiler, codeGenerator);
 上面的示例，会开放Compiler与ICodeGenerator实现自定能力
 
 更多使用示例请参见testcase代码。
+
+### 沟通群号：QQ: 644867264 ###
 
