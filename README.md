@@ -470,5 +470,5 @@ ProtobufProxy.create(clazz, compiler, codeGenerator);
 
 更多使用示例请参见testcase代码。
 
-### 沟通群号：QQ: 644867264 ###
+### 沟通群号：QQ: 644867264 ### 
 
