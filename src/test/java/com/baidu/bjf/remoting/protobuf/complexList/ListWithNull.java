@@ -24,7 +24,6 @@ import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
-import com.baidu.bjf.remoting.protobuf.complexList.Test.EchoInfo;
 
 /**
  * The Class ListWithNull.
@@ -54,9 +53,6 @@ public class ListWithNull {
         list.add(null);
         encode = codec.encode(obj);
         System.out.println(Arrays.toString(encode));
-        
-        EchoInfo echoInfo = EchoInfo.newBuilder().addAllList(obj.list).build();
-        System.out.println(echoInfo.toByteString());
         
         ListWithNull decode = codec.decode(encode);
         System.out.println(decode.list);
