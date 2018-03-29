@@ -640,6 +640,9 @@ public class CodedConstant {
         }
 
         for (Object object : list) {
+            if (object == null) {
+                throw new NullPointerException("List can not include Null value.");
+            }
             writeObject(out, order, type, object, true, !packed);
 
         }
