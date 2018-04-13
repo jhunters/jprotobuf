@@ -28,8 +28,8 @@ import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.google.protobuf.WireFormat;
 import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.WireFormat;
 
 /**
  * Code generator utility class.
@@ -236,8 +236,8 @@ public class CodeGenerator implements ICodeGenerator {
             if (field.getFieldType() == FieldType.ENUM) {
                 String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
                 if (!isList) {
-                    String express =
-                            "java.lang.Enum.valueOf(" + clsName + ".class, " + clsName + ".values()[0].name())";
+                    String express = "java.lang.Enum.valueOf(" + clsName + ".class, " + clsName
+                            + ".values()[0].name())";
                     code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), false))
                             .append(JAVA_LINE_BREAK);
                 }
@@ -290,7 +290,11 @@ public class CodeGenerator implements ICodeGenerator {
                 if (field.getGenericKeyType() != null) {
                     Class cls = field.getGenericKeyType();
 
-                    String name = ClassHelper.getInternalName(cls.getName()); // need to parse nested class
+                    String name = ClassHelper.getInternalName(cls.getName()); // need
+                                                                              // to
+                                                                              // parse
+                                                                              // nested
+                                                                              // class
                     code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                     if (debug) {
                         code.append(", true");
@@ -319,9 +323,15 @@ public class CodeGenerator implements ICodeGenerator {
                 express += CodedConstant.getMapFieldGenericParameterString(field);
                 express += ")";
 
-            } else if (field.getFieldType() == FieldType.OBJECT) { // if object message type
+            } else if (field.getFieldType() == FieldType.OBJECT) { // if object
+                                                                   // message
+                                                                   // type
                 Class cls = field.getField().getType();
-                String name = ClassHelper.getInternalName(cls.getName()); // need to parse nested class
+                String name = ClassHelper.getInternalName(cls.getName()); // need
+                                                                          // to
+                                                                          // parse
+                                                                          // nested
+                                                                          // class
                 code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                 if (debug) {
                     code.append(", true");
@@ -343,6 +353,8 @@ public class CodeGenerator implements ICodeGenerator {
 
             if (field.getFieldType() == FieldType.BYTES) {
                 express += ".toByteArray()";
+            } else if (java.util.Date.class.isAssignableFrom(field.getField().getType())) {
+                express = "new Date(" + express + ")";
             }
             code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), false));
 
@@ -360,18 +372,17 @@ public class CodeGenerator implements ICodeGenerator {
             if (isList) {
                 FieldType fieldType = field.getFieldType();
                 if (fieldType.isPrimitive()) {
-                    code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(),
-                            WireFormat.WIRETYPE_LENGTH_DELIMITED));
+                    code.append("if (tag == ")
+                            .append(CodedConstant.makeTag(field.getOrder(), WireFormat.WIRETYPE_LENGTH_DELIMITED));
                     code.append(") {").append(LINE_BREAK);
-                    
-                    
+
                     code.append("int length = input.readRawVarint32()").append(JAVA_LINE_BREAK);
                     code.append("int limit = input.pushLimit(length)").append(JAVA_LINE_BREAK);
-                    
+
                     code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), true));
-                    
+
                     code.append("input.popLimit(limit)").append(JAVA_LINE_BREAK);
-                    
+
                     code.append("continue").append(JAVA_LINE_BREAK);
                     code.append("}").append(LINE_BREAK);
                 }
@@ -477,7 +488,11 @@ public class CodeGenerator implements ICodeGenerator {
     private void checkType(FieldType type, Field field) {
         Class<?> cls = field.getType();
 
-        if (type == FieldType.OBJECT || type == FieldType.ENUM) {
+        if (type == FieldType.OBJECT || type == FieldType.ENUM || type == FieldType.DATE) {
+            return;
+        }
+
+        if (java.util.Date.class.isAssignableFrom(field.getType()) && type == FieldType.INT64) {
             return;
         }
 
@@ -530,8 +545,13 @@ public class CodeGenerator implements ICodeGenerator {
                         + field.getField().getName() + " already exsit.");
             }
             // define field
-            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(),
-                    getAccessByField("t", field.getField(), cls), isList, field.isMap()));
+            String accessByField = getAccessByField("t", field.getField(), cls);
+            String setValueExpress = accessByField;
+            if (java.util.Date.class.isAssignableFrom(field.getField().getType())) {
+                setValueExpress = accessByField + ".getTime()";
+            }
+            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(), accessByField,
+                    setValueExpress, isList, field.isMap()));
             // compute size
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls)).append("))")
                     .append("{").append(LINE_BREAK);
@@ -581,8 +601,13 @@ public class CodeGenerator implements ICodeGenerator {
                         + field.getField().getName() + " already exsit.");
             }
             // define field
-            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(),
-                    getAccessByField("t", field.getField(), cls), isList, field.isMap()));
+            String accessByField = getAccessByField("t", field.getField(), cls);
+            String setValueExpress = accessByField;
+            if (java.util.Date.class.isAssignableFrom(field.getField().getType())) {
+                setValueExpress = accessByField + ".getTime()";
+            }
+            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(), accessByField,
+                    setValueExpress, isList, field.isMap()));
             if (field.isRequired()) {
                 code.append(CodedConstant.getRequiredCheck(field.getOrder(), field.getField()));
             }
@@ -627,8 +652,13 @@ public class CodeGenerator implements ICodeGenerator {
                         + field.getField().getName() + " already exsit.");
             }
             // define field
-            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(),
-                    getAccessByField("t", field.getField(), cls), isList, field.isMap()));
+            String accessByField = getAccessByField("t", field.getField(), cls);
+            String setValueExpress = accessByField;
+            if (java.util.Date.class.isAssignableFrom(field.getField().getType())) {
+                setValueExpress = accessByField + ".getTime()";
+            }
+            code.append(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(), accessByField,
+                    setValueExpress, isList, field.isMap()));
             // compute size
             code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls)).append("))")
                     .append("{").append(LINE_BREAK);
@@ -687,8 +717,8 @@ public class CodeGenerator implements ICodeGenerator {
     }
 
     /**
-     * generate access {@link Field} value source code. support public field access, getter method access and reflection
-     * access.
+     * generate access {@link Field} value source code. support public field
+     * access, getter method access and reflection access.
      * 
      * @param target
      * @param field
@@ -730,7 +760,7 @@ public class CodeGenerator implements ICodeGenerator {
         String setter = "set" + CodedConstant.capitalize(field.getName());
         // check method exist
         try {
-            cls.getMethod(setter, new Class<?>[] { field.getType() });
+            cls.getMethod(setter, new Class<?>[]{ field.getType() });
             if (isList) {
                 ret.append("List __list = new ArrayList()").append(JAVA_LINE_BREAK);
                 ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(setter).append("(__list)")

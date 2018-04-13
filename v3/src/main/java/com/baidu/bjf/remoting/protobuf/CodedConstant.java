@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -80,8 +81,8 @@ public class CodedConstant {
     private static final String MAP_ENTRY_SUFFIX = "Entry";
 
     /** The Constant WIREFORMAT_CLSNAME. */
-    private static final String WIREFORMAT_CLSNAME =
-            ClassHelper.getInternalName(com.google.protobuf.WireFormat.FieldType.class.getName());
+    private static final String WIREFORMAT_CLSNAME = ClassHelper
+            .getInternalName(com.google.protobuf.WireFormat.FieldType.class.getName());
 
     /** The descriptor codec. */
     private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
@@ -98,18 +99,22 @@ public class CodedConstant {
     }
 
     /**
-     * Compute the number of bytes that would be needed to encode a single tag/value pair of arbitrary type.
+     * Compute the number of bytes that would be needed to encode a single
+     * tag/value pair of arbitrary type.
      *
      * @param type The field's type.
      * @param number The field's number.
-     * @param value Object representing the field's value. Must be of the exact type which would be returned by
-     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @param value Object representing the field's value. Must be of the exact
+     *            type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this
+     *            field.
      * @return the int
      */
     public static int computeElementSize(final WireFormat.FieldType type, final int number, final Object value) {
         int tagSize = CodedOutputStream.computeTagSize(number);
         if (type == WireFormat.FieldType.GROUP) {
-            // Only count the end group tag for proto2 messages as for proto1 the end
+            // Only count the end group tag for proto2 messages as for proto1
+            // the end
             // group tag will be counted as a part of getSerializedSize().
             tagSize *= 2;
         }
@@ -126,15 +131,16 @@ public class CodedConstant {
      * @param isMap is field type is a {@link Map}
      * @return full java expression
      */
-    public static String getMappedTypeDefined(int order, FieldType type, String express, boolean isList,
-            boolean isMap) {
+    public static String getMappedTypeDefined(int order, FieldType type, String conditionField, String express,
+            boolean isList, boolean isMap) {
         StringBuilder code = new StringBuilder();
         String fieldName = getFieldName(order);
         if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
             // add null check
             code.append("com.google.protobuf.ByteString ").append(fieldName).append(" = null")
                     .append(CodeGenerator.JAVA_LINE_BREAK);
-            code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(CodeGenerator.LINE_BREAK);
+            code.append("if (!CodedConstant.isNull(").append(conditionField).append(")) {")
+                    .append(CodeGenerator.LINE_BREAK);
 
             String method = "copyFromUtf8";
             if (type == FieldType.BYTES) {
@@ -154,7 +160,8 @@ public class CodedConstant {
         }
         code.setLength(0);
         code.append(defineType).append(" ").append(fieldName).append(" = null").append(CodeGenerator.JAVA_LINE_BREAK);
-        code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(CodeGenerator.LINE_BREAK);
+        code.append("if (!CodedConstant.isNull(").append(conditionField).append(")) {")
+                .append(CodeGenerator.LINE_BREAK);
         code.append(fieldName).append(" = ").append(express).append(CodeGenerator.JAVA_LINE_BREAK);
         code.append("}").append(CodeGenerator.LINE_BREAK);
         return code.toString();
@@ -330,7 +337,8 @@ public class CodedConstant {
      * @param debug the debug
      * @param path the path
      * @param packed the packed
-     * @param sizeOnly the size only if true will not include order size and tag size
+     * @param sizeOnly the size only if true will not include order size and tag
+     *            size
      * @return the int
      */
     public static int computeListSize(int order, List list, FieldType type, boolean debug, File path, boolean packed,
@@ -376,8 +384,8 @@ public class CodedConstant {
             com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
                     .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
 
-            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
-                    valuesDefaultEntry.newBuilderForType().setKey(entry.getKey()).setValue(entry.getValue()).build();
+            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values = valuesDefaultEntry.newBuilderForType()
+                    .setKey(entry.getKey()).setValue(entry.getValue()).build();
 
             size += com.google.protobuf.CodedOutputStream.computeMessageSize(order, values);
         }
@@ -403,8 +411,8 @@ public class CodedConstant {
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
                 .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
 
-        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
-                input.readMessage(valuesDefaultEntry.getParserForType(), null);
+        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values = input.readMessage(valuesDefaultEntry.getParserForType(),
+                null);
         map.put(values.getKey(), values.getValue());
 
     }
@@ -429,8 +437,8 @@ public class CodedConstant {
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
                 .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
         for (java.util.Map.Entry<K, V> entry : map.entrySet()) {
-            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
-                    valuesDefaultEntry.newBuilderForType().setKey(entry.getKey()).setValue(entry.getValue()).build();
+            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values = valuesDefaultEntry.newBuilderForType()
+                    .setKey(entry.getKey()).setValue(entry.getValue()).build();
             output.writeMessage(order, values);
         }
     }
@@ -681,34 +689,20 @@ public class CodedConstant {
             return;
         }
 
-        if (type == FieldType.OBJECT) {
-
-            Class cls = o.getClass();
-            Codec target = ProtobufProxy.create(cls);
-
-            if (withTag) {
-                out.writeRawVarint32(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
-            }
-            out.writeRawVarint32(target.size(o));
-
-            target.writeTo(o, out);
-            return;
-        }
-
-        if (type == FieldType.BOOL) {
+        if (type == FieldType.BOOL || Boolean.class.isAssignableFrom(o.getClass())) {
             if (withTag) {
                 out.writeBool(order, (Boolean) o);
             } else {
                 out.writeBoolNoTag((Boolean) o);
             }
-        } else if (type == FieldType.BYTES) {
+        } else if (type == FieldType.BYTES || byte[].class.isAssignableFrom(o.getClass())) {
             byte[] bb = (byte[]) o;
             if (withTag) {
                 out.writeBytes(order, ByteString.copyFrom(bb));
             } else {
                 out.writeBytesNoTag(ByteString.copyFrom(bb));
             }
-        } else if (type == FieldType.DOUBLE) {
+        } else if (type == FieldType.DOUBLE || Double.class.isAssignableFrom(o.getClass())) {
             if (withTag) {
                 out.writeDouble(order, (Double) o);
             } else {
@@ -726,19 +720,19 @@ public class CodedConstant {
             } else {
                 out.writeFixed64NoTag((Long) o);
             }
-        } else if (type == FieldType.FLOAT) {
+        } else if (type == FieldType.FLOAT || Float.class.isAssignableFrom(o.getClass())) {
             if (withTag) {
                 out.writeFloat(order, (Float) o);
             } else {
                 out.writeFloatNoTag((Float) o);
             }
-        } else if (type == FieldType.INT32) {
+        } else if (type == FieldType.INT32 || Integer.class.isAssignableFrom(o.getClass())) {
             if (withTag) {
                 out.writeInt32(order, (Integer) o);
             } else {
                 out.writeInt32NoTag((Integer) o);
             }
-        } else if (type == FieldType.INT64) {
+        } else if (type == FieldType.INT64 || Long.class.isAssignableFrom(o.getClass())) {
             if (withTag) {
                 out.writeInt64(order, (Long) o);
             } else {
@@ -768,7 +762,7 @@ public class CodedConstant {
             } else {
                 out.writeSInt64NoTag((Long) o);
             }
-        } else if (type == FieldType.STRING) {
+        } else if (type == FieldType.STRING || String.class.isAssignableFrom(o.getClass())) {
             if (withTag) {
                 out.writeBytes(order, ByteString.copyFromUtf8(String.valueOf(o)));
             } else {
@@ -786,7 +780,8 @@ public class CodedConstant {
             } else {
                 out.writeUInt64NoTag((Long) o);
             }
-        } else if (type == FieldType.ENUM) {
+        } else if (type == FieldType.ENUM || o instanceof Internal.EnumLite || o instanceof EnumReadable
+                || o instanceof Enum) {
             int value = 0;
             if (o instanceof EnumReadable) {
                 value = ((EnumReadable) o).value();
@@ -799,6 +794,17 @@ public class CodedConstant {
             } else {
                 out.writeEnumNoTag(value);
             }
+        } else if (type == FieldType.OBJECT) {
+
+            Class cls = o.getClass();
+            Codec target = ProtobufProxy.create(cls);
+
+            if (withTag) {
+                out.writeRawVarint32(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
+            }
+            out.writeRawVarint32(target.size(o));
+
+            target.writeTo(o, out);
         }
     }
 
@@ -925,8 +931,8 @@ public class CodedConstant {
 
     /**
      * <p>
-     * Capitalizes a String changing the first letter to title case as per {@link Character#toTitleCase(char)}. No other
-     * letters are changed.
+     * Capitalizes a String changing the first letter to title case as per
+     * {@link Character#toTitleCase(char)}. No other letters are changed.
      * </p>
      * 
      * @param str the String to capitalize, may be null
@@ -980,62 +986,65 @@ public class CodedConstant {
     }
 
     /**
-     * Read a field of any primitive type for immutable messages from a CodedInputStream. Enums, groups, and embedded
-     * messages are not handled by this method.
+     * Read a field of any primitive type for immutable messages from a
+     * CodedInputStream. Enums, groups, and embedded messages are not handled by
+     * this method.
      *
      * @param input The stream from which to read.
      * @param type Declared type of the field.
      * @param checkUtf8 When true, check that the input is valid utf8.
-     * @return An object representing the field's value, of the exact type which would be returned by
-     *         {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @return An object representing the field's value, of the exact type which
+     *         would be returned by
+     *         {@link Message#getField(Descriptors.FieldDescriptor)} for this
+     *         field.
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public static Object readPrimitiveField(CodedInputStream input, final WireFormat.FieldType type, boolean checkUtf8)
             throws IOException {
         switch (type) {
-            case DOUBLE:
-                return input.readDouble();
-            case FLOAT:
-                return input.readFloat();
-            case INT64:
-                return input.readInt64();
-            case UINT64:
-                return input.readUInt64();
-            case INT32:
-                return input.readInt32();
-            case FIXED64:
-                return input.readFixed64();
-            case FIXED32:
-                return input.readFixed32();
-            case BOOL:
-                return input.readBool();
-            case STRING:
-                if (checkUtf8) {
-                    return input.readStringRequireUtf8();
-                } else {
-                    return input.readString();
-                }
-            case BYTES:
-                return input.readBytes();
-            case UINT32:
-                return input.readUInt32();
-            case SFIXED32:
-                return input.readSFixed32();
-            case SFIXED64:
-                return input.readSFixed64();
-            case SINT32:
-                return input.readSInt32();
-            case SINT64:
-                return input.readSInt64();
+        case DOUBLE:
+            return input.readDouble();
+        case FLOAT:
+            return input.readFloat();
+        case INT64:
+            return input.readInt64();
+        case UINT64:
+            return input.readUInt64();
+        case INT32:
+            return input.readInt32();
+        case FIXED64:
+            return input.readFixed64();
+        case FIXED32:
+            return input.readFixed32();
+        case BOOL:
+            return input.readBool();
+        case STRING:
+            if (checkUtf8) {
+                return input.readStringRequireUtf8();
+            } else {
+                return input.readString();
+            }
+        case BYTES:
+            return input.readBytes();
+        case UINT32:
+            return input.readUInt32();
+        case SFIXED32:
+            return input.readSFixed32();
+        case SFIXED64:
+            return input.readSFixed64();
+        case SINT32:
+            return input.readSInt32();
+        case SINT64:
+            return input.readSInt64();
 
-            case GROUP:
-                throw new IllegalArgumentException("readPrimitiveField() cannot handle nested groups.");
-            case MESSAGE:
-                throw new IllegalArgumentException("readPrimitiveField() cannot handle embedded messages.");
-            case ENUM:
-                // We don't handle enums because we don't know what to do if the
-                // value is not recognized.
-                throw new IllegalArgumentException("readPrimitiveField() cannot handle enums.");
+        case GROUP:
+            throw new IllegalArgumentException("readPrimitiveField() cannot handle nested groups.");
+        case MESSAGE:
+            throw new IllegalArgumentException("readPrimitiveField() cannot handle embedded messages.");
+        case ENUM:
+            // We don't handle enums because we don't know what to do if the
+            // value is not recognized.
+            throw new IllegalArgumentException("readPrimitiveField() cannot handle enums.");
         }
 
         throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
@@ -1047,8 +1056,10 @@ public class CodedConstant {
      * @param output The output stream.
      * @param type The field's type.
      * @param number The field's number.
-     * @param value Object representing the field's value. Must be of the exact type which would be returned by
-     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @param value Object representing the field's value. Must be of the exact
+     *            type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this
+     *            field.
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void writeElement(final CodedOutputStream output, final WireFormat.FieldType type, final int number,
@@ -1069,7 +1080,8 @@ public class CodedConstant {
      * @param type the type
      * @param isPacked the is packed
      * @return the wire format for field type
-     * @returns One of the {@code WIRETYPE_} constants defined in {@link WireFormat}.
+     * @returns One of the {@code WIRETYPE_} constants defined in
+     *          {@link WireFormat}.
      */
     static int getWireFormatForFieldType(final WireFormat.FieldType type, boolean isPacked) {
         if (isPacked) {
@@ -1084,83 +1096,85 @@ public class CodedConstant {
      *
      * @param output The output stream.
      * @param type The field's type.
-     * @param value Object representing the field's value. Must be of the exact type which would be returned by
-     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @param value Object representing the field's value. Must be of the exact
+     *            type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this
+     *            field.
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public static void writeElementNoTag(final CodedOutputStream output, final WireFormat.FieldType type,
             final Object value) throws IOException {
         switch (type) {
-            case DOUBLE:
-                output.writeDoubleNoTag((Double) value);
-                break;
-            case FLOAT:
-                output.writeFloatNoTag((Float) value);
-                break;
-            case INT64:
-                output.writeInt64NoTag((Long) value);
-                break;
-            case UINT64:
-                output.writeUInt64NoTag((Long) value);
-                break;
-            case INT32:
-                output.writeInt32NoTag((Integer) value);
-                break;
-            case FIXED64:
-                output.writeFixed64NoTag((Long) value);
-                break;
-            case FIXED32:
-                output.writeFixed32NoTag((Integer) value);
-                break;
-            case BOOL:
-                output.writeBoolNoTag((Boolean) value);
-                break;
-            case STRING:
-                output.writeStringNoTag((String) value);
-                break;
-            // group not support yet
-            // case GROUP : output.writeGroupNoTag ((MessageLite) value); break;
-            case MESSAGE:
-                writeObject(output, 0, FieldType.OBJECT, value, false, false);
-                break;
-            case BYTES:
-                if (value instanceof ByteString) {
-                    output.writeBytesNoTag((ByteString) value);
+        case DOUBLE:
+            output.writeDoubleNoTag((Double) value);
+            break;
+        case FLOAT:
+            output.writeFloatNoTag((Float) value);
+            break;
+        case INT64:
+            output.writeInt64NoTag((Long) value);
+            break;
+        case UINT64:
+            output.writeUInt64NoTag((Long) value);
+            break;
+        case INT32:
+            output.writeInt32NoTag((Integer) value);
+            break;
+        case FIXED64:
+            output.writeFixed64NoTag((Long) value);
+            break;
+        case FIXED32:
+            output.writeFixed32NoTag((Integer) value);
+            break;
+        case BOOL:
+            output.writeBoolNoTag((Boolean) value);
+            break;
+        case STRING:
+            output.writeStringNoTag((String) value);
+            break;
+        // group not support yet
+        // case GROUP : output.writeGroupNoTag ((MessageLite) value); break;
+        case MESSAGE:
+            writeObject(output, 0, FieldType.OBJECT, value, false, false);
+            break;
+        case BYTES:
+            if (value instanceof ByteString) {
+                output.writeBytesNoTag((ByteString) value);
+            } else {
+                output.writeByteArrayNoTag((byte[]) value);
+            }
+            break;
+        case UINT32:
+            output.writeUInt32NoTag((Integer) value);
+            break;
+        case SFIXED32:
+            output.writeSFixed32NoTag((Integer) value);
+            break;
+        case SFIXED64:
+            output.writeSFixed64NoTag((Long) value);
+            break;
+        case SINT32:
+            output.writeSInt32NoTag((Integer) value);
+            break;
+        case SINT64:
+            output.writeSInt64NoTag((Long) value);
+            break;
+
+        case ENUM:
+            if (value instanceof Internal.EnumLite) {
+                output.writeEnumNoTag(((Internal.EnumLite) value).getNumber());
+            } else {
+
+                if (value instanceof EnumReadable) {
+                    output.writeEnumNoTag(((EnumReadable) value).value());
+                } else if (value instanceof Enum) {
+                    output.writeEnumNoTag(((Enum) value).ordinal());
                 } else {
-                    output.writeByteArrayNoTag((byte[]) value);
+                    output.writeEnumNoTag(((Integer) value).intValue());
                 }
-                break;
-            case UINT32:
-                output.writeUInt32NoTag((Integer) value);
-                break;
-            case SFIXED32:
-                output.writeSFixed32NoTag((Integer) value);
-                break;
-            case SFIXED64:
-                output.writeSFixed64NoTag((Long) value);
-                break;
-            case SINT32:
-                output.writeSInt32NoTag((Integer) value);
-                break;
-            case SINT64:
-                output.writeSInt64NoTag((Long) value);
-                break;
 
-            case ENUM:
-                if (value instanceof Internal.EnumLite) {
-                    output.writeEnumNoTag(((Internal.EnumLite) value).getNumber());
-                } else {
-
-                    if (value instanceof EnumReadable) {
-                        output.writeEnumNoTag(((EnumReadable) value).value());
-                    } else if (value instanceof Enum) {
-                        output.writeEnumNoTag(((Enum) value).ordinal());
-                    } else {
-                        output.writeEnumNoTag(((Integer) value).intValue());
-                    }
-
-                }
-                break;
+            }
+            break;
         }
     }
 
@@ -1175,76 +1189,107 @@ public class CodedConstant {
     }
 
     /**
-     * Compute the number of bytes that would be needed to encode a particular value of arbitrary type, excluding tag.
+     * Compute the number of bytes that would be needed to encode a particular
+     * value of arbitrary type, excluding tag.
      *
      * @param type The field's type.
-     * @param value Object representing the field's value. Must be of the exact type which would be returned by
-     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @param value Object representing the field's value. Must be of the exact
+     *            type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this
+     *            field.
      * @return the int
      */
     public static int computeElementSizeNoTag(final WireFormat.FieldType type, final Object value) {
         switch (type) {
-            // Note: Minor violation of 80-char limit rule here because this would
-            // actually be harder to read if we wrapped the lines.
-            case DOUBLE:
-                return CodedOutputStream.computeDoubleSizeNoTag((Double) value);
-            case FLOAT:
-                return CodedOutputStream.computeFloatSizeNoTag((Float) value);
-            case INT64:
-                return CodedOutputStream.computeInt64SizeNoTag((Long) value);
-            case UINT64:
-                return CodedOutputStream.computeUInt64SizeNoTag((Long) value);
-            case INT32:
-                return CodedOutputStream.computeInt32SizeNoTag((Integer) value);
-            case FIXED64:
-                return CodedOutputStream.computeFixed64SizeNoTag((Long) value);
-            case FIXED32:
-                return CodedOutputStream.computeFixed32SizeNoTag((Integer) value);
-            case BOOL:
-                return CodedOutputStream.computeBoolSizeNoTag((Boolean) value);
-            case STRING:
-                return CodedOutputStream.computeStringSizeNoTag((String) value);
-            case GROUP:
-                return CodedOutputStream.computeGroupSizeNoTag((MessageLite) value);
-            case BYTES:
-                if (value instanceof ByteString) {
-                    return CodedOutputStream.computeBytesSizeNoTag((ByteString) value);
-                } else {
-                    return CodedOutputStream.computeByteArraySizeNoTag((byte[]) value);
-                }
-            case UINT32:
-                return CodedOutputStream.computeUInt32SizeNoTag((Integer) value);
-            case SFIXED32:
-                return CodedOutputStream.computeSFixed32SizeNoTag((Integer) value);
-            case SFIXED64:
-                return CodedOutputStream.computeSFixed64SizeNoTag((Long) value);
-            case SINT32:
-                return CodedOutputStream.computeSInt32SizeNoTag((Integer) value);
-            case SINT64:
-                return CodedOutputStream.computeSInt64SizeNoTag((Long) value);
+        // Note: Minor violation of 80-char limit rule here because this would
+        // actually be harder to read if we wrapped the lines.
+        case DOUBLE:
+            return CodedOutputStream.computeDoubleSizeNoTag((Double) value);
+        case FLOAT:
+            return CodedOutputStream.computeFloatSizeNoTag((Float) value);
+        case INT64:
+            return CodedOutputStream.computeInt64SizeNoTag((Long) value);
+        case UINT64:
+            return CodedOutputStream.computeUInt64SizeNoTag((Long) value);
+        case INT32:
+            return CodedOutputStream.computeInt32SizeNoTag((Integer) value);
+        case FIXED64:
+            return CodedOutputStream.computeFixed64SizeNoTag((Long) value);
+        case FIXED32:
+            return CodedOutputStream.computeFixed32SizeNoTag((Integer) value);
+        case BOOL:
+            return CodedOutputStream.computeBoolSizeNoTag((Boolean) value);
+        case STRING:
+            return CodedOutputStream.computeStringSizeNoTag((String) value);
+        case GROUP:
+            return CodedOutputStream.computeGroupSizeNoTag((MessageLite) value);
+        case BYTES:
+            if (value instanceof ByteString) {
+                return CodedOutputStream.computeBytesSizeNoTag((ByteString) value);
+            } else {
+                return CodedOutputStream.computeByteArraySizeNoTag((byte[]) value);
+            }
+        case UINT32:
+            return CodedOutputStream.computeUInt32SizeNoTag((Integer) value);
+        case SFIXED32:
+            return CodedOutputStream.computeSFixed32SizeNoTag((Integer) value);
+        case SFIXED64:
+            return CodedOutputStream.computeSFixed64SizeNoTag((Long) value);
+        case SINT32:
+            return CodedOutputStream.computeSInt32SizeNoTag((Integer) value);
+        case SINT64:
+            return CodedOutputStream.computeSInt64SizeNoTag((Long) value);
 
-            case MESSAGE:
-                if (value instanceof LazyField) {
-                    return CodedOutputStream.computeLazyFieldSizeNoTag((LazyField) value);
-                } else {
-                    return computeObjectSizeNoTag(value);
+        case MESSAGE:
+            return computeElementSizeNoTag(value);
+
+        case ENUM:
+            if (value instanceof Internal.EnumLite) {
+                return CodedOutputStream.computeEnumSizeNoTag(((Internal.EnumLite) value).getNumber());
+            } else {
+                if (value instanceof EnumReadable) {
+                    return CodedOutputStream.computeEnumSizeNoTag(((EnumReadable) value).value());
+                } else if (value instanceof Enum) {
+                    return CodedOutputStream.computeEnumSizeNoTag(((Enum) value).ordinal());
                 }
 
-            case ENUM:
-                if (value instanceof Internal.EnumLite) {
-                    return CodedOutputStream.computeEnumSizeNoTag(((Internal.EnumLite) value).getNumber());
-                } else {
-                    if (value instanceof EnumReadable) {
-                        return CodedOutputStream.computeEnumSizeNoTag(((EnumReadable) value).value());
-                    } else if (value instanceof Enum) {
-                        return CodedOutputStream.computeEnumSizeNoTag(((Enum) value).ordinal());
-                    }
-
-                    return CodedOutputStream.computeEnumSizeNoTag((Integer) value);
-                }
+                return CodedOutputStream.computeEnumSizeNoTag((Integer) value);
+            }
         }
 
         throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
+    }
+
+    private static int computeElementSizeNoTag(final Object value) {
+        if (value instanceof String) {
+            return CodedOutputStream.computeStringSizeNoTag((String) value);
+        } else if (value instanceof Double) {
+            return CodedOutputStream.computeDoubleSizeNoTag((Double) value);
+        } else if (value instanceof Float) {
+            return CodedOutputStream.computeFloatSizeNoTag((Float) value);
+        } else if (value instanceof Long) {
+            return CodedOutputStream.computeInt64SizeNoTag((Long) value);
+        } else if (value instanceof Boolean) {
+            return CodedOutputStream.computeBoolSizeNoTag((Boolean) value);
+        } else if (value instanceof byte[]) {
+            return CodedOutputStream.computeByteArraySizeNoTag((byte[]) value);
+        } else if (value instanceof LazyField) {
+            return CodedOutputStream.computeLazyFieldSizeNoTag((LazyField) value);
+        } else if (value instanceof Internal.EnumLite) {
+            return CodedOutputStream.computeEnumSizeNoTag(((Internal.EnumLite) value).getNumber());
+        } else if (value instanceof EnumReadable) {
+            return CodedOutputStream.computeEnumSizeNoTag(((EnumReadable) value).value());
+        } else if (value instanceof Enum) {
+            return CodedOutputStream.computeEnumSizeNoTag(((Enum) value).ordinal());
+
+        } else if (value instanceof Date) {
+            Date date = (Date) value;
+            return CodedOutputStream.computeInt64SizeNoTag((Long) date.getTime());
+
+        } else {
+            return computeObjectSizeNoTag(value);
+        }
+
     }
 
     /**
@@ -1307,8 +1352,8 @@ public class CodedConstant {
 
         FileDescriptor fileDescriptor;
         try {
-            fileDescriptor =
-                    FileDescriptor.buildFrom(fileproto, new com.google.protobuf.Descriptors.FileDescriptor[] {});
+            fileDescriptor = FileDescriptor.buildFrom(fileproto,
+                    new com.google.protobuf.Descriptors.FileDescriptor[]{});
         } catch (DescriptorValidationException e) {
             throw new IOException(e.getMessage(), e);
         }
