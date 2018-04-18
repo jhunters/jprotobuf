@@ -403,26 +403,27 @@ public class CodedConstant {
         putMapValue(input, map, keyType, defaultKey, valueType, defalutValue, null);
 
     }
-    
-    
+
     public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
             com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
-            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue, EnumHandler<V> handler) throws IOException {
+            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue, EnumHandler<V> handler)
+            throws IOException {
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
                 .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
 
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
                 input.readMessage(valuesDefaultEntry.getParserForType(), null);
-        
-        V value = values.getValue();
+
+        Object value = values.getValue();
         if (handler != null) {
-            value = handler.handle((int) value);
+            V value1 = handler.handle((int) value);
+            map.put(values.getKey(), value1);
+        } else {
+            map.put(values.getKey(), values.getValue());
         }
-        
-        map.put(values.getKey(), value);
+
 
     }
-    
 
     /**
      * Write to map.
@@ -992,6 +993,20 @@ public class CodedConstant {
             }
         }
         return "";
+    }
+
+    public static int getEnumValue(Enum en) {
+        if (en != null) {
+            int toCompareValue;
+            if (en instanceof EnumReadable) {
+                toCompareValue = ((EnumReadable) en).value();
+            } else {
+                toCompareValue = en.ordinal();
+            }
+            return toCompareValue;
+        }
+
+        return -1;
     }
 
     /**
