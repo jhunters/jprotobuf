@@ -400,14 +400,29 @@ public class CodedConstant {
     public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
             com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
             com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) throws IOException {
+        putMapValue(input, map, keyType, defaultKey, valueType, defalutValue, null);
+
+    }
+    
+    
+    public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
+            com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
+            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue, EnumHandler<V> handler) throws IOException {
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
                 .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
 
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
                 input.readMessage(valuesDefaultEntry.getParserForType(), null);
-        map.put(values.getKey(), values.getValue());
+        
+        V value = values.getValue();
+        if (handler != null) {
+            value = handler.handle((int) value);
+        }
+        
+        map.put(values.getKey(), value);
 
     }
+    
 
     /**
      * Write to map.

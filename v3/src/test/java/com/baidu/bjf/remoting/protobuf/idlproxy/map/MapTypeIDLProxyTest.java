@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.idlproxy.map;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.baidu.bjf.remoting.protobuf.enumeration.EnumAttrPOJO;
 
 import junit.framework.Assert;
 
@@ -59,4 +61,21 @@ public class MapTypeIDLProxyTest {
         Assert.assertEquals(1, simpleMapPOJO.getStringMap().size());
     }
     
+    
+    @Test
+    public void testMapWithEnum() throws IOException {
+        
+        Codec<EnumMapPOJO> codec = ProtobufProxy.create(EnumMapPOJO.class);
+        
+        EnumMapPOJO pojo = new EnumMapPOJO();
+        Map<String, EnumAttrPOJO> map = new HashMap<String, EnumAttrPOJO>();
+        map.put("abc", EnumAttrPOJO.STRING);
+        pojo.setStringMap(map);
+        
+        
+        byte[] bs = codec.encode(pojo);
+        
+        EnumMapPOJO pojo2 = codec.decode(bs);
+        Assert.assertEquals(EnumAttrPOJO.STRING, pojo2.getStringMap().get("abc"));
+    }
 }

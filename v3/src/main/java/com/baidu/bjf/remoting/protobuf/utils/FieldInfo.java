@@ -18,6 +18,7 @@ package com.baidu.bjf.remoting.protobuf.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -317,5 +318,10 @@ public class FieldInfo {
         this.packed = packed;
     }
 
-    
+    public boolean isEnumValueType() {
+        if (genericeValueType != null) {
+            return Enum.class.isAssignableFrom(genericeValueType);
+        }
+        return false;
+    }
 }

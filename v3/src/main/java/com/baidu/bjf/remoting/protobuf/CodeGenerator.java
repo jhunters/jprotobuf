@@ -28,8 +28,8 @@ import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
-import com.google.protobuf.WireFormat;
 import com.google.protobuf.Descriptors.Descriptor;
+import com.google.protobuf.WireFormat;
 
 /**
  * Code generator utility class.
@@ -314,9 +314,29 @@ public class CodeGenerator implements ICodeGenerator {
             } else if (field.isMap()) {
 
                 String getMapCommand = getMapCommand(field);
+                
+                if (field.isEnumValueType()) {
+                    String enumClassName = field.getGenericeValueType().getName();
+                    code.append("EnumHandler<").append(enumClassName).append("> handler");
+                    code.append("= new EnumHandler");
+                    code.append("<").append(enumClassName).append(">() {");
+                    code.append(LINE_BREAK);
+                    code.append("public ").append(enumClassName).append(" handle(int value) {");
+                    code.append(LINE_BREAK);
+                    code.append("String enumName = CodedConstant.getEnumName(").append(enumClassName).append(".values(), value)");
+                    code.append(JAVA_LINE_BREAK);
+                    code.append("return ").append(enumClassName).append(".valueOf(enumName)");
+                    code.append(JAVA_LINE_BREAK);
+                    code.append("}}");
+                    code.append(JAVA_LINE_BREAK);
+                    
+                }
 
                 express = "CodedConstant.putMapValue(input, " + getMapCommand + ",";
                 express += CodedConstant.getMapFieldGenericParameterString(field);
+                if (field.isEnumValueType()) {
+                    express += ", handler";
+                }
                 express += ")";
 
             } else if (field.getFieldType() == FieldType.OBJECT) { // if object message type
