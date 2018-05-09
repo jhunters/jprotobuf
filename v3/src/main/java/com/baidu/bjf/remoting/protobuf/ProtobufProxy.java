@@ -218,7 +218,7 @@ public final class ProtobufProxy {
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
-        return create(cls, debug, path, JDKCompilerHelper.getJdkCompiler(), getCodeGenerator(cls));
+        return create(cls, debug, path, null, getCodeGenerator(cls));
     }
 
     /**

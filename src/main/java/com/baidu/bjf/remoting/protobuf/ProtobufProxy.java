@@ -60,7 +60,7 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
  * @author xiemalin
  * @since 1.0.0
  */
-public final class ProtobufProxy {
+public final class ProtobufProxy {  
 
     /** The Constant DEBUG_CONTROLLER. */
     public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
@@ -184,7 +184,7 @@ public final class ProtobufProxy {
             debug = false; // set default to close debug info
         }
 
-        return create(cls, debug, null, JDKCompilerHelper.getJdkCompiler(), getCodeGenerator(cls));
+        return create(cls, debug, null, null, getCodeGenerator(cls));
     }
 
     /**
@@ -230,7 +230,7 @@ public final class ProtobufProxy {
      * @return the codec
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug) {
-        return create(cls, debug, null, JDKCompilerHelper.getJdkCompiler(), getCodeGenerator(cls));
+        return create(cls, debug, null, null, getCodeGenerator(cls));
     }
 
     /**
@@ -243,7 +243,7 @@ public final class ProtobufProxy {
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
-        return create(cls, debug, path, JDKCompilerHelper.getJdkCompiler(), getCodeGenerator(cls));
+        return create(cls, debug, path, null, getCodeGenerator(cls));
     }
 
     /**
