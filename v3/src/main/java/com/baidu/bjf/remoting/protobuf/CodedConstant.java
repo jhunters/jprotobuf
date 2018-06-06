@@ -340,14 +340,18 @@ public class CodedConstant {
             return size;
         }
 
+        int dataSize = 0;
         for (Object object : list) {
-            size += computeSize(order, object, type, debug, path);
+            dataSize += computeSize(order, object, type, debug, path);
         }
+        size += dataSize;
         if (type != FieldType.OBJECT) {
             if (packed) {
                 if (!sizeOnly) {
-                    size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(size);
-                    size += 1;
+                    size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(dataSize);
+                    int tag = CodedConstant.makeTag(order,
+                            WireFormat.WIRETYPE_LENGTH_DELIMITED);
+                    size += com.google.protobuf.CodedOutputStream.computeUInt32SizeNoTag(tag);;
                 }
             } else {
                 size += list.size() * CodedOutputStream.computeTagSize(order);
@@ -652,7 +656,7 @@ public class CodedConstant {
 
         if (packed) {
             out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
-            out.writeUInt32NoTag(computeListSize(order, list, type, false, null, packed, true));
+            out.writeUInt32NoTag(computeListSize(order, list, type, false, null, packed, true)); 
         }
 
         for (Object object : list) {

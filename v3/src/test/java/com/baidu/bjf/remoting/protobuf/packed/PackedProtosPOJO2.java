@@ -36,6 +36,10 @@ public class PackedProtosPOJO2 {
     @Packed(false)
     @Protobuf(fieldType = FieldType.INT32, order = 2)
     private List<Integer> id = new ArrayList<Integer>();
+    
+    @Packed
+    @Protobuf(fieldType = FieldType.INT32, order = 12)
+    public List<Integer> id2 = new ArrayList<Integer>();
 
     @Protobuf(fieldType = FieldType.STRING, order = 3)
     private List<String> email = new ArrayList<String>();

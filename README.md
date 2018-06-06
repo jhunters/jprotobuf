@@ -50,7 +50,7 @@ jprotobuf-1.x  JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.10.12</version>
+  <version>1.11.0</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
@@ -61,7 +61,7 @@ jprotobuf-2.x  JDK 7 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.1.11</version> 
+  <version>2.2.0</version> 
 </dependency> 
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
@@ -108,9 +108,9 @@ create success. output path=D:\jprotobuf_local\source\.
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class PersonJProtoBufProtoClass {
-	@Protobuf(fieldType=FieldType.STRING, order=1, required=true)
+	@Protobuf(fieldType=FieldType.STRING, order=1, required=false)
 	public String name;
-	@Protobuf(fieldType=FieldType.INT32, order=2, required=true)
+	@Protobuf(fieldType=FieldType.INT32, order=2, required=false)
 	public Integer id;
 	@Protobuf(fieldType=FieldType.STRING, order=3, required=false)
 	public String email;
@@ -124,6 +124,25 @@ public class PersonJProtoBufProtoClass {
 	public Boolean boolF;
 }
 ```
+
+从版本  1.12.0 and 2.2.0 开始支持 @ProtobufClass注解，支持默认字段识别能力. 下面的方式等 同于上面的配置
+
+注：@ProtobufClass与@Protobuf 可以混合使用
+
+```java
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
+@ProtobufClass
+public class PersonJProtoBufProtoClass {
+	public String name;
+	public Integer id;
+	public String email;
+	public Double doubleF;
+	public Float floatF;
+	public byte[] bytesF;
+	public Boolean boolF;
+}
+```
+
 
 Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf注解标识的对象都会进行预编译操作，并生成相应的class文件到目标jar或war中， 使用示例如下：
 ```xml
@@ -471,4 +490,4 @@ ProtobufProxy.create(clazz, compiler, codeGenerator);
 更多使用示例请参见testcase代码。
 
 ### 沟通群号：QQ: 644867264 ### 
- 
+

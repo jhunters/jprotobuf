@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -29,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.code.CodeGenerator;
 import com.baidu.bjf.remoting.protobuf.code.ICodeGenerator;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
@@ -158,14 +160,24 @@ public final class ProtobufProxy {
                 throw new IllegalArgumentException(e2.getMessage(), e2);
             }
         }
-
-        List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
-        if (fields.isEmpty()) {
-            throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
-                    + Protobuf.class.getName() + " at class " + cls.getName());
+        
+        // if set ProtobufClass annotation
+        Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+        boolean typeDefined = false;
+        List<Field> fields = null;
+        if (annotation == null) {
+            fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
+            if (fields.isEmpty()) {
+                throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
+                        + Protobuf.class.getName() + " at class " + cls.getName());
+            }
+        } else {
+            typeDefined = true;
+            
+            fields = FieldUtils.findMatchedFields(cls, null);
         }
-
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
+        
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
         CodeGenerator cg = new CodeGenerator(fieldInfos, cls);
 
         return cg;

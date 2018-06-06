@@ -17,6 +17,7 @@ package com.baidu.bjf.remoting.protobuf.packed;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -43,7 +44,7 @@ public class PackedValueTest {
 
         List<Integer> list = new ArrayList<Integer>(10000);
         int begin = Integer.MAX_VALUE - 10000;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1; i++) {
             list.add(i + begin);
         }
         pojo.setId(list);
@@ -55,7 +56,9 @@ public class PackedValueTest {
 
         try {
             byte[] byteArray1 = person.toByteArray();
+            System.out.println(Arrays.toString(byteArray1));
             byte[] byteArray2 = codec.encode(pojo);
+            System.out.println(Arrays.toString(byteArray2));
             Assert.assertArrayEquals(byteArray1, byteArray2);
             
             PackedProtosPOJO pojo2 = codec.decode(person.toByteArray());

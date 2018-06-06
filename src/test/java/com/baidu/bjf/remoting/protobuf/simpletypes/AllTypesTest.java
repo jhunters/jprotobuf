@@ -16,6 +16,8 @@
 package com.baidu.bjf.remoting.protobuf.simpletypes;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import junit.framework.Assert;
 
@@ -27,57 +29,56 @@ import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName.TypeDef;
 import com.google.protobuf.ByteString;
 
-
 /**
  * The Class AllTypesTest.
  *
  * @author xiemalin
  */
 public class AllTypesTest {
-	
-	/**
+
+    /**
      * Test required mutli type encode.
      *
      * @throws IOException Signals that an I/O exception has occurred.
      */
-	@Test
-	public void  testRequiredMutliTypeEncode() throws IOException {
-		Codec<AllTypesDojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClass.class);
-	    //AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
-		AllTypesDojoClass c = new AllTypesDojoClass();
-		c.boolF = false;
-		c.bytesF = new byte[] {1,2};
-		c.doubleF = 101D;
-		c.fixed32F = 1;
-		c.fixed64F = 2L;
-		c.floatF = 102F;
-		c.int32F = 3;
-		c.int64F = 4L;
-		c.sfixed32F = 5;
-		c.sfixed64F = 6L;
-		c.sint32F = 7;
-		c.sint64F = 8L;
-		c.stringF = "hello";
-		c.uint32F = 9;
-		c.uint64F = 10L;
-		c.typeDefEnum = TypeDefEnum.DECIMAL;
-		
-		byte[] bb = dojoClassProxy.encode(c);
-		
-		InterClassName icn = InterClassName.parseFrom(bb);
-		Assert.assertEquals(c.doubleF, icn.getDoubleF());
-		byte[] bbb = icn.getBytesF().toByteArray();
-		Assert.assertEquals(2, bbb.length);
-		Assert.assertEquals(1, bbb[0]);
-		Assert.assertEquals(2, bbb[1]);
-		Assert.assertEquals(101D, icn.getDoubleF());
-		Assert.assertEquals(1, icn.getFixed32F());
-		Assert.assertEquals(2L, icn.getFixed64F());
-		Assert.assertEquals(102F, icn.getFloatF());
-		Assert.assertEquals(3, icn.getInt32F());
-		Assert.assertEquals(4L, icn.getInt64F());
-	    Assert.assertEquals(5, icn.getSfixed32F());
-	    Assert.assertEquals(6L, icn.getSfixed64F());
+    @Test
+    public void testRequiredMutliTypeEncode() throws IOException {
+        Codec<AllTypesDojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClass.class);
+        // AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
+        AllTypesDojoClass c = new AllTypesDojoClass();
+        c.boolF = false;
+        c.bytesF = new byte[] { 1, 2 };
+        c.doubleF = 101D;
+        c.fixed32F = 1;
+        c.fixed64F = 2L;
+        c.floatF = 102F;
+        c.int32F = 3;
+        c.int64F = 4L;
+        c.sfixed32F = 5;
+        c.sfixed64F = 6L;
+        c.sint32F = 7;
+        c.sint64F = 8L;
+        c.stringF = "hello";
+        c.uint32F = 9;
+        c.uint64F = 10L;
+        c.typeDefEnum = TypeDefEnum.DECIMAL;
+
+        byte[] bb = dojoClassProxy.encode(c);
+
+        InterClassName icn = InterClassName.parseFrom(bb);
+        Assert.assertEquals(c.doubleF, icn.getDoubleF());
+        byte[] bbb = icn.getBytesF().toByteArray();
+        Assert.assertEquals(2, bbb.length);
+        Assert.assertEquals(1, bbb[0]);
+        Assert.assertEquals(2, bbb[1]);
+        Assert.assertEquals(101D, icn.getDoubleF());
+        Assert.assertEquals(1, icn.getFixed32F());
+        Assert.assertEquals(2L, icn.getFixed64F());
+        Assert.assertEquals(102F, icn.getFloatF());
+        Assert.assertEquals(3, icn.getInt32F());
+        Assert.assertEquals(4L, icn.getInt64F());
+        Assert.assertEquals(5, icn.getSfixed32F());
+        Assert.assertEquals(6L, icn.getSfixed64F());
         Assert.assertEquals(7, icn.getSint32F());
         Assert.assertEquals(8L, icn.getSint64F());
         Assert.assertEquals("hello", icn.getStringF());
@@ -85,39 +86,87 @@ public class AllTypesTest {
         Assert.assertEquals(9, icn.getUint32F());
         Assert.assertEquals(10L, icn.getUint64F());
         Assert.assertEquals(TypeDefEnum.DECIMAL.value(), icn.getEnumT().getNumber());
-	}
-	
-	/**
+    }
+
+    @Test
+    public void testRequiredMutliTypeEncode2() throws IOException {
+        Codec<AllTypesWithProtobufClassDojoClass> dojoClassProxy =
+                ProtobufProxy.create(AllTypesWithProtobufClassDojoClass.class);
+        // AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
+        AllTypesWithProtobufClassDojoClass c = new AllTypesWithProtobufClassDojoClass();
+        c.boolF = false;
+        c.bytesF = new byte[] { 1, 2 };
+        c.doubleF = 101D;
+        c.fixed32F = 1;
+        c.fixed64F = 2L;
+        c.floatF = 102F;
+        c.int32F = 3;
+        c.int64F = 4L;
+        c.sfixed32F = 5;
+        c.sfixed64F = 6L;
+        c.sint32F = 7;
+        c.sint64F = 8L;
+        c.stringF = "hello";
+        c.uint32F = 9;
+        c.uint64F = 10L;
+        c.typeDefEnum = TypeDefEnum.DECIMAL;
+        c.strings = new ArrayList<String>();
+        c.strings.add("hello");
+        c.strings.add("matthew");
+        c.intergers = new ArrayList<Integer>();
+        c.intergers.add(1);
+        c.intergers.add(2);
+
+        c.allTypesDojoClasses = new ArrayList<AllTypesDojoClass>();
+        c.allTypesDojoClasses.add(new AllTypesDojoClass());
+
+        byte[] bb = dojoClassProxy.encode(c);
+
+        AllTypesWithProtobufClassDojoClass icn = dojoClassProxy.decode(bb);
+
+        Assert.assertEquals(c.doubleF, icn.getDoubleF());
+        byte[] bbb = icn.getBytesF();
+        Assert.assertEquals(2, bbb.length);
+        Assert.assertEquals(1, bbb[0]);
+        Assert.assertEquals(2, bbb[1]);
+        Assert.assertEquals(101D, icn.getDoubleF());
+        Assert.assertEquals(1, icn.getFixed32F());
+        Assert.assertEquals(2L, icn.getFixed64F());
+        Assert.assertEquals(102F, icn.getFloatF());
+        Assert.assertEquals(3, icn.getInt32F());
+        Assert.assertEquals(4L, icn.getInt64F());
+        Assert.assertEquals(5, icn.getSfixed32F());
+        Assert.assertEquals(6L, icn.getSfixed64F());
+        Assert.assertEquals(7, icn.getSint32F());
+        Assert.assertEquals(8L, icn.getSint64F());
+        Assert.assertEquals("hello", icn.getStringF());
+        Assert.assertEquals(false, icn.getBoolF());
+        Assert.assertEquals(9, icn.getUint32F());
+        Assert.assertEquals(10L, icn.getUint64F());
+        Assert.assertEquals(TypeDefEnum.DECIMAL.value(), icn.getTypeDefEnum().value());
+
+        Assert.assertEquals(2, icn.strings.size());
+        Assert.assertEquals(2, icn.intergers.size());
+        Assert.assertEquals(1, icn.allTypesDojoClasses.size());
+    }
+
+    /**
      * Test required mutli type decode.
      *
      * @throws IOException Signals that an I/O exception has occurred.
      */
-	@Test
-	public void  testRequiredMutliTypeDecode() throws IOException {
-		InterClassName icn = InterClassName.newBuilder()
-		    .setBoolF(true)
-		    .setBytesF(ByteString.copyFrom(new byte[] {1, 2}))
-		    .setDoubleF(202D)
-		    .setFixed32F(1)
-		    .setFixed64F(2L)
-		    .setFloatF(303F)
-		    .setInt32F(4)
-		    .setInt64F(5L)
-		    .setSfixed32F(6)
-		    .setSfixed64F(7L)
-		    .setSint32F(8)
-		    .setSint64F(9L)
-		    .setStringF("world")
-		    .setUint32F(10)
-		    .setUint64F(11L)
-		    .setEnumT(TypeDef.ID)
-		    .build();
-		
-		byte[] bb = icn.toByteArray();
-		
-		Codec<AllTypesDojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClass.class);
-		AllTypesDojoClass decode = dojoClassProxy.decode(bb);
-		
+    @Test
+    public void testRequiredMutliTypeDecode() throws IOException {
+        InterClassName icn = InterClassName.newBuilder().setBoolF(true)
+                .setBytesF(ByteString.copyFrom(new byte[] { 1, 2 })).setDoubleF(202D).setFixed32F(1).setFixed64F(2L)
+                .setFloatF(303F).setInt32F(4).setInt64F(5L).setSfixed32F(6).setSfixed64F(7L).setSint32F(8)
+                .setSint64F(9L).setStringF("world").setUint32F(10).setUint64F(11L).setEnumT(TypeDef.ID).build();
+
+        byte[] bb = icn.toByteArray();
+
+        Codec<AllTypesDojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClass.class);
+        AllTypesDojoClass decode = dojoClassProxy.decode(bb);
+
         Assert.assertEquals(2, decode.bytesF.length);
         Assert.assertEquals(1, decode.bytesF[0]);
         Assert.assertEquals(2, decode.bytesF[1]);
@@ -136,31 +185,28 @@ public class AllTypesTest {
         Assert.assertEquals(10, decode.uint32F.intValue());
         Assert.assertEquals(11L, decode.uint64F.longValue());
         Assert.assertEquals(TypeDefEnum.ID.value(), decode.typeDefEnum.value());
-        
+
         Codec<AllTypesPrimitivePojoClass> pojoClassProxy = ProtobufProxy.create(AllTypesPrimitivePojoClass.class);
         AllTypesPrimitivePojoClass decode2 = pojoClassProxy.decode(bb);
-        boolean r =
-                decode2.check(decode.doubleF, decode.floatF, decode.int32F, decode.int64F, decode.uint32F,
-                        decode.uint64F, decode.sint32F, decode.sint64F, decode.fixed32F, decode.fixed64F,
-                        decode.sfixed32F, decode.sfixed64F, decode.boolF, decode.stringF, decode.bytesF,
-                        decode.typeDefEnum);
+        boolean r = decode2.check(decode.doubleF, decode.floatF, decode.int32F, decode.int64F, decode.uint32F,
+                decode.uint64F, decode.sint32F, decode.sint64F, decode.fixed32F, decode.fixed64F, decode.sfixed32F,
+                decode.sfixed64F, decode.boolF, decode.stringF, decode.bytesF, decode.typeDefEnum);
         Assert.assertTrue(r);
-        
-        
-	}
-	
-	/**
+
+    }
+
+    /**
      * Test mutli type default type encode decode.
      *
      * @throws IOException Signals that an I/O exception has occurred.
      */
-	@Test
-    public void  testMutliTypeDefaultTypeEncodeDecode() throws IOException {
+    @Test
+    public void testMutliTypeDefaultTypeEncodeDecode() throws IOException {
         Codec<AllTypesDojoClassWithDefault> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClassWithDefault.class);
-        //AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
+        // AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
         AllTypesDojoClassWithDefault c = new AllTypesDojoClassWithDefault();
         c.boolF = false;
-        c.bytesF = new byte[] {1,2};
+        c.bytesF = new byte[] { 1, 2 };
         c.doubleF = 101D;
         c.fixed32F = 1;
         c.fixed64F = 2L;
@@ -175,11 +221,11 @@ public class AllTypesTest {
         c.uint32F = 9;
         c.uint64F = 10L;
         c.typeDefEnum = TypeDefEnum.DECIMAL;
-        
+
         byte[] bb = dojoClassProxy.encode(c);
-        
+
         AllTypesDojoClassWithDefault decode = dojoClassProxy.decode(bb);
-        
+
         Assert.assertEquals(2, decode.bytesF.length);
         Assert.assertEquals(1, decode.bytesF[0]);
         Assert.assertEquals(2, decode.bytesF[1]);
@@ -199,5 +245,5 @@ public class AllTypesTest {
         Assert.assertEquals(10L, decode.uint64F.longValue());
         Assert.assertEquals(TypeDefEnum.DECIMAL.value(), decode.typeDefEnum.value());
     }
-	
+
 }

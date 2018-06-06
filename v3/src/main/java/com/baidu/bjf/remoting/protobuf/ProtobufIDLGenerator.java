@@ -118,7 +118,7 @@ public class ProtobufIDLGenerator {
         Set<Class<Enum>> enumTypes = new HashSet<Class<Enum>>();
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
 
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields);
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, false);
         boolean isMap = false;
         for (FieldInfo field : fieldInfos) {
             if (field.hasDescription()) {

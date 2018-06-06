@@ -16,8 +16,7 @@
 package com.baidu.bjf.remoting.protobuf.simpletypes;
 
 import java.io.IOException;
-
-import junit.framework.Assert;
+import java.util.ArrayList;
 
 import org.junit.Test;
 
@@ -26,6 +25,8 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName.TypeDef;
 import com.google.protobuf.ByteString;
+
+import junit.framework.Assert;
 
 
 /**
@@ -80,6 +81,68 @@ public class AllTypesTest {
         Assert.assertEquals(10L, icn.getUint64F());
         Assert.assertEquals(TypeDefEnum.DECIMAL.value(), icn.getEnumT().getNumber());
 	}
+	
+    @Test
+    public void testRequiredMutliTypeEncode2() throws IOException {
+        Codec<AllTypesWithProtobufClassDojoClass> dojoClassProxy =
+                ProtobufProxy.create(AllTypesWithProtobufClassDojoClass.class, false);
+        // AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
+        AllTypesWithProtobufClassDojoClass c = new AllTypesWithProtobufClassDojoClass();
+        c.boolF = false;
+        c.bytesF = new byte[] { 1, 2 };
+        c.doubleF = 101D;
+        c.fixed32F = 1;
+        c.fixed64F = 2L;
+        c.floatF = 102F;
+        c.int32F = 3;
+        c.int64F = 4L;
+        c.sfixed32F = 5;
+        c.sfixed64F = 6L;
+        c.sint32F = 7;
+        c.sint64F = 8L;
+        c.stringF = "hello";
+        c.uint32F = 9;
+        c.uint64F = 10L;
+        c.typeDefEnum = TypeDefEnum.DECIMAL;
+        c.strings = new ArrayList<String>();
+        c.strings.add("hello");
+        c.strings.add("matthew");
+        c.intergers = new ArrayList<Integer>();
+        c.intergers.add(1);
+        c.intergers.add(2);
+
+        c.allTypesDojoClasses = new ArrayList<AllTypesDojoClass>();
+        c.allTypesDojoClasses.add(new AllTypesDojoClass());
+
+        byte[] bb = dojoClassProxy.encode(c);
+
+        AllTypesWithProtobufClassDojoClass icn = dojoClassProxy.decode(bb);
+
+        Assert.assertEquals(c.doubleF, icn.getDoubleF());
+        byte[] bbb = icn.getBytesF();
+        Assert.assertEquals(2, bbb.length);
+        Assert.assertEquals(1, bbb[0]);
+        Assert.assertEquals(2, bbb[1]);
+        Assert.assertEquals(101D, icn.getDoubleF());
+        Assert.assertEquals(1, icn.getFixed32F());
+        Assert.assertEquals(2L, icn.getFixed64F());
+        Assert.assertEquals(102F, icn.getFloatF());
+        Assert.assertEquals(3, icn.getInt32F());
+        Assert.assertEquals(4L, icn.getInt64F());
+        Assert.assertEquals(5, icn.getSfixed32F());
+        Assert.assertEquals(6L, icn.getSfixed64F());
+        Assert.assertEquals(7, icn.getSint32F());
+        Assert.assertEquals(8L, icn.getSint64F());
+        Assert.assertEquals("hello", icn.getStringF());
+        Assert.assertEquals(false, icn.getBoolF());
+        Assert.assertEquals(9, icn.getUint32F());
+        Assert.assertEquals(10L, icn.getUint64F());
+        Assert.assertEquals(TypeDefEnum.DECIMAL.value(), icn.getTypeDefEnum().value());
+
+        Assert.assertEquals(2, icn.strings.size());
+        Assert.assertEquals(2, icn.intergers.size());
+        Assert.assertEquals(1, icn.allTypesDojoClasses.size());
+    }
 	
 	@Test
 	public void  testRequiredMutliTypeDecode() throws IOException {

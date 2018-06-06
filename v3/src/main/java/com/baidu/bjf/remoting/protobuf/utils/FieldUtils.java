@@ -194,6 +194,10 @@ public final class FieldUtils {
             // file.
             Field[] fields = targetClass.getDeclaredFields();
             for (int i = 0; i < fields.length; i++) {
+                if (ann == null) {
+                    ret.add(fields[i]);
+                    continue;
+                }
                 Annotation protobuf = fields[i].getAnnotation(ann);
                 if (protobuf != null) {
                     ret.add(fields[i]);

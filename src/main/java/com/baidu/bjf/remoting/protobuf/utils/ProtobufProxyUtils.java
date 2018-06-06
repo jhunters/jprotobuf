@@ -17,9 +17,12 @@ package com.baidu.bjf.remoting.protobuf.utils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
@@ -79,7 +82,7 @@ public class ProtobufProxyUtils {
      * @param fields all field to process
      * @return list of fields
      */
-    public static List<FieldInfo> processDefaultValue(List<Field> fields) {
+    public static List<FieldInfo> processDefaultValue(List<Field> fields, boolean ignoreNoAnnotation) {
         if (fields == null) {
             return null;
         }
@@ -88,9 +91,10 @@ public class ProtobufProxyUtils {
 
         int maxOrder = 0;
         List<FieldInfo> unorderFields = new ArrayList<FieldInfo>(fields.size());
+        Set<Integer> orders = new HashSet<Integer>();
         for (Field field : fields) {
             Protobuf protobuf = field.getAnnotation(Protobuf.class);
-            if (protobuf == null) {
+            if (protobuf == null && !ignoreNoAnnotation) {
                 throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
             }
 
@@ -105,15 +109,32 @@ public class ProtobufProxyUtils {
             }
 
             FieldInfo fieldInfo = new FieldInfo(field);
-            fieldInfo.setRequired(protobuf.required());
-            fieldInfo.setDescription(protobuf.description());
-
+            FieldType annFieldType = FieldType.DEFAULT;
+            int order = -1;
+            if (protobuf != null) {
+                fieldInfo.setRequired(protobuf.required());
+                fieldInfo.setDescription(protobuf.description());
+                annFieldType = protobuf.fieldType();
+                order = protobuf.order();
+            } else {
+                fieldInfo.setRequired(false);
+            }
+            
             // process type
-            if (protobuf.fieldType() == FieldType.DEFAULT) {
-                FieldType fieldType = TYPE_MAPPING.get(field.getType());
+            if (annFieldType == FieldType.DEFAULT) {
+                
+                Class fieldTypeClass = field.getType();
+                
+                // if list
+                boolean isList = fieldInfo.isList();
+                if (isList) {
+                    fieldTypeClass = fieldInfo.getGenericKeyType();
+                }
+                
+                FieldType fieldType = TYPE_MAPPING.get(fieldTypeClass);
                 if (fieldType == null) {
                     // check if type is enum
-                    if (Enum.class.isAssignableFrom(field.getType())) {
+                    if (Enum.class.isAssignableFrom(fieldTypeClass)) {
                         fieldType = FieldType.ENUM;
                     } else {
                         fieldType = FieldType.OBJECT;
@@ -121,11 +142,14 @@ public class ProtobufProxyUtils {
                 }
                 fieldInfo.setFieldType(fieldType);
             } else {
-                fieldInfo.setFieldType(protobuf.fieldType());
+                fieldInfo.setFieldType(annFieldType);
             }
-
-            int order = protobuf.order();
+            
             if (order > 0) {
+                if (orders.contains(order)) {
+                    throw new RuntimeException(
+                            "order id '" + order + "' from field name '" + field.getName() + "'  is duplicate");
+                }
                 fieldInfo.setOrder(order);
                 if (order > maxOrder) {
                     maxOrder = order;

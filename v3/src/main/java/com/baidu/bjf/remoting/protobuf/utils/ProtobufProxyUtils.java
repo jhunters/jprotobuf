@@ -1,25 +1,15 @@
-/*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
  */
 package com.baidu.bjf.remoting.protobuf.utils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
@@ -36,11 +26,10 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class ProtobufProxyUtils {
 
+    /** The Constant TYPE_MAPPING. */
     public static final Map<Class<?>, FieldType> TYPE_MAPPING;
-    
-    /**
-     * Logger for this class
-     */
+
+    /** Logger for this class. */
     private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
 
     static {
@@ -64,10 +53,11 @@ public class ProtobufProxyUtils {
         TYPE_MAPPING.put(Boolean.class, FieldType.BOOL);
         TYPE_MAPPING.put(boolean.class, FieldType.BOOL);
     }
-    
+
     /**
-     * Test if target type is from protocol buffer default type
-     * @param cls target type 
+     * Test if target type is from protocol buffer default type.
+     *
+     * @param cls target type
      * @return true if is from protocol buffer default type
      */
     public static boolean isScalarType(Class<?> cls) {
@@ -76,11 +66,12 @@ public class ProtobufProxyUtils {
 
     /**
      * to process default value of <code>@Protobuf</code> value on field.
-     * 
+     *
      * @param fields all field to process
+     * @param ignoreNoAnnotation the ignore no annotation
      * @return list of fields
      */
-    public static List<FieldInfo> processDefaultValue(List<Field> fields) {
+    public static List<FieldInfo> processDefaultValue(List<Field> fields, boolean ignoreNoAnnotation) {
         if (fields == null) {
             return null;
         }
@@ -89,12 +80,13 @@ public class ProtobufProxyUtils {
 
         int maxOrder = 0;
         List<FieldInfo> unorderFields = new ArrayList<FieldInfo>(fields.size());
+        Set<Integer> orders = new HashSet<Integer>();
         for (Field field : fields) {
             Protobuf protobuf = field.getAnnotation(Protobuf.class);
-            if (protobuf == null) {
+            if (protobuf == null && !ignoreNoAnnotation) {
                 throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
             }
-            
+
             // check field is support for protocol buffer
             // any array except byte array is not support
             String simpleName = field.getType().getName();
@@ -106,15 +98,32 @@ public class ProtobufProxyUtils {
             }
 
             FieldInfo fieldInfo = new FieldInfo(field);
-            fieldInfo.setRequired(protobuf.required());
-            fieldInfo.setDescription(protobuf.description());
+            FieldType annFieldType = FieldType.DEFAULT;
+            int order = -1;
+            if (protobuf != null) {
+                fieldInfo.setRequired(protobuf.required());
+                fieldInfo.setDescription(protobuf.description());
+                annFieldType = protobuf.fieldType();
+                order = protobuf.order();
+            } else {
+                fieldInfo.setRequired(false);
+            }
 
             // process type
-            if (protobuf.fieldType() == FieldType.DEFAULT) {
-                FieldType fieldType = TYPE_MAPPING.get(field.getType());
+            if (annFieldType == FieldType.DEFAULT) {
+
+                Class fieldTypeClass = field.getType();
+
+                // if list
+                boolean isList = fieldInfo.isList();
+                if (isList) {
+                    fieldTypeClass = fieldInfo.getGenericKeyType();
+                }
+
+                FieldType fieldType = TYPE_MAPPING.get(fieldTypeClass);
                 if (fieldType == null) {
                     // check if type is enum
-                    if (Enum.class.isAssignableFrom(field.getType())) {
+                    if (Enum.class.isAssignableFrom(fieldTypeClass)) {
                         fieldType = FieldType.ENUM;
                     } else {
                         fieldType = FieldType.OBJECT;
@@ -122,11 +131,15 @@ public class ProtobufProxyUtils {
                 }
                 fieldInfo.setFieldType(fieldType);
             } else {
-                fieldInfo.setFieldType(protobuf.fieldType());
+                fieldInfo.setFieldType(annFieldType);
             }
 
-            int order = protobuf.order();
             if (order > 0) {
+                if (orders.contains(order)) {
+                    throw new RuntimeException(
+                            "order id '" + order + "' from field name '" + field.getName() + "'  is duplicate");
+                }
+                orders.add(order);
                 fieldInfo.setOrder(order);
                 if (order > maxOrder) {
                     maxOrder = order;
@@ -134,7 +147,7 @@ public class ProtobufProxyUtils {
             } else {
                 unorderFields.add(fieldInfo);
             }
-            
+
             if (fieldInfo.isList() && fieldInfo.getFieldType().isPrimitive()) {
                 Packed packed = field.getAnnotation(Packed.class);
                 if (packed == null) {
@@ -154,7 +167,7 @@ public class ProtobufProxyUtils {
         for (FieldInfo fieldInfo : unorderFields) {
             maxOrder++;
             fieldInfo.setOrder(maxOrder);
-            
+
             LOGGER.warning("Field '" + fieldInfo.getField().getName() + "' from "
                     + fieldInfo.getField().getDeclaringClass().getName()
                     + " with @Protobuf annotation but not set order or order is 0," + " It will set order value to "
@@ -163,23 +176,34 @@ public class ProtobufProxyUtils {
 
         return ret;
     }
-    
+
+    /**
+     * Checks if is object type.
+     *
+     * @param cls the cls
+     * @return true, if is object type
+     */
     public static boolean isObjectType(Class<?> cls) {
         FieldType fieldType = TYPE_MAPPING.get(cls);
         if (fieldType != null) {
             return false;
         }
-        
+
         return true;
     }
-    
-    
+
+    /**
+     * Process protobuf type.
+     *
+     * @param cls the cls
+     * @return the string
+     */
     public static String processProtobufType(Class<?> cls) {
         FieldType fieldType = TYPE_MAPPING.get(cls);
         if (fieldType != null) {
             return fieldType.getType();
         }
-        
+
         return cls.getSimpleName();
     }
 
