@@ -351,7 +351,7 @@ public class CodedConstant {
                     size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(dataSize);
                     int tag = CodedConstant.makeTag(order,
                             WireFormat.WIRETYPE_LENGTH_DELIMITED);
-                    size += com.google.protobuf.CodedOutputStream.computeUInt32SizeNoTag(tag);;
+                    size += com.google.protobuf.CodedOutputStream.computeUInt32SizeNoTag(tag);
                 }
             } else {
                 size += list.size() * CodedOutputStream.computeTagSize(order);

@@ -60,6 +60,8 @@ public class CodeGenerator implements ICodeGenerator {
     private static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
 
     public static final String PACKAGE_SPLIT = ".";
+    
+    public static final String CLASS_JOINER = "$";
 
     /**
      * 
@@ -465,7 +467,7 @@ public class CodeGenerator implements ICodeGenerator {
         keyGeneric = field.getGenericKeyType().getName();
 
         String valueGeneric;
-        valueGeneric = field.getGenericeValueType().getName();
+        valueGeneric = field.getGenericeValueType().getName().replace(CLASS_JOINER, PACKAGE_SPLIT);
         String getMapCommand = "(Map<" + keyGeneric;
         getMapCommand = getMapCommand + ", " + valueGeneric + ">)";
         getMapCommand = getMapCommand + getAccessByField("ret", field.getField(), cls);

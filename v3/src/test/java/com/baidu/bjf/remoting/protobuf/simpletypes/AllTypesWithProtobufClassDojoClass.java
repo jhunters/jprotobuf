@@ -87,7 +87,7 @@ public class AllTypesWithProtobufClassDojoClass {
     public String stringF;
     
     /** The bytes f. */
-    //@Protobuf
+    @Protobuf(order = 51)
     public byte[] bytesF;
     
     /** The type def enum. */
