@@ -188,10 +188,10 @@ public class CodeGenerator implements ICodeGenerator {
 
         // define class code
         code.append("public class " + className + " implements com.baidu.bjf.remoting.protobuf.Codec");
-        code.append("<").append(ClassHelper.getInternalName(cls.getName())).append("> {" + LINE_BREAK);
+        code.append("<").append(ClassHelper.getInternalName(cls.getCanonicalName())).append("> {" + LINE_BREAK);
 
         // define Descriptor field
-        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
+        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getCanonicalName());
         code.append("private ").append(descriptorClsName).append(" descriptor").append(JAVA_LINE_BREAK);
 
         code.append(getEncodeMethodCode());
@@ -219,7 +219,7 @@ public class CodeGenerator implements ICodeGenerator {
         code.append("import java.util.*").append(JAVA_LINE_BREAK);
 
         if (!StringUtils.isEmpty(getPackage())) {
-            code.append("import ").append(ClassHelper.getInternalName(cls.getName())).append(JAVA_LINE_BREAK);
+            code.append("import ").append(ClassHelper.getInternalName(cls.getCanonicalName())).append(JAVA_LINE_BREAK);
         }
     }
 
@@ -229,14 +229,14 @@ public class CodeGenerator implements ICodeGenerator {
      * @param code add new generated code to the builder.
      */
     private void getParseBytesMethodCode(StringBuilder code) {
-        code.append(ClassHelper.getInternalName(cls.getName())).append(" ret = new ");
-        code.append(ClassHelper.getInternalName(cls.getName())).append("()" + JAVA_LINE_BREAK);
+        code.append(ClassHelper.getInternalName(cls.getCanonicalName())).append(" ret = new ");
+        code.append(ClassHelper.getInternalName(cls.getCanonicalName())).append("()" + JAVA_LINE_BREAK);
 
         // 执行初始化，主要针对枚举类型
         for (FieldInfo field : fields) {
             boolean isList = field.isList();
             if (field.getFieldType() == FieldType.ENUM) {
-                String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
+                String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 if (!isList) {
                     String express =
                             "java.lang.Enum.valueOf(" + clsName + ".class, " + clsName + ".values()[0].name())";
@@ -274,11 +274,11 @@ public class CodeGenerator implements ICodeGenerator {
 
             // enumeration type
             if (field.getFieldType() == FieldType.ENUM) {
-                String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
+                String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 if (isList) {
                     if (field.getGenericKeyType() != null) {
                         Class cls = field.getGenericKeyType();
-                        clsName = ClassHelper.getInternalName(cls.getName());
+                        clsName = ClassHelper.getInternalName(cls.getCanonicalName());
                     }
                 }
                 express = "java.lang.Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName
@@ -292,7 +292,7 @@ public class CodeGenerator implements ICodeGenerator {
                 if (field.getGenericKeyType() != null) {
                     Class cls = field.getGenericKeyType();
 
-                    String name = ClassHelper.getInternalName(cls.getName()); // need to parse nested class
+                    String name = ClassHelper.getInternalName(cls.getCanonicalName()); // need to parse nested class
                     code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                     if (debug) {
                         code.append(", true");
@@ -318,7 +318,7 @@ public class CodeGenerator implements ICodeGenerator {
                 String getMapCommand = getMapCommand(field);
                 
                 if (field.isEnumValueType()) {
-                    String enumClassName = field.getGenericeValueType().getName();
+                    String enumClassName = field.getGenericeValueType().getCanonicalName();
                     code.append("EnumHandler<").append(enumClassName).append("> handler");
                     code.append("= new EnumHandler");
                     code.append("<").append(enumClassName).append(">() {");
@@ -343,7 +343,7 @@ public class CodeGenerator implements ICodeGenerator {
 
             } else if (field.getFieldType() == FieldType.OBJECT) { // if object message type
                 Class cls = field.getField().getType();
-                String name = ClassHelper.getInternalName(cls.getName()); // need to parse nested class
+                String name = ClassHelper.getInternalName(cls.getCanonicalName()); // need to parse nested class
                 code.append("codec = ProtobufProxy.create(").append(name).append(".class");
                 if (debug) {
                     code.append(", true");
@@ -429,7 +429,7 @@ public class CodeGenerator implements ICodeGenerator {
     private String getDecodeMethodCode() {
         StringBuilder code = new StringBuilder();
 
-        code.append("public ").append(ClassHelper.getInternalName(cls.getName()));
+        code.append("public ").append(ClassHelper.getInternalName(cls.getCanonicalName()));
         code.append(" decode(byte[] bb) throws IOException {").append(LINE_BREAK);
         code.append("CodedInputStream input = CodedInputStream.newInstance(bb, 0, bb.length)").append(JAVA_LINE_BREAK);
         getParseBytesMethodCode(code);
@@ -444,14 +444,14 @@ public class CodeGenerator implements ICodeGenerator {
     private Object getGetDescriptorMethodCode() {
         StringBuilder code = new StringBuilder();
 
-        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
+        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getCanonicalName());
         code.append("public ").append(descriptorClsName);
         code.append(" getDescriptor() throws IOException {").append(LINE_BREAK);
         code.append("if (this.descriptor != null) {").append(LINE_BREAK);
         code.append("return this.descriptor").append(JAVA_LINE_BREAK);
         code.append("}").append(LINE_BREAK);
         code.append(descriptorClsName).append(" descriptor = ");
-        code.append("CodedConstant.getDescriptor(").append(ClassHelper.getInternalName(cls.getName()))
+        code.append("CodedConstant.getDescriptor(").append(ClassHelper.getInternalName(cls.getCanonicalName()))
                 .append(JAVA_CLASS_FILE_SUFFIX).append(")").append(JAVA_LINE_BREAK);
         code.append("return (this.descriptor = descriptor)").append(JAVA_LINE_BREAK);
         code.append("}").append(LINE_BREAK);
@@ -464,10 +464,10 @@ public class CodeGenerator implements ICodeGenerator {
      */
     private String getMapCommand(FieldInfo field) {
         String keyGeneric;
-        keyGeneric = field.getGenericKeyType().getName();
+        keyGeneric = field.getGenericKeyType().getCanonicalName();
 
         String valueGeneric;
-        valueGeneric = field.getGenericeValueType().getName().replace(CLASS_JOINER, PACKAGE_SPLIT);
+        valueGeneric = field.getGenericeValueType().getCanonicalName();
         String getMapCommand = "(Map<" + keyGeneric;
         getMapCommand = getMapCommand + ", " + valueGeneric + ">)";
         getMapCommand = getMapCommand + getAccessByField("ret", field.getField(), cls);
@@ -482,7 +482,7 @@ public class CodeGenerator implements ICodeGenerator {
     private String getReadFromMethodCode() {
         StringBuilder code = new StringBuilder();
 
-        code.append("public ").append(ClassHelper.getInternalName(cls.getName()))
+        code.append("public ").append(ClassHelper.getInternalName(cls.getCanonicalName()))
                 .append(" readFrom(CodedInputStream input) throws IOException {").append(LINE_BREAK);
 
         getParseBytesMethodCode(code);
@@ -525,7 +525,7 @@ public class CodeGenerator implements ICodeGenerator {
     private String getMismatchTypeErroMessage(FieldType type, Field field) {
         return "Type mismatch. @Protobuf required type '" + type.getJavaType() + "' but field type is '"
                 + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
-                + field.getDeclaringClass().getName();
+                + field.getDeclaringClass().getCanonicalName();
     }
 
     /**
@@ -537,7 +537,7 @@ public class CodeGenerator implements ICodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public byte[] encode(").append(ClassHelper.getInternalName(cls.getName()));
+        code.append("public byte[] encode(").append(ClassHelper.getInternalName(cls.getCanonicalName()));
         code.append(" t) throws IOException {").append(LINE_BREAK);
         code.append("int size = 0").append(JAVA_END);
         for (FieldInfo field : fields) {
@@ -587,7 +587,7 @@ public class CodeGenerator implements ICodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public void writeTo(").append(ClassHelper.getInternalName(cls.getName()))
+        code.append("public void writeTo(").append(ClassHelper.getInternalName(cls.getCanonicalName()))
                 .append(" t, CodedOutputStream output) throws IOException {").append(LINE_BREAK);
         for (FieldInfo field : fields) {
 
@@ -632,7 +632,7 @@ public class CodeGenerator implements ICodeGenerator {
         StringBuilder code = new StringBuilder();
         Set<Integer> orders = new HashSet<Integer>();
         // encode method
-        code.append("public int size(").append(ClassHelper.getInternalName(cls.getName()));
+        code.append("public int size(").append(ClassHelper.getInternalName(cls.getCanonicalName()));
         code.append(" t) throws IOException {").append(LINE_BREAK);
         code.append("int size = 0").append(JAVA_LINE_BREAK);
         for (FieldInfo field : fields) {
@@ -683,7 +683,7 @@ public class CodeGenerator implements ICodeGenerator {
         }
         // check if has getter method
         String getter;
-        if ("boolean".equalsIgnoreCase(field.getType().getName())) {
+        if ("boolean".equalsIgnoreCase(field.getType().getCanonicalName())) {
             getter = "is" + CodedConstant.capitalize(field.getName());
         } else {
             getter = "get" + CodedConstant.capitalize(field.getName());
@@ -696,8 +696,8 @@ public class CodeGenerator implements ICodeGenerator {
             LOGGER.log(Level.FINE, e.getMessage(), e);
         }
 
-        String type = field.getType().getName();
-        if ("[B".equals(type) || "[Ljava.lang.Byte;".equals(type)) {
+        String type = field.getType().getCanonicalName();
+        if ("[B".equals(type) || "[Ljava.lang.Byte;".equals(type) || "java.lang.Byte[]".equals(type)) {
             type = "byte[]";
         }
 

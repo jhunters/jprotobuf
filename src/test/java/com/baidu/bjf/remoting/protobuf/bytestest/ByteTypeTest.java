@@ -90,7 +90,7 @@ public class ByteTypeTest {
      */
     @Test
     public void testTypeClass4() throws IOException  {
-        Codec<ByteTypeClass4> codec = ProtobufProxy.create(ByteTypeClass4.class);
+        Codec<ByteTypeClass4> codec = ProtobufProxy.create(ByteTypeClass4.class, false);
         
         ByteTypeClass4 o = new ByteTypeClass4();
         byte[] bb = codec.encode(o);

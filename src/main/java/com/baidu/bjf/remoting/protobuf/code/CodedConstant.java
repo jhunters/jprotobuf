@@ -156,7 +156,7 @@ public class CodedConstant {
         boolean enumSpecial = false;
         if (type == FieldType.ENUM) {
             if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
-                String clsName = field.getField().getType().getName().replaceAll("\\$", ".");
+                String clsName = field.getField().getType().getCanonicalName();
                 fieldName = "((" + clsName + ") " + fieldName + ").value()";
                 enumSpecial = true;
             }
@@ -291,7 +291,7 @@ public class CodedConstant {
             boolean enumSpecial = false;
             if (type == FieldType.ENUM) {
                 if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
-                    String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
+                    String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                     fieldName = "((" + clsName + ") " + fieldName + ").value()";
                     enumSpecial = true;
                 }

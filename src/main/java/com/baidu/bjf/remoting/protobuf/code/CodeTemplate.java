@@ -34,7 +34,7 @@ public class CodeTemplate {
      * @return the source code for getDescriptor method
      */
     public static String descriptorMethodSource(Class cls) {
-        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
+        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getCanonicalName());
         
         String code = "if (this.descriptor != null) {" + ClassCode.LINE_BREAK  +
                             "return this.descriptor;" + ClassCode.LINE_BREAK  +
@@ -43,7 +43,7 @@ public class CodeTemplate {
                        "return (this.descriptor = descriptor);"; 
         
         return String.format(code, descriptorClsName, 
-                ClassHelper.getInternalName(cls.getName()) + CodeGenerator.JAVA_CLASS_FILE_SUFFIX);
+                ClassHelper.getInternalName(cls.getCanonicalName()) + CodeGenerator.JAVA_CLASS_FILE_SUFFIX);
         
     }
     

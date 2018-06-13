@@ -46,7 +46,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
     public static final String JAVA_CLASS_FILE_SUFFIX = ".class";
 
     /** Logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class.getCanonicalName());
 
     /** The relative proxy classes. */
     private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
@@ -89,7 +89,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
 
         ClassCode code = new ClassCode(ClassCode.SCOPE_PUBLIC, className);
         // to implements Codec interface
-        code.addInteface(Codec.class.getName() + "<" + ClassHelper.getInternalName(cls.getName()) + ">");
+        code.addInteface(Codec.class.getName() + "<" + ClassHelper.getInternalName(cls.getCanonicalName()) + ">");
 
         // package
         code.setPkg(getPackage());
@@ -97,7 +97,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         genImportCode(code);
 
         // define Descriptor field
-        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
+        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getCanonicalName());
         code.addField(ClassCode.SCOPE_DEFAULT, descriptorClsName, "descriptor", null);
 
         // define class
@@ -126,7 +126,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         code.importClass("com.google.protobuf.*");
 
         if (!StringUtils.isEmpty(getPackage())) {
-            code.importClass(ClassHelper.getInternalName(cls.getName()));
+            code.importClass(ClassHelper.getInternalName(cls.getCanonicalName()));
         }
     }
 
@@ -140,8 +140,8 @@ public class CodeGenerator extends AbstractCodeGenerator {
 
         StringBuilder code = new StringBuilder();
         // define return
-        code.append(ClassHelper.getInternalName(cls.getName())).append(" ret = new ");
-        code.append(ClassHelper.getInternalName(cls.getName())).append("()");
+        code.append(ClassHelper.getInternalName(cls.getCanonicalName())).append(" ret = new ");
+        code.append(ClassHelper.getInternalName(cls.getCanonicalName())).append("()");
         mc.appendLineCode1(code.toString());
         code.setLength(0);
 
@@ -149,7 +149,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         for (FieldInfo field : fields) {
             boolean isList = field.isList();
             if (field.getFieldType() == FieldType.ENUM) {
-                String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
+                String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 if (!isList) {
                     String express =
                             "java.lang.Enum.valueOf(" + clsName + ".class, " + clsName + ".values()[0].name())";
@@ -192,11 +192,11 @@ public class CodeGenerator extends AbstractCodeGenerator {
 
             // enumeration type
             if (field.getFieldType() == FieldType.ENUM) {
-                String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
+                String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 if (isList) {
                     if (field.getGenericKeyType() != null) {
                         Class cls = field.getGenericKeyType();
-                        clsName = ClassHelper.getInternalName(cls.getName());
+                        clsName = ClassHelper.getInternalName(cls.getCanonicalName());
                     }
                 }
                 express = "java.lang.Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName
@@ -210,7 +210,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
                 if (field.getGenericKeyType() != null) {
                     Class cls = field.getGenericKeyType();
 
-                    String name = ClassHelper.getInternalName(cls.getName()); // need
+                    String name = ClassHelper.getInternalName(cls.getCanonicalName()); // need
                                                                               // to
                                                                               // parse
                                                                               // nested
@@ -238,7 +238,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
                                                                    // message
                                                                    // type
                 Class cls = field.getField().getType();
-                String name = ClassHelper.getInternalName(cls.getName()); // need
+                String name = ClassHelper.getInternalName(cls.getCanonicalName()); // need
                                                                           // to
                                                                           // parse
                                                                           // nested
@@ -306,7 +306,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         MethodCode mc = new MethodCode();
         mc.setName("decode");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
-        mc.setReturnType(ClassHelper.getInternalName(cls.getName()));
+        mc.setReturnType(ClassHelper.getInternalName(cls.getCanonicalName()));
         mc.addParameter("byte[]", "bb");
         mc.addException("IOException");
 
@@ -324,7 +324,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
      * @return the gets the descriptor method code
      */
     private MethodCode getGetDescriptorMethodCode() {
-        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
+        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getCanonicalName());
 
         MethodCode mc = new MethodCode();
         mc.setName("getDescriptor");
@@ -346,7 +346,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
     private MethodCode getReadFromMethodCode() {
         MethodCode mc = new MethodCode();
         mc.setName("readFrom");
-        mc.setReturnType(ClassHelper.getInternalName(cls.getName()));
+        mc.setReturnType(ClassHelper.getInternalName(cls.getCanonicalName()));
         mc.setScope(ClassCode.SCOPE_PUBLIC);
         mc.addParameter("CodedInputStream", "input");
         mc.addException("IOException");
@@ -391,7 +391,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
     private String getMismatchTypeErroMessage(FieldType type, Field field) {
         return "Type mismatch. @Protobuf required type '" + type.getJavaType() + "' but field type is '"
                 + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
-                + field.getDeclaringClass().getName();
+                + field.getDeclaringClass().getCanonicalName();
     }
 
     /**
@@ -404,7 +404,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         mc.setName("encode");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
         mc.setReturnType("byte[]");
-        mc.addParameter(ClassHelper.getInternalName(cls.getName()), "t");
+        mc.addParameter(ClassHelper.getInternalName(cls.getCanonicalName()), "t");
         mc.addException("IOException");
 
         // add method code
@@ -465,7 +465,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         mc.setName("writeTo");
         mc.setReturnType("void");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
-        mc.addParameter(ClassHelper.getInternalName(cls.getName()), "t");
+        mc.addParameter(ClassHelper.getInternalName(cls.getCanonicalName()), "t");
         mc.addParameter("CodedOutputStream", "output");
         mc.addException("IOException");
 
@@ -513,7 +513,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         mc.setName("size");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
         mc.setReturnType("int");
-        mc.addParameter(ClassHelper.getInternalName(cls.getName()), "t");
+        mc.addParameter(ClassHelper.getInternalName(cls.getCanonicalName()), "t");
         mc.addException("IOException");
 
         // add method code
@@ -574,7 +574,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         }
         // check if has getter method
         String getter;
-        if ("boolean".equalsIgnoreCase(field.getType().getName())) {
+        if ("boolean".equalsIgnoreCase(field.getType().getCanonicalName())) {
             getter = "is" + CodedConstant.capitalize(field.getName());
         } else {
             getter = "get" + CodedConstant.capitalize(field.getName());
@@ -587,8 +587,8 @@ public class CodeGenerator extends AbstractCodeGenerator {
             LOGGER.log(Level.FINE, e.getMessage(), e);
         }
 
-        String type = field.getType().getName();
-        if ("[B".equals(type) || "[Ljava.lang.Byte;".equals(type)) {
+        String type = field.getType().getCanonicalName();
+        if ("[B".equals(type) || "[Ljava.lang.Byte;".equals(type) || "java.lang.Byte[]".equals(type)) {
             type = "byte[]";
         }
 

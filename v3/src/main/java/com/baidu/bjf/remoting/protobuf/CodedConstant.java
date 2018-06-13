@@ -81,7 +81,7 @@ public class CodedConstant {
 
     /** The Constant WIREFORMAT_CLSNAME. */
     private static final String WIREFORMAT_CLSNAME =
-            ClassHelper.getInternalName(com.google.protobuf.WireFormat.FieldType.class.getName());
+            ClassHelper.getInternalName(com.google.protobuf.WireFormat.FieldType.class.getCanonicalName());
 
     /** The descriptor codec. */
     private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
@@ -207,7 +207,7 @@ public class CodedConstant {
         boolean enumSpecial = false;
         if (type == FieldType.ENUM) {
             if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
-                String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
+                String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 fieldName = "((" + clsName + ") " + fieldName + ").value()";
                 enumSpecial = true;
             }
@@ -237,7 +237,7 @@ public class CodedConstant {
                 Class<?> declaringClass = field.getGenericKeyType();
                 Field[] fields = declaringClass.getFields();
                 if (fields != null && fields.length > 0) {
-                    defaultKeyValue = ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "."
+                    defaultKeyValue = ClassHelper.getInternalName(field.getGenericKeyType().getCanonicalName()) + "."
                             + fields[0].getName();
                 } else {
                     defaultKeyValue = "0";
@@ -248,10 +248,10 @@ public class CodedConstant {
                 // check constructor
                 boolean hasDefaultConstructor = ClassHelper.hasDefaultConstructor(field.getGenericKeyType());
                 if (!hasDefaultConstructor) {
-                    throw new IllegalArgumentException("Class '" + field.getGenericKeyType().getName()
+                    throw new IllegalArgumentException("Class '" + field.getGenericKeyType().getCanonicalName()
                             + "' must has default constructor method with no parameters.");
                 }
-                defaultKeyValue = "new " + ClassHelper.getInternalName(field.getGenericKeyType().getName()) + "()";
+                defaultKeyValue = "new " + ClassHelper.getInternalName(field.getGenericKeyType().getCanonicalName()) + "()";
             }
         } else {
             keyClass = WIREFORMAT_CLSNAME + "." + fieldType.toString();
@@ -268,7 +268,7 @@ public class CodedConstant {
                 Class<?> declaringClass = field.getGenericeValueType();
                 Field[] fields = declaringClass.getFields();
                 if (fields != null && fields.length > 0) {
-                    defaultValueValue = ClassHelper.getInternalName(field.getGenericeValueType().getName()) + "."
+                    defaultValueValue = ClassHelper.getInternalName(field.getGenericeValueType().getCanonicalName()) + "."
                             + fields[0].getName();
                 } else {
                     defaultValueValue = "0";
@@ -279,10 +279,10 @@ public class CodedConstant {
                 // check constructor
                 boolean hasDefaultConstructor = ClassHelper.hasDefaultConstructor(field.getGenericeValueType());
                 if (!hasDefaultConstructor) {
-                    throw new IllegalArgumentException("Class '" + field.getGenericeValueType().getName()
+                    throw new IllegalArgumentException("Class '" + field.getGenericeValueType().getCanonicalName()
                             + "' must has default constructor method with no parameters.");
                 }
-                defaultValueValue = "new " + ClassHelper.getInternalName(field.getGenericeValueType().getName()) + "()";
+                defaultValueValue = "new " + ClassHelper.getInternalName(field.getGenericeValueType().getCanonicalName()) + "()";
             }
         } else {
             valueClass = WIREFORMAT_CLSNAME + "." + fieldType.toString();
@@ -588,7 +588,7 @@ public class CodedConstant {
             boolean enumSpecial = false;
             if (type == FieldType.ENUM) {
                 if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
-                    String clsName = ClassHelper.getInternalName(field.getField().getType().getName());
+                    String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                     fieldName = "((" + clsName + ") " + fieldName + ").value()";
                     enumSpecial = true;
                 }

@@ -53,7 +53,7 @@ public class ClassHelper {
         if (clsName == null) {
             return null;
         }
-        return clsName.replace('$', PACKAGE_SEPARATOR_CHAR);
+        return clsName;
     }
 
     public static long getLastModifyTime(Class<?> cls) {
