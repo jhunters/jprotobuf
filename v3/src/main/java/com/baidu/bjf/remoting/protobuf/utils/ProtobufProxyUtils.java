@@ -168,7 +168,7 @@ public class ProtobufProxyUtils {
             maxOrder++;
             fieldInfo.setOrder(maxOrder);
 
-            LOGGER.warning("Field '" + fieldInfo.getField().getName() + "' from "
+            LOGGER.info("Field '" + fieldInfo.getField().getName() + "' from "
                     + fieldInfo.getField().getDeclaringClass().getName()
                     + " with @Protobuf annotation but not set order or order is 0," + " It will set order value to "
                     + maxOrder);
