@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
@@ -25,9 +26,12 @@ import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
+import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.google.protobuf.Descriptors.Descriptor;
 
@@ -50,6 +54,9 @@ public class CodeGenerator extends AbstractCodeGenerator {
 
     /** The relative proxy classes. */
     private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
+    
+    /** The fields. */
+    protected List<FieldInfo> fields;
 
     /**
      * Gets the relative proxy classes.
@@ -66,8 +73,8 @@ public class CodeGenerator extends AbstractCodeGenerator {
      * @param fields protobuf mapped fields
      * @param cls protobuf mapped class
      */
-    public CodeGenerator(List<FieldInfo> fields, Class<?> cls) {
-        super(fields, cls);
+    public CodeGenerator(Class<?> cls) {
+        super(cls);
     }
 
     /* (non-Javadoc)
@@ -84,6 +91,10 @@ public class CodeGenerator extends AbstractCodeGenerator {
      */
     @Override
     public String getCode() {
+        
+        if (fields == null) {
+            fields = fetchFieldInfos();
+        }
 
         String className = getClassName();
 
@@ -109,6 +120,32 @@ public class CodeGenerator extends AbstractCodeGenerator {
         code.addMethod(getGetDescriptorMethodCode());
 
         return code.toCode();
+    }
+    
+    /**
+     * Fetch field infos.
+     *
+     * @return the list
+     */
+    protected List<FieldInfo> fetchFieldInfos() {
+        // if set ProtobufClass annotation
+        Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+        boolean typeDefined = false;
+        List<Field> fields = null;
+        if (annotation == null) {
+            fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
+            if (fields.isEmpty()) {
+                throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
+                        + Protobuf.class.getName() + " at class " + cls.getName());
+            }
+        } else {
+            typeDefined = true;
+            
+            fields = FieldUtils.findMatchedFields(cls, null);
+        }
+        
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
+        return fieldInfos;
     }
 
     /**

@@ -136,24 +136,7 @@ public final class ProtobufProxy {
             }
         }
         
-        // if set ProtobufClass annotation
-        Annotation annotation = cls.getAnnotation(ProtobufClass.class);
-        boolean typeDefined = false;
-        List<Field> fields = null;
-        if (annotation == null) {
-            fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
-            if (fields.isEmpty()) {
-                throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
-                        + Protobuf.class.getName() + " at class " + cls.getName());
-            }
-        } else {
-            typeDefined = true;
-            
-            fields = FieldUtils.findMatchedFields(cls, null);
-        }
-        
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
-        CodeGenerator cg = new CodeGenerator(fieldInfos, cls);
+        CodeGenerator cg = new CodeGenerator(cls);
 
         return cg;
     }

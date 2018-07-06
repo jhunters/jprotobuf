@@ -36,9 +36,6 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
     /** The output path. */
     protected File outputPath;
     
-    /** The fields. */
-    protected List<FieldInfo> fields;
-    
     /** The cls. */
     protected Class<?> cls;
     
@@ -48,8 +45,7 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      * @param fields the fields
      * @param cls the cls
      */
-    public AbstractCodeGenerator(List<FieldInfo> fields, Class<?> cls) {
-        this.fields = fields;
+    public AbstractCodeGenerator(Class<?> cls) {
         this.cls = cls;
     }
 

@@ -16,6 +16,7 @@
 package com.baidu.bjf.remoting.protobuf;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
@@ -24,9 +25,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
+import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.WireFormat;
@@ -133,9 +137,8 @@ public class CodeGenerator implements ICodeGenerator {
      * @param fields protobuf mapped fields
      * @param cls protobuf mapped class
      */
-    public CodeGenerator(List<FieldInfo> fields, Class<?> cls) {
+    public CodeGenerator(Class<?> cls) {
         super();
-        this.fields = fields;
         this.cls = cls;
     }
 
@@ -180,6 +183,11 @@ public class CodeGenerator implements ICodeGenerator {
      */
     @Override
     public String getCode() {
+        
+        if (fields == null) {
+            fields = fetchFieldInfos();
+        }
+        
         StringBuilder code = new StringBuilder();
 
         String className = getClassName();
@@ -203,6 +211,32 @@ public class CodeGenerator implements ICodeGenerator {
         code.append("}");
 
         return code.toString();
+    }
+    
+    /**
+     * Fetch field infos.
+     *
+     * @return the list
+     */
+    protected List<FieldInfo> fetchFieldInfos() {
+        // if set ProtobufClass annotation
+        Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+        boolean typeDefined = false;
+        List<Field> fields = null;
+        if (annotation == null) {
+            fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
+            if (fields.isEmpty()) {
+                throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
+                        + Protobuf.class.getName() + " at class " + cls.getName());
+            }
+        } else {
+            typeDefined = true;
+            
+            fields = FieldUtils.findMatchedFields(cls, null);
+        }
+        
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
+        return fieldInfos;
     }
 
     /**
