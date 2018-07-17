@@ -739,9 +739,14 @@ public class ProtobufIDLProxy {
 
                 String valueType = mapType.valueType().toString();
                 subType = typeMapping.get(valueType);
+                
                 String valueJavaType;
                 if (subType == null) {
-                    valueJavaType = valueType;
+                    valueJavaType = getProxyClassName(valueType, packages, mappedUniName, isUniName);
+
+                    if (!isNestedTypeDependency(valueJavaType, checkNestedTypes, mappedUniName, isUniName)) {
+                        cd.addDependency(valueJavaType);
+                    }
                 } else {
                     valueJavaType = subType.getJavaType();
                 }
