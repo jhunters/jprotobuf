@@ -48,6 +48,22 @@ public class EnumClassTest {
         Assert.assertEquals(com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumAttr.INT, enumClass.getStatus());
     }
     
+    /**
+     * Test enum notexist.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    @Test
+    public void testEnumNotexist() throws IOException {
+        byte[] byteArray = EnumClassInternal.newBuilder().setStatus(
+                com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumAttr.NOTEXIST).build().toByteArray();
+        
+        Codec<EnumPOJOClass> codec = ProtobufProxy.create(EnumPOJOClass.class);
+        EnumPOJOClass decode = codec.decode(byteArray);
+        
+        Assert.assertNull(decode.enumAttr);
+    }
+    
     @Test
     public void testEnum2() throws IOException {
         

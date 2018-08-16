@@ -999,6 +999,12 @@ public class CodedConstant {
         return "";
     }
 
+    /**
+     * Gets the enum value.
+     *
+     * @param en the en
+     * @return the enum value
+     */
     public static int getEnumValue(Enum en) {
         if (en != null) {
             int toCompareValue;
@@ -1011,6 +1017,28 @@ public class CodedConstant {
         }
 
         return -1;
+    }
+    
+    /**
+     * Gets the enumeration value.
+     *
+     * @param <T> the generic type
+     * @param enumType the enum type
+     * @param name the name
+     * @return the enum value
+     */
+    public static <T extends Enum<T>> T getEnumValue(Class<T> enumType,
+            String name) {
+        if (StringUtils.isEmpty(name)) {
+            return null;
+        }
+        
+        try {
+            T v = Enum.valueOf(enumType, name);
+            return v;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     /**

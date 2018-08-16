@@ -273,7 +273,7 @@ public class CodeGenerator implements ICodeGenerator {
                 String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 if (!isList) {
                     String express =
-                            "java.lang.Enum.valueOf(" + clsName + ".class, " + clsName + ".values()[0].name())";
+                            "CodedConstant.getEnumValue(" + clsName + ".class, " + clsName + ".values()[0].name())";
                     code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), false))
                             .append(JAVA_LINE_BREAK);
                 }
@@ -315,7 +315,7 @@ public class CodeGenerator implements ICodeGenerator {
                         clsName = ClassHelper.getInternalName(cls.getCanonicalName());
                     }
                 }
-                express = "java.lang.Enum.valueOf(" + clsName + ".class, CodedConstant.getEnumName(" + clsName
+                express = "CodedConstant.getEnumValue(" + clsName + ".class, CodedConstant.getEnumName(" + clsName
                         + ".values()," + "input.read" + t + "()))";
             } else {
                 express = "input.read" + t + "()";

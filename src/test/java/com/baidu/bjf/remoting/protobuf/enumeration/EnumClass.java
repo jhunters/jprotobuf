@@ -46,6 +46,8 @@ public final class EnumClass {
     
     /** <code>INT = 50;</code>. */
     INT(1, 1),
+    
+    NOTEXIST(2, 2),
     ;
 
     /** <code>STRING = 100;</code>. */

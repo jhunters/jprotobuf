@@ -16,7 +16,6 @@
 package com.baidu.bjf.remoting.protobuf.enumeration;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -63,6 +62,22 @@ public class EnumClassTest {
         // process default
         decode = codec.decode(new byte[0]);
         Assert.assertEquals(EnumAttrPOJO.STRING, decode.enumAttr);
+    }
+    
+    /**
+     * Test enum notexist.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    @Test
+    public void testEnumNotexist() throws IOException {
+        byte[] byteArray = EnumClassInternal.newBuilder().setStatus(
+                com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumAttr.NOTEXIST).build().toByteArray();
+        
+        Codec<EnumPOJOClass> codec = ProtobufProxy.create(EnumPOJOClass.class);
+        EnumPOJOClass decode = codec.decode(byteArray);
+        
+        Assert.assertNull(decode.enumAttr);
     }
     
     /**
