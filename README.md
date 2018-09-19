@@ -152,7 +152,7 @@ Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf
 	<plugin>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-precompile-plugin</artifactId>
-		<version>1.2.1</version>
+		<version>1.2.8</version>
 		<configuration>
 			<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 			<filterClassPackage>com.baidu</filterClassPackage>
