@@ -15,6 +15,7 @@ jprotobuf是针对Java程序开发一套简易类库，目的是简化java语言
 
 
 #####How it works#####
+
 jprotobuf工作原理如下：<br>
 1. 扫描类上的注解的信息，进行分析(与protobuf读取proto文件进行分析过程相似)<br>
 2. 根据注解分析的结果，动态生成java代码进行protobuf序列化与反序列化的功能实现<br>
@@ -22,6 +23,7 @@ jprotobuf工作原理如下：<br>
 
 
 #####Performace#####
+
 jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的过程。<br>
 在执行序列化与反序列化的过程中，几乎与protobuf生成的代码效率等同。
 
@@ -38,6 +40,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
 3. jprotobuf-android Android development supports
 
 #####关联项目：#####
+<br>
 JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
 访问地址： [https://github.com/jhunters/Jprotobuf-rpc-socket](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket)<br>
 JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本发布RPC服务<br>

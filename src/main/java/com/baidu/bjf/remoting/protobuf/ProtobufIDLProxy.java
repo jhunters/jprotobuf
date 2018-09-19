@@ -253,7 +253,7 @@ public class ProtobufIDLProxy {
     }
 
     /**
-     * TODO.
+     * to check current {@link File} is a directory.
      *
      * @param generateSouceOnly the generate souce only
      * @param sourceOutputDir the source output dir
