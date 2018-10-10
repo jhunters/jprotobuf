@@ -43,7 +43,7 @@ import com.google.protobuf.Descriptors.Descriptor;
  * @author xiemalin
  * @since 1.0.0
  */
-@Deprecated
+@Deprecated 
 public class CodeGenerator extends AbstractCodeGenerator {
 
     /** auto proxied suffix class name. */
