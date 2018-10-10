@@ -54,7 +54,7 @@ public class RequrieRepeatedNumberType2Test {
         
         
         Codec<RequrieRepeatedNumberTypePOJOClass2> proxy;
-        proxy = ProtobufProxy.create(RequrieRepeatedNumberTypePOJOClass2.class, false);
+        proxy = ProtobufProxy.create(RequrieRepeatedNumberTypePOJOClass2.class, true);
         try {
             byte[] bb = proxy.encode(type);
             Assert.assertArrayEquals(oldbb, bb);

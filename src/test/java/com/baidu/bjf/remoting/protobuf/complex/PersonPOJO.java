@@ -17,6 +17,7 @@ package com.baidu.bjf.remoting.protobuf.complex;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.enumeration.EnumAttrPOJO;
 
 /**
  * The Class PersonPOJO.
@@ -53,4 +54,5 @@ public class PersonPOJO {
     /** The bool f. */
     @Protobuf(fieldType=FieldType.BOOL, order=7, required=false)
     public Boolean boolF;    
+    
 }

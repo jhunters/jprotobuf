@@ -73,7 +73,7 @@ public class CodedConstant {
      * @param order field order
      * @return field name
      */
-    private static String getFieldName(int order) {
+    public static String getFieldName(int order) {
         String fieldName = "f_" + order;
         return fieldName;
     }
@@ -118,6 +118,49 @@ public class CodedConstant {
         code += "}";
         return code;
     }
+    
+    /**
+     * Gets the filed type.
+     *
+     * @param type the type
+     * @param isList the is list
+     * @return the filed type
+     */
+    public static String getFiledType(FieldType type, boolean isList) {
+        if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
+            return "com.google.protobuf.ByteString";
+        }
+        
+        // add null check
+        String defineType = type.getJavaType();
+        if (isList) {
+            defineType = "List";
+        }
+        
+        return defineType;
+        
+    }
+    
+    /**
+     * Gets the write value to field.
+     *
+     * @param type the type
+     * @param express the express
+     * @param isList the is list
+     * @return the write value to field
+     */
+    public static String getWriteValueToField(FieldType type, String express, boolean isList) {
+        if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
+            String method = "copyFromUtf8";
+            if (type == FieldType.BYTES) {
+                method = "copyFrom";
+            }
+
+            return "com.google.protobuf.ByteString." + method + "(" + express + ")";
+        }
+        
+        return express;
+    }
 
     /**
      * Gets the mapped type size.
@@ -138,13 +181,13 @@ public class CodedConstant {
         if (isList) {
             String typeString = type.getType().toUpperCase();
             return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
-                    + Boolean.valueOf(debug) + "," + spath + ");\n";
+                    + Boolean.valueOf(debug) + "," + spath + ");";
         }
 
         if (type == FieldType.OBJECT) {
             String typeString = type.getType().toUpperCase();
             return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
-                    + Boolean.valueOf(debug) + "," + spath + ");\n";
+                    + Boolean.valueOf(debug) + "," + spath + ");";
         }
 
         String t = type.getType();
@@ -166,7 +209,7 @@ public class CodedConstant {
         }
 
         return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ")"
-                + ClassCode.JAVA_LINE_BREAK;
+                + ClassCode.JAVA_END;
     }
 
     /**

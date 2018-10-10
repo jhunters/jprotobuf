@@ -16,10 +16,20 @@
 package com.baidu.bjf.remoting.protobuf.code;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
+import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
+import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 /**
@@ -29,6 +39,9 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  * @since 1.10.7
  */
 public abstract class AbstractCodeGenerator implements ICodeGenerator {
+    
+    /** Logger for this class. */
+    private static final Logger LOGGER = Logger.getLogger(AbstractCodeGenerator.class.getCanonicalName());
 
     /** The debug. */
     protected boolean debug = false;
@@ -38,6 +51,12 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
     
     /** The cls. */
     protected Class<?> cls;
+
+    /** The target proxy classname. */
+    private String targetProxyClassname;
+    
+    /** The fields. */
+    protected List<FieldInfo> fields;
     
     /**
      * Instantiates a new abstract code generator.
@@ -47,6 +66,45 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      */
     public AbstractCodeGenerator(Class<?> cls) {
         this.cls = cls;
+        
+        targetProxyClassname = ClassHelper.getInternalName(cls.getCanonicalName());
+        
+        fields = fetchFieldInfos();
+    }
+    
+    /**
+     * Fetch field infos.
+     *
+     * @return the list
+     */
+    protected List<FieldInfo> fetchFieldInfos() {
+        // if set ProtobufClass annotation
+        Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+        boolean typeDefined = false;
+        List<Field> fields = null;
+        if (annotation == null) {
+            fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
+            if (fields.isEmpty()) {
+                throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
+                        + Protobuf.class.getName() + " at class " + cls.getName());
+            }
+        } else {
+            typeDefined = true;
+            
+            fields = FieldUtils.findMatchedFields(cls, null);
+        }
+        
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
+        return fieldInfos;
+    }
+    
+    /**
+     * Gets the target proxy classname.
+     *
+     * @return the target proxy classname
+     */
+    protected String getTargetProxyClassname() {
+        return targetProxyClassname;
     }
 
     /* (non-Javadoc)
@@ -110,6 +168,82 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
 
         return getPackage() + ClassHelper.PACKAGE_SEPARATOR + getClassName();
     }
+    
+    /**
+     * Check {@link FieldType} is validate to class type of {@link Field}.
+     *
+     * @param type the type
+     * @param field the field
+     */
+    protected void checkType(FieldType type, Field field) {
+        Class<?> cls = field.getType();
 
+        if (type == FieldType.OBJECT || type == FieldType.ENUM) {
+            return;
+        }
+
+        String javaType = type.getJavaType();
+        if (Integer.class.getSimpleName().equals(javaType)) {
+            if (cls.getSimpleName().equals("int") || Integer.class.getSimpleName().equals(cls.getSimpleName())) {
+                return;
+            }
+            throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
+        }
+        if (!javaType.equalsIgnoreCase(cls.getSimpleName())) {
+            throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
+        }
+    }
+
+    /**
+     * get error message info by type not matched.
+     *
+     * @param type the type
+     * @param field the field
+     * @return error message for mismatch type
+     */
+    private String getMismatchTypeErroMessage(FieldType type, Field field) {
+        return "Type mismatch. @Protobuf required type '" + type.getJavaType() + "' but field type is '"
+                + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
+                + field.getDeclaringClass().getCanonicalName();
+    }
+    
+    /**
+     * get field access code.
+     *
+     * @param target target instance name
+     * @param field java field instance
+     * @param cls mapped class
+     * @return full field access java code
+     */
+    protected String getAccessByField(String target, Field field, Class<?> cls) {
+        if (field.getModifiers() == Modifier.PUBLIC) {
+            return target + ClassHelper.PACKAGE_SEPARATOR + field.getName();
+        }
+        // check if has getter method
+        String getter;
+        if ("boolean".equalsIgnoreCase(field.getType().getCanonicalName())) {
+            getter = "is" + CodedConstant.capitalize(field.getName());
+        } else {
+            getter = "get" + CodedConstant.capitalize(field.getName());
+        }
+        // check method exist
+        try {
+            cls.getMethod(getter, new Class<?>[0]);
+            return target + ClassHelper.PACKAGE_SEPARATOR + getter + "()";
+        } catch (Exception e) {
+            LOGGER.log(Level.FINE, e.getMessage(), e);
+        }
+
+        String type = field.getType().getCanonicalName();
+        if ("[B".equals(type) || "[Ljava.lang.Byte;".equals(type) || "java.lang.Byte[]".equals(type)) {
+            type = "byte[]";
+        }
+
+        // use reflection to get value
+        String code = "(" + FieldUtils.toObjectType(type) + ") ";
+        code += "FieldUtils.getField(" + target + ", \"" + field.getName() + "\")";
+
+        return code;
+    }
 
 }

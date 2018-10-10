@@ -38,9 +38,12 @@ import com.google.protobuf.Descriptors.Descriptor;
 /**
  * Code generator utility class.
  * 
+ * @deprecated please use {@link TemplateCodeGenerator}
+ * 
  * @author xiemalin
  * @since 1.0.0
  */
+@Deprecated
 public class CodeGenerator extends AbstractCodeGenerator {
 
     /** auto proxied suffix class name. */
@@ -393,43 +396,6 @@ public class CodeGenerator extends AbstractCodeGenerator {
         return mc;
     }
 
-    /**
-     * Check {@link FieldType} is validate to class type of {@link Field}.
-     *
-     * @param type the type
-     * @param field the field
-     */
-    private void checkType(FieldType type, Field field) {
-        Class<?> cls = field.getType();
-
-        if (type == FieldType.OBJECT || type == FieldType.ENUM) {
-            return;
-        }
-
-        String javaType = type.getJavaType();
-        if (Integer.class.getSimpleName().equals(javaType)) {
-            if (cls.getSimpleName().equals("int") || Integer.class.getSimpleName().equals(cls.getSimpleName())) {
-                return;
-            }
-            throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
-        }
-        if (!javaType.equalsIgnoreCase(cls.getSimpleName())) {
-            throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
-        }
-    }
-
-    /**
-     * get error message info by type not matched.
-     *
-     * @param type the type
-     * @param field the field
-     * @return error message for mismatch type
-     */
-    private String getMismatchTypeErroMessage(FieldType type, Field field) {
-        return "Type mismatch. @Protobuf required type '" + type.getJavaType() + "' but field type is '"
-                + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
-                + field.getDeclaringClass().getCanonicalName();
-    }
 
     /**
      * Gets the encode method code.

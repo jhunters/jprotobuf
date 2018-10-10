@@ -148,7 +148,7 @@ public class ProtobufIDLProxyTest {
     @Test
     public void testMultiDecode() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code, true, false);
 
         IDLProxyObject idlProxyObject = idlProxyObjects.get(AddressBookProtosPOJO.class.getSimpleName());
 
@@ -163,7 +163,7 @@ public class ProtobufIDLProxyTest {
             Assert.assertNotNull(e);
         }
         byte[] bb = idlProxyObject.encode();
-
+        System.out.println(Arrays.toString(bb));
         IDLProxyObject newObject = idlProxyObject.decode(bb);
         Assert.assertEquals("hello", newObject.get("name"));
         Assert.assertEquals("yes", newObject.get("list.name"));

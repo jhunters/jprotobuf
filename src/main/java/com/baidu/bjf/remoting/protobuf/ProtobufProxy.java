@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.baidu.bjf.remoting.protobuf.code.CodeGenerator;
 import com.baidu.bjf.remoting.protobuf.code.ICodeGenerator;
+import com.baidu.bjf.remoting.protobuf.code.TemplateCodeGenerator;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
@@ -139,7 +139,7 @@ public final class ProtobufProxy {
      * @param cls the cls
      * @return the code generator
      */
-    private static CodeGenerator getCodeGenerator(Class cls) {
+    private static ICodeGenerator getCodeGenerator(Class cls) {
         // check if has default constructor
 
         if (!cls.isMemberClass()) {
@@ -154,7 +154,7 @@ public final class ProtobufProxy {
         }
         
 
-        CodeGenerator cg = new CodeGenerator(cls);
+        ICodeGenerator cg = new TemplateCodeGenerator(cls);
 
         return cg;
     }
