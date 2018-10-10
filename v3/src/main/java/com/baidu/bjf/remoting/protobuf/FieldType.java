@@ -113,7 +113,7 @@ public enum FieldType {
      * get primitive type in string
      * @return primitive type in string
      */
-    protected String getToPrimitiveType() {
+    public String getToPrimitiveType() {
         return toPrimitiveType;
     }
 

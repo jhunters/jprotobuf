@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.code;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
@@ -248,6 +249,7 @@ public class CodeGenerator implements ICodeGenerator {
         code.append("import com.google.protobuf.*").append(JAVA_LINE_BREAK);
         code.append("import java.io.IOException").append(JAVA_LINE_BREAK);
         code.append("import com.baidu.bjf.remoting.protobuf.utils.*").append(JAVA_LINE_BREAK);
+        code.append("import com.baidu.bjf.remoting.protobuf.code.*").append(JAVA_LINE_BREAK);
         code.append("import java.lang.reflect.*").append(JAVA_LINE_BREAK);
         code.append("import com.baidu.bjf.remoting.protobuf.*").append(JAVA_LINE_BREAK);
         code.append("import java.util.*").append(JAVA_LINE_BREAK);

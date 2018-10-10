@@ -42,7 +42,7 @@ import com.google.protobuf.Descriptors.Descriptor;
  * 
  * @author xiemalin
  * @since 1.0.0
- */
+ */ 
 @Deprecated 
 public class CodeGenerator extends AbstractCodeGenerator {
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.code;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.baidu.bjf.remoting.protobuf.Codec;
+import com.baidu.bjf.remoting.protobuf.EnumHandler;
+import com.baidu.bjf.remoting.protobuf.EnumReadable;
+import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
+import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.descriptor.DescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.EnumDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.EnumOptionsPOJO;
@@ -92,7 +99,7 @@ public class CodedConstant {
      * @param order field order
      * @return field name
      */
-    private static String getFieldName(int order) {
+    public static String getFieldName(int order) {
         String fieldName = "f_" + order;
         return fieldName;
     }
@@ -160,6 +167,49 @@ public class CodedConstant {
         return code.toString();
     }
 
+    /**
+     * Gets the filed type.
+     *
+     * @param type the type
+     * @param isList the is list
+     * @return the filed type
+     */
+    public static String getFiledType(FieldType type, boolean isList) {
+        if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
+            return "com.google.protobuf.ByteString";
+        }
+        
+        // add null check
+        String defineType = type.getJavaType();
+        if (isList) {
+            defineType = "List";
+        }
+        
+        return defineType;
+        
+    }
+    
+    /**
+     * Gets the write value to field.
+     *
+     * @param type the type
+     * @param express the express
+     * @param isList the is list
+     * @return the write value to field
+     */
+    public static String getWriteValueToField(FieldType type, String express, boolean isList) {
+        if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
+            String method = "copyFromUtf8";
+            if (type == FieldType.BYTES) {
+                method = "copyFrom";
+            }
+
+            return "com.google.protobuf.ByteString." + method + "(" + express + ")";
+        }
+        
+        return express;
+    }
+    
     /**
      * Gets the mapped type size.
      *

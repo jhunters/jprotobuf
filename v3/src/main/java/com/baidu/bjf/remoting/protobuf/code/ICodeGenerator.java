@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.code;
 
 import java.io.File;
 import java.util.Set;
@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * The Interface ICodeGenerator.
  * @author xiemalin
- * @since 2.1.3
+ * @since 1.10.7
  */
 public interface ICodeGenerator {
 

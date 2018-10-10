@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.Map;
 
+import com.baidu.bjf.remoting.protobuf.code.CodedConstant;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
