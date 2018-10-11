@@ -302,8 +302,12 @@ public final class ProtobufProxy {
         try {
             c = Class.forName(className, true, getClassLoader());
         } catch (ClassNotFoundException e1) {
-            // if class not found so should generate a new java source class.
-            c = null;
+            try {
+                c = Class.forName(className, true, ProtobufProxy.class.getClassLoader());
+            } catch (ClassNotFoundException e2) {
+                // if class not found so should generate a new java source class.
+                c = null;
+            }
         }
 
         if (c != null) {
