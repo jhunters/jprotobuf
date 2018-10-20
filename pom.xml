@@ -12,7 +12,7 @@
 
 	<groupId>com.baidu</groupId>
 	<artifactId>jprotobuf</artifactId>
-	<version>1.11.5-SNAPSHOT</version> 
+	<version>1.11.5</version> 
 
 	<name>Jprotobuf</name>
 	<description>A very useful utility library for java programmer using google protobuf.</description>
@@ -205,7 +205,8 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>	
+
 
 		</plugins>
 	</build>

@@ -16,6 +16,7 @@
 package com.baidu.bjf.remoting.protobuf.code;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
@@ -64,10 +65,9 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
      */
     public TemplateCodeGenerator(Class<?> cls) {
         super(cls);
-        String templateFile = cls.getResource(TEMPLATE_FILE).getPath();
-
+        InputStream templateFile = cls.getResourceAsStream(TEMPLATE_FILE);
         try {
-            templator = new MiniTemplator(templateFile);
+            templator = new MiniTemplator(TEMPLATE_FILE, templateFile);
         } catch (TemplateSyntaxException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (IOException e) {

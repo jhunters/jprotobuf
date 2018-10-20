@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
@@ -54,6 +56,9 @@ import com.squareup.protoparser.Type;
  * @since 1.0.2
  */
 public class ProtobufIDLProxy {
+    
+    /** Logger for this class. */
+    private static final Logger LOGGER = Logger.getLogger(ProtobufIDLProxy.class.getCanonicalName());
 
     /**
      * google Protobuf IDL message dependency result.
@@ -1641,7 +1646,9 @@ public class ProtobufIDLProxy {
                 try {
                     fos.close();
                 } catch (IOException e) {
-                    throw new RuntimeException(e.getMessage(), e);
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.fine(e.getMessage());
+                    }
                 }
             }
         }

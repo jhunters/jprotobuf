@@ -15,14 +15,9 @@
  */
 package com.baidu.bjf.remoting.protobuf.complexList;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.FieldType;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
@@ -35,26 +30,5 @@ public class ListWithNull {
     
     @Protobuf(fieldType = FieldType.STRING)
     public List<String> list;
-
     
-    public static void main(String[] args) throws IOException {
-        
-        ListWithNull obj = new ListWithNull();
-        
-        List<String> list = new ArrayList<String>();
-        list.add("abc");
-        obj.list = list;
-        
-        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class, true);
-        
-        byte[] encode = codec.encode(obj);
-        System.out.println(Arrays.toString(encode));
-        
-        list.add(null);
-        encode = codec.encode(obj);
-        System.out.println(Arrays.toString(encode));
-        
-        ListWithNull decode = codec.decode(encode);
-        System.out.println(decode.list);
-    }
 }

@@ -39,9 +39,11 @@ import com.google.protobuf.WireFormat;
 /**
  * Code generator utility class.
  * 
+ * @deprecated please use {@link TemplateCodeGenerator} instead
  * @author xiemalin
  * @since 1.0.0
  */
+@Deprecated
 public class CodeGenerator implements ICodeGenerator {
 
     /**

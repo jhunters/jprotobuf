@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-// Copyright 2003-2010 Christian d'Heureuse, Inventec Informatik AG, Zurich, Switzerland
-// www.source-code.biz, www.inventec.ch/chdh
-//
-// This module is multi-licensed and may be used under the terms
-// of any of the following licenses:
-//
-//  EPL, Eclipse Public License, http://www.eclipse.org/legal
-//  LGPL, GNU Lesser General Public License, http://www.gnu.org/licenses/lgpl.html
-//
-// Please contact the author if you need another license.
-// This module is provided "as is", without warranties of any kind.
-
 package com.baidu.bjf.remoting.protobuf.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -156,6 +145,9 @@ public class MiniTemplator {
          */
         public String templateFileName;
 
+        /** The template file stream. */
+        public InputStream templateFileStream;
+
         /**
          * The path of the base directory for reading subtemplate files. This path is used to convert the relative paths
          * of subtemplate files (specified with the $include commands) into absolute paths. If this field is null, the
@@ -249,9 +241,11 @@ public class MiniTemplator {
      * @throws IOException when an i/o error occurs while reading the template.
      * @see #MiniTemplator(TemplateSpecification)
      */
-    public MiniTemplator(String templateFileName) throws IOException, TemplateSyntaxException {
+    public MiniTemplator(String templateFileName, InputStream templateFileStream)
+            throws IOException, TemplateSyntaxException {
         TemplateSpecification templateSpec = new TemplateSpecification();
         templateSpec.templateFileName = templateFileName;
+        templateSpec.templateFileStream = templateFileStream;
         init(templateSpec);
     }
 
@@ -266,7 +260,7 @@ public class MiniTemplator {
         }
         String templateText = templateSpec.templateText;
         if (templateText == null && templateSpec.templateFileName != null) {
-            templateText = readFileIntoString(templateSpec.templateFileName);
+            templateText = readFileIntoString(templateSpec.templateFileName, templateSpec.templateFileStream);
         }
         if (templateText == null) {
             throw new IllegalArgumentException("No templateFileName or templateText specified.");
@@ -305,8 +299,7 @@ public class MiniTemplator {
      * @return the template text string of the subtemplate.
      */
     protected String loadSubtemplate(String subtemplateName) throws IOException {
-        String fileName = new File(subtemplateBasePath, subtemplateName).getPath();
-        return readFileIntoString(fileName);
+        return readFileIntoString(subtemplateName, null);
     }
 
     // --- build up (template variables and blocks) ------------------------
@@ -762,12 +755,17 @@ public class MiniTemplator {
     // --- general utility routines ---------------------------------------
 
     // Reads the contents of a file into a string variable.
-    private String readFileIntoString(String fileName) throws IOException {
+    private String readFileIntoString(String fileName,  InputStream is) throws IOException {
         FileInputStream stream = null;
         InputStreamReader reader = null;
         try {
-            stream = new FileInputStream(fileName);
-            reader = new InputStreamReader(stream, charset);
+            if (is != null) {
+                reader = new InputStreamReader(is, charset);
+            } else {
+                stream = new FileInputStream(fileName);
+                reader = new InputStreamReader(stream, charset);
+            }
+            
             return readStreamIntoString(reader);
         } finally {
             if (reader != null) {
