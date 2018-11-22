@@ -16,7 +16,6 @@
 package com.baidu.bjf.remoting.protobuf.code;
 
 import java.io.File;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -24,8 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
-import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
-import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
@@ -69,34 +66,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
         
         targetProxyClassname = ClassHelper.getInternalName(cls.getCanonicalName());
         
-        fields = fetchFieldInfos();
+        fields = ProtobufProxyUtils.fetchFieldInfos(cls, true);
     }
     
-    /**
-     * Fetch field infos.
-     *
-     * @return the list
-     */
-    protected List<FieldInfo> fetchFieldInfos() {
-        // if set ProtobufClass annotation
-        Annotation annotation = cls.getAnnotation(ProtobufClass.class);
-        boolean typeDefined = false;
-        List<Field> fields = null;
-        if (annotation == null) {
-            fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
-            if (fields.isEmpty()) {
-                throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
-                        + Protobuf.class.getName() + " at class " + cls.getName());
-            }
-        } else {
-            typeDefined = true;
-            
-            fields = FieldUtils.findMatchedFields(cls, null);
-        }
-        
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
-        return fieldInfos;
-    }
     
     /**
      * Gets the target proxy classname.

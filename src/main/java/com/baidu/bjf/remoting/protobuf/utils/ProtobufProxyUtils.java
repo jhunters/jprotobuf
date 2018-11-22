@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.utils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import java.util.logging.Logger;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 
 /**
  * 
@@ -74,6 +76,33 @@ public class ProtobufProxyUtils {
     public static boolean isScalarType(Class<?> cls) {
         return TYPE_MAPPING.containsKey(cls);
     }
+    
+    /**
+     * Fetch field infos.
+     *
+     * @return the list
+     */
+    public static List<FieldInfo> fetchFieldInfos(Class cls, boolean ignoreNoAnnotation) {
+        // if set ProtobufClass annotation
+        Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+        boolean typeDefined = false;
+        List<Field> fields = null;
+        if (annotation == null) {
+            fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
+            if (fields.isEmpty() && ignoreNoAnnotation) {
+                throw new IllegalArgumentException("Invalid class [" + cls.getName() + "] no field use annotation @"
+                        + Protobuf.class.getName() + " at class " + cls.getName());
+            }
+        } else {
+            typeDefined = true;
+            
+            fields = FieldUtils.findMatchedFields(cls, null);
+        }
+        
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
+        return fieldInfos;
+    }
+    
 
     /**
      * to process default value of <code>@Protobuf</code> value on field.
@@ -168,7 +197,7 @@ public class ProtobufProxyUtils {
             maxOrder++;
             fieldInfo.setOrder(maxOrder);
 
-            LOGGER.info("Field '" + fieldInfo.getField().getName() + "' from "
+            LOGGER.fine("Field '" + fieldInfo.getField().getName() + "' from "
                     + fieldInfo.getField().getDeclaringClass().getName()
                     + " with @Protobuf annotation but not set order or order is 0," + " It will set order value to "
                     + maxOrder);

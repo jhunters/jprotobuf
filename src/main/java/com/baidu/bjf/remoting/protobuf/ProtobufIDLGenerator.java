@@ -24,7 +24,6 @@ import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
-import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 
 /**
@@ -119,13 +118,12 @@ public class ProtobufIDLGenerator {
      */
     private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes,
             Set<Class<?>> cachedEnumTypes) {
-        List<Field> fields = FieldUtils.findMatchedFields(cls, Protobuf.class);
 
         Set<Class<?>> subTypes = new HashSet<Class<?>>();
         Set<Class<Enum>> enumTypes = new HashSet<Class<Enum>>();
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
 
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, false);
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.fetchFieldInfos(cls, false);
         for (FieldInfo field : fieldInfos) {
             if (field.hasDescription()) {
                 code.append("// ").append(field.getDescription()).append("\n");

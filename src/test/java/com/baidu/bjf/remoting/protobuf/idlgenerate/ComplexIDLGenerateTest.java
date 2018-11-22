@@ -26,6 +26,7 @@ import org.junit.Test;
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
@@ -257,11 +258,28 @@ public class ComplexIDLGenerateTest {
     }
     
     /**
+     * Test empty class.
+     */
+    @Test
+    public void testProtoClassDefineClass() {
+        String code = ProtobufIDLGenerator.getIDL(ProtoClassDefineClass.class);
+        Assert.assertTrue(code.indexOf("message") !=  -1);
+        Assert.assertTrue(code.indexOf("name") !=  -1);
+    }
+    
+    /**
      * The Class EmptyClass.
      */
     private static class EmptyClass {
         
     }
+    
+    @ProtobufClass
+    private static class ProtoClassDefineClass {
+        private String name;
+        private int age;
+    }
+    
     
     /**
      * Test protobuf idl generator get idl types returns.

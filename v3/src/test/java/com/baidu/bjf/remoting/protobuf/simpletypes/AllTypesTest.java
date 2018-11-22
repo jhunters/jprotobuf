@@ -89,7 +89,7 @@ public class AllTypesTest {
         // AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
         AllTypesWithProtobufClassDojoClass c = new AllTypesWithProtobufClassDojoClass();
         c.boolF = false;
-        c.bytesF = new byte[] { 1, 2 };
+        c.bytesF = new byte[] { 1, 2 }; 
         c.doubleF = 101D;
         c.fixed32F = 1;
         c.fixed64F = 2L;
