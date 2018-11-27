@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
+ */
 package com.baidu.jprotobuf.mojo;
 
 import java.io.File;
@@ -16,76 +19,118 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 import jodd.io.findfile.ClassScanner;
 
 /**
+ * The Class JprotobufPreCompileMain.
+ *
  * @author xiemalin
  * @since 1.0
+ * @since 1.2.12 增加多个包名前缀配置支持, 用;分隔
  */
 public class JprotobufPreCompileMain {
 
-	public static void main(String[] args) {
+    /** The Constant MULTI_PKG_SPLIT. */
+    private static final String MULTI_PKG_SPLIT = ";";
 
-		if (args == null || args.length == 0 || args.length != 3) {
-			throw new RuntimeException(printUsage());
-		}
-		
-		final File outputPath = new File(args[0] + File.separator + "temp");
-		try {
-			FileUtils.deleteDirectory(outputPath);
-		} catch (Exception e) {
-		    // dummy exception
-		}
-		outputPath.mkdirs();
-		
-		JDKCompilerHelper.setCompiler(new JdkCompiler(Thread.currentThread().getContextClassLoader()));
-		
-		final String filterClassPackage = args[2];
+    /**
+     * The main method.
+     *
+     * @param args the arguments
+     */
+    public static void main(String[] args) {
 
-		ClassScanner scanner = new ClassScanner() {
+        if (args == null || args.length == 0 || args.length != 3) {
+            throw new RuntimeException(printUsage());
+        }
 
-			@Override
-			protected void onEntry(EntryData entryData) throws Exception {
-				String name = entryData.getName();
-				if (filterClassPackage != null) {
-					if (!name.startsWith(filterClassPackage)) {
-						return;
-					}
-				}
-				
-				Class c = getByClass(name);
-				if (c == null) {
-					return;
-				}
+        final File outputPath = new File(args[0] + File.separator + "temp");
+        try {
+            FileUtils.deleteDirectory(outputPath);
+        } catch (Exception e) {
+            // dummy exception
+        }
+        outputPath.mkdirs();
 
-				try {
-					List<Field> fields = FieldUtils.findMatchedFields(c, Protobuf.class);
-					if (!fields.isEmpty()) {
-						ProtobufProxy.create(c, false, outputPath);
-					}
-				} catch (Throwable e) {
-				    throw new Exception(e.getMessage(), e);
-				}
-			}
-		};
+        JDKCompilerHelper.setCompiler(new JdkCompiler(Thread.currentThread().getContextClassLoader()));
 
-		scanner.scanDefaultClasspath();
-		
-		// copy files
-		try {
-			FileUtils.copyDirectory(outputPath, new File(args[1]));
-		} catch (IOException e) {
-		}
+        final String filterClassPackage = args[2];
+        if (filterClassPackage == null) {
+            return;
+        }
 
-	}
+        final String[] split = filterClassPackage.split(MULTI_PKG_SPLIT);
 
-	private static String printUsage() {
-		return "Usage: " + JprotobufPreCompileMain.class.getName() + " outputFile";
-	}
+        ClassScanner scanner = new ClassScanner() {
 
-	private static Class getByClass(String name) {
-		try {
-			return Thread.currentThread().getContextClassLoader().loadClass(name);
-		} catch (Throwable e) {
-		}
-		return null;
-	}
+            @Override
+            protected void onEntry(EntryData entryData) throws Exception {
+                String name = entryData.getName();
+                if (!isStartWith(name, split)) {
+                    return;
+                }
+
+                Class c = getByClass(name);
+                if (c == null) {
+                    return;
+                }
+
+                try {
+                    List<Field> fields = FieldUtils.findMatchedFields(c, Protobuf.class);
+                    if (!fields.isEmpty()) {
+                        ProtobufProxy.create(c, false, outputPath);
+                    }
+                } catch (Throwable e) {
+                    throw new Exception(e.getMessage(), e);
+                }
+            }
+        };
+
+        scanner.scanDefaultClasspath();
+
+        // copy files
+        try {
+            FileUtils.copyDirectory(outputPath, new File(args[1]));
+        } catch (IOException e) {
+        }
+
+    }
+
+    /**
+     * Prints the usage.
+     *
+     * @return the string
+     */
+    private static String printUsage() {
+        return "Usage: " + JprotobufPreCompileMain.class.getName() + " outputFile";
+    }
+
+    /**
+     * Checks if is start with.
+     *
+     * @param testString the test string
+     * @param targetStrings the target strings
+     * @return true, if is start with
+     */
+    private static boolean isStartWith(String testString, String[] targetStrings) {
+        for (String s : targetStrings) {
+            if (testString.startsWith(s)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the by class.
+     *
+     * @param name the name
+     * @return the by class
+     */
+    private static Class getByClass(String name) {
+        try {
+            return Thread.currentThread().getContextClassLoader().loadClass(name);
+        } catch (Throwable e) {
+        }
+        return null;
+    }
 
 }
