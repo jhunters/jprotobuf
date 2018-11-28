@@ -21,7 +21,10 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
@@ -33,6 +36,9 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
  * @since 1.0.1
  */
 public class ProtobufIDLGenerator {
+    
+    /** Logger for this class. */
+    private static final Logger LOGGER = Logger.getLogger(ProtobufIDLGenerator.class.getName());
 
     /** The Constant JPROTOBUF_CLASS_NAME_SUFFIX. */
     public static final String JPROTOBUF_CLASS_NAME_SUFFIX = "$$ByJProtobuf";
@@ -49,6 +55,13 @@ public class ProtobufIDLGenerator {
      */
     public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
             final Set<Class<?>> cachedEnumTypes, boolean ignoreJava) {
+        
+        Ignore ignore = cls.getAnnotation(Ignore.class);
+        if (ignore != null) {
+            LOGGER.log(Level.INFO, "class '" + cls.getName() + "' marked as @Ignore annotation, create IDL ignored.");
+            return null;
+        }
+        
         Set<Class<?>> types = cachedTypes;
         if (types == null) {
             types = new HashSet<Class<?>>();

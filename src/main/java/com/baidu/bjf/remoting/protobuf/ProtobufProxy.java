@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.code.ICodeGenerator;
 import com.baidu.bjf.remoting.protobuf.code.TemplateCodeGenerator;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
@@ -281,6 +282,12 @@ public final class ProtobufProxy {
     protected static <T> Codec<T> doCreate(Class<T> cls, boolean debug, Compiler compiler, ICodeGenerator cg) {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
+        }
+        
+        Ignore ignore = cls.getAnnotation(Ignore.class);
+        if (ignore != null) {
+            LOGGER.log(Level.INFO, "class '" + cls.getName() + "' marked as @Ignore annotation, proxy ignored.");
+            return null;
         }
 
         String uniClsName = cls.getName();
