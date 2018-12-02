@@ -84,7 +84,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
     public String getClassName() {
         return ClassHelper.getClassName(cls) + DEFAULT_SUFFIX_CLASSNAME;
     }
-
+    
     /*
      * (non-Javadoc)
      * 
@@ -92,8 +92,14 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
      */
     @Override
     public String getCode() {
+        
+        String pkg = getPackage();
+        if (!StringUtils.isEmpty(pkg)) {
+            pkg = "package " + pkg + ";";
+        }
+        
         // set package
-        templator.setVariable("package", getPackage());
+        templator.setVariable("package", pkg);
 
         // add loop block for import packages
         genImportCode();

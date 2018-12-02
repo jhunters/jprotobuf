@@ -15,7 +15,6 @@ package com.baidu.bjf.remoting.protobuf;
  * limitations under the License.
  */
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,7 +55,7 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
  * @author xiemalin
  * @since 1.0.0
  */
-public final class ProtobufProxy {  
+public final class ProtobufProxy {
 
     /** The Constant DEBUG_CONTROLLER. */
     public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
@@ -154,7 +153,6 @@ public final class ProtobufProxy {
                 throw new IllegalArgumentException(e2.getMessage(), e2);
             }
         }
-        
 
         ICodeGenerator cg = new TemplateCodeGenerator(cls);
 
@@ -169,12 +167,13 @@ public final class ProtobufProxy {
      * @return {@link Codec} instance proxy
      */
     public static <T> Codec<T> create(Class<T> cls) {
+
         Boolean debug = DEBUG_CONTROLLER.get();
         if (debug == null) {
             debug = false; // set default to close debug info
         }
 
-        return create(cls, debug, null, null, getCodeGenerator(cls));
+        return create(cls, debug);
     }
 
     /**
@@ -220,7 +219,7 @@ public final class ProtobufProxy {
      * @return the codec
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug) {
-        return create(cls, debug, null, null, getCodeGenerator(cls));
+        return create(cls, debug, null);
     }
 
     /**
@@ -233,6 +232,14 @@ public final class ProtobufProxy {
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
+        // to check cache early
+        String uniClsName = cls.getName();
+        if (isCacheEnabled()) {
+            Codec codec = CACHED.get(uniClsName);
+            if (codec != null) {
+                return codec;
+            }
+        }
         return create(cls, debug, path, null, getCodeGenerator(cls));
     }
 
@@ -284,7 +291,7 @@ public final class ProtobufProxy {
         if (cls == null) {
             throw new NullPointerException("Parameter cls is null");
         }
-        
+
         Ignore ignore = cls.getAnnotation(Ignore.class);
         if (ignore != null) {
             LOGGER.log(Level.INFO, "class '" + cls.getName() + "' marked as @Ignore annotation, proxy ignored.");
