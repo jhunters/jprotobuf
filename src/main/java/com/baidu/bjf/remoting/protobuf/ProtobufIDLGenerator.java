@@ -21,8 +21,9 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
@@ -38,7 +39,7 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 public class ProtobufIDLGenerator {
     
     /** Logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(ProtobufIDLGenerator.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufIDLGenerator.class.getName());
 
     /** The Constant JPROTOBUF_CLASS_NAME_SUFFIX. */
     public static final String JPROTOBUF_CLASS_NAME_SUFFIX = "$$ByJProtobuf";
@@ -58,7 +59,9 @@ public class ProtobufIDLGenerator {
         
         Ignore ignore = cls.getAnnotation(Ignore.class);
         if (ignore != null) {
-            LOGGER.log(Level.INFO, "class '" + cls.getName() + "' marked as @Ignore annotation, create IDL ignored.");
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("class '{}' marked as @Ignore annotation, create IDL ignored.", cls.getName());
+            }
             return null;
         }
         

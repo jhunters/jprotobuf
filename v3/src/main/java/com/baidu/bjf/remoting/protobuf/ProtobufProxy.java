@@ -24,7 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.code.ICodeGenerator;
@@ -61,7 +63,7 @@ public final class ProtobufProxy {
     public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
 
     /** Logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufProxy.class.getName());
 
     /**
      * cached {@link Codec} instance by class name.
@@ -294,7 +296,7 @@ public final class ProtobufProxy {
 
         Ignore ignore = cls.getAnnotation(Ignore.class);
         if (ignore != null) {
-            LOGGER.log(Level.INFO, "class '" + cls.getName() + "' marked as @Ignore annotation, proxy ignored.");
+            LOGGER.info("class '{}' marked as @Ignore annotation, proxy ignored.", cls.getName());
             return null;
         }
 
@@ -401,7 +403,9 @@ public final class ProtobufProxy {
                     ProtobufProxy.create(relativeClass, debug, path, compiler, cg);
                 }
             } catch (Exception e) {
-                LOGGER.log(Level.FINE, e.getMessage(), e.getCause());
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(e.getMessage(), e);
+                }
             }
 
             return newInstance;

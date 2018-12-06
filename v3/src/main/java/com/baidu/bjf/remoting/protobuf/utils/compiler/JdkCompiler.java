@@ -35,8 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
@@ -50,6 +48,9 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
@@ -62,7 +63,7 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 public class JdkCompiler extends AbstractCompiler {
     
     /** Logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(JdkCompiler.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(JdkCompiler.class.getName());
 
     /** The compiler. */
     private final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -143,8 +144,8 @@ public class JdkCompiler extends AbstractCompiler {
     @Override
     public synchronized Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
          
-    	if (LOGGER.isLoggable(Level.FINE)) {
-    		LOGGER.fine("Begin to compile source code: class is '" + name + "'");
+    	if (LOGGER.isDebugEnabled()) {
+    		LOGGER.debug("Begin to compile source code: class is '{}'", name);
     	}
         
         int i = name.lastIndexOf('.');
@@ -163,14 +164,14 @@ public class JdkCompiler extends AbstractCompiler {
                     + diagnosticCollector.getDiagnostics());
         }
         
-        if (LOGGER.isLoggable(Level.FINE)) {
-        	LOGGER.fine("compile source code done: class is '" + name + "'");
-        	LOGGER.fine("loading class '" + name + "'");
+        if (LOGGER.isDebugEnabled()) {
+        	LOGGER.debug("compile source code done: class is '{}'", name);
+        	LOGGER.debug("loading class '{}', name");
         }
         
         Class<?> retClass = classLoader.loadClass(name);
-        if (LOGGER.isLoggable(Level.FINE)) {
-        	LOGGER.fine("loading class done  '" + name + "'");
+        if (LOGGER.isDebugEnabled()) {
+        	LOGGER.debug("loading class done  '{}'", name);
         }
 
         if (os != null) {

@@ -22,7 +22,9 @@ import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.FieldType;
@@ -43,7 +45,7 @@ import com.google.protobuf.Descriptors.Descriptor;
 public class TemplateCodeGenerator extends AbstractCodeGenerator {
 
     /** Logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(TemplateCodeGenerator.class.getCanonicalName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateCodeGenerator.class.getCanonicalName());
 
     /** The Constant TEMPLATE_FILE. */
     private static final String TEMPLATE_FILE = "/jprotobuf_classes_template.tpl";
@@ -411,7 +413,9 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             }
             return target + ClassHelper.PACKAGE_SEPARATOR + setter + "(" + express + ")\n";
         } catch (Exception e) {
-            LOGGER.log(Level.FINE, e.getMessage(), e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
 
         if (isList) {

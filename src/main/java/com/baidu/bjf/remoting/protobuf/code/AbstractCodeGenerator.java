@@ -20,7 +20,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
@@ -38,7 +40,7 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 public abstract class AbstractCodeGenerator implements ICodeGenerator {
     
     /** Logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(AbstractCodeGenerator.class.getCanonicalName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCodeGenerator.class.getCanonicalName());
 
     /** The debug. */
     protected boolean debug = false;
@@ -203,7 +205,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
             cls.getMethod(getter, new Class<?>[0]);
             return target + ClassHelper.PACKAGE_SEPARATOR + getter + "()";
         } catch (Exception e) {
-            LOGGER.log(Level.FINE, e.getMessage(), e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
 
         String type = field.getType().getCanonicalName();

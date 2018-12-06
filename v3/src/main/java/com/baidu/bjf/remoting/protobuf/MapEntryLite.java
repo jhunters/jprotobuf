@@ -25,7 +25,6 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.ExtensionRegistryLite;
-import com.google.protobuf.MessageLite;
 import com.google.protobuf.WireFormat;
 
 /**

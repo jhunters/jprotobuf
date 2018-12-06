@@ -22,7 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.FieldType;
@@ -53,7 +55,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
     public static final String JAVA_CLASS_FILE_SUFFIX = ".class";
 
     /** Logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class.getCanonicalName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CodeGenerator.class.getCanonicalName());
 
     /** The relative proxy classes. */
     private Set<Class<?>> relativeProxyClasses = new HashSet<Class<?>>();
@@ -587,7 +589,9 @@ public class CodeGenerator extends AbstractCodeGenerator {
             cls.getMethod(getter, new Class<?>[0]);
             return target + ClassHelper.PACKAGE_SEPARATOR + getter + "()";
         } catch (Exception e) {
-            LOGGER.log(Level.FINE, e.getMessage(), e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
 
         String type = field.getType().getCanonicalName();
@@ -663,7 +667,9 @@ public class CodeGenerator extends AbstractCodeGenerator {
             }
             return target + ClassHelper.PACKAGE_SEPARATOR + setter + "(" + express + ")\n";
         } catch (Exception e) {
-            LOGGER.log(Level.FINE, e.getMessage(), e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
 
         if (isList) {

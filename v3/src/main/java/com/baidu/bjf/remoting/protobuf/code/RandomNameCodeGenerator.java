@@ -23,7 +23,7 @@ import java.util.UUID;
  * @author xiemalin
  * @since 1.10.2
  */
-public class RandomNameCodeGenerator extends CodeGenerator {
+public class RandomNameCodeGenerator extends TemplateCodeGenerator {
     
     private final String randNameSuffix = UUID.randomUUID().toString().replace("-", "");
 

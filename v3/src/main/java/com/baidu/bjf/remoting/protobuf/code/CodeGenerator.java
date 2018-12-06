@@ -23,7 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
@@ -78,7 +80,7 @@ public class CodeGenerator implements ICodeGenerator {
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = Logger.getLogger(CodeGenerator.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CodeGenerator.class.getName());
 
     /**
      * target fields which marked <code> @Protofuf </code> annotation
@@ -731,7 +733,9 @@ public class CodeGenerator implements ICodeGenerator {
             cls.getMethod(getter, new Class<?>[0]);
             return target + ClassHelper.PACKAGE_SEPARATOR + getter + "()";
         } catch (Exception e) {
-            LOGGER.log(Level.FINE, e.getMessage(), e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
 
         String type = field.getType().getCanonicalName();
@@ -815,7 +819,9 @@ public class CodeGenerator implements ICodeGenerator {
             }
             return target + ClassHelper.PACKAGE_SEPARATOR + setter + "(" + express + ")\n";
         } catch (Exception e) {
-            LOGGER.log(Level.FINE, e.getMessage(), e);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
 
         if (isList) {
