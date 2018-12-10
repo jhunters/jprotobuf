@@ -197,7 +197,7 @@ public class ProtobufIDLProxyTest {
                 " "
                 ;
         
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(protoCotent, true);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(protoCotent, false);
         System.out.println(idlProxyObjects);
         
         idlProxyObjects.get("Http").put("param_addon.key", "abc");
@@ -232,7 +232,7 @@ public class ProtobufIDLProxyTest {
         idl.append("   optional DataInfo.SubDataInfo.Sub2DataInfo sub2DataInfo = 3;\n");
         idl.append("}");
 
-        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(idl.toString(), true);
+        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(idl.toString(), false);
 
         IDLProxyObject idlProxyObject = map.get("DataStatus");
 

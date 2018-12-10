@@ -11,10 +11,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Packed;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
@@ -32,7 +35,7 @@ public class ProtobufProxyUtils {
     public static final Map<Class<?>, FieldType> TYPE_MAPPING;
 
     /** Logger for this class. */
-    private static final Logger LOGGER = Logger.getLogger(ProtobufProxy.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufProxy.class.getName());
 
     static {
         TYPE_MAPPING = new HashMap<Class<?>, FieldType>();
@@ -110,6 +113,14 @@ public class ProtobufProxyUtils {
         List<FieldInfo> unorderFields = new ArrayList<FieldInfo>(fields.size());
         Set<Integer> orders = new HashSet<Integer>();
         for (Field field : fields) {
+            Ignore ignore = field.getAnnotation(Ignore.class);
+            if (ignore != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Field name '{}' marked @Ignore annotation will be ignored.", field.getName());
+                }
+                continue;
+            }
+            
             Protobuf protobuf = field.getAnnotation(Protobuf.class);
             if (protobuf == null && !ignoreNoAnnotation) {
                 throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
@@ -196,10 +207,12 @@ public class ProtobufProxyUtils {
             maxOrder++;
             fieldInfo.setOrder(maxOrder);
 
-            LOGGER.fine("Field '" + fieldInfo.getField().getName() + "' from "
-                    + fieldInfo.getField().getDeclaringClass().getName()
-                    + " with @Protobuf annotation but not set order or order is 0," + " It will set order value to "
-                    + maxOrder);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
+                        "Field '{}' from {} with @Protobuf annotation but not set order or order is 0,"
+                                + " It will set order value to {}",
+                        fieldInfo.getField().getName(), fieldInfo.getField().getDeclaringClass().getName(), maxOrder);
+            }
         }
 
         return ret;

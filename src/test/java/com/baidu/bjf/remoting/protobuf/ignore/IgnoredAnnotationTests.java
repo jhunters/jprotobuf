@@ -15,6 +15,8 @@
  */
 package com.baidu.bjf.remoting.protobuf.ignore;
 
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,21 +34,45 @@ public class IgnoredAnnotationTests {
 
     
     /**
-     * Test ingored POJO class.
+     * Test ignore POJO class.
      */
     @Test
-    public void testProxybufProxyOnIngoredPOJOClass() {
+    public void testProxybufProxyOnIgnoredPOJOClass() {
         Codec<IgnoredPOJOClass> codec = ProtobufProxy.create(IgnoredPOJOClass.class);
         Assert.assertNull(codec);
     }
     
     /**
-     * Test ingored POJO class 2.
+     * Test ignore POJO class 2.
      */
     @Test
-    public void testProxybufProxyOnIngoredPOJOClass2() {
+    public void testProxybufProxyOnIgnoredPOJOClass2() {
         Codec<IgnoredPOJOClass2> codec = ProtobufProxy.create(IgnoredPOJOClass2.class);
         Assert.assertNull(codec);
+    }
+    
+    /**
+     * Test ignore POJO class 3.
+     */
+    @Test
+    public void testProxybufProxyOnIgnoredPOJOClass3() {
+        Codec<IgnoredPOJOClass3> codec = ProtobufProxy.create(IgnoredPOJOClass3.class);
+        
+        IgnoredPOJOClass3 pojo = new IgnoredPOJOClass3();
+        pojo.name = "abc";
+        
+        IgnoredPOJOClass3 pojo2 = new IgnoredPOJOClass3();
+        pojo2.name = "abc";
+        pojo2.address = "hello";
+        
+        try {
+            byte[] encode = codec.encode(pojo2);
+            byte[] encode2 = codec.encode(pojo);
+            Assert.assertArrayEquals(encode, encode2);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
     }
     
     /**

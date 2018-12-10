@@ -27,14 +27,14 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 
 
 /**
- * A mapped annotation for class type. <br>
+ * A mapped annotation for class type and field. <br>
  * proxy action will be ignored if this annotation marked at class. affect for {@link ProtobufProxy},
  * {@link ProtobufIDLGenerator}
  * 
  * @author xiemalin
  * @since 1.11.0
  */
-@Target({ ElementType.TYPE })
+@Target({ ElementType.TYPE,  ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented

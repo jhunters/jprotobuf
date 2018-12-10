@@ -23,9 +23,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 
@@ -43,7 +46,7 @@ public class ProtobufProxyUtils {
     /**
      * Logger for this class
      */
-    private static final Logger LOGGER = Logger.getLogger(ProtobufProxyUtils.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufProxyUtils.class.getName());
 
     static {
         TYPE_MAPPING = new HashMap<Class<?>, FieldType>();
@@ -76,7 +79,7 @@ public class ProtobufProxyUtils {
     public static boolean isScalarType(Class<?> cls) {
         return TYPE_MAPPING.containsKey(cls);
     }
-    
+
     /**
      * Fetch field infos.
      *
@@ -95,14 +98,13 @@ public class ProtobufProxyUtils {
             }
         } else {
             typeDefined = true;
-            
+
             fields = FieldUtils.findMatchedFields(cls, null);
         }
-        
+
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
         return fieldInfos;
     }
-    
 
     /**
      * to process default value of <code>@Protobuf</code> value on field.
@@ -121,6 +123,14 @@ public class ProtobufProxyUtils {
         List<FieldInfo> unorderFields = new ArrayList<FieldInfo>(fields.size());
         Set<Integer> orders = new HashSet<Integer>();
         for (Field field : fields) {
+            Ignore ignore = field.getAnnotation(Ignore.class);
+            if (ignore != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Field name '{}' marked @Ignore annotation will be ignored.", field.getName());
+                }
+                continue;
+            }
+
             Protobuf protobuf = field.getAnnotation(Protobuf.class);
             if (protobuf == null && !ignoreNoAnnotation) {
                 throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
@@ -147,18 +157,18 @@ public class ProtobufProxyUtils {
             } else {
                 fieldInfo.setRequired(false);
             }
-            
+
             // process type
             if (annFieldType == FieldType.DEFAULT) {
-                
+
                 Class fieldTypeClass = field.getType();
-                
+
                 // if list
                 boolean isList = fieldInfo.isList();
                 if (isList) {
                     fieldTypeClass = fieldInfo.getGenericKeyType();
                 }
-                
+
                 FieldType fieldType = TYPE_MAPPING.get(fieldTypeClass);
                 if (fieldType == null) {
                     // check if type is enum
@@ -172,7 +182,7 @@ public class ProtobufProxyUtils {
             } else {
                 fieldInfo.setFieldType(annFieldType);
             }
-            
+
             if (order > 0) {
                 if (orders.contains(order)) {
                     throw new RuntimeException(
@@ -196,11 +206,13 @@ public class ProtobufProxyUtils {
         for (FieldInfo fieldInfo : unorderFields) {
             maxOrder++;
             fieldInfo.setOrder(maxOrder);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(
+                        "Field '{}' from {} with @Protobuf annotation but not set order or order is 0,"
+                                + " It will set order value to {}",
+                        fieldInfo.getField().getName(), fieldInfo.getField().getDeclaringClass().getName(), maxOrder);
+            }
 
-            LOGGER.fine("Field '" + fieldInfo.getField().getName() + "' from "
-                    + fieldInfo.getField().getDeclaringClass().getName()
-                    + " with @Protobuf annotation but not set order or order is 0," + " It will set order value to "
-                    + maxOrder);
         }
 
         return ret;
