@@ -720,12 +720,8 @@ public class CodedConstant {
 
         FileDescriptorProto fileproto;
         try {
-            Boolean debug = ProtobufProxy.DEBUG_CONTROLLER.get();
-            if (debug == null) {
-                debug = false;
-            }
             Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class,
-                    debug, ProtobufProxy.OUTPUT_PATH.get());
+                    ProtobufProxy.isCacheEnabled(), ProtobufProxy.OUTPUT_PATH.get());
             byte[] bs = descriptorCodec.encode(fileDescriptorProto);
             fileproto = FileDescriptorProto.parseFrom(bs);
         } catch (InvalidProtocolBufferException e) {

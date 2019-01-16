@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +74,9 @@ public final class ProtobufProxy {
 
     /** The Constant OUTPUT_PATH for target directory to create generated source code out. */
     public static final ThreadLocal<Boolean> CACHE_ENABLED = new ThreadLocal<Boolean>();
+    
+    /** The Constant for debug control from environment. */
+    private static final String DEBUG_CONTROL = "X_DEBUG_ENABLE"; 
 
     /**
      * Enable cache.
@@ -97,6 +99,25 @@ public final class ProtobufProxy {
         }
 
         return b;
+    }
+    
+    /**
+     * Checks if is debug enabled.
+     *
+     * @return true, if is debug enabled
+     */
+    public static boolean isDebugEnabled() {
+        String debugEnv = System.getenv(DEBUG_CONTROL);
+        if (debugEnv != null && Boolean.parseBoolean(debugEnv)) {
+            return true;
+        }
+        
+        Boolean debug = DEBUG_CONTROLLER.get();
+        if (debug == null) {
+            debug = false; // set default to close debug info
+        }
+        
+        return debug;
     }
 
     /**
@@ -169,13 +190,7 @@ public final class ProtobufProxy {
      * @return {@link Codec} instance proxy
      */
     public static <T> Codec<T> create(Class<T> cls) {
-
-        Boolean debug = DEBUG_CONTROLLER.get();
-        if (debug == null) {
-            debug = false; // set default to close debug info
-        }
-
-        return create(cls, debug);
+        return create(cls, isDebugEnabled());
     }
 
     /**
@@ -188,12 +203,7 @@ public final class ProtobufProxy {
      * @return {@link Codec} instance proxy
      */
     public static <T> Codec<T> create(Class<T> cls, Compiler compiler, ICodeGenerator codeGenerator) {
-        Boolean debug = DEBUG_CONTROLLER.get();
-        if (debug == null) {
-            debug = false; // set default to close debug info
-        }
-
-        return create(cls, debug, null, compiler, getCodeGenerator(cls));
+        return create(cls, isDebugEnabled(), null, compiler, getCodeGenerator(cls));
     }
 
     /**
@@ -261,7 +271,7 @@ public final class ProtobufProxy {
         DEBUG_CONTROLLER.set(debug);
         OUTPUT_PATH.set(path);
         try {
-            return doCreate(cls, debug, compiler, codeGenerator);
+            return doCreate(cls, isDebugEnabled(), compiler, codeGenerator);
         } finally {
             DEBUG_CONTROLLER.remove();
             OUTPUT_PATH.remove();

@@ -29,4 +29,9 @@ public class EnumPOJOClass {
     /** The enum attr. */
     @Protobuf(fieldType = FieldType.ENUM)
     public EnumAttrPOJO enumAttr;
+    
+    public void setEnumAttr(EnumAttrPOJO enumAttr) {
+        this.enumAttr = enumAttr;
+    }
+    
 }
