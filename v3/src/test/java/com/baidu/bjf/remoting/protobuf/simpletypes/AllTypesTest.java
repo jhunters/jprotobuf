@@ -37,9 +37,9 @@ public class AllTypesTest {
 	
 	@Test
 	public void  testRequiredMutliTypeEncode() throws IOException {
-		Codec<AllTypesDojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClass.class);
+		Codec<AllTypesPojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesPojoClass.class);
 	    //AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
-		AllTypesDojoClass c = new AllTypesDojoClass();
+		AllTypesPojoClass c = new AllTypesPojoClass();
 		c.boolF = false;
 		c.bytesF = new byte[] {1,2};
 		c.doubleF = 101D;
@@ -111,8 +111,8 @@ public class AllTypesTest {
         c.intergers.add(1);
         c.intergers.add(2);
 
-        c.allTypesDojoClasses = new ArrayList<AllTypesDojoClass>();
-        c.allTypesDojoClasses.add(new AllTypesDojoClass());
+        c.allTypesDojoClasses = new ArrayList<AllTypesPojoClass>();
+        c.allTypesDojoClasses.add(new AllTypesPojoClass());
 
         byte[] bb = dojoClassProxy.encode(c);
 
@@ -167,8 +167,8 @@ public class AllTypesTest {
 		
 		byte[] bb = icn.toByteArray();
 		
-		Codec<AllTypesDojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClass.class);
-		AllTypesDojoClass decode = dojoClassProxy.decode(bb);
+		Codec<AllTypesPojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesPojoClass.class);
+		AllTypesPojoClass decode = dojoClassProxy.decode(bb);
 		
         Assert.assertEquals(2, decode.bytesF.length);
         Assert.assertEquals(1, decode.bytesF[0]);

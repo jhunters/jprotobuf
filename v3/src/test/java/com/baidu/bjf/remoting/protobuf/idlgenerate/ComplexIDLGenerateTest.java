@@ -30,7 +30,7 @@ import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
 import com.baidu.bjf.remoting.protobuf.simplerepeat.RequrieRepeatedNumberTypePOJOClass2;
-import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
+import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesPojoClass;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
@@ -188,7 +188,7 @@ public class ComplexIDLGenerateTest {
     
     @Test
     public void testGenerateIDLSimpleType() throws InvalidProtocolBufferException {
-        String code = ProtobufIDLGenerator.getIDL(AllTypesDojoClass.class);
+        String code = ProtobufIDLGenerator.getIDL(AllTypesPojoClass.class);
         Assert.assertNotNull(code);
         
     }

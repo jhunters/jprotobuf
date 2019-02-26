@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
@@ -135,6 +136,13 @@ public class CodeGenerator extends AbstractCodeGenerator {
     protected List<FieldInfo> fetchFieldInfos() {
         // if set ProtobufClass annotation
         Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+        
+        Annotation zipZap = cls.getAnnotation(EnableZigZap.class);
+        boolean isZipZap = false;
+        if (zipZap != null) {
+            isZipZap = true;
+        }
+        
         boolean typeDefined = false;
         List<Field> fields = null;
         if (annotation == null) {
@@ -149,7 +157,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
             fields = FieldUtils.findMatchedFields(cls, null);
         }
         
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined, isZipZap);
         return fieldInfos;
     }
 

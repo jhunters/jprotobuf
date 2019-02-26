@@ -36,9 +36,9 @@ public class AllTypesPressureTest {
     @Test
     public void testDynamiceEncode() throws IOException {
         long time = System.currentTimeMillis();
-        Codec<AllTypesDojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClass.class);
+        Codec<AllTypesPojoClass> dojoClassProxy = ProtobufProxy.create(AllTypesPojoClass.class);
         //AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
-        AllTypesDojoClass c = new AllTypesDojoClass();
+        AllTypesPojoClass c = new AllTypesPojoClass();
         c.boolF = false;
         c.bytesF = new byte[] {1,2};
         c.doubleF = 101D;

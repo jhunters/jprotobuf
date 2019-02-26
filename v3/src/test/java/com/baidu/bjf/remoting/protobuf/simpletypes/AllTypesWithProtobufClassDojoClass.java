@@ -18,6 +18,7 @@ package com.baidu.bjf.remoting.protobuf.simpletypes;
 import java.util.List;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
 import com.baidu.bjf.remoting.protobuf.annotation.Packed;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
@@ -27,6 +28,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
  *
  * @author xiemalin
  */
+@EnableZigZap
 @ProtobufClass
 public class AllTypesWithProtobufClassDojoClass {
 
@@ -102,7 +104,7 @@ public class AllTypesWithProtobufClassDojoClass {
     public List<Integer> intergers;
     
     //@Protobuf
-    public List<AllTypesDojoClass> allTypesDojoClasses;
+    public List<AllTypesPojoClass> allTypesDojoClasses;
 
     public double getDoubleF() {
         return doubleF;

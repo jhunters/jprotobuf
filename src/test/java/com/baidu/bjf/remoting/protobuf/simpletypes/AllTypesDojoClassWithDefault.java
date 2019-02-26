@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.simpletypes;
 
+import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
@@ -22,6 +23,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  *
  * @author xiemalin
  */
+@EnableZigZap
 public class AllTypesDojoClassWithDefault {
 
     /** The double f. */

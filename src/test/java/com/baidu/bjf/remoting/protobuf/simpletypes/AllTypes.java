@@ -2525,4 +2525,14 @@ public final class AllTypes {
     }
 
     // @@protoc_insertion_point(outer_class_scope)
+    
+    public static void main(String[] args) {
+        System.out.println(Integer.toBinaryString(37));
+        System.out.println(Integer.toBinaryString(~37));
+        System.out.println(Integer.toBinaryString(-38));
+        System.out.println(Integer.toBinaryString(0x7F));
+        System.out.println(Integer.toBinaryString(~0x7F));
+        int value = 12;
+        System.out.println( ((value & ~0x7F) == 0));
+    }
 }

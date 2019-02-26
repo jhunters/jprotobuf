@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
+import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
 import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
@@ -88,6 +89,13 @@ public class ProtobufProxyUtils {
     public static List<FieldInfo> fetchFieldInfos(Class cls, boolean ignoreNoAnnotation) {
         // if set ProtobufClass annotation
         Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+
+        Annotation zipZap = cls.getAnnotation(EnableZigZap.class);
+        boolean isZipZap = false;
+        if (zipZap != null) {
+            isZipZap = true;
+        }
+
         boolean typeDefined = false;
         List<Field> fields = null;
         if (annotation == null) {
@@ -102,17 +110,20 @@ public class ProtobufProxyUtils {
             fields = FieldUtils.findMatchedFields(cls, null);
         }
 
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined, isZipZap);
         return fieldInfos;
     }
 
     /**
      * to process default value of <code>@Protobuf</code> value on field.
-     * 
+     *
      * @param fields all field to process
+     * @param ignoreNoAnnotation the ignore no annotation
+     * @param isZipZap the is zip zap
      * @return list of fields
      */
-    public static List<FieldInfo> processDefaultValue(List<Field> fields, boolean ignoreNoAnnotation) {
+    public static List<FieldInfo> processDefaultValue(List<Field> fields, boolean ignoreNoAnnotation,
+            boolean isZipZap) {
         if (fields == null) {
             return null;
         }
@@ -178,6 +189,16 @@ public class ProtobufProxyUtils {
                         fieldType = FieldType.OBJECT;
                     }
                 }
+                
+                // check if enable zagzip
+                if (isZipZap) {
+                    if (fieldType == FieldType.INT32) {
+                        fieldType = FieldType.SINT32; // to convert to sint32 to enable zagzip
+                    } else if (fieldType == FieldType.INT64) {
+                        fieldType = FieldType.SINT64; // to convert to sint64 to enable zagzip
+                    }
+                }
+                
                 fieldInfo.setFieldType(fieldType);
             } else {
                 fieldInfo.setFieldType(annFieldType);

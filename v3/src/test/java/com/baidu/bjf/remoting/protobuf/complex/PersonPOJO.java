@@ -35,5 +35,6 @@ public class PersonPOJO {
     public byte[] bytesF;
     
     @Protobuf(fieldType=FieldType.BOOL, order=7, required=false)
-    public Boolean boolF;    
+    public Boolean boolF;   
+    
 }

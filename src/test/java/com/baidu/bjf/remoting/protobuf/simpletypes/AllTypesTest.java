@@ -17,9 +17,6 @@ package com.baidu.bjf.remoting.protobuf.simpletypes;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -28,6 +25,8 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName.TypeDef;
 import com.google.protobuf.ByteString;
+
+import junit.framework.Assert;
 
 /**
  * The Class AllTypesTest.
@@ -202,7 +201,7 @@ public class AllTypesTest {
      */
     @Test
     public void testMutliTypeDefaultTypeEncodeDecode() throws IOException {
-        Codec<AllTypesDojoClassWithDefault> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClassWithDefault.class);
+        Codec<AllTypesDojoClassWithDefault> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClassWithDefault.class, true);
         // AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
         AllTypesDojoClassWithDefault c = new AllTypesDojoClassWithDefault();
         c.boolF = false;

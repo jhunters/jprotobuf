@@ -27,7 +27,7 @@ import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
-import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
+import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesPojoClass;
 
 /**
  * Test class for {@link ProtobufIDLProxy}
@@ -58,7 +58,7 @@ public class ProtobufIDLProxyTest {
 
     @Test
     public void testDecodeComplex() throws Exception {
-        String code = ProtobufIDLGenerator.getIDL(AllTypesDojoClass.class);
+        String code = ProtobufIDLGenerator.getIDL(AllTypesPojoClass.class);
         IDLProxyObject object = ProtobufIDLProxy.create(code).entrySet().iterator().next().getValue();
 
         object.put("boolF", false);

@@ -1,5 +1,17 @@
-/**
- * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
+/*
+ * Copyright 2002-2007 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.baidu.bjf.remoting.protobuf.utils;
 
@@ -17,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
 import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Packed;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
@@ -68,7 +81,7 @@ public class ProtobufProxyUtils {
     public static boolean isScalarType(Class<?> cls) {
         return TYPE_MAPPING.containsKey(cls);
     }
-    
+
     /**
      * Fetch field infos.
      *
@@ -77,6 +90,13 @@ public class ProtobufProxyUtils {
     public static List<FieldInfo> fetchFieldInfos(Class cls, boolean ignoreNoAnnotation) {
         // if set ProtobufClass annotation
         Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+
+        Annotation zipZap = cls.getAnnotation(EnableZigZap.class);
+        boolean isZipZap = false;
+        if (zipZap != null) {
+            isZipZap = true;
+        }
+
         boolean typeDefined = false;
         List<Field> fields = null;
         if (annotation == null) {
@@ -87,11 +107,11 @@ public class ProtobufProxyUtils {
             }
         } else {
             typeDefined = true;
-            
+
             fields = FieldUtils.findMatchedFields(cls, null);
         }
-        
-        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined);
+
+        List<FieldInfo> fieldInfos = ProtobufProxyUtils.processDefaultValue(fields, typeDefined, isZipZap);
         return fieldInfos;
     }
 
@@ -100,9 +120,11 @@ public class ProtobufProxyUtils {
      *
      * @param fields all field to process
      * @param ignoreNoAnnotation the ignore no annotation
+     * @param isZipZap the is zip zap
      * @return list of fields
      */
-    public static List<FieldInfo> processDefaultValue(List<Field> fields, boolean ignoreNoAnnotation) {
+    public static List<FieldInfo> processDefaultValue(List<Field> fields, boolean ignoreNoAnnotation,
+            boolean isZipZap) {
         if (fields == null) {
             return null;
         }
@@ -120,7 +142,7 @@ public class ProtobufProxyUtils {
                 }
                 continue;
             }
-            
+
             Protobuf protobuf = field.getAnnotation(Protobuf.class);
             if (protobuf == null && !ignoreNoAnnotation) {
                 throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
@@ -168,6 +190,16 @@ public class ProtobufProxyUtils {
                         fieldType = FieldType.OBJECT;
                     }
                 }
+                
+                // check if enable zagzip
+                if (isZipZap) {
+                    if (fieldType == FieldType.INT32) {
+                        fieldType = FieldType.SINT32; // to convert to sint32 to enable zagzip
+                    } else if (fieldType == FieldType.INT64) {
+                        fieldType = FieldType.SINT64; // to convert to sint64 to enable zagzip
+                    }
+                }
+                
                 fieldInfo.setFieldType(fieldType);
             } else {
                 fieldInfo.setFieldType(annFieldType);
