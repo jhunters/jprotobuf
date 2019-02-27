@@ -53,7 +53,7 @@ jprotobuf-1.x  JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.11.6</version>
+  <version>1.11.7</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
@@ -64,7 +64,7 @@ jprotobuf-2.x  JDK 7 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.2.7</version> 
+  <version>2.2.8</version> 
 </dependency> 
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
@@ -131,13 +131,15 @@ public class PersonJProtoBufProtoClass {
 }
 ```
 
-从版本  1.12.0 and 2.2.0 开始支持 @ProtobufClass注解，支持默认字段识别能力. 下面的方式等 同于上面的配置
+从版本  1.11.6 and 2.2.0 开始支持 @ProtobufClass注解，支持默认字段识别能力. 下面的方式等 同于上面的配置
+从版本  1.11.7 and 2.2.8 开始支持@EnableZigZap 注解，针对 未指定类型情况下，针对int和long 使用 sint32和sint64类型
 
 注：@ProtobufClass与@Protobuf 可以混合使用
 
 ```java
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 @ProtobufClass
+@Enable
 public class PersonJProtoBufProtoClass {
 	public String name;
 	public Integer id;
