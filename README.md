@@ -84,7 +84,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>1.2.12</version>
+  <version>1.2.13</version>
 </dependency>
 备注： precompile-plugin的版本 1.2.11 只支持 jprotobuf 1.11.5 及以上的版本。    其它版本请有 1.2.10及以下precompile plugin
 
@@ -92,7 +92,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>2.0.7</version>
+  <version>2.0.8</version>
 </dependency>
 备注： precompile-plugin的版本 2.0.5 只支持 jprotobuf 2.2.6 及以上的版本。     其它版本请有2.0.4及以下precompile plugin
 ```
