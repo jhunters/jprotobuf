@@ -139,7 +139,7 @@ public class PersonJProtoBufProtoClass {
 ```java
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 @ProtobufClass
-@Enable
+@EnableZigZap
 public class PersonJProtoBufProtoClass {
 	public String name;
 	public Integer id;
