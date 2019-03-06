@@ -15,6 +15,9 @@
  */
 package com.baidu.bjf.remoting.protobuf.enumeration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.baidu.bjf.remoting.protobuf.EnumReadable;
 
 /**
@@ -60,7 +63,16 @@ public enum EnumAttrPOJO implements EnumReadable {
     }
 
     public static void main(String[] args) {
-        EnumAttrPOJO valueOf = Enum.valueOf(EnumAttrPOJO.class, EnumAttrPOJO.values()[0].name());
-        System.out.println(valueOf);
+
+        List<String> list = new ArrayList();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        list.add("1");
+        
+        for (String string : list) {
+            list.remove(string);
+            System.out.println(list);
+        }
     }
 }

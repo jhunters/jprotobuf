@@ -83,6 +83,8 @@ import com.google.protobuf.WireFormat;
  */
 public class CodedConstant {
 
+    private static final String FIELD_PREFIX = "f_";
+
     /** The Constant MAP_ENTRY_SUFFIX. */
     private static final String MAP_ENTRY_SUFFIX = "Entry";
 
@@ -100,7 +102,7 @@ public class CodedConstant {
      * @return field name
      */
     public static String getFieldName(int order) {
-        String fieldName = "f_" + order;
+        String fieldName = FIELD_PREFIX + order;
         return fieldName;
     }
 

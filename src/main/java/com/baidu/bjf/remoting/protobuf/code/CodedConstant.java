@@ -67,6 +67,9 @@ import com.squareup.protoparser.ProtoSchemaParser;
  */
 public class CodedConstant {
 
+    /** The Constant FIELD_PREFIX. */
+    private static final String FIELD_PREFIX = "f_";
+
     /**
      * get field name.
      *
@@ -74,7 +77,7 @@ public class CodedConstant {
      * @return field name
      */
     public static String getFieldName(int order) {
-        String fieldName = "f_" + order;
+        String fieldName = FIELD_PREFIX + order;
         return fieldName;
     }
 

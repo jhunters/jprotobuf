@@ -97,7 +97,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         if (!StringUtils.isEmpty(pkg)) {
             pkg = "package " + pkg + ";";
         }
-        
+
         // set package
         templator.setVariable("package", pkg);
 
@@ -268,7 +268,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             } else if (field.isMap()) {
 
                 String getMapCommand = getMapCommand(field);
-                
+
                 if (field.isEnumValueType()) {
                     String enumClassName = field.getGenericeValueType().getCanonicalName();
                     code.append("EnumHandler<").append(enumClassName).append("> handler");
@@ -277,13 +277,14 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                     code.append(ClassCode.LINE_BREAK);
                     code.append("public ").append(enumClassName).append(" handle(int value) {");
                     code.append(ClassCode.LINE_BREAK);
-                    code.append("String enumName = CodedConstant.getEnumName(").append(enumClassName).append(".values(), value)");
+                    code.append("String enumName = CodedConstant.getEnumName(").append(enumClassName)
+                            .append(".values(), value)");
                     code.append(ClassCode.JAVA_LINE_BREAK);
                     code.append("return ").append(enumClassName).append(".valueOf(enumName)");
                     code.append(ClassCode.JAVA_LINE_BREAK);
                     code.append("}}");
                     code.append(ClassCode.JAVA_LINE_BREAK);
-                    
+
                 }
                 objectDecodeExpress = code.toString();
                 code.setLength(0);
@@ -343,27 +344,26 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             } else {
                 templator.setVariable("deocdeCheckNull", "");
             }
-            
+
             String objectPackedDecodeExpress = "";
             // read packed type
             if (isList) {
                 FieldType fieldType = field.getFieldType();
                 if (fieldType.isPrimitive() || fieldType.isEnum()) {
-                    code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(),
-                            WireFormat.WIRETYPE_LENGTH_DELIMITED));
+                    code.append("if (tag == ")
+                            .append(CodedConstant.makeTag(field.getOrder(), WireFormat.WIRETYPE_LENGTH_DELIMITED));
                     code.append(") {").append(ClassCode.LINE_BREAK);
-                    
-                    
+
                     code.append("int length = input.readRawVarint32()").append(ClassCode.JAVA_LINE_BREAK);
                     code.append("int limit = input.pushLimit(length)").append(ClassCode.JAVA_LINE_BREAK);
-                    
+
                     code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), true));
-                    
+
                     code.append("input.popLimit(limit)").append(ClassCode.JAVA_LINE_BREAK);
-                    
+
                     code.append("continue").append(ClassCode.JAVA_LINE_BREAK);
                     code.append("}").append(ClassCode.LINE_BREAK);
-                    
+
                     objectPackedDecodeExpress = code.toString();
                 }
             }
@@ -374,7 +374,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             templator.addBlock("decodeFields");
         }
     }
-    
+
     /**
      * @param field
      * @return
