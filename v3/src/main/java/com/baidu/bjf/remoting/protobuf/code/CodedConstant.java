@@ -654,7 +654,6 @@ public class CodedConstant {
             ret.append(order).append(",").append("FieldType.").append(typeString);
             ret.append(",").append(fieldName).append(", false)").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
                     .append(CodeGenerator.LINE_BREAK);
-            ;
             return ret.toString();
         }
 
@@ -662,7 +661,6 @@ public class CodedConstant {
             ret.append(prefix).append(".writeBytes(").append(order);
             ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
                     .append(CodeGenerator.LINE_BREAK);
-            ;
             return ret.toString();
         }
         String t = type.getType();
@@ -671,7 +669,6 @@ public class CodedConstant {
         ret.append(prefix).append(".write").append(t).append("(").append(order);
         ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
                 .append(CodeGenerator.LINE_BREAK);
-        ;
         return ret.toString();
     }
 

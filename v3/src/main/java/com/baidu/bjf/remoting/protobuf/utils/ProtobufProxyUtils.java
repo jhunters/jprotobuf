@@ -219,7 +219,7 @@ public class ProtobufProxyUtils {
                 unorderFields.add(fieldInfo);
             }
 
-            if (fieldInfo.isList() && fieldInfo.getFieldType().isPrimitive()) {
+            if (fieldInfo.isList() && (fieldInfo.getFieldType().isPrimitive() || fieldInfo.getFieldType().isEnum())) {
                 Packed packed = field.getAnnotation(Packed.class);
                 if (packed == null) {
                     fieldInfo.setPacked(true);

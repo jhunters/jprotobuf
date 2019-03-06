@@ -349,7 +349,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             // read packed type
             if (isList) {
                 FieldType fieldType = field.getFieldType();
-                if (fieldType.isPrimitive()) {
+                if (fieldType.isPrimitive() || fieldType.isEnum()) {
                     code.append("if (tag == ").append(CodedConstant.makeTag(field.getOrder(),
                             WireFormat.WIRETYPE_LENGTH_DELIMITED));
                     code.append(") {").append(ClassCode.LINE_BREAK);
