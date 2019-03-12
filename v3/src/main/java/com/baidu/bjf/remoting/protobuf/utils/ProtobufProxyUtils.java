@@ -186,6 +186,8 @@ public class ProtobufProxyUtils {
                     // check if type is enum
                     if (Enum.class.isAssignableFrom(fieldTypeClass)) {
                         fieldType = FieldType.ENUM;
+                    } else if (fieldInfo.isMap()) {
+                        fieldType = FieldType.MAP;
                     } else {
                         fieldType = FieldType.OBJECT;
                     }
@@ -199,6 +201,8 @@ public class ProtobufProxyUtils {
                         fieldType = FieldType.SINT64; // to convert to sint64 to enable zagzip
                     }
                 }
+                
+                
                 
                 fieldInfo.setFieldType(fieldType);
             } else {
