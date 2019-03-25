@@ -135,7 +135,7 @@ public class ComplexIDLGenerateTest {
         
         messageType = (MessageElement) type;
         fields = messageType.fields();
-        Assert.assertEquals(7, fields.size());
+        Assert.assertEquals(8, fields.size());
         
         for (FieldElement field : fields) {
             System.out.println(field.tag());

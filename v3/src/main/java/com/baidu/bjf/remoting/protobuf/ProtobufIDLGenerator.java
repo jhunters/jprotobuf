@@ -42,6 +42,9 @@ public class ProtobufIDLGenerator {
     /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufIDLGenerator.class.getName());
     
+    /** The Constant V3_HEADER. */
+    private static final String V3_HEADER = "syntax=\"proto3\"";
+    
     /**
      * get IDL content from class.
      * 
@@ -75,7 +78,7 @@ public class ProtobufIDLGenerator {
         }
 
         StringBuilder code = new StringBuilder();
-        
+        code.append(V3_HEADER).append(";\n");
         if (!ignoreJava) {
             // define package
             code.append("package ").append(cls.getPackage().getName()).append(";\n");
@@ -292,10 +295,6 @@ public class ProtobufIDLGenerator {
      * @return
      */
     private static String getFieldRequired(boolean required) {
-        if (required) {
-            return "required";
-        }
-
-        return "optional";
+        return "";
     }
 }
