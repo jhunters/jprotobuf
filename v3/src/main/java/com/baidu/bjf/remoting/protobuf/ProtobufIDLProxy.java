@@ -1537,7 +1537,7 @@ public class ProtobufIDLProxy {
             }
             ret = StringUtils.removeEnd(ret, PACKAGE_SPLIT);
         } else {
-            String clsName = name + DEFAULT_SUFFIX_CLASSNAME;
+            String clsName = name;
 
             String uniName = mappedUniName.get(clsName);
             if (uniName == null) {
@@ -1581,7 +1581,7 @@ public class ProtobufIDLProxy {
         if (!uniName) {
             return "";
         }
-        return UUID.randomUUID().toString().replace("-", "");
+        return DEFAULT_SUFFIX_CLASSNAME + UUID.randomUUID().toString().replace("-", "");
     }
 
     /**

@@ -7,6 +7,8 @@
  */
 package com.baidu.bjf.remoting.protobuf.complex;
 
+import java.util.Map;
+
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
@@ -34,5 +36,8 @@ public class PersonPOJOWithDefault {
     public byte[] bytesF;
     
     @Protobuf
-    public Boolean boolF;    
+    public Boolean boolF; 
+    
+    @Protobuf
+    public Map<String, Integer> mapF;
 }

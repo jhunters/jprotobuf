@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -807,7 +806,10 @@ public class ProtobufIDLProxy {
             for (Type t : checkNestedTypes) {
                 Iterator<String> iterator = cd.dependencies.iterator();
                 while (iterator.hasNext()) {
-                    String dependName = iterator.next().replaceAll(DEFAULT_SUFFIX_CLASSNAME, "");
+                    String dependName = iterator.next();
+                    if (!StringUtils.isEmpty(DEFAULT_SUFFIX_CLASSNAME)) {
+                        dependName = dependName.replaceAll(DEFAULT_SUFFIX_CLASSNAME, "");
+                    }
                     if (t.getFullyQualifiedName().endsWith(dependName)) {
                         iterator.remove();
                     }
@@ -1285,7 +1287,7 @@ public class ProtobufIDLProxy {
                 Codec codec = ProtobufProxy.create(cls, debug, path);
                 IDLProxyObject idlProxyObject = new IDLProxyObject(codec, newInstance, cls);
                 String name = cls.getSimpleName();
-                if (name.indexOf(DEFAULT_SUFFIX_CLASSNAME) != -1) {
+                if (!StringUtils.isEmpty(DEFAULT_SUFFIX_CLASSNAME) && name.indexOf(DEFAULT_SUFFIX_CLASSNAME) != -1) {
                     name = StringUtils.substringBefore(name, DEFAULT_SUFFIX_CLASSNAME);
                 }
                 ret.put(name, idlProxyObject);
@@ -1505,7 +1507,7 @@ public class ProtobufIDLProxy {
             }
             ret = StringUtils.removeEnd(ret, PACKAGE_SPLIT);
         } else {
-            String clsName = name + DEFAULT_SUFFIX_CLASSNAME;
+            String clsName = name;
 
             String uniName = mappedUniName.get(clsName);
             if (uniName == null) {
@@ -1528,7 +1530,7 @@ public class ProtobufIDLProxy {
         if (!uniName) {
             return "";
         }
-        return UUID.randomUUID().toString().replace("-", "");
+        return DEFAULT_SUFFIX_CLASSNAME + UUID.randomUUID().toString().replace("-", "");
     }
 
     /**
