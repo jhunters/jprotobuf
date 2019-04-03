@@ -1372,6 +1372,18 @@ public class ProtobufIDLProxy {
                 protoFiles.addAll(findRelateProtoFiles(dependencyFile, dependencyNames));
             }
         }
+        
+        List<String> publicDependencies = protoFile.publicDependencies();
+        if (publicDependencies != null && !publicDependencies.isEmpty()) {
+            for (String fn : publicDependencies) {
+                if (dependencyNames.contains(fn)) {
+                    continue;
+                }
+                File dependencyFile = new File(parent, fn);
+                protoFiles.addAll(findRelateProtoFiles(dependencyFile, dependencyNames));
+            }
+        }
+        
         return protoFiles;
     }
 
