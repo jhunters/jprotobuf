@@ -29,11 +29,6 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  * @author xiemalin
  * @since 1.10.3
  */
-/**
- * TODO
- * @author xiemalin
- *
- */
 public class MethodCode {
     
     /** The scope. */
