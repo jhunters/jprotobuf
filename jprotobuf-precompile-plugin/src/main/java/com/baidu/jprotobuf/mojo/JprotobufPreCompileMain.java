@@ -5,6 +5,7 @@ package com.baidu.jprotobuf.mojo;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
@@ -71,6 +73,17 @@ public class JprotobufPreCompileMain {
                 if (c == null) {
                     return;
                 }
+                
+                Annotation annotation = c.getAnnotation(ProtobufClass.class);
+                if (annotation != null) {
+                    try {
+                            ProtobufProxy.create(c, false, outputPath);
+                    } catch (Throwable e) {
+                        throw new Exception(e.getMessage(), e);
+                    }
+                    return;
+                }
+                
 
                 try {
                     List<Field> fields = FieldUtils.findMatchedFields(c, Protobuf.class);
