@@ -173,7 +173,7 @@ Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf
 		</executions>
 	</plugin>
 ```
-filterClassPackage 用来指定进行预编译时需要扫描的package,目前只支持配置一个package名称<br>
+filterClassPackage 用来指定进行预编译时需要扫描的package,目前只支持配置多个package名称，使用";"分隔<br>
 maven执行命令如下:<br>
 ```property
 mvn jprotobuf:precompile
