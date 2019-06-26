@@ -352,6 +352,7 @@ public final class ProtobufProxy {
         }
 
         String code = cg.getCode();
+        
         if (debug) {
             String printCode = code;
             CodePrinter.printCode(printCode, "generate protobuf proxy code");

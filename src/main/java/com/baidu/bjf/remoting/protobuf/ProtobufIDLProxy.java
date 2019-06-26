@@ -57,7 +57,7 @@ import com.squareup.protoparser.Type;
  * @since 1.0.2
  */
 public class ProtobufIDLProxy {
-    
+
     /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufIDLProxy.class.getCanonicalName());
 
@@ -144,7 +144,7 @@ public class ProtobufIDLProxy {
 
     /** The Constant PACKAGE_SPLIT_CHAR. */
     private static final char PACKAGE_SPLIT_CHAR = '.';
-    
+
     /** The Constant PACKAGE_SPLIT. */
     private static final String PACKAGE_SPLIT = PACKAGE_SPLIT_CHAR + "";
 
@@ -964,7 +964,7 @@ public class ProtobufIDLProxy {
     public static IDLProxyObject createSingle(InputStream is) throws IOException {
         return createSingle(is, false);
     }
-    
+
     /**
      * Creates the single.
      *
@@ -1348,7 +1348,7 @@ public class ProtobufIDLProxy {
                 protoFiles.addAll(findRelateProtoFiles(dependencyFile, dependencyNames));
             }
         }
-        
+
         List<String> publicDependencies = protoFile.getPublicDependencies();
         if (publicDependencies != null && !publicDependencies.isEmpty()) {
             for (String fn : publicDependencies) {
@@ -1652,8 +1652,11 @@ public class ProtobufIDLProxy {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(new File(f, cd.name + ".java"));
-            fos.write(cd.code.getBytes(UTF_8));
+
+            String code = cd.code;
+            fos.write(code.getBytes(UTF_8));
             fos.flush();
+
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
