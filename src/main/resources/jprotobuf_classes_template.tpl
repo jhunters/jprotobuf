@@ -55,6 +55,8 @@ public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
     public ${targetProxyClassName} readFrom(CodedInputStream input) throws IOException {
         ${targetProxyClassName} ret = new ${targetProxyClassName}();
 
+		${initListMapFields}
+
         <!-- $BeginBlock enumFields -->
         ${enumInitialize};
         <!-- $EndBlock enumFields -->

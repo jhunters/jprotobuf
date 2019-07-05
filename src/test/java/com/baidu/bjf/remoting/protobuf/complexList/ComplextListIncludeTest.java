@@ -17,6 +17,7 @@ package com.baidu.bjf.remoting.protobuf.complexList;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -100,4 +101,24 @@ public class ComplextListIncludeTest {
 
     }
 
+    /**
+     * Test empty list case.
+     */
+    @Test
+    public void testEmptyListCase() {
+        ListWithNull listWithNull = new ListWithNull();
+        listWithNull.list = new ArrayList<>();
+        
+        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class);
+        try {
+            
+            byte[] encode = codec.encode(listWithNull);
+            Assert.assertTrue(encode.length == 0);
+            ListWithNull listWithNull2 = codec.decode(encode);
+            Assert.assertTrue(listWithNull2.list.isEmpty());
+        } catch (Exception e) {
+            org.junit.Assert.fail(e.getMessage());
+        }
+    }
+    
 }

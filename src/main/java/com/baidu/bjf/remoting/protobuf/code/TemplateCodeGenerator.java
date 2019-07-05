@@ -54,7 +54,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
 
     /** The templator. */
     private MiniTemplator templator;
-    
+
     /** auto proxied suffix class name. */
     public static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
 
@@ -85,7 +85,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
     public String getClassName() {
         return ClassHelper.getClassName(cls) + DEFAULT_SUFFIX_CLASSNAME;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -93,12 +93,12 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
      */
     @Override
     public String getCode() {
-        
+
         String pkg = getPackage();
         if (!StringUtils.isEmpty(pkg)) {
             pkg = "package " + pkg + ";";
         }
-        
+
         // set package
         templator.setVariable("package", pkg);
 
@@ -182,9 +182,25 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
     }
 
     protected void initDecodeMethodTemplateVariable() {
+
+        StringBuilder initListMapFields = new StringBuilder();
+
         // 执行初始化，主要针对枚举类型
         for (FieldInfo field : fields) {
             boolean isList = field.isList();
+            boolean isMap = field.isMap();
+            String e = "";
+            if (isList) {
+                e = "new ArrayList()";
+            } else if (isMap) {
+                e = "new HashMap()";
+            }
+
+            if (isList || isMap) {
+                initListMapFields.append(getSetToField("ret", field.getField(), cls, e, false, false))
+                        .append(ClassCode.JAVA_LINE_BREAK);
+            }
+
             if (field.getFieldType() == FieldType.ENUM) {
                 String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 if (!isList) {
@@ -198,7 +214,10 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             }
         }
 
+        templator.setVariable("initListMapFields", initListMapFields.toString());
+
         StringBuilder code = new StringBuilder();
+
         // 处理field解析
         for (FieldInfo field : fields) {
             boolean isList = field.isList();

@@ -10,6 +10,8 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
@@ -28,6 +30,9 @@ import jodd.io.findfile.ClassScanner;
  * @since 1.2.12 增加多个包名前缀配置支持, 用;分隔
  */
 public class JprotobufPreCompileMain {
+    
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JprotobufPreCompileMain.class);
 
     /** The Constant MULTI_PKG_SPLIT. */
     private static final String MULTI_PKG_SPLIT = ";";
@@ -55,6 +60,7 @@ public class JprotobufPreCompileMain {
 
         final String filterClassPackage = args[2];
         if (filterClassPackage == null) {
+            LOGGER.error("filterClassPackage setting is null.");
             return;
         }
 
@@ -71,6 +77,11 @@ public class JprotobufPreCompileMain {
 
                 Class c = getByClass(name);
                 if (c == null) {
+                    return;
+                }
+                
+                
+                if (Enum.class.isAssignableFrom(c)) {
                     return;
                 }
                 
@@ -102,6 +113,9 @@ public class JprotobufPreCompileMain {
         try {
             FileUtils.copyDirectory(outputPath, new File(args[1]));
         } catch (IOException e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
 
     }
@@ -142,6 +156,9 @@ public class JprotobufPreCompileMain {
         try {
             return Thread.currentThread().getContextClassLoader().loadClass(name);
         } catch (Throwable e) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(e.getMessage(), e);
+            }
         }
         return null;
     }

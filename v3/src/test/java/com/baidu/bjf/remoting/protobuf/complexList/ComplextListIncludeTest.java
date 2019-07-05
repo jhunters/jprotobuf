@@ -1,14 +1,23 @@
-/**
- * Copyright 2014 the original author or authors.
+/*
+ * Copyright 2002-2007 the original author or authors.
  *
- * Licensed under the Baidu company (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.baidu.bjf.remoting.protobuf.complexList;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -23,14 +32,14 @@ import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
- * 
+ * The Class ComplextListIncludeTest.
+ *
  * @author xiemalin
- * 
  */
 public class ComplextListIncludeTest {
 
     /**
-     * test encode and decode with JProtobuf and Protobuf java
+     * test encode and decode with JProtobuf and Protobuf java.
      */
     @Test
     public void testEncodeDecode() {
@@ -91,5 +100,46 @@ public class ComplextListIncludeTest {
         }
 
     }
+    
+    /**
+     * Test empty list case.
+     */
+    @Test
+    public void testEmptyListCase() {
+        ListWithNull listWithNull = new ListWithNull();
+        listWithNull.list = new ArrayList<>();
+        
+        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class, true);
+        try {
+            
+            byte[] encode = codec.encode(listWithNull);
+            Assert.assertTrue(encode.length == 0);
+            ListWithNull listWithNull2 = codec.decode(encode);
+            Assert.assertTrue(listWithNull2.list.isEmpty());
+        } catch (Exception e) {
+            e.printStackTrace();
+            org.junit.Assert.fail(e.getMessage());
+        }
+    }
 
+    
+    /**
+     * Test empty map case.
+     */
+    @Test
+    public void testEmptyMapCase() {
+        ListWithNull listWithNull = new ListWithNull();
+        listWithNull.map = new HashMap<String, String>();
+        
+        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class);
+        try {
+            
+            byte[] encode = codec.encode(listWithNull);
+            Assert.assertTrue(encode.length == 0);
+            ListWithNull listWithNull2 = codec.decode(encode);
+            Assert.assertTrue(listWithNull2.map.isEmpty());
+        } catch (Exception e) {
+            org.junit.Assert.fail(e.getMessage());
+        }
+    }
 }
