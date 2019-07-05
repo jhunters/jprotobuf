@@ -107,7 +107,7 @@ public class ComplextListIncludeTest {
     @Test
     public void testEmptyListCase() {
         ListWithNull listWithNull = new ListWithNull();
-        listWithNull.list = new ArrayList<>();
+        listWithNull.list = new ArrayList();
         
         Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class, true);
         try {

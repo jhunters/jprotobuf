@@ -17,10 +17,7 @@ package com.baidu.bjf.remoting.protobuf.complexList;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -30,6 +27,8 @@ import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.AddressBook
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.Person;
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef;
 import com.google.protobuf.InvalidProtocolBufferException;
+
+import junit.framework.Assert;
 
 /**
  * The Class ComplextListIncludeTest.
@@ -107,7 +106,7 @@ public class ComplextListIncludeTest {
     @Test
     public void testEmptyListCase() {
         ListWithNull listWithNull = new ListWithNull();
-        listWithNull.list = new ArrayList<>();
+        listWithNull.list = new ArrayList();
         
         Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class);
         try {
