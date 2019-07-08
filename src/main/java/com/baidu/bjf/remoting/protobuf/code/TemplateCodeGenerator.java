@@ -429,7 +429,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                         .append(ClassCode.JAVA_LINE_BREAK).append("}");
                 return ret + express;
             }
-            return target + ClassHelper.PACKAGE_SEPARATOR + setter + "(" + express + ")\n";
+            return target + ClassHelper.PACKAGE_SEPARATOR + setter + "(" + express + ")" + ClassCode.LINE_BREAK;
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(e.getMessage(), e);
