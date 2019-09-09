@@ -131,6 +131,14 @@ public class JprotobufPreCompileMain {
 
     }
     
+    /**
+     * Creates the proto file.
+     *
+     * @param c the c
+     * @param outputPath the output path
+     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private static void createProtoFile(Class c,  String outputPath) throws UnsupportedEncodingException, IOException {
         String code = ProtobufIDLGenerator.getIDL(c);
         
