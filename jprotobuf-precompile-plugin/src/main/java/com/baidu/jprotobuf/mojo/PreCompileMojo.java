@@ -1,3 +1,6 @@
+/**
+ * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
+ */
 package com.baidu.jprotobuf.mojo;
 
 /*
@@ -243,12 +246,16 @@ public class PreCompileMojo
     private List<String> additionalClasspathElements;
     
     /**
-     * The main class to execute.
+     * set filter class package name, support multiple packages split by ';'
      * 
      * @since 1.0
      */
     @Parameter( required = true, property = "jprotobuf.filterClassPackage" )
     private String filterClassPackage;
+    
+    /** The generate proto file. */
+    @Parameter( required = false, property = "jprotobuf.generateProtoFile" )
+    private String generateProtoFile = Boolean.FALSE.toString();
 
     /**
      * Execute goal.
@@ -269,7 +276,8 @@ public class PreCompileMojo
             getLog().warn( "Warning: killAfter is now deprecated. Do you need it ? Please comment on MEXEC-6." );
         }
 
-        arguments = new String[] {outputParentDirectory.getAbsolutePath(), outputDirectory.getAbsolutePath(), filterClassPackage};
+        arguments = new String[] {outputParentDirectory.getAbsolutePath(), outputDirectory.getAbsolutePath(), 
+                filterClassPackage, generateProtoFile};
 
         if ( getLog().isDebugEnabled() )
         {

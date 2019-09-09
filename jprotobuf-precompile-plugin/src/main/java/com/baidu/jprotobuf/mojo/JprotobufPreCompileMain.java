@@ -5,6 +5,7 @@ package com.baidu.jprotobuf.mojo;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -13,11 +14,13 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
+import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 
 import jodd.io.findfile.ClassScanner;
@@ -44,7 +47,7 @@ public class JprotobufPreCompileMain {
      */
     public static void main(String[] args) {
 
-        if (args == null || args.length == 0 || args.length != 3) {
+        if (args == null || args.length == 0 || args.length != 4) {
             throw new RuntimeException(printUsage());
         }
 
@@ -65,6 +68,8 @@ public class JprotobufPreCompileMain {
         }
 
         final String[] split = filterClassPackage.split(MULTI_PKG_SPLIT);
+        
+        final boolean generateProtofile = Boolean .valueOf(args[3]);
 
         ClassScanner scanner = new ClassScanner() {
 
@@ -89,6 +94,9 @@ public class JprotobufPreCompileMain {
                 if (annotation != null) {
                     try {
                             ProtobufProxy.create(c, false, outputPath);
+                            if (generateProtofile) {
+                                createProtoFile(c, outputPath.getCanonicalPath());
+                            }
                     } catch (Throwable e) {
                         throw new Exception(e.getMessage(), e);
                     }
@@ -100,6 +108,9 @@ public class JprotobufPreCompileMain {
                     List<Field> fields = FieldUtils.findMatchedFields(c, Protobuf.class);
                     if (!fields.isEmpty()) {
                         ProtobufProxy.create(c, false, outputPath);
+                        if (generateProtofile) {
+                            createProtoFile(c, outputPath.getCanonicalPath());
+                        }
                     }
                 } catch (Throwable e) {
                     throw new Exception(e.getMessage(), e);
@@ -118,6 +129,25 @@ public class JprotobufPreCompileMain {
             }
         }
 
+    }
+    
+    private static void createProtoFile(Class c,  String outputPath) throws UnsupportedEncodingException, IOException {
+        String code = ProtobufIDLGenerator.getIDL(c);
+        
+        String pkg = "";
+        String className = c.getName();
+        if (className.indexOf('.') != -1) {
+            pkg = StringUtils.substringBeforeLast(className, ".");
+        }
+        
+        // mkdirs
+        String dir = outputPath + File.separator + pkg.replace('.', File.separatorChar);
+        File f = new File(dir);
+        f.mkdirs();
+        String fileName = c.getSimpleName() + ".proto";
+        File file = new File(dir, fileName);
+        LOGGER.info("Generate proto file to " + file.getAbsolutePath());
+        FileUtils.writeByteArrayToFile(file, code.getBytes("utf-8"));
     }
 
     /**
