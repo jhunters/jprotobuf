@@ -81,11 +81,12 @@ jprotobuf-android
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
 
 jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的预编译操作. 注：plugin版本建议使用>=1.2.0， jprotobuf 支持版本>=1.9.4   
+1.2.15和2.0.11版本之后，支持在预编译阶段生成 proto声明文件的功能， 文件生成位置在当前类的相同目录下。具体使用方式详见下面插件使用说明
 ```xml
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>1.2.14</version>
+  <version>1.2.15</version>
 </dependency>
 备注： precompile-plugin的版本 1.2.11 只支持 jprotobuf 1.11.5 及以上的版本。    其它版本请有 1.2.10及以下precompile plugin
 
@@ -93,7 +94,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>2.0.10</version>
+  <version>2.0.11</version>
 </dependency>
 备注： precompile-plugin的版本 2.0.5 只支持 jprotobuf 2.2.6 及以上的版本。     其它版本请有2.0.4及以下precompile plugin
 ```
@@ -154,6 +155,7 @@ public class PersonJProtoBufProtoClass {
 
 
 Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf注解标识的对象都会进行预编译操作，并生成相应的class文件到目标jar或war中， 使用示例如下：
+1.2.15和2.0.11版本之后增加 generateProtoFile属性，设置true可开启proto文件生成.
 ```xml
 	<plugin>
 		<groupId>com.baidu</groupId>
@@ -162,6 +164,7 @@ Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf
 		<configuration>
 			<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 			<filterClassPackage>com.baidu</filterClassPackage>
+			<generateProtoFile>true</generateProtoFile>
 		</configuration>
 		<executions>
 			<execution>
@@ -174,6 +177,7 @@ Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf
 	</plugin>
 ```
 filterClassPackage 用来指定进行预编译时需要扫描的package,目前只支持配置多个package名称，使用";"分隔<br>
+generateProtoFile 设置是否开启proto文件生成，默认为false，不生成
 maven执行命令如下:<br>
 ```property
 mvn jprotobuf:precompile
