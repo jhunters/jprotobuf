@@ -140,6 +140,8 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 
 - [Full docs](./Document.md)
 
+## Contact us
+QQ: 644867264
 
 ## License
 JProtobuf is [Apache 2.0 licensed](./LICENSE).
