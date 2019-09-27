@@ -80,7 +80,7 @@ public class JprotobufPreCompileMain {
                     return;
                 }
 
-                Class c = getByClass(name);
+                Class c = toClass(name);
                 if (c == null) {
                     return;
                 }
@@ -190,7 +190,7 @@ public class JprotobufPreCompileMain {
      * @param name the name
      * @return the by class
      */
-    private static Class getByClass(String name) {
+    private static Class toClass(String name) {
         try {
             return Thread.currentThread().getContextClassLoader().loadClass(name);
         } catch (Throwable e) {

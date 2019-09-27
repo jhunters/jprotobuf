@@ -21,6 +21,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
@@ -164,6 +165,7 @@ public class ComplexIDLGenerateTest {
     /**
      * Test default value.
      */
+    @Ignore
     @Test
     public void testDefaultValue() {
         
