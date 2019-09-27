@@ -5,11 +5,10 @@
 A very useful utility library for java programmer to use google protobuf library.
 </p>
 
-<p align="center">
+
 [![Build Status](https://travis-ci.org/jhunters/jprotobuf.svg?branch=master)](https://travis-ci.org/jhunters/jprotobuf)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.baidu/jprotobuf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu/jprotobuf)
 [![Coverage Status](https://coveralls.io/repos/github/jhunters/jprotobuf/badge.svg?branch=master)](https://coveralls.io/github/jhunters/jprotobuf?branch=master)
-</p>
 
 
 ## What is jprotobuf
