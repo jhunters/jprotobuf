@@ -6,7 +6,7 @@ cache:
   directories:
     - $HOME/.m2
 sudo: false
-install: "mvn test -Dmaven.javadoc.skip=true"
+install: "mvn -Dmaven.javadoc.skip=true test"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
