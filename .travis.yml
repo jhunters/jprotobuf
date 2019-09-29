@@ -2,4 +2,4 @@ language: java
 jdk:
 - oraclejdk9
 sudo: false
-install: "mvn test"
+install: "mvn package -DskipTests"
