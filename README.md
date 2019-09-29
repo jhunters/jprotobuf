@@ -8,7 +8,7 @@ A very useful utility library for java programmer to use google protobuf library
 
 [![Build Status](https://travis-ci.org/jhunters/jprotobuf.svg?branch=master)](https://travis-ci.org/jhunters/jprotobuf)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.baidu/jprotobuf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu/jprotobuf)
-[![codecov](https://codecov.io/gh/apache/jprotobuf/branch/master/graph/badge.svg)](https://codecov.io/gh/apache/jprotobuf)
+[![codecov](https://codecov.io/gh/jhunters/jprotobuf/branch/master/graph/badge.svg)](https://codecov.io/gh/jhunters/jprotobuf)
 
 
 ## What is jprotobuf
