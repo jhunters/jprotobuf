@@ -6,3 +6,5 @@ coverage:
         threshold: 0.1%
 ignore:
   - "src/main/java/com/baidu/bjf/remoting/protobuf/descriptor/*.java" #  descriptor meta define class, ignore test coverage for them
+  - "src/main/java/com/baidu/bjf/remoting/protobuf/command/*.java" #  main class, ignore test coverage for them
+  - "src/main/java/com/baidu/bjf/remoting/protobuf/code/CodeGenerator.java # deprecated class 
