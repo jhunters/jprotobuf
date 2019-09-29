@@ -201,7 +201,7 @@ public class AllTypesTest {
      */
     @Test
     public void testMutliTypeDefaultTypeEncodeDecode() throws IOException {
-        Codec<AllTypesDojoClassWithDefault> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClassWithDefault.class, true);
+        Codec<AllTypesDojoClassWithDefault> dojoClassProxy = ProtobufProxy.create(AllTypesDojoClassWithDefault.class, false);
         // AllTypesDojoClass$$BJFProtoBufClass dojoClassProxy = new AllTypesDojoClass$$BJFProtoBufClass();
         AllTypesDojoClassWithDefault c = new AllTypesDojoClassWithDefault();
         c.boolF = false;
