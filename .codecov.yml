@@ -1,0 +1,8 @@
+coverage:
+  status:
+    # pull-requests only
+    patch:
+      default:
+        threshold: 0.1%
+ignore:
+  - "src/main/java/com/baidu/bjf/remoting/protobuf/descriptor/*.java" #  descriptor meta define class, ignore test coverage for them
