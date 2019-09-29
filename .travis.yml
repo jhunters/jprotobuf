@@ -1,5 +1,15 @@
 language: java
 jdk:
-- oraclejdk9
+  - openjdk11
+  - openjdk8
+cache:
+  directories:
+    - $HOME/.m2
 sudo: false
 install: "mvn test"
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+after_failure:
+  - echo "build failed!"
