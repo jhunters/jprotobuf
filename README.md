@@ -40,7 +40,12 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
 2. jprotobuf-2.x supports google protocol buffer v3.0.0. 实现对MAP结构的支持. [文档](https://github.com/jhunters/jprotobuf/tree/master/v3)<br>
 3. jprotobuf-android Android development supports
 
-
+## 关联项目：
+<br>
+JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
+访问地址： [https://github.com/jhunters/Jprotobuf-rpc-socket](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket)<br>
+JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本发布RPC服务<br>
+访问地址： [https://github.com/jhunters/JProtobuf-rpc-http](https://github.com/jhunters/JProtobuf-rpc-http)
 
 ## Quick Start
 
