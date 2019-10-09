@@ -50,6 +50,51 @@ public class MethodCode {
     private LinkedHashMap<String, String> parameters = new LinkedHashMap<String, String>();
 
     /**
+     * Gets the name.
+     *
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+    
+    /**
+     * Gets the return type.
+     *
+     * @return the return type
+     */
+    public String getReturnType() {
+        return returnType;
+    }
+    
+    /**
+     * Gets the scope.
+     *
+     * @return the scope
+     */
+    public String getScope() {
+        return scope;
+    }
+    
+    /**
+     * Gets the exceptions.
+     *
+     * @return the exceptions
+     */
+    public List<String> getExceptions() {
+        return exceptions;
+    }
+    
+    /**
+     * Gets the parameters.
+     *
+     * @return the parameters
+     */
+    public LinkedHashMap<String, String> getParameters() {
+        return parameters;
+    }
+    
+    /**
      * To code.
      *
      * @return the string
@@ -89,17 +134,24 @@ public class MethodCode {
                 }
             }
         }
-        source.append("{").append(ClassCode.LINE_BREAK);
-        
-        for (String c : code) {
-            source.append(ClassCode.CODE_FORMAT).append(c);
-        }
-        
-        source.append("}").append(ClassCode.LINE_BREAK);
-        
+        source.append(getBody());
         return source.toString();
     }
     
+    /**
+     * Gets the body.
+     *
+     * @return the body
+     */
+    public String getBody() {
+        StringBuilder source = new StringBuilder();
+        source.append("{").append(ClassCode.LINE_BREAK);
+        for (String c : code) {
+            source.append(ClassCode.CODE_FORMAT).append(c);
+        }
+        source.append("}").append(ClassCode.LINE_BREAK);
+        return source.toString();
+    }
     
     
     /**

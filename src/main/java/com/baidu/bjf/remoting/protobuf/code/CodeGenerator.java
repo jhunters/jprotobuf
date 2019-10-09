@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -35,17 +36,16 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.Descriptors.Descriptor;
 
 /**
  * Code generator utility class.
  * 
- * @deprecated please use {@link TemplateCodeGenerator}
- * 
  * @author xiemalin
  * @since 1.0.0
  */ 
-@Deprecated 
 public class CodeGenerator extends AbstractCodeGenerator {
 
     /** auto proxied suffix class name. */
@@ -63,10 +63,8 @@ public class CodeGenerator extends AbstractCodeGenerator {
     /** The fields. */
     protected List<FieldInfo> fields;
 
-    /**
-     * Gets the relative proxy classes.
-     *
-     * @return the relative proxy classes
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getRelativeProxyClasses()
      */
     public Set<Class<?>> getRelativeProxyClasses() {
         return relativeProxyClasses;
@@ -75,7 +73,6 @@ public class CodeGenerator extends AbstractCodeGenerator {
     /**
      * Constructor method.
      *
-     * @param fields protobuf mapped fields
      * @param cls protobuf mapped class
      */
     public CodeGenerator(Class<?> cls) {
@@ -96,35 +93,44 @@ public class CodeGenerator extends AbstractCodeGenerator {
      */
     @Override
     public String getCode() {
-        
+        ClassCode code = getClassCode();
+        return code.toCode();
+    }
+    
+    /**
+     * Gets the class code.
+     *
+     * @return the class code
+     */
+    public ClassCode getClassCode() {
         if (fields == null) {
             fields = fetchFieldInfos();
         }
-
+        
         String className = getClassName();
-
+        
         ClassCode code = new ClassCode(ClassCode.SCOPE_PUBLIC, className);
         // to implements Codec interface
-        code.addInteface(Codec.class.getName() + "<" + ClassHelper.getInternalName(cls.getCanonicalName()) + ">");
-
+        InterfaceCode interfaceCode = new InterfaceCode(Codec.class.getName());
+        interfaceCode.addGeneric(ClassHelper.getInternalName(cls.getCanonicalName()));
+        code.addInteface(interfaceCode);
+        
         // package
         code.setPkg(getPackage());
         // import classes
         genImportCode(code);
-
+        
         // define Descriptor field
-        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getCanonicalName());
-        code.addField(ClassCode.SCOPE_DEFAULT, descriptorClsName, "descriptor", null);
-
+        code.addField(ClassCode.SCOPE_DEFAULT, Descriptor.class, "descriptor", null);
+        
         // define class
+        code.addMethod(getWriteToMethodCode());
         code.addMethod(getEncodeMethodCode());
         code.addMethod(getDecodeMethodCode());
         code.addMethod(getSizeMethodCode());
-        code.addMethod(getWriteToMethodCode());
         code.addMethod(getReadFromMethodCode());
         code.addMethod(getGetDescriptorMethodCode());
-
-        return code.toCode();
+        return code;
     }
     
     /**
@@ -173,6 +179,9 @@ public class CodeGenerator extends AbstractCodeGenerator {
         code.importClass("com.baidu.bjf.remoting.protobuf.utils.*");
         code.importClass("com.baidu.bjf.remoting.protobuf.*");
         code.importClass("com.google.protobuf.*");
+        code.importClass("com.baidu.bjf.remoting.protobuf.code.*");
+        code.importClass("com.baidu.bjf.remoting.protobuf.utils.*");
+        code.importClass("com.baidu.bjf.remoting.protobuf");
 
         if (!StringUtils.isEmpty(getPackage())) {
             code.importClass(ClassHelper.getInternalName(cls.getCanonicalName()));
@@ -182,10 +191,10 @@ public class CodeGenerator extends AbstractCodeGenerator {
     /**
      * To generate parse google protocol buffer byte array parser code.
      *
-     * @param code add new generated code to the builder.
+     * @param mc the mc
      * @return the parses the bytes method code
      */
-    private void getParseBytesMethodCode(MethodCode mc) {
+    private void getParseBytesMethodCode(MethodCode mc, String paramName) {
 
         StringBuilder code = new StringBuilder();
         // define return
@@ -214,7 +223,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         mc.appendLineCode1(ClassCode.CODE_FORMAT + "boolean done = false");
         mc.appendLineCode1(ClassCode.CODE_FORMAT + "Codec codec = null");
         mc.appendLineCode0(ClassCode.CODE_FORMAT + "while (!done) {");
-        mc.appendLineCode1(ClassCode.CODE_FORMAT + "int tag = input.readTag()");
+        mc.appendLineCode1(ClassCode.CODE_FORMAT + "int tag =  " + paramName + ".readTag()");
         mc.appendLineCode0(ClassCode.CODE_FORMAT + "if (tag == 0) { break;}");
 
         for (FieldInfo field : fields) {
@@ -249,9 +258,9 @@ public class CodeGenerator extends AbstractCodeGenerator {
                     }
                 }
                 express = "CodedConstant.getEnumValue(" + clsName + ".class, CodedConstant.getEnumName(" + clsName
-                        + ".values()," + "input.read" + t + "()))";
+                        + ".values()," + paramName + ".read" + t + "()))";
             } else {
-                express = "input.read" + t + "()";
+                express = paramName + ".read" + t + "()";
             }
 
             // if List type and element is object message type
@@ -277,10 +286,10 @@ public class CodeGenerator extends AbstractCodeGenerator {
                     mc.appendLineCode1(code.toString());
                     code.setLength(0);
 
-                    mc.appendLineCode1("int length = input.readRawVarint32()");
-                    mc.appendLineCode1("final int oldLimit = input.pushLimit(length)");
+                    mc.appendLineCode1("int length =  " + paramName + ".readRawVarint32()");
+                    mc.appendLineCode1("final int oldLimit =  " + paramName + ".pushLimit(length)");
                     listTypeCheck = true;
-                    express = "(" + name + ") codec.readFrom(input)";
+                    express = "(" + name + ") codec.readFrom( " + paramName + ")";
 
                 }
             } else if (field.getFieldType() == FieldType.OBJECT) { // if object
@@ -305,11 +314,11 @@ public class CodeGenerator extends AbstractCodeGenerator {
                 mc.appendLineCode1(code.toString());
                 code.setLength(0);
 
-                mc.appendLineCode1("int length = input.readRawVarint32()");
-                mc.appendLineCode1("final int oldLimit = input.pushLimit(length)");
+                mc.appendLineCode1("int length =  " + paramName + ".readRawVarint32()");
+                mc.appendLineCode1("final int oldLimit =  " + paramName + ".pushLimit(length)");
 
                 listTypeCheck = true;
-                express = "(" + name + ") codec.readFrom(input)";
+                express = "(" + name + ") codec.readFrom( " + paramName + ")";
             }
 
             if (field.getFieldType() == FieldType.BYTES) {
@@ -319,8 +328,8 @@ public class CodeGenerator extends AbstractCodeGenerator {
             mc.appendLineCode1(getSetToField("ret", field.getField(), cls, express, isList, field.isMap()));
 
             if (listTypeCheck) {
-                mc.appendLineCode1("input.checkLastTagWas(0)");
-                mc.appendLineCode1("input.popLimit(oldLimit)");
+                mc.appendLineCode1(paramName + ".checkLastTagWas(0)");
+                mc.appendLineCode1(paramName + ".popLimit(oldLimit)");
             }
 
             mc.appendLineCode1("continue");
@@ -328,7 +337,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
 
         }
 
-        mc.appendLineCode1("input.skipField(tag)");
+        mc.appendLineCode1(paramName + ".skipField(tag)");
         mc.appendLineCode0("}");
         mc.appendLineCode0("} catch (com.google.protobuf.InvalidProtocolBufferException e) {");
         mc.appendLineCode1("throw e");
@@ -355,14 +364,14 @@ public class CodeGenerator extends AbstractCodeGenerator {
         MethodCode mc = new MethodCode();
         mc.setName("decode");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
-        mc.setReturnType(ClassHelper.getInternalName(cls.getCanonicalName()));
-        mc.addParameter("byte[]", "bb");
-        mc.addException("IOException");
+        mc.setReturnType("java.lang.Object");
+        mc.addParameter("byte[]", "$1");
+        mc.addException(IOException.class.getName());
 
         // add method code
-        mc.appendLineCode1("CodedInputStream input = CodedInputStream.newInstance(bb, 0, bb.length)");
+        mc.appendLineCode1("CodedInputStream input = CodedInputStream.newInstance($1, 0, $1.length)");
 
-        getParseBytesMethodCode(mc);
+        getParseBytesMethodCode(mc, "input");
 
         return mc;
     }
@@ -373,13 +382,13 @@ public class CodeGenerator extends AbstractCodeGenerator {
      * @return the gets the descriptor method code
      */
     private MethodCode getGetDescriptorMethodCode() {
-        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getCanonicalName());
+        String descriptorClsName = ClassHelper.getInternalName(Descriptor.class.getName());
 
         MethodCode mc = new MethodCode();
         mc.setName("getDescriptor");
         mc.setReturnType(descriptorClsName);
         mc.setScope(ClassCode.SCOPE_PUBLIC);
-        mc.addException("IOException");
+        mc.addException(IOException.class.getName());
 
         String methodSource = CodeTemplate.descriptorMethodSource(cls);
 
@@ -395,12 +404,12 @@ public class CodeGenerator extends AbstractCodeGenerator {
     private MethodCode getReadFromMethodCode() {
         MethodCode mc = new MethodCode();
         mc.setName("readFrom");
-        mc.setReturnType(ClassHelper.getInternalName(cls.getCanonicalName()));
+        mc.setReturnType("java.lang.Object");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
-        mc.addParameter("CodedInputStream", "input");
-        mc.addException("IOException");
+        mc.addParameter(CodedInputStream.class.getName(), "$1");
+        mc.addException(IOException.class.getName());
 
-        getParseBytesMethodCode(mc);
+        getParseBytesMethodCode(mc, "$1");
 
         return mc;
     }
@@ -416,8 +425,11 @@ public class CodeGenerator extends AbstractCodeGenerator {
         mc.setName("encode");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
         mc.setReturnType("byte[]");
-        mc.addParameter(ClassHelper.getInternalName(cls.getCanonicalName()), "t");
-        mc.addException("IOException");
+        mc.addParameter("java.lang.Object", "$1");
+        mc.addException(IOException.class.getName());
+        
+        String pNameType = ClassHelper.getInternalName(cls.getCanonicalName());
+        mc.appendLineCode1(pNameType + " t = (" + pNameType + ") $1");
 
         // add method code
         mc.appendLineCode1("int size = 0");
@@ -461,7 +473,7 @@ public class CodeGenerator extends AbstractCodeGenerator {
         mc.appendLineCode1("final byte[] result = new byte[size]");
         mc.appendLineCode1("final CodedOutputStream output = CodedOutputStream.newInstance(result)");
         // call writeTo method
-        mc.appendLineCode1("writeTo(t, output)");
+        mc.appendLineCode1("writeTo($1, output)");
         mc.appendLineCode1("return result");
 
         return mc;
@@ -477,9 +489,12 @@ public class CodeGenerator extends AbstractCodeGenerator {
         mc.setName("writeTo");
         mc.setReturnType("void");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
-        mc.addParameter(ClassHelper.getInternalName(cls.getCanonicalName()), "t");
-        mc.addParameter("CodedOutputStream", "output");
-        mc.addException("IOException");
+        mc.addParameter("java.lang.Object", "$1");
+        mc.addParameter(CodedOutputStream.class.getName(), "$2");
+        mc.addException(IOException.class.getName());
+        
+        String pNameType = ClassHelper.getInternalName(cls.getCanonicalName());
+        mc.appendLineCode1(pNameType + " t = (" + pNameType + ") $1");
 
         Set<Integer> orders = new HashSet<Integer>();
         for (FieldInfo field : fields) {
@@ -507,10 +522,10 @@ public class CodeGenerator extends AbstractCodeGenerator {
             boolean isList = field.isList();
             // set write to byte
             mc.appendLineCode0(
-                    CodedConstant.getMappedWriteCode(field, "output", field.getOrder(), field.getFieldType(), isList));
+                    CodedConstant.getMappedWriteCode(field, "$2", field.getOrder(), field.getFieldType(), isList));
         }
         
-        mc.appendLineCode1("output.flush()");
+        mc.appendLineCode1("$2.flush()");
 
         return mc;
     }
@@ -525,8 +540,8 @@ public class CodeGenerator extends AbstractCodeGenerator {
         mc.setName("size");
         mc.setScope(ClassCode.SCOPE_PUBLIC);
         mc.setReturnType("int");
-        mc.addParameter(ClassHelper.getInternalName(cls.getCanonicalName()), "t");
-        mc.addException("IOException");
+        mc.addParameter(ClassHelper.getInternalName(cls.getCanonicalName()), "$1");
+        mc.addException(IOException.class.getName());
 
         // add method code
         mc.appendLineCode1("int size = 0");
@@ -548,10 +563,10 @@ public class CodeGenerator extends AbstractCodeGenerator {
             }
             // define field
             mc.appendLineCode0(CodedConstant.getMappedTypeDefined(field.getOrder(), field.getFieldType(),
-                    getAccessByField("t", field.getField(), cls), isList));
+                    getAccessByField("$1", field.getField(), cls), isList));
             // compute size
             StringBuilder code = new StringBuilder();
-            code.append("if (!CodedConstant.isNull(").append(getAccessByField("t", field.getField(), cls)).append("))")
+            code.append("if (!CodedConstant.isNull(").append(getAccessByField("$1", field.getField(), cls)).append("))")
                     .append("{");
             mc.appendLineCode0(code.toString());
 
@@ -602,7 +617,11 @@ public class CodeGenerator extends AbstractCodeGenerator {
         }
 
         String type = field.getType().getCanonicalName();
-        if ("[B".equals(type) || "[Ljava.lang.Byte;".equals(type) || "java.lang.Byte[]".equals(type)) {
+        if ("[B".equals(type)) {
+            type = "byte[]";
+        }
+        
+        if ("[Ljava.lang.Byte;".equals(type) || "java.lang.Byte[]".equals(type)) {
             type = "byte[]";
         }
 

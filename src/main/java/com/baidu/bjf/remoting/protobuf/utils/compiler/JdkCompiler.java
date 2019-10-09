@@ -31,11 +31,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
@@ -49,11 +49,13 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.baidu.bjf.remoting.protobuf.utils.ZipUtils;
 
 /**
  * JdkCompiler. (SPI, Singleton, ThreadSafe)
@@ -80,6 +82,14 @@ public class JdkCompiler extends AbstractCompiler {
 
     /** The Constant DEFAULT_JDK_VERSION. */
     private static final String DEFAULT_JDK_VERSION = "1.6";
+
+    static final String BOOT_INF_CLASSES = "BOOT-INF/classes/";
+
+    static final String BOOT_INF_LIB = "BOOT-INF/lib/";
+
+    /** The Constant TEMP_PATH. */
+    static final String TEMP_PATH =
+            System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID().toString();
 
     /**
      * Instantiates a new jdk compiler.
@@ -113,12 +123,12 @@ public class JdkCompiler extends AbstractCompiler {
                 compiler.getStandardFileManager(diagnosticCollector, null, Charset.forName("utf-8"));
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
-
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<File>();
+                boolean isInternalJar = false;
+                String rootJar = null;
                 for (URL url : urlClassLoader.getURLs()) {
-
                     String file = url.getFile();
                     files.add(new File(file));
                     if (StringUtils.endsWith(file, "!/")) {
@@ -128,15 +138,28 @@ public class JdkCompiler extends AbstractCompiler {
                         file = StringUtils.removeStart(file, "file:");
                     }
 
+                    if (file.indexOf("!") != -1) {
+                        // if has internal jar like
+                        // file:/D:/develop/a.jar!/BOOT-INF/lib/spring-boot-starter-1.5.14.RELEASE.jar
+                        isInternalJar = true;
+                        rootJar = StringUtils.substringBefore(file, "!");
+                        rootJar = StringUtils.removeStart(rootJar, "/");
+                    }
                     files.add(new File(file));
-                    
+
                 }
+                if (isInternalJar && rootJar != null) {
+                    ZipUtils.unZip(new File(rootJar), TEMP_PATH);
+                    listFiles(TEMP_PATH, files);
+                    files.add(new File(TEMP_PATH, BOOT_INF_CLASSES));
+                }
+
                 manager.setLocation(StandardLocation.CLASS_PATH, files);
             } catch (IOException e) {
                 throw new IllegalStateException(e.getMessage(), e);
             }
         }
-        
+
         classLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoaderImpl>() {
             public ClassLoaderImpl run() {
                 return new ClassLoaderImpl(loader);
@@ -507,13 +530,6 @@ public class JdkCompiler extends AbstractCompiler {
                 throws IOException {
             Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
 
-            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            List<URL> urlList = new ArrayList<URL>();
-            Enumeration<URL> e = contextClassLoader.getResources("com");
-            while (e.hasMoreElements()) {
-                urlList.add(e.nextElement());
-            }
-
             ArrayList<JavaFileObject> files = new ArrayList<JavaFileObject>();
 
             if (location == StandardLocation.CLASS_PATH && kinds.contains(JavaFileObject.Kind.CLASS)) {
@@ -540,4 +556,24 @@ public class JdkCompiler extends AbstractCompiler {
         }
     }
 
+    /**
+     * List URL files.
+     *
+     * @param classesPath the classes path
+     * @param ext the ext
+     * @param list the list
+     */
+    private static void listFiles(String classesPath, final List<File> list) {
+        Collection listFiles = FileUtils.listFiles(new File(classesPath), new String[] { "jar" }, true);
+        if (listFiles != null) {
+            for (Object f : listFiles) {
+                try {
+                    File file = (File) f;
+                    list.add(file); // add jar file
+                } catch (Exception e) {
+                    LOGGER.warn(e.getMessage());
+                }
+            }
+        }
+    }
 }

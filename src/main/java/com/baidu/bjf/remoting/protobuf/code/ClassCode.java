@@ -76,7 +76,7 @@ public class ClassCode {
     private String className;
     
     /** The interfaces. */
-    private Set<String> interfaces = new HashSet<String>();
+    private Set<InterfaceCode> interfaces = new HashSet<InterfaceCode>();
     
     /** The extend classes. */
     private Set<String> extendClasses = new HashSet<String>();
@@ -101,7 +101,7 @@ public class ClassCode {
      * @param name the name
      * @param defaultValue the default value
      */
-    public void addField(String scope, String type, String name, String defaultValue) {
+    public void addField(String scope, Class type, String name, String defaultValue) {
         fields.put(name, new FieldCode(scope, name, type, defaultValue));
     }
 
@@ -120,6 +120,24 @@ public class ClassCode {
     }
     
     /**
+     * Gets the interfaces.
+     *
+     * @return the interfaces
+     */
+    public Set<InterfaceCode> getInterfaces() {
+        return interfaces;
+    }
+    
+    /**
+     * Gets the fields.
+     *
+     * @return the fields
+     */
+    public Map<String, FieldCode> getFields() {
+        return fields;
+    }
+    
+    /**
      * Instantiates a new class code.
      *
      * @param scope the scope
@@ -128,6 +146,42 @@ public class ClassCode {
     public ClassCode(String scope, String name) {
         this.scope = scope;
         this.className = name;
+    }
+    
+    /**
+     * Gets the methods.
+     *
+     * @return the methods
+     */
+    public List<MethodCode> getMethods() {
+        return methods;
+    }
+    
+    /**
+     * Gets the import classes.
+     *
+     * @return the import classes
+     */
+    public Set<String> getImports() {
+        return imports;
+    }
+    
+    /**
+     * Gets the class name.
+     *
+     * @return the class name
+     */
+    public String getClassName() {
+        return className;
+    }
+    
+    /**
+     * Gets the pkg.
+     *
+     * @return the pkg
+     */
+    public String getPkg() {
+        return pkg;
     }
     
     /**
@@ -151,9 +205,9 @@ public class ClassCode {
         code.append(scope).append(" class ").append(className);
         if (!interfaces.isEmpty()) {
             code.append(" implements ");
-            Iterator<String> iter = interfaces.iterator();
+            Iterator<InterfaceCode> iter = interfaces.iterator();
             while (iter.hasNext()) {
-                code.append(iter.next());
+                code.append(iter.next().toCode());
                 if (iter.hasNext()) {
                     code.append(SENTENCE_COMMA);
                 }
@@ -240,7 +294,7 @@ public class ClassCode {
      *
      * @param intf the intf
      */
-    public void addInteface(String intf) {
+    public void addInteface(InterfaceCode intf) {
         interfaces.add(intf);
     }
     
