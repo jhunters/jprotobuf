@@ -119,6 +119,7 @@ jprotobuf-android
 
 
 ## Download plugin
+插件使用方法，请阅读文档[Full docs](./Document.md)
 #### maven插件
 jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的预编译操作. <br>
 注：plugin版本建议使用>=1.2.0， jprotobuf 支持版本>=1.9.4   
@@ -146,6 +147,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 ```property
 classpath com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.0
 ```
+
 
 ## Document
 
