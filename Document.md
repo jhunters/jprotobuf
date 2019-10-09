@@ -103,6 +103,12 @@ buildscript {
         classpath "com.baidu:jprotobuf:2.2.14"  // include jprotobuf also supports 1.x 
     }
 }
+
+jprotobuf_precompile {
+    filterClassPackage="com.mytest.pkg" // 设置要预编译过滤的包前缀，多个使用 ";"分隔
+    generateProtoFile="true" // 是否支持proto文件生成，默认是false，不生成
+}
+
 ```
 备注：
 由于gradle buildscript是单独的classloader环境，如果遇到编译过程中出现类找不到，请直接在 buildscript的depencies 属性中增加classpath依赖.
