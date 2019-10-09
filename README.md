@@ -34,6 +34,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
    完整支持proto文件所有功能，包括内联对象，匿名对象，枚举类型<br>
 3. 提供从POJO对象的注解方式自动生成proto文件的功能， 方便proto描述文件的管理与维护<br>
 4. 提供预编译Maven插件，进一步提升运行性能
+5. 新增预编译gradle插件
 
 ## Which version
 1. jprotobuf-1.x supports google protocol buffer v2.5.x<br>
@@ -118,6 +119,7 @@ jprotobuf-android
 
 
 ## Download plugin
+#### maven插件
 jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的预编译操作. <br>
 注：plugin版本建议使用>=1.2.0， jprotobuf 支持版本>=1.9.4   
 1.2.15和2.0.11版本之后，支持在预编译阶段生成 proto声明文件的功能， 文件生成位置在当前类的相同目录下。具体使用方式详见下面插件使用说明
@@ -139,6 +141,11 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 </dependency>
 ```
 备注： precompile-plugin的版本 2.0.5 只支持 jprotobuf 2.2.6 及以上的版本。     其它版本请有2.0.4及以下precompile plugin
+
+#### gradle插件
+```property
+classpath com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.0
+```
 
 ## Document
 

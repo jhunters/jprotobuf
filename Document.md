@@ -56,7 +56,7 @@ public class PersonJProtoBufProtoClass {
 ```
 
 ## 预编译插件：
-
+#### maven插件
 Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf注解标识的对象都会进行预编译操作，并生成相应的class文件到目标jar或war中， 使用示例如下：
 1.2.15和2.0.11版本之后增加 generateProtoFile属性，设置true可开启proto文件生成.
 ```xml
@@ -86,6 +86,30 @@ maven执行命令如下:<br>
 mvn jprotobuf:precompile
 or
 mvn package
+```
+
+#### gradle插件
+在build.gradle文件，设置内容如下：
+```property
+apply plugin: 'jprotobuf_plugin'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath gradleApi()
+        classpath "com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.0" // include plugin
+        classpath "com.baidu:jprotobuf:2.2.14"  // include jprotobuf also supports 1.x 
+    }
+}
+```
+备注：
+由于gradle buildscript是单独的classloader环境，如果遇到编译过程中出现类找不到，请直接在 buildscript的depencies 属性中增加classpath依赖.
+
+gradle 执行命令如下:<br>
+```property
+gradle compileJava jprotobuf_precompile build
 ```
 
 ## API使用说明
