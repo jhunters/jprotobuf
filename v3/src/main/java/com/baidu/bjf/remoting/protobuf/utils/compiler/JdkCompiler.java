@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
@@ -83,13 +82,11 @@ public class JdkCompiler extends AbstractCompiler {
     /** The Constant DEFAULT_JDK_VERSION. */
     private static final String DEFAULT_JDK_VERSION = "1.6";
 
-    static final String BOOT_INF_CLASSES = "BOOT-INF/classes/";
-
-    static final String BOOT_INF_LIB = "BOOT-INF/lib/";
+    private static final String BOOT_INF_CLASSES = "BOOT-INF/classes/";
 
     /** The Constant TEMP_PATH. */
-    static final String TEMP_PATH =
-            System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID().toString();
+    private static final String TEMP_PATH =
+            System.getProperty("java.io.tmpdir") + File.separator + "JPROTOBUF_CACHE_DIR";
 
     /**
      * Instantiates a new jdk compiler.
@@ -116,7 +113,7 @@ public class JdkCompiler extends AbstractCompiler {
         // set compiler's classpath to be same as the runtime's
         if (compiler == null) {
             throw new RuntimeException(
-                    "compiler is null maybe you are on JRE enviroment please change to JDK enviroment.");
+                    "compiler is null maybe you are on JRE enviroment please change to JDK environment.");
         }
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
         StandardJavaFileManager manager =
