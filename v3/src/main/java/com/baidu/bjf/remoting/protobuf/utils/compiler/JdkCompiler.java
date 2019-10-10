@@ -24,17 +24,18 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.FileObject;
@@ -48,11 +49,13 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.baidu.bjf.remoting.protobuf.utils.ZipUtils;
 
 /**
  * JdkCompiler. (SPI, Singleton, ThreadSafe)
@@ -61,7 +64,7 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  * @since 1.0.0
  */
 public class JdkCompiler extends AbstractCompiler {
-    
+
     /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(JdkCompiler.class.getName());
 
@@ -76,46 +79,58 @@ public class JdkCompiler extends AbstractCompiler {
 
     /** The options. */
     private volatile List<String> options;
-    
+
     /** The Constant DEFAULT_JDK_VERSION. */
     private static final String DEFAULT_JDK_VERSION = "1.6";
-    
+
+    static final String BOOT_INF_CLASSES = "BOOT-INF/classes/";
+
+    static final String BOOT_INF_LIB = "BOOT-INF/lib/";
+
+    /** The Constant TEMP_PATH. */
+    static final String TEMP_PATH =
+            System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID().toString();
+
     /**
      * Instantiates a new jdk compiler.
      *
      * @param loader the loader
      */
     public JdkCompiler(final ClassLoader loader) {
-    	this(loader, DEFAULT_JDK_VERSION);
+        this(loader, DEFAULT_JDK_VERSION);
     }
-    
-	/**
+
+    /**
      * Instantiates a new jdk compiler.
      *
      * @param loader the loader
      * @param jdkVersion the jdk version
      */
-	public JdkCompiler(final ClassLoader loader, final String jdkVersion) {
+    public JdkCompiler(final ClassLoader loader, final String jdkVersion) {
         options = new ArrayList<String>();
         options.add("-source");
         options.add(jdkVersion);
         options.add("-target");
         options.add(jdkVersion);
+
+        // set compiler's classpath to be same as the runtime's
         if (compiler == null) {
             throw new RuntimeException(
                     "compiler is null maybe you are on JRE enviroment please change to JDK enviroment.");
         }
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
-        StandardJavaFileManager manager = compiler.getStandardFileManager(diagnosticCollector, null, null);
+        StandardJavaFileManager manager =
+                compiler.getStandardFileManager(diagnosticCollector, null, Charset.forName("utf-8"));
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
-
             try {
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<File>();
+                boolean isInternalJar = false;
+                String rootJar = null;
                 for (URL url : urlClassLoader.getURLs()) {
-
                     String file = url.getFile();
+                    files.add(new File(file));
                     if (StringUtils.endsWith(file, "!/")) {
                         file = StringUtils.removeEnd(file, "!/");
                     }
@@ -123,55 +138,73 @@ public class JdkCompiler extends AbstractCompiler {
                         file = StringUtils.removeStart(file, "file:");
                     }
 
+                    if (file.indexOf("!") != -1) {
+                        // if has internal jar like
+                        // file:/D:/develop/a.jar!/BOOT-INF/lib/spring-boot-starter-1.5.14.RELEASE.jar
+                        isInternalJar = true;
+                        rootJar = StringUtils.substringBefore(file, "!");
+                        rootJar = StringUtils.removeStart(rootJar, "/");
+                    }
                     files.add(new File(file));
+
                 }
+                if (isInternalJar && rootJar != null) {
+                    ZipUtils.unZip(new File(rootJar), TEMP_PATH);
+                    listFiles(TEMP_PATH, files);
+                    files.add(new File(TEMP_PATH, BOOT_INF_CLASSES));
+                }
+
                 manager.setLocation(StandardLocation.CLASS_PATH, files);
             } catch (IOException e) {
                 throw new IllegalStateException(e.getMessage(), e);
             }
         }
+
         classLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoaderImpl>() {
             public ClassLoaderImpl run() {
                 return new ClassLoaderImpl(loader);
             }
         });
+
         javaFileManager = new JavaFileManagerImpl(manager, classLoader);
     }
 
-    /* (non-Javadoc)
-     * @see com.baidu.bjf.remoting.protobuf.utils.compiler.AbstractCompiler#doCompile(java.lang.String, java.lang.String, java.io.OutputStream)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.baidu.bjf.remoting.protobuf.utils.compiler.AbstractCompiler#doCompile(java.lang.String,
+     * java.lang.String, java.io.OutputStream)
      */
     @Override
     public synchronized Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
-         
-    	if (LOGGER.isDebugEnabled()) {
-    		LOGGER.debug("Begin to compile source code: class is '{}'", name);
-    	}
-        
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Begin to compile source code: class is '{}'", name);
+        }
+
         int i = name.lastIndexOf('.');
         String packageName = i < 0 ? "" : name.substring(0, i);
         String className = i < 0 ? name : name.substring(i + 1);
         JavaFileObjectImpl javaFileObject = new JavaFileObjectImpl(className, sourceCode);
-        javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName, className
-                + ClassUtils.JAVA_EXTENSION, javaFileObject);
-        
+        javaFileManager.putFileForInput(StandardLocation.SOURCE_PATH, packageName,
+                className + ClassUtils.JAVA_EXTENSION, javaFileObject);
+
         DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
-        Boolean result =
-                compiler.getTask(null, javaFileManager, diagnosticCollector, options, null,
-                        Arrays.asList(new JavaFileObject[] { javaFileObject })).call();
+        Boolean result = compiler.getTask(null, javaFileManager, diagnosticCollector, options, null,
+                Arrays.asList(new JavaFileObject[] { javaFileObject })).call();
         if (result == null || !result.booleanValue()) {
-            throw new IllegalStateException("Compilation failed. class: " + name + ", diagnostics: "
-                    + diagnosticCollector.getDiagnostics());
+            throw new IllegalStateException(
+                    "Compilation failed. class: " + name + ", diagnostics: " + diagnosticCollector.getDiagnostics());
         }
-        
+
         if (LOGGER.isDebugEnabled()) {
-        	LOGGER.debug("compile source code done: class is '{}'", name);
-        	LOGGER.debug("loading class '{}', name");
+            LOGGER.debug("compile source code done: class is '{}'", name);
+            LOGGER.debug("loading class '{}'", name);
         }
-        
+
         Class<?> retClass = classLoader.loadClass(name);
         if (LOGGER.isDebugEnabled()) {
-        	LOGGER.debug("loading class done  '{}'", name);
+            LOGGER.debug("loading class done  '{}'", name);
         }
 
         if (os != null) {
@@ -183,8 +216,10 @@ public class JdkCompiler extends AbstractCompiler {
         }
         return retClass;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler#loadBytes(java.lang.String)
      */
     @Override
@@ -234,7 +269,9 @@ public class JdkCompiler extends AbstractCompiler {
             return null;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see java.lang.ClassLoader#findClass(java.lang.String)
          */
         @Override
@@ -261,7 +298,9 @@ public class JdkCompiler extends AbstractCompiler {
             classes.put(qualifiedClassName, javaFile);
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see java.lang.ClassLoader#loadClass(java.lang.String, boolean)
          */
         @Override
@@ -270,7 +309,9 @@ public class JdkCompiler extends AbstractCompiler {
             return super.loadClass(name, resolve);
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
          */
         @Override
@@ -331,7 +372,9 @@ public class JdkCompiler extends AbstractCompiler {
             source = null;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see javax.tools.SimpleJavaFileObject#getCharContent(boolean)
          */
         @Override
@@ -342,7 +385,9 @@ public class JdkCompiler extends AbstractCompiler {
             return source;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see javax.tools.SimpleJavaFileObject#openInputStream()
          */
         @Override
@@ -350,7 +395,9 @@ public class JdkCompiler extends AbstractCompiler {
             return new ByteArrayInputStream(getByteCode());
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see javax.tools.SimpleJavaFileObject#openOutputStream()
          */
         @Override
@@ -393,8 +440,11 @@ public class JdkCompiler extends AbstractCompiler {
             this.classLoader = classLoader;
         }
 
-        /* (non-Javadoc)
-         * @see javax.tools.ForwardingJavaFileManager#getFileForInput(javax.tools.JavaFileManager.Location, java.lang.String, java.lang.String)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see javax.tools.ForwardingJavaFileManager#getFileForInput(javax.tools.JavaFileManager.Location,
+         * java.lang.String, java.lang.String)
          */
         @Override
         public FileObject getFileForInput(Location location, String packageName, String relativeName)
@@ -431,8 +481,11 @@ public class JdkCompiler extends AbstractCompiler {
             return ClassUtils.toURI(location.getName() + '/' + packageName + '/' + relativeName);
         }
 
-        /* (non-Javadoc)
-         * @see javax.tools.ForwardingJavaFileManager#getJavaFileForOutput(javax.tools.JavaFileManager.Location, java.lang.String, javax.tools.JavaFileObject.Kind, javax.tools.FileObject)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see javax.tools.ForwardingJavaFileManager#getJavaFileForOutput(javax.tools.JavaFileManager.Location,
+         * java.lang.String, javax.tools.JavaFileObject.Kind, javax.tools.FileObject)
          */
         @Override
         public JavaFileObject getJavaFileForOutput(Location location, String qualifiedName, Kind kind,
@@ -442,7 +495,9 @@ public class JdkCompiler extends AbstractCompiler {
             return file;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
+         * 
          * @see javax.tools.ForwardingJavaFileManager#getClassLoader(javax.tools.JavaFileManager.Location)
          */
         @Override
@@ -450,8 +505,11 @@ public class JdkCompiler extends AbstractCompiler {
             return classLoader;
         }
 
-        /* (non-Javadoc)
-         * @see javax.tools.ForwardingJavaFileManager#inferBinaryName(javax.tools.JavaFileManager.Location, javax.tools.JavaFileObject)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see javax.tools.ForwardingJavaFileManager#inferBinaryName(javax.tools.JavaFileManager.Location,
+         * javax.tools.JavaFileObject)
          */
         @Override
         public String inferBinaryName(Location loc, JavaFileObject file) {
@@ -461,20 +519,16 @@ public class JdkCompiler extends AbstractCompiler {
             return super.inferBinaryName(loc, file);
         }
 
-        /* (non-Javadoc)
-         * @see javax.tools.ForwardingJavaFileManager#list(javax.tools.JavaFileManager.Location, java.lang.String, java.util.Set, boolean)
+        /*
+         * (non-Javadoc)
+         * 
+         * @see javax.tools.ForwardingJavaFileManager#list(javax.tools.JavaFileManager.Location, java.lang.String,
+         * java.util.Set, boolean)
          */
         @Override
         public Iterable<JavaFileObject> list(Location location, String packageName, Set<Kind> kinds, boolean recurse)
                 throws IOException {
             Iterable<JavaFileObject> result = super.list(location, packageName, kinds, recurse);
-
-            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-            List<URL> urlList = new ArrayList<URL>();
-            Enumeration<URL> e = contextClassLoader.getResources("com");
-            while (e.hasMoreElements()) {
-                urlList.add(e.nextElement());
-            }
 
             ArrayList<JavaFileObject> files = new ArrayList<JavaFileObject>();
 
@@ -502,5 +556,24 @@ public class JdkCompiler extends AbstractCompiler {
         }
     }
 
-
+    /**
+     * List URL files.
+     *
+     * @param classesPath the classes path
+     * @param ext the ext
+     * @param list the list
+     */
+    private static void listFiles(String classesPath, final List<File> list) {
+        Collection listFiles = FileUtils.listFiles(new File(classesPath), new String[] { "jar" }, true);
+        if (listFiles != null) {
+            for (Object f : listFiles) {
+                try {
+                    File file = (File) f;
+                    list.add(file); // add jar file
+                } catch (Exception e) {
+                    LOGGER.warn(e.getMessage());
+                }
+            }
+        }
+    }
 }
