@@ -114,8 +114,6 @@ buildscript {
 apply plugin: "com.baidu.jprotobuf"
 
 ```
-备注：
-由于gradle buildscript是单独的classloader环境，如果遇到编译过程中出现类找不到，请直接在 buildscript的depencies 属性中增加classpath依赖.
 
 gradle 执行命令如下:<br>
 ```property
