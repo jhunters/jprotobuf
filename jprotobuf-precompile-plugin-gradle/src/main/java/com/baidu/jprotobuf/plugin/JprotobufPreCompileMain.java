@@ -47,7 +47,7 @@ public class JprotobufPreCompileMain {
     private static final String MULTI_PKG_SPLIT = ";";
 
     protected static List<File> classFiles;
-
+    
     /**
      * The main method.
      *
@@ -99,7 +99,6 @@ public class JprotobufPreCompileMain {
                 if (Enum.class.isAssignableFrom(c)) {
                     return;
                 }
-                
                 JdkCompiler jdkCompiler = new JdkCompiler(Protobuf.class.getClassLoader(), classFiles);
 
                 Annotation annotation = c.getAnnotation(ProtobufClass.class);

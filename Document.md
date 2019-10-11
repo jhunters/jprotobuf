@@ -90,24 +90,28 @@ mvn package
 
 #### gradle插件
 在build.gradle文件，设置内容如下：
+
 ```property
-apply plugin: 'jprotobuf_plugin'
 
+plugins {
+    id 'com.baidu.jprotobuf' version '1.0.2'
+}
+```
+或者使用以下方式
+
+```property
 buildscript {
-    repositories {
-        mavenCentral()
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
     }
-    dependencies {
-        classpath gradleApi()
-        classpath "com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.0" // include plugin
-        classpath "com.baidu:jprotobuf:2.2.14"  // include jprotobuf also supports 1.x 
-    }
+  }
+  dependencies {
+    classpath "gradle.plugin.com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.2"
+  }
 }
 
-jprotobuf_precompile {
-    filterClassPackage="com.mytest.pkg" // 设置要预编译过滤的包前缀，多个使用 ";"分隔
-    generateProtoFile="true" // 是否支持proto文件生成，默认是false，不生成
-}
+apply plugin: "com.baidu.jprotobuf"
 
 ```
 备注：

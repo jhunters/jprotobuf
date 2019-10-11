@@ -145,9 +145,12 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 
 #### gradle插件
 ```property
-classpath com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.0
-```
 
+plugins {
+    id 'com.baidu.jprotobuf' version '1.0.2'
+}
+```
+[查看版本信息](https://plugins.gradle.org/plugin/com.baidu.jprotobuf)
 
 ## Document
 

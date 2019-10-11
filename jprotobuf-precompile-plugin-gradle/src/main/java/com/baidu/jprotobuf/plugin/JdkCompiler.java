@@ -86,7 +86,7 @@ public class JdkCompiler extends AbstractCompiler {
      *
      * @param loader the loader
      */
-    public JdkCompiler(final ClassLoader loader,  List<File> classes) {
+    public JdkCompiler(final ClassLoader loader, List<File> classes) {
         this(loader, DEFAULT_JDK_VERSION, classes);
     }
 
@@ -96,7 +96,7 @@ public class JdkCompiler extends AbstractCompiler {
      * @param loader the loader
      * @param jdkVersion the jdk version
      */
-    public JdkCompiler(final ClassLoader loader, final String jdkVersion,  List<File> classes) {
+    public JdkCompiler(final ClassLoader loader, final String jdkVersion, List<File> classes) {
         options = new ArrayList<String>();
         options.add("-source");
         options.add(jdkVersion);
@@ -129,19 +129,19 @@ public class JdkCompiler extends AbstractCompiler {
                     }
 
                     files.add(new File(file));
-                    
+
                 }
-                
+
                 if (classes != null) {
                     files.addAll(classes);
                 }
-                
+
                 manager.setLocation(StandardLocation.CLASS_PATH, files);
             } catch (IOException e) {
                 throw new IllegalStateException(e.getMessage(), e);
             }
         }
-        
+
         classLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoaderImpl>() {
             public ClassLoaderImpl run() {
                 return new ClassLoaderImpl(loader);

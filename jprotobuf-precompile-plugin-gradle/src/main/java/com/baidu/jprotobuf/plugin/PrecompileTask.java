@@ -4,6 +4,7 @@
 package com.baidu.jprotobuf.plugin;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -13,10 +14,16 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.Task;
 import org.gradle.api.internal.project.ProjectInternal;
+import org.gradle.api.internal.tasks.compile.DefaultJavaCompileSpec;
+import org.gradle.api.internal.tasks.compile.JavaCompilerArgumentsBuilder;
+import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.TaskAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
  * The Class PrecompileTask.
@@ -136,13 +143,34 @@ public class PrecompileTask extends DefaultTask {
         LOGGER.info("outputDirectory=" + outputDirectory);
         LOGGER.info("filterClassPackage=" + filterClassPackage);
         LOGGER.info("generateProtoFile=" + generateProtoFile);
+        
+        Task javaCompiletask = project.getTasks().getByName(JavaPlugin.COMPILE_JAVA_TASK_NAME);
+        // get create spec method
+        Method createSpecMethod = ReflectionUtils.findMethod(javaCompiletask.getClass(), "createSpec");
+        final List<URL> list = new ArrayList<URL>();
+        List<File> classFiles = new ArrayList<File>();
+        if (createSpecMethod != null) {
+            createSpecMethod.setAccessible(true);
+            Object ret = ReflectionUtils.invokeMethod(createSpecMethod, javaCompiletask);
+            DefaultJavaCompileSpec spec = (DefaultJavaCompileSpec) ret;
+            
+            List<File> compileClasspath = spec.getCompileClasspath();
+            classFiles.addAll(compileClasspath);
+            compileClasspath.forEach(path -> {
+                try {
+                    list.add(path.toURI().toURL());
+                } catch (MalformedURLException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            });
+        }
+        
 
         String classesPath = outputParentDirectory + File.separator + PrecompilePlugin.CLASSES_PATH;
         mkdirs(classesPath);
         String libsPath = outputParentDirectory + File.separator + PrecompilePlugin.LIBS_PATH;
         mkdirs(libsPath);
 
-        final List<URL> list = new ArrayList<URL>();
         File classPath = new File(classesPath);
         try {
             list.add(classPath.toURI().toURL());
@@ -152,10 +180,9 @@ public class PrecompileTask extends DefaultTask {
         listURLFiles(libsPath, "jar", list);
         classes = list.toArray(new URL[list.size()]);
         
-        List<File> classFiles = new ArrayList<>();
         classFiles.add(classPath);
-
-        URLClassLoader urlClassLoader = new URLClassLoader(classes, project.getClassLoaderScope().getExportClassLoader());
+        
+        URLClassLoader urlClassLoader = new URLClassLoader(classes, Protobuf.class.getClassLoader());
         try {
             Thread.currentThread().setContextClassLoader(urlClassLoader);
             String[] arguments =
