@@ -48,9 +48,6 @@ import com.google.protobuf.Descriptors.Descriptor;
  */ 
 public class CodeGenerator extends AbstractCodeGenerator {
 
-    /** auto proxied suffix class name. */
-    public static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
-
     /** The Constant JAVA_CLASS_FILE_SUFFIX. */
     public static final String JAVA_CLASS_FILE_SUFFIX = ".class";
 

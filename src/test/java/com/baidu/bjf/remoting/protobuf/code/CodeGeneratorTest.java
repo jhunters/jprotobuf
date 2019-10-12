@@ -18,13 +18,10 @@ package com.baidu.bjf.remoting.protobuf.code;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 
 /**
- * The Class TemplateCodeGeneratorTest.
- *
- * @author xiemalin
- * @since 1.12.0
+ * The Class CodeGeneratorTest.
  */
-public class TemplateCodeGeneratorTest extends AbstractCodeGeneratorTest {
-
+public class CodeGeneratorTest extends AbstractCodeGeneratorTest {
+    
     /*
      * (non-Javadoc)
      * 
@@ -32,7 +29,7 @@ public class TemplateCodeGeneratorTest extends AbstractCodeGeneratorTest {
      */
     @Override
     protected ICodeGenerator getCodeGenerator() {
-        return new TemplateCodeGenerator(getTestClass());
+        return new CodeGenerator(getTestClass());
     }
 
     /*
@@ -43,5 +40,5 @@ public class TemplateCodeGeneratorTest extends AbstractCodeGeneratorTest {
     @Override
     protected Class getTestClass() {
         return PersonPOJO.class;
-    }
+    }    
 }

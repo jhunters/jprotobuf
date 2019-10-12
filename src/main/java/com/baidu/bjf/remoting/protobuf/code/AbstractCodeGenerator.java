@@ -44,6 +44,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
     /** The debug. */
     protected boolean debug = false;
     
+    /** auto proxied suffix class name. */
+    public static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
+    
     /** The output path. */
     protected File outputPath;
     
