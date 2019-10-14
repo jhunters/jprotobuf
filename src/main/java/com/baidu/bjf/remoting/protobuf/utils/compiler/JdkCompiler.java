@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +50,7 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,6 +127,7 @@ public class JdkCompiler extends AbstractCompiler {
                 List<File> files = new ArrayList<File>();
                 boolean isInternalJar = false;
                 String rootJar = null;
+                Set<String> fileNames = new HashSet<String>();
                 for (URL url : urlClassLoader.getURLs()) {
                     String file = url.getFile();
                     files.add(new File(file));
@@ -142,12 +145,14 @@ public class JdkCompiler extends AbstractCompiler {
                         rootJar = StringUtils.substringBefore(file, "!");
                         rootJar = StringUtils.removeStart(rootJar, "/");
                     }
-                    files.add(new File(file));
+                    File f = new File(file);
+                    fileNames.add(f.getName());
+                    files.add(f);
 
                 }
                 if (isInternalJar && rootJar != null) {
                     ZipUtils.unZip(new File(rootJar), TEMP_PATH);
-                    listFiles(TEMP_PATH, files);
+                    listFiles(TEMP_PATH, files, fileNames);
                     files.add(new File(TEMP_PATH, BOOT_INF_CLASSES));
                 }
 
@@ -560,8 +565,31 @@ public class JdkCompiler extends AbstractCompiler {
      * @param ext the ext
      * @param list the list
      */
-    private static void listFiles(String classesPath, final List<File> list) {
-        Collection listFiles = FileUtils.listFiles(new File(classesPath), new String[] { "jar" }, true);
+    private static void listFiles(String classesPath, final List<File> list,  final Set<String> filters) {
+        Collection listFiles = FileUtils.listFiles(new File(classesPath), new IOFileFilter() {
+            
+            @Override
+            public boolean accept(File dir, String name) {
+                return filters.contains(name);
+            }
+            
+            @Override
+            public boolean accept(File file) {
+                return filters.contains(file.getName());
+            }
+        }, new IOFileFilter() {
+            
+            @Override
+            public boolean accept(File dir, String name) {
+                return true;
+            }
+            
+            @Override
+            public boolean accept(File file) {
+                return true;
+            }
+        });
+        
         if (listFiles != null) {
             for (Object f : listFiles) {
                 try {
