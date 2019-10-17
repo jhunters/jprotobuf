@@ -15,7 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
-import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
+import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtosPOJO;
 
 /**
  * The Class TemplateCodeGeneratorTest.
@@ -42,6 +42,6 @@ public class TemplateCodeGeneratorTest extends AbstractCodeGeneratorTest {
      */
     @Override
     protected Class getTestClass() {
-        return PersonPOJO.class;
+        return AddressBookProtosPOJO.class;
     }
 }

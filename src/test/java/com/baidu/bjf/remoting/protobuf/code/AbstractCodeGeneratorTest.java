@@ -65,4 +65,5 @@ public abstract class AbstractCodeGeneratorTest {
         Assert.assertEquals(className, getTestClass().getSimpleName() + AbstractCodeGenerator.DEFAULT_SUFFIX_CLASSNAME);
     }
 
+
 }
