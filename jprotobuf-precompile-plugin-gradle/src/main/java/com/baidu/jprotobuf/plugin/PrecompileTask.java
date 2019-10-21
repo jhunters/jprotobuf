@@ -17,7 +17,6 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Task;
 import org.gradle.api.internal.project.ProjectInternal;
 import org.gradle.api.internal.tasks.compile.DefaultJavaCompileSpec;
-import org.gradle.api.internal.tasks.compile.JavaCompilerArgumentsBuilder;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.TaskAction;
 import org.slf4j.Logger;
@@ -192,14 +191,12 @@ public class PrecompileTask extends DefaultTask {
 
             LOGGER.info("execute jprotobuf precompile action finished.");
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.error(e.getMessage(), e);
         } finally {
             try {
                 urlClassLoader.close();
             } catch (Exception e) {
                 LOGGER.warn(e.getMessage());
-                e.printStackTrace();
             }
         }
 
