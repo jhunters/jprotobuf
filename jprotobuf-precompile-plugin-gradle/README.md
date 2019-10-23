@@ -26,6 +26,21 @@ buildscript {
 apply plugin: "com.baidu.jprotobuf"
 ```
 
+参数设置
+
+```property
+jprotobuf_precompile {
+    filterClassPackage="com.mytest.pkg"  // 设置要预编译的包前缀，多个用 ";"分隔
+    generateProtoFile="false" // 设置是否怎么生成proto描述文件, 默认是false, 不生成
+}
+```
+
+使用命令示例
+
+```property
+gradle compileJava jprotobuf_precompile build
+```
+
 [查看版本信息](https://plugins.gradle.org/plugin/com.baidu.jprotobuf)
 
 ## Document
