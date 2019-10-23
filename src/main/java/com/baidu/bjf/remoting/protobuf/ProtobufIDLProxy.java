@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
+import com.baidu.bjf.remoting.protobuf.utils.JavaStyleFormatter;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.squareup.protoparser.EnumType;
 import com.squareup.protoparser.EnumType.Value;
@@ -61,6 +62,18 @@ public class ProtobufIDLProxy {
     /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufIDLProxy.class.getCanonicalName());
 
+    /** The Constant formatJavaField. */
+    private static boolean formatJavaField = false;
+    
+    /**
+     * Sets the Constant formatJavaField.
+     *
+     * @param needFormatJavaField the new Constant formatJavaField
+     */
+    public static void setFormatJavaField(boolean needFormatJavaField) {
+        formatJavaField = needFormatJavaField;
+    }
+    
     /**
      * google Protobuf IDL message dependency result.
      *
@@ -742,8 +755,14 @@ public class ProtobufIDLProxy {
             }
 
             // define field
+            String fieldName = field.getName();
+            // format java style
+            if (formatJavaField) {
+                fieldName = JavaStyleFormatter.formatJavaFieldName(fieldName);
+            }
+            
             code.append("public ").append(javaType);
-            code.append(" ").append(field.getName());
+            code.append(" ").append(fieldName);
 
             // check if has default
             Option defaultOption = Option.findByName(field.getOptions(), "default");

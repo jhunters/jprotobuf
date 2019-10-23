@@ -51,7 +51,7 @@ public class Main {
             System.out.println("proto file not found at " + protoPath.getAbsolutePath());
             System.exit(-1);
         }
-        
+        ProtobufIDLProxy.setFormatJavaField(true);
         try {
             ProtobufIDLProxy.generateSource(protoPath, javaOutPath);
             System.out.println("create success. output path=" + javaOutPath.getAbsolutePath());

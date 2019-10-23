@@ -23,7 +23,7 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 public class Main {
     
     private static final String JAVA_OUT_ARG = "--java_out=";
-
+    
     public static void main(String[] args) {
         // get current path
         File currentPath = new File(".");
@@ -51,7 +51,7 @@ public class Main {
             System.out.println("proto file not found at " + protoPath.getAbsolutePath());
             System.exit(-1);
         }
-        
+        ProtobufIDLProxy.setFormatJavaField(true);
         try {
             ProtobufIDLProxy.generateSource(protoPath, javaOutPath);
             System.out.println("create success. output path=" + javaOutPath.getAbsolutePath());

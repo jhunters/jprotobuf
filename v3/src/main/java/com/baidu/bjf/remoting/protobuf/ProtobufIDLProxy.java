@@ -24,6 +24,7 @@ import java.util.UUID;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
+import com.baidu.bjf.remoting.protobuf.utils.JavaStyleFormatter;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.baidu.jprotobuf.com.squareup.protoparser.DataType;
 import com.baidu.jprotobuf.com.squareup.protoparser.EnumConstantElement;
@@ -44,6 +45,18 @@ import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
  * @since 1.0.2
  */
 public class ProtobufIDLProxy {
+    
+    /** The Constant formatJavaField. */
+    private static boolean formatJavaField = false;
+    
+    /**
+     * Sets the Constant formatJavaField.
+     *
+     * @param needFormatJavaField the new Constant formatJavaField
+     */
+    public static void setFormatJavaField(boolean needFormatJavaField) {
+        formatJavaField = needFormatJavaField;
+    }
 
     /**
      * google Protobuf IDL message dependency result.
@@ -761,7 +774,14 @@ public class ProtobufIDLProxy {
 
             // define field
             code.append("public ").append(javaType);
-            code.append(" ").append(field.name());
+            
+            String fieldName = field.name();
+            // format java style
+            if (formatJavaField) {
+                fieldName = JavaStyleFormatter.formatJavaFieldName(fieldName);
+            }
+            
+            code.append(" ").append(fieldName);
 
             // check if has default
             OptionElement defaultOption = OptionElement.findByName(field.options(), "default");
