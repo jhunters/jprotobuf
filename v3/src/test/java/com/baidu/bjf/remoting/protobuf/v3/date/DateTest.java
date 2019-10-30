@@ -39,8 +39,9 @@ public class DateTest {
     public void testDateEncodeWithOrignalPBClass() {
 
         long secs = System.currentTimeMillis() / 1000;
+        int nanos = (int) (System.currentTimeMillis() % 1000) * 1000000;
 
-        Timestamp ts = Timestamp.newBuilder().setSeconds(secs).build();
+        Timestamp ts = Timestamp.newBuilder().setSeconds(secs).setNanos(nanos).build();
 
         Person person = Person.newBuilder().setTs(ts).build();
 
@@ -51,6 +52,7 @@ public class DateTest {
         DatePOJO datePojo = new DatePOJO();
         com.baidu.bjf.remoting.protobuf.Timestamp ts2 = new com.baidu.bjf.remoting.protobuf.Timestamp();
         ts2.setSeconds(secs);
+        ts2.setNanos(nanos);
         datePojo.setTimeStamp(ts2);
 
         Codec<DatePOJO> codec = ProtobufProxy.create(DatePOJO.class);
@@ -71,11 +73,13 @@ public class DateTest {
     @Test
     public void testTimeStamp() {
         long secs = System.currentTimeMillis() / 1000;
+        int nanos = (int) (System.currentTimeMillis() % 1000) * 1000000;
 
-        Timestamp ts = Timestamp.newBuilder().setSeconds(secs).build();
+        Timestamp ts = Timestamp.newBuilder().setSeconds(secs).setNanos(nanos).build();
 
         com.baidu.bjf.remoting.protobuf.Timestamp ts2 = new com.baidu.bjf.remoting.protobuf.Timestamp();
         ts2.setSeconds(secs);
+        ts2.setNanos(nanos);
 
         Codec<com.baidu.bjf.remoting.protobuf.Timestamp> codec =
                 ProtobufProxy.create(com.baidu.bjf.remoting.protobuf.Timestamp.class);
