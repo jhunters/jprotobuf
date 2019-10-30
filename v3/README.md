@@ -28,6 +28,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
 4. Map数据结构支持.  @Protobuf(fieldType = FieldType.MAP)
    <br>
 5. 完整支持V3针对 repeated primitive类型自动进行packed压缩处理. 如需要手工关闭该功能，需设置@Packed(false)
+6. 支持TimeStamp类型, 与原生protobuf保持一致
 
 
 #####关联项目：#####
@@ -205,6 +206,21 @@ public class Person {
 
 ```
 注：如同google protocol buffer v3规范要求，MAP结构的key，不允许为 float, double和Message对象。
+
+### TimeStamp类型使用 ###
+```java
+
+public class DateTypeTest {
+
+    @Protobuf(fieldType = FieldType.Object, order = 1)
+    private com.baidu.bjf.remoting.protobuf.Timestamp ts;
+}
+
+long secs = System.currentTimeMillis() / 1000;
+com.baidu.bjf.remoting.protobuf.Timestamp ts = new com.baidu.bjf.remoting.protobuf.Timestamp()
+ts.setSeconds(secs);
+```
+
 
 ### 由注解对象动态生成Protobuf的IDL描述文件内容 ###
 JProtobuf提供一个非常实用的功能，可以动态生成Protobuf的IDL描述文件内容
