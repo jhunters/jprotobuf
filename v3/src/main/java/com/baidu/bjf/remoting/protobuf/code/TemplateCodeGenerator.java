@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -483,6 +484,10 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                         .append(ClassCode.LINE_BREAK);
                 return ret.append(express).toString();
             }
+            // if date type
+            if (field.getType().equals(Date.class)) {
+                express =  "new Date(" + express + ")";
+            }
             return target + ClassHelper.PACKAGE_SEPARATOR + field.getName() + "=" + express + ClassCode.LINE_BREAK;
         }
         String setter = "set" + CodedConstant.capitalize(field.getName());
@@ -543,6 +548,11 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         // use reflection to get value
         String code = "";
         if (express != null) {
+            // if date type
+            if (field.getType().equals(Date.class)) {
+                express =  "new Date(" + express + ")";
+            }
+            
             code = "FieldUtils.setField(" + target + ", \"" + field.getName() + "\", " + express + ")"
                     + ClassCode.LINE_BREAK;
         }

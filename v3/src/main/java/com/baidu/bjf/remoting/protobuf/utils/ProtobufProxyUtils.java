@@ -18,6 +18,7 @@ package com.baidu.bjf.remoting.protobuf.utils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,6 +71,7 @@ public class ProtobufProxyUtils {
         TYPE_MAPPING.put(Double.class, FieldType.DOUBLE);
         TYPE_MAPPING.put(Boolean.class, FieldType.BOOL);
         TYPE_MAPPING.put(boolean.class, FieldType.BOOL);
+        TYPE_MAPPING.put(Date.class, FieldType.DATE);
     }
 
     /**

@@ -186,6 +186,7 @@ public class ProtobufIDLProxy {
         fieldTypeMapping.put("sint64", "FieldType.SINT64");
         fieldTypeMapping.put("sint32", "FieldType.SINT32");
         fieldTypeMapping.put("enum", "FieldType.ENUM");
+        fieldTypeMapping.put("map", "FieldType.MAP");
     }
 
     /** auto proxied suffix class name. */

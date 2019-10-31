@@ -112,7 +112,7 @@ public class SimpleTypeTest {
     
     @Protobuf(fieldType = FieldType.INT32, order = 2, required = false)
     private int value;
-
+    
     public int getValue() {
         return value;
     }
@@ -214,6 +214,10 @@ public class DateTypeTest {
 
     @Protobuf(fieldType = FieldType.Object, order = 1)
     private com.baidu.bjf.remoting.protobuf.Timestamp ts;
+    
+    // simple date 使用long类型自动传递
+    @Protobuf(fieldType = FieldType.DATE)
+    private Date date;
 }
 
 long secs = System.currentTimeMillis() / 1000;

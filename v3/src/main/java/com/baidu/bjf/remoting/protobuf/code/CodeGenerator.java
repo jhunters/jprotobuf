@@ -19,10 +19,10 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -857,6 +857,10 @@ public class CodeGenerator implements ICodeGenerator {
         // use reflection to get value
         String code = "";
         if (express != null) {
+            // if date type
+            if (field.getType().equals(Date.class)) {
+                express =  "new Date(" + express + ")";
+            }
             code = "FieldUtils.setField(" + target + ", \"" + field.getName() + "\", " + express + ")" + LINE_BREAK;
         }
         return code;
