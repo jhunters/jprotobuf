@@ -35,6 +35,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
 3. 提供从POJO对象的注解方式自动生成proto文件的功能， 方便proto描述文件的管理与维护<br>
 4. 提供预编译Maven插件，进一步提升运行性能
 5. 新增预编译gradle插件
+6. 2.x版本。 支持TimeStamp类型, 与原生protobuf保持一致。 支持Date类型，使用long类型传递 [docs](./v3/README.md)
 
 ## Which version
 1. jprotobuf-1.x supports google protocol buffer v2.5.x<br>

@@ -28,7 +28,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
 4. Map数据结构支持.  @Protobuf(fieldType = FieldType.MAP)
    <br>
 5. 完整支持V3针对 repeated primitive类型自动进行packed压缩处理. 如需要手工关闭该功能，需设置@Packed(false)
-6. 支持TimeStamp类型, 与原生protobuf保持一致
+6. 支持TimeStamp类型, 与原生protobuf保持一致。 支持Date类型，使用long类型传递
 
 
 #####关联项目：#####
