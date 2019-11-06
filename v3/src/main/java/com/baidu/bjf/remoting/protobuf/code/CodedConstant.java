@@ -756,9 +756,9 @@ public class CodedConstant {
             Codec target = ProtobufProxy.create(cls);
 
             if (withTag) {
-                out.writeRawVarint32(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
+                out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
             }
-            out.writeRawVarint32(target.size(o));
+            out.writeUInt32NoTag(target.size(o));
 
             target.writeTo(o, out);
             return;

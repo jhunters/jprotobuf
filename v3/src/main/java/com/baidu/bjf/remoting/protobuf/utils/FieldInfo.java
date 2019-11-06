@@ -18,7 +18,6 @@ package com.baidu.bjf.remoting.protobuf.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -32,13 +31,13 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
  */
 public class FieldInfo {
 
+    /** The field. */
     private Field field;
 
+    /** The required. */
     boolean required;
 
-    /**
-     * field description
-     */
+    /** field description. */
     private String description;
 
     /**
@@ -48,32 +47,75 @@ public class FieldInfo {
      */
     int order;
 
-    /**
-     * the type used for List or Map key generic type
-     */
+    /** the type used for List or Map key generic type. */
     private Class<?> genericKeyType;
 
-    /**
-     * the type used for Map value generic type
-     */
+    /** the type used for Map value generic type. */
     private Class<?> genericeValueType;
 
     /**
-     * field type
-     * 
+     * field type.
+     *
      * @return field type
      */
     FieldType fieldType;
 
+    /** The is list. */
     private boolean isList;
+    
+    /** The is map. */
     private boolean isMap;
     
+    /** The packed. */
     private boolean packed;
+    
+    /** The use type. */
+    private boolean useType;
+    
+    /** The use as type. */
+    private Class useAsType;
+    
+    /**
+     * Sets the use as type.
+     *
+     * @param useAsType the new use as type
+     */
+    public void setUseAsType(Class useAsType) {
+        this.useAsType = useAsType;
+    }
+    
+    /**
+     * Gets the use as type.
+     *
+     * @return the use as type
+     */
+    public Class getUseAsType() {
+        return useAsType;
+    }
+    
+    /**
+     * Sets the use type.
+     *
+     * @param useType the new use type
+     */
+    public void setUseType(boolean useType) {
+        this.useType = useType;
+    }
+    
+    /**
+     * Checks if is use type.
+     *
+     * @return true, if is use type
+     */
+    public boolean isUseType() {
+        return useType;
+    }
+    
 
     /**
-     * To check if type of {@link Field} is assignable from {@link List}
-     * 
-     * @param field
+     * To check if type of {@link Field} is assignable from {@link List}.
+     *
+     * @param field the field
      * @return true if is assignable from {@link List}
      */
     private void checkListMapType(Field field) {
@@ -136,7 +178,9 @@ public class FieldInfo {
     }
 
     /**
-     * @param field
+     * Instantiates a new field info.
+     *
+     * @param field the field
      */
     public FieldInfo(Field field) {
         super();
@@ -145,8 +189,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the isList
-     * 
+     * get the isList.
+     *
      * @return the isList
      */
     public boolean isList() {
@@ -154,8 +198,8 @@ public class FieldInfo {
     }
 
     /**
-     * set isList value to isList
-     * 
+     * set isList value to isList.
+     *
      * @param isList the isList to set
      */
     public void setList(boolean isList) {
@@ -163,8 +207,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the isMap
-     * 
+     * get the isMap.
+     *
      * @return the isMap
      */
     public boolean isMap() {
@@ -172,8 +216,8 @@ public class FieldInfo {
     }
 
     /**
-     * set isMap value to isMap
-     * 
+     * set isMap value to isMap.
+     *
      * @param isMap the isMap to set
      */
     public void setMap(boolean isMap) {
@@ -181,8 +225,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the field
-     * 
+     * get the field.
+     *
      * @return the field
      */
     public Field getField() {
@@ -190,8 +234,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the required
-     * 
+     * get the required.
+     *
      * @return the required
      */
     public boolean isRequired() {
@@ -199,8 +243,8 @@ public class FieldInfo {
     }
 
     /**
-     * set required value to required
-     * 
+     * set required value to required.
+     *
      * @param required the required to set
      */
     public void setRequired(boolean required) {
@@ -208,8 +252,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the order
-     * 
+     * get the order.
+     *
      * @return the order
      */
     public int getOrder() {
@@ -217,8 +261,8 @@ public class FieldInfo {
     }
 
     /**
-     * set order value to order
-     * 
+     * set order value to order.
+     *
      * @param order the order to set
      */
     public void setOrder(int order) {
@@ -226,8 +270,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the fieldType
-     * 
+     * get the fieldType.
+     *
      * @return the fieldType
      */
     public FieldType getFieldType() {
@@ -235,8 +279,8 @@ public class FieldInfo {
     }
 
     /**
-     * set fieldType value to fieldType
-     * 
+     * set fieldType value to fieldType.
+     *
      * @param fieldType the fieldType to set
      */
     public void setFieldType(FieldType fieldType) {
@@ -244,8 +288,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the description
-     * 
+     * get the description.
+     *
      * @return the description
      */
     public String getDescription() {
@@ -253,14 +297,19 @@ public class FieldInfo {
     }
 
     /**
-     * set description value to description
-     * 
+     * set description value to description.
+     *
      * @param description the description to set
      */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Checks for description.
+     *
+     * @return true, if successful
+     */
     public boolean hasDescription() {
         if (description == null || description.trim().length() == 0) {
             return false;
@@ -269,8 +318,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the genericKeyType
-     * 
+     * get the genericKeyType.
+     *
      * @return the genericKeyType
      */
     public Class<?> getGenericKeyType() {
@@ -278,8 +327,8 @@ public class FieldInfo {
     }
 
     /**
-     * set genericKeyType value to genericKeyType
-     * 
+     * set genericKeyType value to genericKeyType.
+     *
      * @param genericKeyType the genericKeyType to set
      */
     public void setGenericKeyType(Class<?> genericKeyType) {
@@ -287,8 +336,8 @@ public class FieldInfo {
     }
 
     /**
-     * get the genericeValueType
-     * 
+     * get the genericeValueType.
+     *
      * @return the genericeValueType
      */
     public Class<?> getGenericeValueType() {
@@ -296,8 +345,8 @@ public class FieldInfo {
     }
 
     /**
-     * set genericeValueType value to genericeValueType
-     * 
+     * set genericeValueType value to genericeValueType.
+     *
      * @param genericeValueType the genericeValueType to set
      */
     public void setGenericeValueType(Class<?> genericeValueType) {
@@ -305,6 +354,8 @@ public class FieldInfo {
     }
 
     /**
+     * Checks if is packed.
+     *
      * @return the packed
      */
     public boolean isPacked() {
@@ -312,12 +363,28 @@ public class FieldInfo {
     }
 
     /**
+     * Sets the packed.
+     *
      * @param packed the packed to set
      */
     public void setPacked(boolean packed) {
         this.packed = packed;
     }
+    
+    /**
+     * Checks if is object type.
+     *
+     * @return true, if is object type
+     */
+    public boolean isObjectType() {
+        return fieldType == FieldType.OBJECT;
+    }
 
+    /**
+     * Checks if is enum value type.
+     *
+     * @return true, if is enum value type
+     */
     public boolean isEnumValueType() {
         if (genericeValueType != null) {
             return Enum.class.isAssignableFrom(genericeValueType);

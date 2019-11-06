@@ -233,6 +233,7 @@ public class ProtobufProxyUtils {
                     fieldInfo.setPacked(packed.value());
                 }
             }
+            
 
             ret.add(fieldInfo);
         }

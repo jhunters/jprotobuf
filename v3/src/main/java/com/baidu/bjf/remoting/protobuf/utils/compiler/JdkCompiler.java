@@ -55,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
+import com.baidu.bjf.remoting.protobuf.utils.OS;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.baidu.bjf.remoting.protobuf.utils.ZipUtils;
 
@@ -129,6 +130,7 @@ public class JdkCompiler extends AbstractCompiler {
                 String rootJar = null;
                 Set<String> fileNames = new HashSet<String>();
                 for (URL url : urlClassLoader.getURLs()) {
+                    
                     String file = url.getFile();
                     files.add(new File(file));
                     if (StringUtils.endsWith(file, "!/")) {
@@ -143,7 +145,9 @@ public class JdkCompiler extends AbstractCompiler {
                         // file:/D:/develop/a.jar!/BOOT-INF/lib/spring-boot-starter-1.5.14.RELEASE.jar
                         isInternalJar = true;
                         rootJar = StringUtils.substringBefore(file, "!");
-                        rootJar = StringUtils.removeStart(rootJar, "/");
+                        if (OS.isFamilyWindows() || OS.isFamilyWin9x()) {
+                            rootJar = StringUtils.removeStart(rootJar, "/");
+                        }
                     }
                     File f = new File(file);
                     fileNames.add(f.getName());

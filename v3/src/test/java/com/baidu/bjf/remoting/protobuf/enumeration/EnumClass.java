@@ -395,7 +395,7 @@ public final class EnumClass {
       public com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumClassInternal build() {
         com.baidu.bjf.remoting.protobuf.enumeration.EnumClass.EnumClassInternal result = buildPartial();
         if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
+          //throw newUninitializedMessageException(result);
         }
         return result;
       }

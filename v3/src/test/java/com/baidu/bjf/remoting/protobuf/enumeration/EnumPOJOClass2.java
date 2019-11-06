@@ -38,4 +38,11 @@ public class EnumPOJOClass2 {
     }
     
     
+    
+    public static void main(String[] args) {
+        
+        
+        
+        
+    }
 }
