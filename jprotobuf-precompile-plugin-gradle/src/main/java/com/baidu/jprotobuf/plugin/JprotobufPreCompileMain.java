@@ -63,11 +63,11 @@ public class JprotobufPreCompileMain {
         final File outputTempPath =
                 new File(args[0] + File.separator + "temp" + File.separator + PrecompilePlugin.CLASSES_PATH);
 
-        // try {
-        // FileUtils.deleteDirectory(outputPath);
-        // } catch (Exception e) {
-        // // dummy exception
-        // }
+        try {
+            FileUtils.deleteDirectory(outputTempPath);
+        } catch (Exception e) {
+            // dummy exception
+        }
         outputPath.mkdirs();
 
         // JDKCompilerHelper.setCompiler(new JdkCompiler(classLoader));

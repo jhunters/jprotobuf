@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.baidu.jprotobuf</groupId>
 	<artifactId>jprotobuf-precompile-plugin-gradle</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.5</version>
 	<name>jprotobuf-precompile-plugin-gradle</name>
 	<description>jprotobuf-precompile-plugin-gradle</description>
 
