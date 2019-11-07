@@ -61,7 +61,7 @@ public class EnumClassTest {
         
         // process default
         decode = codec.decode(new byte[0]);
-        Assert.assertEquals(null, decode.enumAttr);
+        Assert.assertEquals(decode.enumAttr.STRING, decode.enumAttr);
     }
     
     /**
