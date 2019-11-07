@@ -1,3 +1,18 @@
+/*
+ * Copyright 2002-2007 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.baidu.bjf.remoting.protobuf;
 /*
  * Copyright 2002-2007 the original author or authors.
@@ -244,14 +259,20 @@ public final class ProtobufProxy {
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
-        // to check cache early
         String uniClsName = cls.getName();
+        // to check cache early
         if (isCacheEnabled()) {
-            Codec codec = CACHED.get(uniClsName);
+            Codec<T> codec = CACHED.get(uniClsName);
             if (codec != null) {
                 return codec;
             }
         }
+        String className = ClassHelper.getClassName(cls) + ICodeGenerator.DEFAULT_SUFFIX_CLASSNAME;
+        Codec<T> codec = loadCompiledClass(uniClsName, className);
+        if (codec != null) {
+            return codec;
+        }
+        
         return create(cls, debug, path, null, getCodeGenerator(cls));
     }
 
@@ -325,30 +346,9 @@ public final class ProtobufProxy {
 
         // try to load first
         String className = cg.getFullClassName();
-        Class<?> c = null;
-        try {
-            c = Class.forName(className, true, getClassLoader());
-        } catch (ClassNotFoundException e1) {
-            try {
-                c = Class.forName(className, true, ProtobufProxy.class.getClassLoader());
-            } catch (ClassNotFoundException e2) {
-                // if class not found so should generate a new java source class.
-                c = null;
-            }
-        }
-
-        if (c != null) {
-            try {
-                Codec<T> newInstance = (Codec<T>) c.newInstance();
-                if (!CACHED.containsKey(uniClsName)) {
-                    CACHED.put(uniClsName, newInstance);
-                }
-                return newInstance;
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+        Codec<T> codec = loadCompiledClass(uniClsName, className);
+        if (codec != null) {
+            return codec;
         }
 
         String code = cg.getCode();
@@ -424,6 +424,44 @@ public final class ProtobufProxy {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    /**
+     * Load compiled class.
+     *
+     * @param <T> the generic type
+     * @param uniClsName the uni cls name
+     * @param className the class name
+     * @return the codec
+     */
+    private static <T> Codec<T> loadCompiledClass(String uniClsName, String className) {
+        Class<?> c = null;
+        try {
+            c = Class.forName(className, true, getClassLoader());
+        } catch (ClassNotFoundException e1) {
+            try {
+                c = Class.forName(className, true, ProtobufProxy.class.getClassLoader());
+            } catch (ClassNotFoundException e2) {
+                // if class not found so should generate a new java source class.
+                c = null;
+            }
+        }
+
+        if (c != null) {
+            try {
+                Codec<T> newInstance = (Codec<T>) c.newInstance();
+                if (!CACHED.containsKey(uniClsName)) {
+                    CACHED.put(uniClsName, newInstance);
+                }
+                return newInstance;
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+        
+        return null;
     }
 
     /**

@@ -57,9 +57,6 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
     /** The templator. */
     private MiniTemplator templator;
 
-    /** auto proxied suffix class name. */
-    public static final String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
-
     /**
      * Instantiates a new template code generator.
      *

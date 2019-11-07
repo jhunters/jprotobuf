@@ -48,7 +48,7 @@ public class EnumClassTest {
         
         // process default
         decode = codec.decode(new byte[0]);
-        Assert.assertEquals(null, decode.enumAttr);
+        Assert.assertEquals(EnumAttrPOJO.STRING, decode.enumAttr);
     }
 
     /**
@@ -68,7 +68,7 @@ public class EnumClassTest {
         Assert.assertNull(decode.enumAttr);
         
         EnumClassInternal build = EnumClassInternal.newBuilder().build();
-        Assert.assertNull(build.getStatus());
+        Assert.assertNotNull(build.getStatus());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class EnumClassTest {
         EnumPOJOClass enumPOJOClass2 = codec.decode(bs);
         
         
-        Assert.assertNull(enumPOJOClass2.enumAttr);
+        Assert.assertNotNull(enumPOJOClass2.enumAttr);
     }
 
     @Test
