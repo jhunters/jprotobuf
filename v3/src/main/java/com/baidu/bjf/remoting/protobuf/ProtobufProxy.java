@@ -267,13 +267,29 @@ public final class ProtobufProxy {
                 return codec;
             }
         }
-        String className = ClassHelper.getClassName(cls) + ICodeGenerator.DEFAULT_SUFFIX_CLASSNAME;
+        String className = getFullClassName(cls);
         Codec<T> codec = loadCompiledClass(uniClsName, className);
         if (codec != null) {
             return codec;
         }
         
         return create(cls, debug, path, null, getCodeGenerator(cls));
+    }
+    
+    /**
+     * Gets the full class name.
+     *
+     * @param cls the cls
+     * @return the full class name
+     */
+    public static String getFullClassName(Class cls) {
+        String pkg = ClassHelper.getPackage(cls);
+        String className = ClassHelper.getClassName(cls) + ICodeGenerator.DEFAULT_SUFFIX_CLASSNAME;
+        if (StringUtils.isEmpty(pkg)) {
+            return className;
+        }
+
+        return pkg + ClassHelper.PACKAGE_SEPARATOR + className;
     }
 
     /**

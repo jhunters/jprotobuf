@@ -101,6 +101,44 @@ public class ComplextListIncludeTest {
 
     }
     
+    
+    /**
+     * test encode and decode with JProtobuf and Protobuf java.
+     */
+    @Test
+    public void testEncode() {
+
+        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, false);
+
+        // jprotobuf -> protobuf
+        AddressBookProtosPOJO pojo = new AddressBookProtosPOJO();
+
+        PersonPOJO person = new PersonPOJO();
+        person.name = "xiemalin";
+        person.id = 100;
+        person.boolF = true;
+        person.bytesF = new byte[] { 1, 2 };
+        person.email = "xiemalin@baidu.com";
+
+        List<PersonPOJO> list = new ArrayList<PersonPOJO>();
+        list.add(person);
+        list.add(person);
+        pojo.setList(list);
+        
+        pojo.typeList = new ArrayList<TypeDefEnum>();
+        pojo.typeList.add(TypeDefEnum.DECIMAL);
+        pojo.typeList.add(TypeDefEnum.URL);
+
+        byte[] bb = null;
+        try {
+            bb = codec.encode(pojo);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+    }
+    
+    
     /**
      * Test empty list case.
      */

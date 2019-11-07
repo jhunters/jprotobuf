@@ -419,6 +419,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         imports.add("com.baidu.bjf.remoting.protobuf.utils.*");
         imports.add("com.baidu.bjf.remoting.protobuf.*");
         imports.add("com.google.protobuf.*");
+        imports.add("org.apache.commons.collections.map.LRUMap");
 
         if (!StringUtils.isEmpty(getPackage())) {
             imports.add(getTargetProxyClassname());

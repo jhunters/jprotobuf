@@ -252,7 +252,30 @@ public final class ProtobufProxy {
                 return codec;
             }
         }
+        
+        String className = getFullClassName(cls);
+        Codec<T> codec = loadCompiledClass(uniClsName, className);
+        if (codec != null) {
+            return codec;
+        }
+        
         return create(cls, debug, path, null, getCodeGenerator(cls));
+    }
+    
+    /**
+     * Gets the full class name.
+     *
+     * @param cls the cls
+     * @return the full class name
+     */
+    public static String getFullClassName(Class cls) {
+        String pkg = ClassHelper.getPackage(cls);
+        String className = ClassHelper.getClassName(cls) + ICodeGenerator.DEFAULT_SUFFIX_CLASSNAME;
+        if (StringUtils.isEmpty(pkg)) {
+            return className;
+        }
+
+        return pkg + ClassHelper.PACKAGE_SEPARATOR + className;
     }
 
     /**
@@ -325,30 +348,9 @@ public final class ProtobufProxy {
 
         // try to load first
         String className = cg.getFullClassName();
-        Class<?> c = null;
-        try {
-            c = Class.forName(className, true, getClassLoader());
-        } catch (ClassNotFoundException e1) {
-            try {
-                c = Class.forName(className, true, ProtobufProxy.class.getClassLoader());
-            } catch (ClassNotFoundException e2) {
-                // if class not found so should generate a new java source class.
-                c = null;
-            }
-        }
-
-        if (c != null) {
-            try {
-                Codec<T> newInstance = (Codec<T>) c.newInstance();
-                if (!CACHED.containsKey(uniClsName)) {
-                    CACHED.put(uniClsName, newInstance);
-                }
-                return newInstance;
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+        Codec<T> codec = loadCompiledClass(uniClsName, className);
+        if (codec != null) {
+            return codec;
         }
 
         String code = cg.getCode();
@@ -425,6 +427,44 @@ public final class ProtobufProxy {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+    
+    /**
+     * Load compiled class.
+     *
+     * @param <T> the generic type
+     * @param uniClsName the uni cls name
+     * @param className the class name
+     * @return the codec
+     */
+    private static <T> Codec<T> loadCompiledClass(String uniClsName, String className) {
+        Class<?> c = null;
+        try {
+            c = Class.forName(className, true, getClassLoader());
+        } catch (ClassNotFoundException e1) {
+            try {
+                c = Class.forName(className, true, ProtobufProxy.class.getClassLoader());
+            } catch (ClassNotFoundException e2) {
+                // if class not found so should generate a new java source class.
+                c = null;
+            }
+        }
+
+        if (c != null) {
+            try {
+                Codec<T> newInstance = (Codec<T>) c.newInstance();
+                if (!CACHED.containsKey(uniClsName)) {
+                    CACHED.put(uniClsName, newInstance);
+                }
+                return newInstance;
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+        
+        return null;
     }
 
     /**
