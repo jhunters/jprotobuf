@@ -7,7 +7,6 @@ import ${importPackage};
 
 public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
     private ${descriptorClsName} descriptor;
-    private LRUMap lruMap = new LRUMap(1000);
 
     public byte[] encode(${targetProxyClassName} t) throws IOException {
         int size = size(t);
@@ -23,10 +22,6 @@ public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
     }
 
     public int size(${targetProxyClassName} t) throws IOException {
-        Object object = lruMap.get(t.hashCode());
-        if (object != null) {
-            return Integer.valueOf(object.toString());
-        }
         int size = 0;
         <!-- $BeginBlock encodeFields -->
         ${encodeFieldType} ${encodeFieldName} = null;
@@ -36,7 +31,6 @@ public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
         }
         ${checkNull}
         <!-- $EndBlock encodeFields -->
-        lruMap.put(t.hashCode(), size);
         return size;
     }
  
