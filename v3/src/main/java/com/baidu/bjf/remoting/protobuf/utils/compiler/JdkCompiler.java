@@ -183,7 +183,6 @@ public class JdkCompiler extends AbstractCompiler {
      */
     @Override
     public synchronized Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
-
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Begin to compile source code: class is '{}'", name);
         }

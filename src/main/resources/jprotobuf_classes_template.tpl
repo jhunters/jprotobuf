@@ -1,6 +1,6 @@
 ${package}
 
-
+import java.io.ByteArrayOutputStream;
 <!-- $BeginBlock imports -->
 import ${importPackage};
 <!-- $EndBlock imports -->
@@ -9,11 +9,11 @@ public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
     private ${descriptorClsName} descriptor;
 
     public byte[] encode(${targetProxyClassName} t) throws IOException {
-        int size = size(t);
-        final byte[] result = new byte[size];
-        final CodedOutputStream output = CodedOutputStream.newInstance(result);
-        doWriteTo(t, output);
-        return result;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CodedOutputStream newInstance = CodedOutputStream.newInstance(baos);
+        doWriteTo(t, newInstance);
+        newInstance.flush();
+        return baos.toByteArray();
     }
 
     public ${targetProxyClassName} decode(byte[] bb) throws IOException {
@@ -47,9 +47,7 @@ public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
  
     public void writeTo(${targetProxyClassName} t, CodedOutputStream output)
             throws IOException {
-        byte[] bytes = encode(t);
-		output.writeRawBytes(bytes);
-        output.flush();
+        doWriteTo(t, output);
     }
  
     public ${targetProxyClassName} readFrom(CodedInputStream input) throws IOException {

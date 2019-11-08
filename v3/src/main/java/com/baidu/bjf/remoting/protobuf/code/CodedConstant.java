@@ -92,9 +92,6 @@ public class CodedConstant {
     private static final String WIREFORMAT_CLSNAME =
             ClassHelper.getInternalName(com.google.protobuf.WireFormat.FieldType.class.getCanonicalName());
 
-    /** The descriptor codec. */
-    private static Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class);
-
     /**
      * get field name.
      *
@@ -1366,7 +1363,6 @@ public class CodedConstant {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public static Descriptor getDescriptor(Class<?> cls) throws IOException {
-
         String idl = ProtobufIDLGenerator.getIDL(cls);
         ProtoFile file = ProtoParser.parse(ProtobufIDLProxy.DEFAULT_FILE_NAME, idl);
 
@@ -1410,6 +1406,8 @@ public class CodedConstant {
 
         FileDescriptorProto fileproto;
         try {
+            Codec<FileDescriptorProtoPOJO> descriptorCodec = ProtobufProxy.create(FileDescriptorProtoPOJO.class,
+                    ProtobufProxy.isCacheEnabled(), ProtobufProxy.OUTPUT_PATH.get());
             byte[] bs = descriptorCodec.encode(fileDescriptorProto);
             fileproto = FileDescriptorProto.parseFrom(bs);
         } catch (InvalidProtocolBufferException e) {
