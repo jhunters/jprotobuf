@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -699,19 +700,25 @@ public class CodedConstant {
         if (list == null || list.isEmpty()) {
             return;
         }
-
-        if (packed) {
-            out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
-            out.writeUInt32NoTag(computeListSize(order, list, type, false, null, packed, true)); 
-        }
-
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CodedOutputStream newInstance = CodedOutputStream.newInstance(baos, 0);
         for (Object object : list) {
             if (object == null) {
                 throw new NullPointerException("List can not include Null value.");
             }
-            writeObject(out, order, type, object, true, !packed);
-
+            writeObject(newInstance, order, type, object, true, !packed);
         }
+        newInstance.flush();
+        byte[] byteArray = baos.toByteArray();
+        
+
+        if (packed) {
+            out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
+            out.writeUInt32NoTag(byteArray.length); 
+        }
+
+        out.write(byteArray, 0, byteArray.length);
 
     }
 
@@ -755,9 +762,15 @@ public class CodedConstant {
             if (withTag) {
                 out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
             }
-            out.writeUInt32NoTag(target.size(o));
-
-            target.writeTo(o, out);
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            CodedOutputStream newInstance = CodedOutputStream.newInstance(baos, 0);
+            target.writeTo(o, newInstance);
+            newInstance.flush();
+            byte[] byteArray = baos.toByteArray();
+            out.writeUInt32NoTag(byteArray.length);
+            out.write(byteArray, 0, byteArray.length);
+            
             return;
         }
 

@@ -36,7 +36,7 @@ public class SimpleDatePOJOTest {
     /** The test simple date. */
     @Test
     public void testSimpleDate() {
-        Codec<SimpleDatePOJO> create = ProtobufProxy.create(SimpleDatePOJO.class, true);
+        Codec<SimpleDatePOJO> create = ProtobufProxy.create(SimpleDatePOJO.class, false);
         
         SimpleDatePOJO pojo = new SimpleDatePOJO();
         pojo.date = new Date();

@@ -147,7 +147,7 @@ public class ComplextListIncludeTest {
         ListWithNull listWithNull = new ListWithNull();
         listWithNull.list = new ArrayList();
         
-        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class, true);
+        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class, false);
         try {
             
             byte[] encode = codec.encode(listWithNull);
