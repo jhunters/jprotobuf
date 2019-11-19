@@ -59,6 +59,7 @@ public class PersonJProtoBufProtoClass {
 #### maven插件
 Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf注解标识的对象都会进行预编译操作，并生成相应的class文件到目标jar或war中， 使用示例如下：
 1.2.15和2.0.11版本之后增加 generateProtoFile属性，设置true可开启proto文件生成.
+1.3.1和2.1.2版本之后，增加了 compileDependencies属性，默认为true, 可以针对依赖的类进行编译，即使依赖类不在filterClassPackage的范围内.
 ```xml
 	<plugin>
 		<groupId>com.baidu</groupId>
@@ -68,6 +69,7 @@ Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf
 			<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 			<filterClassPackage>com.baidu</filterClassPackage>
 			<generateProtoFile>true</generateProtoFile>
+			<compileDependencies>true</compileDependencies>
 		</configuration>
 		<executions>
 			<execution>
