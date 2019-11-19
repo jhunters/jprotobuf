@@ -224,5 +224,14 @@ public enum FieldType {
         
         return false;
     }
+    
+    /**
+     * Checks if is enum.
+     *
+     * @return true, if is enum
+     */
+    public boolean isEnum() {
+        return this == ENUM;
+    }
 
 }

@@ -18,6 +18,7 @@ package com.baidu.bjf.remoting.protobuf.idlproxy.map;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,6 +60,23 @@ public class MapTypeIDLProxyTest {
         SimpleMapPOJO simpleMapPOJO = codec.decode(bytes);
         Assert.assertEquals("hello", simpleMapPOJO.name);
         Assert.assertEquals(1, simpleMapPOJO.getStringMap().size());
+    }
+    
+    @Test
+    public void testSimpleMap2() throws IOException {
+        Codec<SimpleMapPOJO> codec = ProtobufProxy.create(SimpleMapPOJO.class);
+        
+        SimpleMapPOJO pojo = new SimpleMapPOJO();
+        Map<String, byte[]> bytesMap = new HashMap<String, byte[]>();
+        bytesMap.put("hello", "world".getBytes());
+        pojo.setBytesMap(bytesMap);
+        
+        byte[] arrayBytes = codec.encode(pojo);
+
+
+        SimpleMapPOJO simpleMapPOJO = codec.decode(arrayBytes);
+        Assert.assertEquals(bytesMap.size(), simpleMapPOJO.getBytesMap().size());
+        
     }
     
     

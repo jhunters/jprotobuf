@@ -26,6 +26,9 @@ public class SimpleMapPOJO {
     @Protobuf(fieldType = FieldType.MAP)
     private Map<String, String> stringMap;
     
+    @Protobuf(fieldType = FieldType.MAP)
+    private Map<String, byte[]>  bytesMap;
+    
     /**
      * get the stringMap
      * @return the stringMap
@@ -40,6 +43,22 @@ public class SimpleMapPOJO {
      */
     public void setStringMap(Map<String, String> stringMap) {
         this.stringMap = stringMap;
+    }
+
+    /**
+     * getter method for property bytesMap
+     * @return the bytesMap
+     */
+    public Map<String, byte[]> getBytesMap() {
+        return bytesMap;
+    }
+
+    /**
+     * setter method for property bytesMap
+     * @param bytesMap the bytesMap to set
+     */
+    public void setBytesMap(Map<String, byte[]> bytesMap) {
+        this.bytesMap = bytesMap;
     }
 
     

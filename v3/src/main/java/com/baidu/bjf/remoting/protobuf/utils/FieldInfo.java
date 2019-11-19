@@ -391,4 +391,22 @@ public class FieldInfo {
         }
         return false;
     }
+    
+    /**
+     * Checks if is primitive type.
+     *
+     * @param c the c
+     * @return true, if is primitive type
+     */
+    public static boolean isPrimitiveType(Class c) {
+        if (c.isPrimitive()) {
+            return true;
+        }
+        
+        if (c.getName().equals(String.class.getName())) {
+            return true;
+        }
+        
+        return false;
+    }
 }

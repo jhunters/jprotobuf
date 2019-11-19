@@ -74,6 +74,11 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         }
     }
 
+    /**
+     * Gets the class name.
+     *
+     * @return the class name
+     */
     /*
      * (non-Javadoc)
      * 
@@ -84,6 +89,11 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         return ClassHelper.getClassName(cls) + DEFAULT_SUFFIX_CLASSNAME;
     }
 
+    /**
+     * Gets the code.
+     *
+     * @return the code
+     */
     /*
      * (non-Javadoc)
      * 
@@ -199,7 +209,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                 initListMapFields.append(getSetToField("ret", field.getField(), cls, e, false, false, false))
                         .append(ClassCode.JAVA_LINE_BREAK);
             }
-            
+
             if (field.getFieldType() == FieldType.ENUM) {
                 String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 if (!isList) {
@@ -256,6 +266,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             if (isList && field.getFieldType() == FieldType.OBJECT) {
                 if (field.getGenericKeyType() != null) {
                     Class cls = field.getGenericKeyType();
+
+                    checkObjectType(field, cls);
 
                     String name = ClassHelper.getInternalName(cls.getCanonicalName()); // need
                     // to
@@ -316,6 +328,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                 // message
                 // type
                 Class cls = field.getField().getType();
+                checkObjectType(field, cls);
                 String name = ClassHelper.getInternalName(cls.getCanonicalName()); // need
                 // to
                 // parse
@@ -392,8 +405,24 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
     }
 
     /**
-     * @param field
-     * @return
+     * Check object type.
+     *
+     * @param field the field
+     * @param cls the cls
+     */
+    private void checkObjectType(FieldInfo field, Class cls) {
+        if (FieldInfo.isPrimitiveType(cls)) {
+            throw new RuntimeException("invalid generic type for List as Object type, current type is '"
+                    + cls.getName() + "'  on field name '" + field.getField().getDeclaringClass().getName()
+                    + "#" + field.getField().getName());
+        }
+    }
+
+    /**
+     * Gets the map command.
+     *
+     * @param field the field
+     * @return the map command
      */
     private String getMapCommand(FieldInfo field) {
         String keyGeneric;
@@ -442,13 +471,15 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
     /**
      * generate access {@link Field} value source code. support public field access, getter method access and reflection
      * access.
-     * 
-     * @param target
-     * @param field
-     * @param cls
-     * @param express
-     * @param isList
-     * @return
+     *
+     * @param target the target
+     * @param field the field
+     * @param cls the cls
+     * @param express the express
+     * @param isList the is list
+     * @param isMap the is map
+     * @param packed the packed
+     * @return the sets the to field
      */
     protected String getSetToField(String target, Field field, Class<?> cls, String express, boolean isList,
             boolean isMap, boolean packed) {
@@ -483,7 +514,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             }
             // if date type
             if (field.getType().equals(Date.class)) {
-                express =  "new Date(" + express + ")";
+                express = "new Date(" + express + ")";
             }
             return target + ClassHelper.PACKAGE_SEPARATOR + field.getName() + "=" + express + ClassCode.LINE_BREAK;
         }
@@ -547,9 +578,9 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         if (express != null) {
             // if date type
             if (field.getType().equals(Date.class)) {
-                express =  "new Date(" + express + ")";
+                express = "new Date(" + express + ")";
             }
-            
+
             code = "FieldUtils.setField(" + target + ", \"" + field.getName() + "\", " + express + ")"
                     + ClassCode.LINE_BREAK;
         }

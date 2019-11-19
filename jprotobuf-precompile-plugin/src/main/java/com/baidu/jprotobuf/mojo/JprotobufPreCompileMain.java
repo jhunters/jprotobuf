@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
+import com.baidu.bjf.remoting.protobuf.code.TemplateCodeGenerator;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
@@ -47,7 +50,7 @@ public class JprotobufPreCompileMain {
      */
     public static void main(String[] args) {
 
-        if (args == null || args.length == 0 || args.length != 4) {
+        if (args == null || args.length == 0 || args.length != 5) {
             throw new RuntimeException(printUsage());
         }
 
@@ -69,7 +72,11 @@ public class JprotobufPreCompileMain {
 
         final String[] split = filterClassPackage.split(MULTI_PKG_SPLIT);
         
-        final boolean generateProtofile = Boolean .valueOf(args[3]);
+        final boolean generateProtofile = Boolean.valueOf(args[3]);
+        
+        final boolean compileDependencies = Boolean.valueOf(args[4]);
+        
+        final Set<Class> dependenciesClasses = new HashSet<Class>();
 
         ClassScanner scanner = new ClassScanner() {
 
@@ -97,6 +104,10 @@ public class JprotobufPreCompileMain {
                             if (generateProtofile) {
                                 createProtoFile(c, outputPath.getCanonicalPath());
                             }
+                            if (compileDependencies) {
+                                TemplateCodeGenerator tcg = new TemplateCodeGenerator(c);
+                                tcg.getAllDependenciesClasses(dependenciesClasses);
+                            }
                     } catch (Throwable e) {
                         throw new Exception(e.getMessage(), e);
                     }
@@ -111,6 +122,10 @@ public class JprotobufPreCompileMain {
                         if (generateProtofile) {
                             createProtoFile(c, outputPath.getCanonicalPath());
                         }
+                        if (compileDependencies) {
+                            TemplateCodeGenerator tcg = new TemplateCodeGenerator(c);
+                            tcg.getAllDependenciesClasses(dependenciesClasses);
+                        }
                     }
                 } catch (Throwable e) {
                     throw new Exception(e.getMessage(), e);
@@ -119,6 +134,21 @@ public class JprotobufPreCompileMain {
         };
 
         scanner.scanDefaultClasspath();
+        
+        if (compileDependencies) {
+            // compile dependencies classes
+            for (Class cls : dependenciesClasses) {
+                try {
+                    ProtobufProxy.create(cls, false, outputPath);
+                    if (generateProtofile) {
+                        createProtoFile(cls, outputPath.getCanonicalPath());
+                    }
+                } catch (Exception e) {
+                    // dummy exception
+                }
+            }
+        }
+
 
         // copy files
         try {

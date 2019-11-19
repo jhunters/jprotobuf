@@ -22,4 +22,5 @@ public class AddressBookProtosPOJO {
 
     @Protobuf(fieldType = FieldType.STRING, order=2, required = false)
     public String name;
+    
 }

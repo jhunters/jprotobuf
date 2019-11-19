@@ -15,9 +15,14 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
+import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtosPOJO;
+import com.baidu.bjf.remoting.protobuf.v3.complexmap.ComplexMapPOJO;
 
 import junit.framework.Assert;
 
@@ -30,12 +35,43 @@ import junit.framework.Assert;
 public class TemplateCodeGeneratorTest {
 
     
+    /**
+     * Test code generate.
+     */
     @Test
     public void testCodeGenerate() {
         
         TemplateCodeGenerator generator = new TemplateCodeGenerator(PersonPOJO.class);
         
         Assert.assertNotNull(generator.getCode());
+        
+    }
+    
+    /**
+     * Test empty dependencies.
+     */
+    @Test
+    public void testEmptyDependencies() {
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(PersonPOJO.class);
+        Set<Class> dependenciesClasses = generator.getDependenciesClasses();
+        Assert.assertTrue(dependenciesClasses.isEmpty());
+    }
+    
+    @Test
+    public void testListPOJODependencies() {
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(AddressBookProtosPOJO.class);
+        Set<Class> dependenciesClasses = generator.getDependenciesClasses();
+        Assert.assertEquals(dependenciesClasses.size(), 2);
+    }
+    
+    
+    @Test
+    public void testMapAndSubClassDependencies() {
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(ComplexMapPOJO.class);
+        Set<Class> list = new HashSet<Class>();
+        generator.getAllDependenciesClasses(list);
+        System.out.println(list);
+        Assert.assertEquals(list.size(), 2);
         
     }
 }

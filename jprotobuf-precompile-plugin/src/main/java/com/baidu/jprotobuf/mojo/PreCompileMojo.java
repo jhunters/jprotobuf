@@ -256,6 +256,10 @@ public class PreCompileMojo
     /** The generate proto file. */
     @Parameter( required = false, property = "jprotobuf.generateProtoFile" )
     private String generateProtoFile = Boolean.FALSE.toString();
+    
+    /** The compile dependencies. */
+    @Parameter( required = false, property = "jprotobuf.compileDependencies" )
+    private String compileDependencies = Boolean.TRUE.toString();
 
     /**
      * Execute goal.
@@ -277,7 +281,7 @@ public class PreCompileMojo
         }
 
         arguments = new String[] {outputParentDirectory.getAbsolutePath(), outputDirectory.getAbsolutePath(), 
-                filterClassPackage, generateProtoFile};
+                filterClassPackage, generateProtoFile, compileDependencies};
 
         if ( getLog().isDebugEnabled() )
         {

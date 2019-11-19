@@ -255,6 +255,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             if (isList && field.getFieldType() == FieldType.OBJECT) {
                 if (field.getGenericKeyType() != null) {
                     Class cls = field.getGenericKeyType();
+                    
+                    checkObjectType(field, cls);
 
                     String name = ClassHelper.getInternalName(cls.getCanonicalName()); // need
                     // to
@@ -284,6 +286,9 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                 // message
                 // type
                 Class cls = field.getField().getType();
+                
+                checkObjectType(field, cls);
+                
                 String name = ClassHelper.getInternalName(cls.getCanonicalName()); // need
                 // to
                 // parse
@@ -332,6 +337,20 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             templator.setVariable("objectDecodeExpressSuffix", objectDecodeExpressSuffix);
             templator.setVariable("decodeFieldSetValue", decodeFieldSetValue);
             templator.addBlock("decodeFields");
+        }
+    }
+    
+    /**
+     * Check object type.
+     *
+     * @param field the field
+     * @param cls the cls
+     */
+    private void checkObjectType(FieldInfo field, Class cls) {
+        if (FieldInfo.isPrimitiveType(cls)) {
+            throw new RuntimeException("invalid generic type for List as Object type, current type is '"
+                    + cls.getName() + "'  on field name '" + field.getField().getDeclaringClass().getName()
+                    + "#" + field.getField().getName());
         }
     }
 

@@ -46,7 +46,7 @@ public class ComplexMapTest {
         byte[] bytes = person.toByteArray();
         System.out.println(Arrays.toString(bytes));
         
-        Codec<ComplexMapPOJO> complexMapPOJOCodec = ProtobufProxy.create(ComplexMapPOJO.class, false);
+        Codec<ComplexMapPOJO> complexMapPOJOCodec = ProtobufProxy.create(ComplexMapPOJO.class, true);
         
         try {
             ComplexMapPOJO decode = complexMapPOJOCodec.decode(bytes);

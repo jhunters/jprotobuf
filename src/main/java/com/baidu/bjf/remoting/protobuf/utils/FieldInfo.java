@@ -301,4 +301,30 @@ public class FieldInfo {
         this.genericeValueType = genericeValueType;
     }
 
+    /**
+     * Checks if is object type.
+     *
+     * @return true, if is object type
+     */
+    public boolean isObjectType() {
+        return fieldType == FieldType.OBJECT;
+    }
+    
+    /**
+     * Checks if is primitive type.
+     *
+     * @param c the c
+     * @return true, if is primitive type
+     */
+    public static boolean isPrimitiveType(Class c) {
+        if (c.isPrimitive()) {
+            return true;
+        }
+        
+        if (c.getName().equals(String.class.getName())) {
+            return true;
+        }
+        
+        return false;
+    }
 }
