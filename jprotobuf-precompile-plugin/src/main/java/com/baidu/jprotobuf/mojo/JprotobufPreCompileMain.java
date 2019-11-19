@@ -26,6 +26,7 @@ import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.baidu.bjf.remoting.protobuf.utils.compiler.JdkCompiler;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import jodd.io.findfile.ClassScanner;
 
 /**
@@ -36,7 +37,7 @@ import jodd.io.findfile.ClassScanner;
  * @since 1.2.12 增加多个包名前缀配置支持, 用;分隔
  */
 public class JprotobufPreCompileMain {
-    
+
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(JprotobufPreCompileMain.class);
 
@@ -71,12 +72,16 @@ public class JprotobufPreCompileMain {
         }
 
         final String[] split = filterClassPackage.split(MULTI_PKG_SPLIT);
-        
+
         final boolean generateProtofile = Boolean.valueOf(args[3]);
-        
+
         final boolean compileDependencies = Boolean.valueOf(args[4]);
-        
+
         final Set<Class> dependenciesClasses = new HashSet<Class>();
+
+        final Set<Class> compiledClasses = new HashSet<Class>();
+
+        printInfo(split, generateProtofile, compileDependencies);
 
         ClassScanner scanner = new ClassScanner() {
 
@@ -91,33 +96,37 @@ public class JprotobufPreCompileMain {
                 if (c == null) {
                     return;
                 }
-                
-                
+
+                if (compiledClasses.contains(c)) {
+                    return;
+                }
+
                 if (Enum.class.isAssignableFrom(c)) {
                     return;
                 }
-                
+
                 Annotation annotation = c.getAnnotation(ProtobufClass.class);
                 if (annotation != null) {
                     try {
-                            ProtobufProxy.create(c, false, outputPath);
-                            if (generateProtofile) {
-                                createProtoFile(c, outputPath.getCanonicalPath());
-                            }
-                            if (compileDependencies) {
-                                TemplateCodeGenerator tcg = new TemplateCodeGenerator(c);
-                                tcg.getAllDependenciesClasses(dependenciesClasses);
-                            }
+                        compiledClasses.add(c);
+                        ProtobufProxy.create(c, false, outputPath);
+                        if (generateProtofile) {
+                            createProtoFile(c, outputPath.getCanonicalPath());
+                        }
+                        if (compileDependencies) {
+                            TemplateCodeGenerator tcg = new TemplateCodeGenerator(c);
+                            tcg.getAllDependenciesClasses(dependenciesClasses);
+                        }
                     } catch (Throwable e) {
                         throw new Exception(e.getMessage(), e);
                     }
                     return;
                 }
-                
 
                 try {
                     List<Field> fields = FieldUtils.findMatchedFields(c, Protobuf.class);
                     if (!fields.isEmpty()) {
+                        compiledClasses.add(c);
                         ProtobufProxy.create(c, false, outputPath);
                         if (generateProtofile) {
                             createProtoFile(c, outputPath.getCanonicalPath());
@@ -134,8 +143,9 @@ public class JprotobufPreCompileMain {
         };
 
         scanner.scanDefaultClasspath();
-        
+
         if (compileDependencies) {
+            compiledClasses.addAll(dependenciesClasses);
             // compile dependencies classes
             for (Class cls : dependenciesClasses) {
                 try {
@@ -148,7 +158,8 @@ public class JprotobufPreCompileMain {
                 }
             }
         }
-
+        
+        LOGGER.info("JProtobuf pre compile finished. " + compiledClasses.size() + " classes compiled.");
 
         // copy files
         try {
@@ -160,7 +171,20 @@ public class JprotobufPreCompileMain {
         }
 
     }
-    
+
+    /**
+     * Prints the info.
+     *
+     * @param split the split
+     * @param generateProtofile the generate protofile
+     * @param compileDependencies the compile dependencies
+     */
+    private static void printInfo(String[] split, boolean generateProtofile, boolean compileDependencies) {
+        LOGGER.info("* filterClassPackages='" + Arrays.toString(split) + "'");
+        LOGGER.info("* generateProtofile='" + generateProtofile + "'");
+        LOGGER.info("* compileDependencies='" + compileDependencies + "'");
+    }
+
     /**
      * Creates the proto file.
      *
@@ -169,15 +193,15 @@ public class JprotobufPreCompileMain {
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private static void createProtoFile(Class c,  String outputPath) throws UnsupportedEncodingException, IOException {
+    private static void createProtoFile(Class c, String outputPath) throws UnsupportedEncodingException, IOException {
         String code = ProtobufIDLGenerator.getIDL(c);
-        
+
         String pkg = "";
         String className = c.getName();
         if (className.indexOf('.') != -1) {
             pkg = StringUtils.substringBeforeLast(className, ".");
         }
-        
+
         // mkdirs
         String dir = outputPath + File.separator + pkg.replace('.', File.separatorChar);
         File f = new File(dir);
