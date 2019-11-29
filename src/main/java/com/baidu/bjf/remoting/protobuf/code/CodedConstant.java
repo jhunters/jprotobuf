@@ -227,7 +227,7 @@ public class CodedConstant {
      * @param path the path
      * @return full java expression
      */
-    public static int computeListSize(int order, List list, FieldType type, boolean debug, File path) {
+    public static int computeListSize(int order, Collection list, FieldType type, boolean debug, File path) {
         int size = 0;
         if (list == null || list.isEmpty()) {
             return size;
@@ -385,7 +385,7 @@ public class CodedConstant {
      * @param list target list object to be serialized
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public static void writeToList(CodedOutputStream out, int order, FieldType type, List list) throws IOException {
+    public static void writeToList(CodedOutputStream out, int order, FieldType type, Collection list) throws IOException {
         if (list == null || list.isEmpty()) {
             return;
         }

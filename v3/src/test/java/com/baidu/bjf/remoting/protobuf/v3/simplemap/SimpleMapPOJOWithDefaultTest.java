@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf.simplerepeat;
+package com.baidu.bjf.remoting.protobuf.v3.simplemap;
 
-import java.util.List;
+import org.junit.Test;
 
-import com.baidu.bjf.remoting.protobuf.FieldType;
-import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.Codec;
+import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
+
+import junit.framework.Assert;
 
 /**
- * RequrieRepeatedDojoClass2
- * 
+ * The Class SimpleMapPOJOWithDefaultTest.
+ *
  * @author xiemalin
- * @since 1.0
+ * @since 2.2.13
  */
-public class RequrieRepeatedDojoClass2 {
+public class SimpleMapPOJOWithDefaultTest {
 
-    @Protobuf(fieldType = FieldType.STRING, order = 1, required = false)
-    private java.util.List<String> list;
-
-    public void setList(List<String> list) {
-        this.list = list;
+    
+    /**
+     * Test default map field.
+     */
+    @Test
+    public void testDefaultMapField() {
+        Codec<SimpleMapPOJOWithDefault> codec = ProtobufProxy.create(SimpleMapPOJOWithDefault.class, false);
+        Assert.assertNotNull(codec);
     }
-
-    public List<String> getList() {
-        return list;
-    }
-
 }

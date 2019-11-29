@@ -200,7 +200,11 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             boolean isMap = field.isMap();
             String e = "";
             if (isList) {
-                e = "new ArrayList()";
+                if (FieldInfo.isListType(field.getField())) {
+                    e = "new ArrayList()";
+                } else if (FieldInfo.isSetType(field.getField())) {
+                    e = "new HashSet()";
+                }
             } else if (isMap) {
                 e = "new HashMap()";
             }
@@ -488,12 +492,23 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             ret.append("if ((").append(getAccessByField(target, field, cls)).append(") == null) {")
                     .append(ClassCode.LINE_BREAK);
         }
+        
+        String collectionTypetoCreate = "";
+        String collectionType = "";
+        if (FieldInfo.isListType(field)) {
+            collectionTypetoCreate = "new ArrayList()";
+            collectionType = "List";
+        } else if (FieldInfo.isSetType(field)) {
+            collectionTypetoCreate = "new HashSet()";
+            collectionType = "Set";
+        }
+        
         // if field of public modifier we can access directly
         if (Modifier.isPublic(field.getModifiers())) {
             if (isList) {
                 // should initialize list
                 ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName())
-                        .append("= new ArrayList()").append(ClassCode.JAVA_LINE_BREAK).append("}")
+                        .append("= ").append(collectionTypetoCreate).append(ClassCode.JAVA_LINE_BREAK).append("}")
                         .append(ClassCode.LINE_BREAK);
                 if (express != null) {
                     if (packed) {
@@ -523,7 +538,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         try {
             cls.getMethod(setter, new Class<?>[] { field.getType() });
             if (isList) {
-                ret.append("List __list = new ArrayList()").append(ClassCode.JAVA_LINE_BREAK);
+                ret.append(collectionType).append(" __list = ").append(collectionTypetoCreate).append(ClassCode.JAVA_LINE_BREAK);
                 ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(setter).append("(__list)")
                         .append(ClassCode.JAVA_LINE_BREAK).append("}").append(ClassCode.LINE_BREAK);
 
@@ -552,7 +567,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         }
 
         if (isList) {
-            ret.append("List __list = new ArrayList()").append(ClassCode.JAVA_LINE_BREAK);
+            ret.append(collectionType).append(" __list = ").append(collectionTypetoCreate).append(ClassCode.JAVA_LINE_BREAK);
             ret.append("FieldUtils.setField(").append(target).append(", \"").append(field.getName())
                     .append("\", __list)").append(ClassCode.JAVA_LINE_BREAK).append("}").append(ClassCode.LINE_BREAK);
             if (express != null) {

@@ -20,6 +20,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 
@@ -326,5 +327,25 @@ public class FieldInfo {
         }
         
         return false;
+    }
+    
+    /**
+     * Checks if is list type.
+     *
+     * @param field the field
+     * @return true, if is list type
+     */
+    public static boolean isListType(Field field) {
+        return List.class.isAssignableFrom(field.getType()) ;
+    }
+    
+    /**
+     * Checks if is set type.
+     *
+     * @param field the field
+     * @return true, if is set type
+     */
+    public static boolean isSetType(Field field) {
+        return Set.class.isAssignableFrom(field.getType()) ;
     }
 }

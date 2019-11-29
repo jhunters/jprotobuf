@@ -10,6 +10,8 @@ package com.baidu.bjf.remoting.protobuf.v3.complexmap;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,7 +48,7 @@ public class ComplexMapTest {
         byte[] bytes = person.toByteArray();
         System.out.println(Arrays.toString(bytes));
         
-        Codec<ComplexMapPOJO> complexMapPOJOCodec = ProtobufProxy.create(ComplexMapPOJO.class, true);
+        Codec<ComplexMapPOJO> complexMapPOJOCodec = ProtobufProxy.create(ComplexMapPOJO.class, false);
         
         try {
             ComplexMapPOJO decode = complexMapPOJOCodec.decode(bytes);
@@ -97,4 +99,47 @@ public class ComplexMapTest {
                 person.getPhoneNumberObjectValueMap().get("key1").getNumber());
     }
 
+    
+    @Test
+    public void testPOJOCodec() throws IOException {
+
+        Codec<ComplexMapPOJO> complexMapPOJOCodec = ProtobufProxy.create(ComplexMapPOJO.class, false);
+
+        // initialize POJO value
+        ComplexMapPOJO pojo = new ComplexMapPOJO();
+
+        pojo.name = "xiemalin";
+
+        pojo.phoneTypeEnumValueMap = new HashMap<String, PhoneTypeEnumPOJO>();
+        pojo.phoneTypeEnumValueMap.put("a", PhoneTypeEnumPOJO.HOME);
+        pojo.phoneTypeEnumValueMap.put("b", PhoneTypeEnumPOJO.MOBILE);
+        pojo.phoneTypeEnumValueMap.put("c", PhoneTypeEnumPOJO.WORK);
+
+        pojo.phoneNumberObjectValueMap = new HashMap<String, PhoneNumberPOJO>();
+
+        PhoneNumberPOJO phoneNumberPOJO = new PhoneNumberPOJO();
+        phoneNumberPOJO.number = "10000000000";
+        phoneNumberPOJO.type = PhoneTypeEnumPOJO.MOBILE;
+
+        pojo.phoneNumberObjectValueMap.put("key1", phoneNumberPOJO);
+        
+        byte[] bb = new byte[] {1, 2, 3};
+        byte[] bbKey = new byte[] {4, 5, 6};
+        pojo.bytesMap = new HashMap<byte[], byte[]>();
+        pojo.bytesMap.put(bbKey, bb);
+
+        byte[] bytes = complexMapPOJOCodec.encode(pojo);
+        
+        ComplexMapPOJO decode = complexMapPOJOCodec.decode(bytes);
+        Assert.assertEquals(1, decode.bytesMap.size());
+        Assert.assertEquals(bb.length, decode.bytesMap.values().iterator().next().length);
+        Assert.assertArrayEquals(bb, decode.bytesMap.values().iterator().next());
+        
+        Iterator<Entry<byte[], byte[]>> iterator = decode.bytesMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next().getKey());
+        }
+        
+
+    }
 }

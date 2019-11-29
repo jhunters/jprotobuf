@@ -15,28 +15,22 @@
  */
 package com.baidu.bjf.remoting.protobuf.simplerepeat;
 
-import java.util.List;
+import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 
 /**
- * RequrieRepeatedDojoClass2
- * 
+ * RequrieRepeatedDojoClass
  * @author xiemalin
- * @since 1.0
+ * @since 3.4.0
  */
-public class RequrieRepeatedDojoClass2 {
+public class StringSetDojoClass {
 
     @Protobuf(fieldType = FieldType.STRING, order = 1, required = false)
-    private java.util.List<String> list;
-
-    public void setList(List<String> list) {
-        this.list = list;
-    }
-
-    public List<String> getList() {
-        return list;
-    }
-
+    public Set<String> stringSet;
+    
+    @Protobuf(fieldType = FieldType.OBJECT, order = 2, required = false)
+    public Set<PersonPOJO> personSet;
 }

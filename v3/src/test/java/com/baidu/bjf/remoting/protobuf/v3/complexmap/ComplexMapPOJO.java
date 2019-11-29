@@ -29,4 +29,8 @@ public class ComplexMapPOJO {
     @Protobuf(fieldType = FieldType.MAP)
     public Map<String, PhoneNumberPOJO> phoneNumberObjectValueMap;
     
+    
+    @Protobuf(fieldType = FieldType.MAP)
+    public Map<byte[], byte[]> bytesMap;
+    
 }
