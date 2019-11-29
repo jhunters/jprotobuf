@@ -71,7 +71,7 @@ public class TemplateCodeGeneratorTest {
         Set<Class> list = new HashSet<Class>();
         generator.getAllDependenciesClasses(list);
         System.out.println(list);
-        Assert.assertEquals(list.size(), 2);
+        Assert.assertEquals(list.size(), 3);
         
     }
 }

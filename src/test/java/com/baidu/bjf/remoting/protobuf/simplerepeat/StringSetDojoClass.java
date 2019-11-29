@@ -19,6 +19,7 @@ import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 
 /**
  * RequrieRepeatedDojoClass
@@ -28,5 +29,8 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 public class StringSetDojoClass {
 
     @Protobuf(fieldType = FieldType.STRING, order = 1, required = false)
-    public Set<String> list;
+    public Set<String> stringSet;
+    
+    @Protobuf(fieldType = FieldType.OBJECT, order = 2, required = false)
+    public Set<PersonPOJO> personSet;
 }

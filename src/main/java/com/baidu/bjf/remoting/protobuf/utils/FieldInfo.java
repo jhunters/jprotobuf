@@ -77,7 +77,7 @@ public class FieldInfo {
     private void checkListMapType(Field field) {
         Class<?> cls = field.getType();
         boolean needCheckGenericType = false;
-        if (List.class.isAssignableFrom(cls)) {
+        if (List.class.isAssignableFrom(cls) || Set.class.isAssignableFrom(cls)) {
             // if check is list ignore check
             isList = true;
             needCheckGenericType = true;

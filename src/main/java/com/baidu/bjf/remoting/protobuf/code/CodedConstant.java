@@ -139,7 +139,7 @@ public class CodedConstant {
         // add null check
         String defineType = type.getJavaType();
         if (isList) {
-            defineType = "List";
+            defineType = "Collection";
         }
         
         return defineType;
