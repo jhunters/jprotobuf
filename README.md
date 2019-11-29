@@ -93,7 +93,7 @@ jprotobuf-1.x  JDK 6 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>1.12.1</version>
+  <version>1.13.0</version>
 </dependency>
 ```
 [下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
@@ -103,7 +103,7 @@ jprotobuf-2.x  JDK 7 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.3.3</version>
+  <version>2.4.0</version>
 </dependency>
 ```
 [下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
@@ -129,7 +129,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
 </dependency>
 ```
 备注： precompile-plugin的版本 1.2.11 只支持 jprotobuf 1.11.5 及以上的版本。    其它版本请有 1.2.10及以下precompile plugin
@@ -139,7 +139,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>2.1.2</version>
+  <version>2.2.0</version>
 </dependency>
 ```
 备注： precompile-plugin的版本 2.0.5 只支持 jprotobuf 2.2.6 及以上的版本。     其它版本请有2.0.4及以下precompile plugin
@@ -148,7 +148,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 ```property
 
 plugins {
-    id 'com.baidu.jprotobuf' version '1.0.6'
+    id 'com.baidu.jprotobuf' version '1.0.7'
 }
 ```
 [查看版本信息](https://plugins.gradle.org/plugin/com.baidu.jprotobuf)

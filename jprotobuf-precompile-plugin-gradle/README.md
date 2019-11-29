@@ -5,7 +5,7 @@
 ```property
 
 plugins {
-    id 'com.baidu.jprotobuf' version '1.0.6'
+    id 'com.baidu.jprotobuf' version '1.0.7'
 }
 ```
 
