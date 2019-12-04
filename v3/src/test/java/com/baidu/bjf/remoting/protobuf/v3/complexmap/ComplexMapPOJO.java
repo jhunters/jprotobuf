@@ -19,7 +19,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  * @since 2.0.0
  */
 public class ComplexMapPOJO {
-
+    
     @Protobuf(required = true) 
     public String name;
     
@@ -28,7 +28,6 @@ public class ComplexMapPOJO {
     
     @Protobuf(fieldType = FieldType.MAP)
     public Map<String, PhoneNumberPOJO> phoneNumberObjectValueMap;
-    
     
     @Protobuf(fieldType = FieldType.MAP)
     public Map<byte[], byte[]> bytesMap;

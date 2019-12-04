@@ -63,19 +63,19 @@ public class FieldInfo {
 
     /** The is list. */
     private boolean isList;
-    
+
     /** The is map. */
     private boolean isMap;
-    
+
     /** The packed. */
     private boolean packed;
-    
+
     /** The use type. */
     private boolean useType;
-    
+
     /** The use as type. */
     private Class useAsType;
-    
+
     /**
      * Sets the use as type.
      *
@@ -84,7 +84,7 @@ public class FieldInfo {
     public void setUseAsType(Class useAsType) {
         this.useAsType = useAsType;
     }
-    
+
     /**
      * Gets the use as type.
      *
@@ -93,7 +93,7 @@ public class FieldInfo {
     public Class getUseAsType() {
         return useAsType;
     }
-    
+
     /**
      * Sets the use type.
      *
@@ -102,7 +102,7 @@ public class FieldInfo {
     public void setUseType(boolean useType) {
         this.useType = useType;
     }
-    
+
     /**
      * Checks if is use type.
      *
@@ -111,7 +111,6 @@ public class FieldInfo {
     public boolean isUseType() {
         return useType;
     }
-    
 
     /**
      * To check if type of {@link Field} is assignable from {@link List}.
@@ -164,17 +163,46 @@ public class FieldInfo {
                 Type targetType = actualTypeArguments[0];
                 if (targetType instanceof Class) {
                     genericKeyType = (Class) targetType;
+                } else if (targetType instanceof ParameterizedType) {
+                    boolean mapKey = false;
+                    if (isMap) {
+                        mapKey = true;
+                    }
+                    throw new RuntimeException(noSubParameterizedType(field, mapKey));
                 }
 
                 if (actualTypeArguments.length > 1) {
                     targetType = actualTypeArguments[1];
                     if (targetType instanceof Class) {
                         genericeValueType = (Class) targetType;
+                    } else if (targetType instanceof ParameterizedType) {
+                        boolean mapKey = false;
+                        if (isMap) {
+                            mapKey = true;
+                        }
+                        throw new RuntimeException(noSubParameterizedType(field, mapKey));
                     }
                 }
 
             }
         }
+
+    }
+
+    /**
+     * No sub parameterized type.
+     *
+     * @param field the field
+     * @param listOrMap the list or map
+     * @return the string
+     */
+    private String noSubParameterizedType(Field field, boolean listOrMap) {
+        String key = "List";
+        if (listOrMap) {
+            key = "Map";
+        }
+        return key + " can not has sub parameterized type  please check  field name '" + field.getName() + " at class "
+                + field.getDeclaringClass().getName();
 
     }
 
@@ -371,7 +399,7 @@ public class FieldInfo {
     public void setPacked(boolean packed) {
         this.packed = packed;
     }
-    
+
     /**
      * Checks if is object type.
      *
@@ -392,7 +420,7 @@ public class FieldInfo {
         }
         return false;
     }
-    
+
     /**
      * Checks if is primitive type.
      *
@@ -403,14 +431,14 @@ public class FieldInfo {
         if (c.isPrimitive()) {
             return true;
         }
-        
+
         if (c.getName().equals(String.class.getName())) {
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Checks if is list type.
      *
@@ -418,9 +446,9 @@ public class FieldInfo {
      * @return true, if is list type
      */
     public static boolean isListType(Field field) {
-        return List.class.isAssignableFrom(field.getType()) ;
+        return List.class.isAssignableFrom(field.getType());
     }
-    
+
     /**
      * Checks if is set type.
      *
@@ -428,6 +456,6 @@ public class FieldInfo {
      * @return true, if is set type
      */
     public static boolean isSetType(Field field) {
-        return Set.class.isAssignableFrom(field.getType()) ;
+        return Set.class.isAssignableFrom(field.getType());
     }
 }
