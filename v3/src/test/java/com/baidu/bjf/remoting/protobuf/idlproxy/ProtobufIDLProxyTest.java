@@ -15,10 +15,9 @@
  */
 package com.baidu.bjf.remoting.protobuf.idlproxy;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-
-import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -29,6 +28,8 @@ import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesPojoClass;
 
+import junit.framework.Assert;
+
 /**
  * Test class for {@link ProtobufIDLProxy}
  * 
@@ -36,6 +37,16 @@ import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesPojoClass;
  * @since 1.0.2
  */
 public class ProtobufIDLProxyTest {
+    
+    @Test
+    public void testCodeGenerateFromIDL() {
+        String protoCotent = "package mypackage.test; "
+                + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                + "option java_outer_classname = \"StringTypeClassToIDLGenerator\";  " + "message StringMessage { "
+                + "  required string message = 1 [default = \"hello\"]; }";
+        ProtobufIDLProxy.generateSource(protoCotent, new File("."));
+        
+    }
 
     @Test
     public void testDecode() throws Exception {
@@ -43,7 +54,7 @@ public class ProtobufIDLProxyTest {
         String protoCotent = "package mypackage.test; "
                 + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
                 + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
-                + "  required string message = 1; }";
+                + "  required string message = 1 [default = \"hello\"]; }";
         IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
 
         // 动态设置字段值

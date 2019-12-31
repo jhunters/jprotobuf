@@ -124,7 +124,12 @@ public class JprotobufPreCompileMain {
                 }
 
                 try {
-                    List<Field> fields = FieldUtils.findMatchedFields(c, Protobuf.class);
+                    List<Field> fields = null;
+                    try {
+                        fields = FieldUtils.findMatchedFields(c, Protobuf.class);
+                    } catch (Exception e) {
+                        return;
+                    }
                     if (!fields.isEmpty()) {
                         compiledClasses.add(c);
                         ProtobufProxy.create(c, false, outputPath);
