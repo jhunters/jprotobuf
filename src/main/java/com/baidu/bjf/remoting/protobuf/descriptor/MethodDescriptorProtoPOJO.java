@@ -38,4 +38,9 @@ public class MethodDescriptorProtoPOJO {
     @Protobuf(order = MethodDescriptorProto.OPTIONS_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public MethodOptionsPOJO options;
     
+    @Protobuf(order = MethodDescriptorProto.CLIENT_STREAMING_FIELD_NUMBER)
+    public Boolean clientStreaming;
+    
+    @Protobuf(order = MethodDescriptorProto.SERVER_STREAMING_FIELD_NUMBER)
+    public Boolean serverStreaming;
 }

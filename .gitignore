@@ -13,3 +13,8 @@ target
 
 .settings/org.eclipse.core.resources.prefs
 /v3-b/
+/jprotobuf-precompile-pluginv3/
+/.idea/
+/.settings/
+/benchmark/
+/.externalToolBuilders/

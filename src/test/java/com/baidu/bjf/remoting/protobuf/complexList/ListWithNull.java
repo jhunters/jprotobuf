@@ -16,6 +16,7 @@
 package com.baidu.bjf.remoting.protobuf.complexList;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
@@ -41,6 +42,19 @@ public class ListWithNull {
     @Protobuf(fieldType = FieldType.STRING)
     private List<String> list3;
     
+    /** The list. */
+    @Protobuf(fieldType = FieldType.MAP)
+    public Map<String, String> map;
+    
+    
+    /** The list 2. */
+    @Protobuf(fieldType = FieldType.MAP)
+    private Map<String, String> map2;
+    
+    /** The list 2. */
+    @Protobuf(fieldType = FieldType.MAP)
+    private Map<String, String> map3;
+    
     /**
      * Sets the list 2.
      *
@@ -57,6 +71,25 @@ public class ListWithNull {
      */
     public List<String> getList2() {
         return list2;
+    }
+    
+    
+    /**
+     * Sets the map 2.
+     *
+     * @param map2 the map 2
+     */
+    public void setMap2(Map<String, String> map2) {
+        this.map2 = map2;
+    }
+    
+    /**
+     * Gets the map 2.
+     *
+     * @return the map 2
+     */
+    public Map<String, String> getMap2() {
+        return map2;
     }
     
 }

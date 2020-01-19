@@ -55,6 +55,15 @@ public class FileOptionsPOJO {
     @Protobuf(order = FileOptions.JAVA_GENERATE_EQUALS_AND_HASH_FIELD_NUMBER)
     public Boolean javaGenerateEqualsAndHash;
     
+    @Protobuf(order = FileOptions.DEPRECATED_FIELD_NUMBER)
+    public Boolean deprecated;
+    
+    @Protobuf(order = FileOptions.JAVA_STRING_CHECK_UTF8_FIELD_NUMBER)
+    public Boolean javaStringCheckUtf8;
+    
+    @Protobuf(order = FileOptions.CC_ENABLE_ARENAS_FIELD_NUMBER)
+    public Boolean ccEnableArenas;
+    
     @Protobuf(order = FileOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOptions;
 }

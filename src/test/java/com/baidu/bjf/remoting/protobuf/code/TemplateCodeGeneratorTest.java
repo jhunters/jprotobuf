@@ -15,7 +15,16 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.junit.Test;
+
+import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtosPOJO;
+import com.baidu.bjf.remoting.protobuf.v3.complexmap.ComplexMapPOJO;
+
+import junit.framework.Assert;
 
 /**
  * The Class TemplateCodeGeneratorTest.
@@ -23,25 +32,46 @@ import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtosPOJO;
  * @author xiemalin
  * @since 1.12.0
  */
-public class TemplateCodeGeneratorTest extends AbstractCodeGeneratorTest {
+public class TemplateCodeGeneratorTest {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baidu.bjf.remoting.protobuf.code.AbstractCodeGeneratorTest#getCodeGenerator()
+    
+    /**
+     * Test code generate.
      */
-    @Override
-    protected ICodeGenerator getCodeGenerator() {
-        return new TemplateCodeGenerator(getTestClass());
+    @Test
+    public void testCodeGenerate() {
+        
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(PersonPOJO.class);
+        
+        Assert.assertNotNull(generator.getCode());
+        
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.baidu.bjf.remoting.protobuf.code.AbstractCodeGeneratorTest#getTestClass()
+    
+    /**
+     * Test empty dependencies.
      */
-    @Override
-    protected Class getTestClass() {
-        return AddressBookProtosPOJO.class;
+    @Test
+    public void testEmptyDependencies() {
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(PersonPOJO.class);
+        Set<Class> dependenciesClasses = generator.getDependenciesClasses();
+        Assert.assertTrue(dependenciesClasses.isEmpty());
+    }
+    
+    @Test
+    public void testListPOJODependencies() {
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(AddressBookProtosPOJO.class);
+        Set<Class> dependenciesClasses = generator.getDependenciesClasses();
+        Assert.assertEquals(dependenciesClasses.size(), 2);
+    }
+    
+    
+    @Test
+    public void testMapAndSubClassDependencies() {
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(ComplexMapPOJO.class);
+        Set<Class> list = new HashSet<Class>();
+        generator.getAllDependenciesClasses(list);
+        System.out.println(list);
+        Assert.assertEquals(list.size(), 3);
+        
     }
 }

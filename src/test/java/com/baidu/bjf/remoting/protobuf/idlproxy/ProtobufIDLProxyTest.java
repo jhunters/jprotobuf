@@ -17,7 +17,6 @@ package com.baidu.bjf.remoting.protobuf.idlproxy;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Test;
@@ -27,30 +26,35 @@ import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
-import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
+import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesPojoClass;
 
 import junit.framework.Assert;
 
 /**
- * Test class for {@link ProtobufIDLProxy}.
- *
+ * Test class for {@link ProtobufIDLProxy}
+ * 
  * @author xiemalin
  * @since 1.0.2
  */
 public class ProtobufIDLProxyTest {
+    
+    @Test
+    public void testCodeGenerateFromIDL() {
+        String protoCotent = "package mypackage.test; "
+                + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                + "option java_outer_classname = \"StringTypeClassToIDLGenerator\";  " + "message StringMessage { "
+                + "  required string message = 1 [default = \"hello\"]; }";
+        ProtobufIDLProxy.generateSource(protoCotent, new File("."));
+        
+    }
 
-    /**
-     * Test decode.
-     *
-     * @throws Exception the exception
-     */
     @Test
     public void testDecode() throws Exception {
 
-        String protoCotent =
-                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
-                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
-                        + "  required string message = 1; }";
+        String protoCotent = "package mypackage.test; "
+                + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
+                + "  required string message = 1 [default = \"hello\"]; }";
         IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
 
         // 动态设置字段值
@@ -62,45 +66,10 @@ public class ProtobufIDLProxyTest {
         IDLProxyObject newObject = object.decode(bb);
         Assert.assertEquals("hello你好", newObject.get("message"));
     }
-    
-    @Test
-    public void testDyanmicIDLChange() throws Exception {
 
-        String protoCotent =
-                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
-                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
-                        + "  required string message = 1; }";
-        IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
-
-        String expected = "hello你好";
-        // 动态设置字段值
-        object.put("message", expected);
-        
-        Object result = object.get("message");
-        Assert.assertEquals(expected, result);
-        
-        protoCotent =
-                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
-                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
-                        + "  required string message1 = 1; }";
-  
-        object = ProtobufIDLProxy.createSingle(protoCotent);
-
-        // 动态设置字段值
-        object.put("message1", expected);
-        
-        result = object.get("message1");
-        Assert.assertEquals(expected, result);
-    }
-
-    /**
-     * Test decode complex.
-     *
-     * @throws Exception the exception
-     */
     @Test
     public void testDecodeComplex() throws Exception {
-        String code = ProtobufIDLGenerator.getIDL(AllTypesDojoClass.class);
+        String code = ProtobufIDLGenerator.getIDL(AllTypesPojoClass.class);
         IDLProxyObject object = ProtobufIDLProxy.create(code).entrySet().iterator().next().getValue();
 
         object.put("boolF", false);
@@ -139,16 +108,41 @@ public class ProtobufIDLProxyTest {
         Assert.assertEquals(9, icn.getUint32F());
         Assert.assertEquals(10L, icn.getUint64F());
     }
+    
+    @Test
+    public void testDyanmicIDLChange() throws Exception {
 
-    /**
-     * Test multi decode.
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
+        String protoCotent =
+                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
+                        + "  required string message = 1; }";
+        IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
+
+        String expected = "hello你好";
+        // 动态设置字段值
+        object.put("message", expected);
+        
+        Object result = object.get("message");
+        Assert.assertEquals(expected, result);
+        
+        protoCotent =
+                "package mypackage.test; " + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
+                        + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
+                        + "  required string message1 = 1; }";
+  
+        object = ProtobufIDLProxy.createSingle(protoCotent);
+
+        // 动态设置字段值
+        object.put("message1", expected);
+        
+        result = object.get("message1");
+        Assert.assertEquals(expected, result);
+    }
+
     @Test
     public void testMultiDecode() throws IOException {
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code, false);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(code);
 
         IDLProxyObject idlProxyObject = idlProxyObjects.get(AddressBookProtosPOJO.class.getSimpleName());
 
@@ -163,13 +157,12 @@ public class ProtobufIDLProxyTest {
             Assert.assertNotNull(e);
         }
         byte[] bb = idlProxyObject.encode();
-        System.out.println(Arrays.toString(bb));
+
         IDLProxyObject newObject = idlProxyObject.decode(bb);
         Assert.assertEquals("hello", newObject.get("name"));
         Assert.assertEquals("yes", newObject.get("list.name"));
 
     }
-
     /**
      * Test inner including service idl generate source.
      */
@@ -197,78 +190,11 @@ public class ProtobufIDLProxyTest {
                 " "
                 ;
         
-        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(protoCotent, false);
+        Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(protoCotent);
         System.out.println(idlProxyObjects);
         
         idlProxyObjects.get("Http").put("param_addon.key", "abc");
-    }
-
-    /**
-     * Test inner including service idl generate source.
-     */
-    @Test
-    public void testInnerIncludingServiceIDLGenerateSource() {
-        StringBuilder idl = new StringBuilder();
-        idl.append("package mypkg;\n");
-        idl.append("message DataInfo {\n");
-        idl.append("   enum DataVisibility {\n");
-
-        idl.append("   PUBLIC = 1;\n");
-        idl.append("   PRIVATE = 2;\n");
-        idl.append("   }");
-        idl.append("    optional DataVisibility v = 1;\n");
-        idl.append("   message SubDataInfo {\n");
-        idl.append("      optional string name =1;\n");
-        idl.append("      message Sub2DataInfo {\n");
-        idl.append("        required int32 age = 1;\n");
-        idl.append("      }\n");
-        idl.append("   }\n");
-
-        idl.append("}\n");
-
-        idl.append("message DataStatus {\n");
-        idl.append("   optional DataInfo.DataVisibility visibility = 1; \n");
-        idl.append("   optional DataInfo.SubDataInfo subDataInfo = 2;\n");
-        idl.append("   optional DataInfo.SubDataInfo.Sub2DataInfo sub2DataInfo = 3;\n");
-        idl.append("}");
-
-        Map<String, IDLProxyObject> map = ProtobufIDLProxy.create(idl.toString(), false);
-
-        IDLProxyObject idlProxyObject = map.get("DataStatus");
-
-        idlProxyObject.put("subDataInfo.name", "abc");
-
-        try {
-            byte[] bytes = idlProxyObject.encode();
-
-            System.out.println(Arrays.toString(bytes));
-
-            IDLProxyObject idlProxyObject2 = idlProxyObject.decode(bytes);
-            Assert.assertEquals(idlProxyObject2.get("subDataInfo.name"), "abc");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Test file import with diff package idl generate source.
-     */
-    @Test
-    public void testFileImportWithDiffPackageIDLGenerateSource() {
-
-        File file = new File("D:/adapter.proto.txt");
-        if (!file.exists()) {
-            return;
-        }
-        try {
-
-            ProtobufIDLProxy.generateSource(file, new File("D:\\BaiduYunDownload"));
-
-            // Map<String, IDLProxyObject> idlProxyObjects = ProtobufIDLProxy.create(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Assert.assertEquals("abc", idlProxyObjects.get("Http").get("param_addon.key"));
     }
 
 }

@@ -28,12 +28,15 @@ import com.google.protobuf.DescriptorProtos.ServiceOptions;
  */
 public class ServiceOptionsPOJO {
 
+    @Protobuf(order = ServiceOptions.DEPRECATED_FIELD_NUMBER)
+    public Boolean deprecated;
+    
     @Protobuf(order = ServiceOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOption;
 
     @Override
     public String toString() {
-        return "ServiceOptionsPOJO [uninterpretedOption=" + uninterpretedOption + "]";
+        return "ServiceOptionsPOJO [deprecated=" + deprecated + ", uninterpretedOption=" + uninterpretedOption + "]";
     }
     
     

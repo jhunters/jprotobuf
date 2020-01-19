@@ -1,9 +1,0 @@
-package com.base.research;
-option java_package = "com.base.research.protobufMsg.test";
-option java_outer_classname = "PersonProto";
-
-message Person {
-required string name = 1;
-required int32 id = 2;
-optional string email = 3;
-}

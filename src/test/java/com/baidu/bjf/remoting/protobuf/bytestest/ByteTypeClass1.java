@@ -19,14 +19,12 @@ import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * Test single private byte array field.
- *
+ * Test single private byte array field
+ * 
  * @author xiemalin
  * @since 1.0.9
  */
 public class ByteTypeClass1 {
-    
-    /** The bytes. */
     @Protobuf(fieldType = FieldType.BYTES)
     private byte[] bytes;
 }

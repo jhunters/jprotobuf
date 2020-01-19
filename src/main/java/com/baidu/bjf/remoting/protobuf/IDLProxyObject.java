@@ -50,7 +50,7 @@ public class IDLProxyObject {
     /**
      * Checks if is cached.
      *
-     * @return the cached
+     * @return true, if is cached
      */
     public boolean isCached() {
         return cached;
@@ -364,10 +364,10 @@ public class IDLProxyObject {
      * The Class ReflectInfo.
      */
     private static class ReflectInfo {
-
+        
         /** The field. */
         private Field field;
-
+        
         /** The target. */
         private Object target;
 

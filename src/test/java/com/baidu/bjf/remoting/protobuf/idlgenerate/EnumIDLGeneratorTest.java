@@ -1,17 +1,9 @@
-/*
- * Copyright 2002-2007 the original author or authors.
+/**
+ * Copyright 2014 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Baidu company (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package com.baidu.bjf.remoting.protobuf.idlgenerate;
 
@@ -33,32 +25,18 @@ import com.baidu.bjf.remoting.protobuf.enumeration.EnumAttrPOJO;
 import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
 
 /**
- * Test class for enum idl proxy.
+ * 
+ * Test class for enum idl proxy
  *
  * @author xiemalin
  * @since 1.4.0
  */
 public class EnumIDLGeneratorTest {
 
-    /**
-     * Methoda.
-     *
-     * @param a the a
-     * @param b the b
-     * @param c the c
-     * @param d the d
-     * @param map the map
-     * @return the list
-     */
     public List<String> methoda(int a, long b, float c, double d, Map<String, String> map) {
         return null;
     }
 
-    /**
-     * Test enum idl proxy.
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     @Test
     public void testEnumIDLProxy() throws IOException {
         String idl = ProtobufIDLGenerator.getIDL(EnumPOJOClass.class);
@@ -72,13 +50,6 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(enumPOJOClass.enumAttr.value(), EnumAttrPOJO.STRING.value());
     }
 
-    /**
-     * Initial from protofile.
-     *
-     * @param fileName the file name
-     * @return the map
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     private Map<String, IDLProxyObject> initialFromProtofile(String fileName) throws IOException {
         File file = new File(EnumIDLGeneratorTest.class.getResource(fileName).getFile());
 
@@ -89,11 +60,6 @@ public class EnumIDLGeneratorTest {
         return map;
     }
 
-    /**
-     * Test most complex idl source generate.
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     @Ignore
     @Test
     public void testMostComplexIDLSourceGenerate() throws IOException {
@@ -101,11 +67,6 @@ public class EnumIDLGeneratorTest {
         ProtobufIDLProxy.generateSource(file, new File("D:\\test"));
     }
 
-    /**
-     * Test most complex idl proxy.
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     @Ignore
     @Test
     public void testMostComplexIDLProxy() throws IOException {
@@ -177,11 +138,6 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(idlProxyObject2.get("product_template.template_size.height"), 444);
     }
 
-    /**
-     * Test complex idl proxy.
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     @Ignore
     @Test
     public void testComplexIDLProxy() throws IOException {
@@ -219,11 +175,6 @@ public class EnumIDLGeneratorTest {
         Assert.assertEquals(decodeProxyObject.get("head.appid") + "", "DSP");
     }
 
-    /**
-     * Test complex idl proxy on error.
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     @Ignore
     @Test
     public void testComplexIDLProxyOnError() throws IOException {
@@ -246,11 +197,6 @@ public class EnumIDLGeneratorTest {
         }
     }
 
-    /**
-     * Test idl import reference proxy.
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
     @Ignore
     @Test
     public void testIDLImportReferenceProxy() throws IOException {
@@ -260,5 +206,4 @@ public class EnumIDLGeneratorTest {
 
         Assert.assertEquals(2, map.size());
     }
-
 }

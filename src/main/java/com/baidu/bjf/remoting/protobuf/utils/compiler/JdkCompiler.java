@@ -130,6 +130,7 @@ public class JdkCompiler extends AbstractCompiler {
                 String rootJar = null;
                 Set<String> fileNames = new HashSet<String>();
                 for (URL url : urlClassLoader.getURLs()) {
+                    
                     String file = url.getFile();
                     files.add(new File(file));
                     if (StringUtils.endsWith(file, "!/")) {
@@ -182,7 +183,6 @@ public class JdkCompiler extends AbstractCompiler {
      */
     @Override
     public synchronized Class<?> doCompile(String name, String sourceCode, OutputStream os) throws Throwable {
-
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Begin to compile source code: class is '{}'", name);
         }

@@ -26,17 +26,14 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class SimplePOJO {
 
-    /** The name. */
     @Protobuf(fieldType = FieldType.STRING, order = 1, required = false)
     private String name;
-
-    /** The age. */
+    
     @Protobuf(fieldType = FieldType.INT32, order = 2, required = false)
     private int age;
 
     /**
-     * Gets the name.
-     *
+     * get the name
      * @return the name
      */
     public String getName() {
@@ -44,17 +41,15 @@ public class SimplePOJO {
     }
 
     /**
-     * Sets the name.
-     *
-     * @param name the new name
+     * set name value to name
+     * @param name the name to set
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * Gets the age.
-     *
+     * get the age
      * @return the age
      */
     public int getAge() {
@@ -62,12 +57,12 @@ public class SimplePOJO {
     }
 
     /**
-     * Sets the age.
-     *
-     * @param age the new age
+     * set age value to age
+     * @param age the age to set
      */
     public void setAge(int age) {
         this.age = age;
     }
-
+    
+    
 }

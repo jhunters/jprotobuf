@@ -28,6 +28,7 @@ public interface ICodeGenerator {
     /** auto proxied suffix class name. */
     String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
 
+
     /**
      * Sets the output path. if set should write generated source code to target path
      *

@@ -16,16 +16,13 @@
 package com.baidu.bjf.remoting.protobuf;
 
 /**
- * Supports to read enum element value.
- *
+ * Supports to read enum element value
  * @author xiemalin
  * @since 1.4.0
  */
 public interface EnumReadable {
     
     /**
-     * Value.
-     *
      * @return the value of Enum element
      */
     int value();

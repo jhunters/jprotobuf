@@ -170,7 +170,7 @@ message TemplateElementConf{
     required bytes name = 2;       				
     required bytes value = 3;       			
     required bytes literal = 4;     			
-    optional string target_url = 5 [default="en_US"];   			
+    optional string target_url = 5;   			
     optional string wireless_target_url = 6; 	
 };
 

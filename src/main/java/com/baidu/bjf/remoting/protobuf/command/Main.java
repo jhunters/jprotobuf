@@ -23,7 +23,7 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 public class Main {
     
     private static final String JAVA_OUT_ARG = "--java_out=";
-    
+
     public static void main(String[] args) {
         // get current path
         File currentPath = new File(".");

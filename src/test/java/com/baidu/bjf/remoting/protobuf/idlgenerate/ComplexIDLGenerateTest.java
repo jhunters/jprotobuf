@@ -19,48 +19,38 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Assert;
-
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
-import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
 import com.baidu.bjf.remoting.protobuf.simplerepeat.RequrieRepeatedNumberTypePOJOClass2;
-import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesDojoClass;
+import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesPojoClass;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.squareup.protoparser.MessageType;
-import com.squareup.protoparser.MessageType.Field;
-import com.squareup.protoparser.MessageType.Label;
-import com.squareup.protoparser.ProtoFile;
-import com.squareup.protoparser.ProtoSchemaParser;
-import com.squareup.protoparser.Type;
+
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.MessageElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoFile;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoParser;
+import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
+import junit.framework.Assert;
 
 /**
- * Test IDL script generate tool.
+ * Test IDL script generate tool
  *
  * @author xiemalin
  * @since 1.0.1
  */
 public class ComplexIDLGenerateTest {
     
-    /**
-     * Gets the by name.
-     *
-     * @param name the name
-     * @param types the types
-     * @return the by name
-     */
-    protected Type getByName(String name, List<Type> types) {
-        for (Type type : types) {
-            String typeName = type.getName();
+    protected TypeElement getByName(String name, List<TypeElement> types) {
+        for (TypeElement type : types) {
+            String typeName = type.name();
             if (typeName.equals(name)) {
                 return type;
             }
@@ -68,104 +58,90 @@ public class ComplexIDLGenerateTest {
         return null;
     }
 
-    /**
-     * Test generate idl complex list.
-     *
-     * @throws InvalidProtocolBufferException the invalid protocol buffer exception
-     */
     @Test
     public void TestGenerateIDLComplexList() throws InvalidProtocolBufferException {
         
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJO.class);
 
         Assert.assertNotNull(code);
-        ProtoFile protoFile = ProtoSchemaParser.parse("autogenerate", code);
+        ProtoFile protoFile = ProtoParser.parse("autogenerate", code);
         Assert.assertNotNull(protoFile);
         
         Assert.assertEquals(AddressBookProtosPOJO.class.getPackage().getName(), 
-                protoFile.getPackageName());
+                protoFile.packageName());
         
-        Assert.assertEquals(2, protoFile.getTypes().size());
+        Assert.assertEquals(2, protoFile.typeElements().size());
         
-        List<Type> types = protoFile.getTypes();
-        Type type = getByName(AddressBookProtosPOJO.class.getSimpleName(), types);
+        List<TypeElement> types = protoFile.typeElements();
+        TypeElement type = getByName(AddressBookProtosPOJO.class.getSimpleName(), types);
         
         
         Assert.assertNotNull(type);
         
-        MessageType messageType = (MessageType) type;
-        System.out.println(messageType.getExtensions());
+        MessageElement messageType = (MessageElement) type;
+        System.out.println(messageType.extensions());
         
-        List<Field> fields = messageType.getFields();
+        List<FieldElement> fields = messageType.fields();
         Assert.assertEquals(2, fields.size());
         
-        Assert.assertEquals("list", fields.get(0).getName());
-        Assert.assertEquals(PersonPOJO.class.getSimpleName(), fields.get(0).getType());
-        Assert.assertEquals(Label.OPTIONAL, fields.get(0).getLabel());
+        Assert.assertEquals("list", fields.get(0).name());
+        Assert.assertEquals(PersonPOJO.class.getSimpleName(), fields.get(0).type().toString());
+        Assert.assertEquals(FieldElement.Label.OPTIONAL, fields.get(0).label());
         
         type = getByName(PersonPOJO.class.getSimpleName(), types);
         Assert.assertNotNull(type);
         
-        messageType = (MessageType) type;
-        fields = messageType.getFields();
+        messageType = (MessageElement) type;
+        fields = messageType.fields();
         Assert.assertEquals(7, fields.size());
         
-        for (Field field : fields) {
-            System.out.println(field.getTag());
+        for (FieldElement field : fields) {
+            System.out.println(field.tag());
         }
     }
   
-    /**
-     * Test generate idl complex list with defalut.
-     *
-     * @throws InvalidProtocolBufferException the invalid protocol buffer exception
-     */
     @Test
     public void TestGenerateIDLComplexListWithDefalut() throws InvalidProtocolBufferException {
         
         String code = ProtobufIDLGenerator.getIDL(AddressBookProtosPOJOWithDefault.class);
 
         Assert.assertNotNull(code);
-        ProtoFile protoFile = ProtoSchemaParser.parse("autogenerate", code);
+        ProtoFile protoFile = ProtoParser.parse("autogenerate", code);
         Assert.assertNotNull(protoFile);
         
         Assert.assertEquals(AddressBookProtosPOJOWithDefault.class.getPackage().getName(), 
-                protoFile.getPackageName());
+                protoFile.packageName());
         
-        Assert.assertEquals(2, protoFile.getTypes().size());
+        Assert.assertEquals(2, protoFile.typeElements().size());
         
-        List<Type> types = protoFile.getTypes();
-        Type type = getByName(AddressBookProtosPOJOWithDefault.class.getSimpleName(), types);
+        List<TypeElement> types = protoFile.typeElements();
+        TypeElement type = getByName(AddressBookProtosPOJOWithDefault.class.getSimpleName(), types);
         
         
         Assert.assertNotNull(type);
         
-        MessageType messageType = (MessageType) type;
-        System.out.println(messageType.getExtensions());
+        MessageElement messageType = (MessageElement) type;
+        System.out.println(messageType.extensions());
         
-        List<Field> fields = messageType.getFields();
+        List<FieldElement> fields = messageType.fields();
         Assert.assertEquals(2, fields.size());
         
-        Assert.assertEquals("list", fields.get(0).getName());
-        Assert.assertEquals(PersonPOJOWithDefault.class.getSimpleName(), fields.get(0).getType());
-        Assert.assertEquals(Label.OPTIONAL, fields.get(0).getLabel());
+        Assert.assertEquals("list", fields.get(0).name());
+        Assert.assertEquals(PersonPOJOWithDefault.class.getSimpleName(), fields.get(0).type().toString());
+        Assert.assertEquals(FieldElement.Label.OPTIONAL, fields.get(0).label());
         
         type = getByName(PersonPOJOWithDefault.class.getSimpleName(), types);
         Assert.assertNotNull(type);
         
-        messageType = (MessageType) type;
-        fields = messageType.getFields();
-        Assert.assertEquals(7, fields.size());
+        messageType = (MessageElement) type;
+        fields = messageType.fields();
+        Assert.assertEquals(8, fields.size());
         
-        for (Field field : fields) {
-            System.out.println(field.getTag());
+        for (FieldElement field : fields) {
+            System.out.println(field.tag());
         }
     }
     
-    /**
-     * Test default value.
-     */
-    @Ignore
     @Test
     public void testDefaultValue() {
         
@@ -173,13 +149,13 @@ public class ComplexIDLGenerateTest {
             "option java_package = \"com.example.tutorial\";" +
             "option java_outer_classname = \"AddressBookProtos\";" +
             "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
-            " message PhoneNumber {" +
+            " message PhoneNumberAA {" +
                 "optional PhoneType type = 1 [default = HOME];" +
                 "optional int32 name = 2 [default = 10];" +
                 "optional string vName = 3 [default = \"hello world\"];" +
           "}"; 
         
-        IDLProxyObject idlProxyObject = ProtobufIDLProxy.createSingle(idl);
+        IDLProxyObject idlProxyObject = ProtobufIDLProxy.createSingle(idl, false);
         
         Object type = idlProxyObject.get("type"); 
         
@@ -189,46 +165,34 @@ public class ComplexIDLGenerateTest {
         
     }
     
-    /**
-     * Test message dependency miss exception.
-     */
     @Test
-    public void testMessageDependencyMissException() {
+    public void testNoOptionalMark() {
         
-        String idl = "package tutorial;" +
+        String idl = "syntax = \"proto3\";package tutorial;" +
             "option java_package = \"com.example.tutorial\";" +
             "option java_outer_classname = \"AddressBookProtos\";" +
             "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
             " message PhoneNumber {" +
-                "optional PhoneType type = 1 [default = HOME];" +
-                "optional int32 name = 2 [default = 10];" +
-                "optional String vName = 3 [default = \"hello world\"];" +
+                " int32 type = 1; " +
+                " int32 name = 2 [default = 10];" +
+                " string vName = 3 [default = \"hello world\"];" +
           "}"; 
         
         try {
-            ProtobufIDLProxy.createSingle(idl);
-            Assert.fail();
+           ProtobufIDLProxy.createSingle(idl);
         } catch (Exception e) {
-            Assert.assertNotNull(e);
+            Assert.fail(e.getMessage());
         }
     }
     
     
-    /**
-     * Test generate idl simple type.
-     *
-     * @throws InvalidProtocolBufferException the invalid protocol buffer exception
-     */
     @Test
     public void testGenerateIDLSimpleType() throws InvalidProtocolBufferException {
-        String code = ProtobufIDLGenerator.getIDL(AllTypesDojoClass.class);
+        String code = ProtobufIDLGenerator.getIDL(AllTypesPojoClass.class);
         Assert.assertNotNull(code);
         
     }
     
-    /**
-     * Test generate idl enum type and types returns.
-     */
     @Test
     public void testGenerateIDLEnumTypeAndTypesReturns() {
         final Set<Class<?>> cachedTypes = new HashSet<Class<?>>();
@@ -241,51 +205,22 @@ public class ComplexIDLGenerateTest {
         Assert.assertEquals(1, cachedEnumTypes.size());
     }
     
-    /**
-     * Test list idl generate.
-     */
     @Test
     public void testListIDLGenerate() {
         String code = ProtobufIDLGenerator.getIDL(RequrieRepeatedNumberTypePOJOClass2.class);
         Assert.assertTrue(code.indexOf("repeated int32") != -1);
     }
     
-    /**
-     * Test empty class.
-     */
     @Test
     public void testEmptyClass() {
         String code = ProtobufIDLGenerator.getIDL(EmptyClass.class);
         Assert.assertTrue(code.indexOf("message") !=  -1);
     }
     
-    /**
-     * Test empty class.
-     */
-    @Test
-    public void testProtoClassDefineClass() {
-        String code = ProtobufIDLGenerator.getIDL(ProtoClassDefineClass.class);
-        Assert.assertTrue(code.indexOf("message") !=  -1);
-        Assert.assertTrue(code.indexOf("name") !=  -1);
-    }
-    
-    /**
-     * The Class EmptyClass.
-     */
     private static class EmptyClass {
         
     }
     
-    @ProtobufClass
-    private static class ProtoClassDefineClass {
-        private String name;
-        private int age;
-    }
-    
-    
-    /**
-     * Test protobuf idl generator get idl types returns.
-     */
     @Test
     public void testProtobufIDLGeneratorGetIDLTypesReturns() {
         

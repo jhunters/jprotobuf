@@ -34,13 +34,20 @@ public class MessageOptionsPOJO {
     @Protobuf(order = MessageOptions.NO_STANDARD_DESCRIPTOR_ACCESSOR_FIELD_NUMBER)
     public Boolean noStandardDescriptorAccessor;
     
+    @Protobuf(order = MessageOptions.DEPRECATED_FIELD_NUMBER)
+    public Boolean deprecated;
+    
+    @Protobuf(order = MessageOptions.MAP_ENTRY_FIELD_NUMBER)
+    public Boolean mapEntry;
+    
     @Protobuf(order = MessageOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOptions;
 
     @Override
     public String toString() {
         return "MessageOptionsPOJO [messageSetWireFormat=" + messageSetWireFormat + ", noStandardDescriptorAccessor="
-                + noStandardDescriptorAccessor + ", uninterpretedOptions=" + uninterpretedOptions + "]";
+                + noStandardDescriptorAccessor + ", deprecated=" + deprecated + ", mapEntry=" + mapEntry
+                + ", uninterpretedOptions=" + uninterpretedOptions + "]";
     }
     
     

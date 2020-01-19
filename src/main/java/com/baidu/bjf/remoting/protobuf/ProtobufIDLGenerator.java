@@ -31,8 +31,9 @@ import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 
 /**
- * Utility class for generate protobuf IDL content from @{@link Protobuf}.
- *
+ * 
+ * Utility class for generate protobuf IDL content from @{@link Protobuf}
+ * 
  * @author xiemalin
  * @since 1.0.1
  */
@@ -40,10 +41,10 @@ public class ProtobufIDLGenerator {
     
     /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufIDLGenerator.class.getName());
-
-    /** The Constant JPROTOBUF_CLASS_NAME_SUFFIX. */
-    public static final String JPROTOBUF_CLASS_NAME_SUFFIX = "$$ByJProtobuf";
-
+    
+    /** The Constant V3_HEADER. */
+    private static final String V3_HEADER = "syntax=\"proto3\"";
+    
     /**
      * get IDL content from class.
      * 
@@ -54,14 +55,11 @@ public class ProtobufIDLGenerator {
      * @return protobuf IDL content in string
      * @see Protobuf
      */
-    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
             final Set<Class<?>> cachedEnumTypes, boolean ignoreJava) {
-        
         Ignore ignore = cls.getAnnotation(Ignore.class);
         if (ignore != null) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("class '{}' marked as @Ignore annotation, create IDL ignored.", cls.getName());
-            }
+            LOGGER.info("class '{}' marked as @Ignore annotation, create IDL ignored.", cls.getName());
             return null;
         }
         
@@ -74,18 +72,17 @@ public class ProtobufIDLGenerator {
         if (enumTypes == null) {
             enumTypes = new HashSet<Class<?>>();
         }
-
+        
         if (types.contains(cls)) {
             return null;
         }
 
         StringBuilder code = new StringBuilder();
-
+        code.append(V3_HEADER).append(";\n");
         if (!ignoreJava) {
             // define package
             code.append("package ").append(cls.getPackage().getName()).append(";\n");
-            code.append("option java_outer_classname = \"").append(cls.getSimpleName())
-                    .append(JPROTOBUF_CLASS_NAME_SUFFIX + "\";\n");
+            code.append("option java_outer_classname = \"").append(cls.getSimpleName()).append("$$ByJProtobuf\";\n");
         }
 
         // define outer name class
@@ -106,7 +103,7 @@ public class ProtobufIDLGenerator {
      * @return protobuf IDL content in string
      * @see Protobuf
      */
-    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
             final Set<Class<?>> cachedEnumTypes) {
 
         return getIDL(cls, cachedTypes, cachedEnumTypes, false);
@@ -124,12 +121,8 @@ public class ProtobufIDLGenerator {
     }
 
     /**
-     * Generate idl.
-     *
-     * @param code the code
-     * @param cls the cls
-     * @param cachedTypes the cached types
-     * @param cachedEnumTypes the cached enum types
+     * @param code
+     * @param cls
      * @return sub message class list
      */
     private static void generateIDL(StringBuilder code, Class<?> cls, Set<Class<?>> cachedTypes,
@@ -140,6 +133,7 @@ public class ProtobufIDLGenerator {
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
 
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.fetchFieldInfos(cls, false);
+        boolean isMap = false;
         for (FieldInfo field : fieldInfos) {
             if (field.hasDescription()) {
                 code.append("// ").append(field.getDescription()).append("\n");
@@ -155,33 +149,33 @@ public class ProtobufIDLGenerator {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
                                 Class c = (Class) targetType;
-
+                                
                                 String fieldTypeName;
                                 if (ProtobufProxyUtils.isScalarType(c)) {
-
+                                    
                                     FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(c);
                                     fieldTypeName = fieldType.getType();
-
+                                    
                                 } else {
                                     if (field.getFieldType() == FieldType.ENUM) {
                                         if (!cachedEnumTypes.contains(c)) {
                                             cachedEnumTypes.add(c);
                                             enumTypes.add(c);
                                         }
-                                    } else {
-
+                                    } else  {
+                                        
                                         if (!cachedTypes.contains(c)) {
                                             cachedTypes.add(c);
                                             subTypes.add(c);
                                         }
                                     }
-
+                                    
                                     fieldTypeName = c.getSimpleName();
                                 }
-
+                                
                                 code.append("repeated ").append(fieldTypeName).append(" ")
-                                        .append(field.getField().getName()).append("=").append(field.getOrder())
-                                        .append(";\n");
+                                .append(field.getField().getName()).append("=").append(field.getOrder())
+                                .append(";\n");
                             }
                         }
                     }
@@ -194,8 +188,8 @@ public class ProtobufIDLGenerator {
                             cachedEnumTypes.add(c);
                             enumTypes.add(c);
                         }
-                    } else {
-
+                    } else  {
+                        
                         if (!cachedTypes.contains(c)) {
                             cachedTypes.add(c);
                             subTypes.add(c);
@@ -215,9 +209,36 @@ public class ProtobufIDLGenerator {
                             enumTypes.add(c);
                         }
                     }
+                } else if (field.getFieldType() == FieldType.MAP) {
+                    isMap = true;
+                    Class keyClass = field.getGenericKeyType();
+                    Class valueClass = field.getGenericeValueType();
+                    type = type + "<" + ProtobufProxyUtils.processProtobufType(keyClass) + ", ";
+                    type = type + ProtobufProxyUtils.processProtobufType(valueClass)  + ">";
+                    
+                    // check map key or value is object type
+                    if (ProtobufProxyUtils.isObjectType(keyClass)) {
+                        if (Enum.class.isAssignableFrom(keyClass)) {
+                            enumTypes.add(keyClass);
+                        } else {
+                            subTypes.add(keyClass);
+                        }
+                    }
+                    
+                    if (ProtobufProxyUtils.isObjectType(valueClass)) {
+                        if (Enum.class.isAssignableFrom(valueClass)) {
+                            enumTypes.add(valueClass);
+                        } else {
+                            subTypes.add(valueClass);
+                        }
+                    }
+                    
                 }
 
                 String required = getFieldRequired(field.isRequired());
+                if (isMap) {
+                    required = "";
+                }
 
                 if (field.isList()) {
                     required = "repeated";
@@ -245,18 +266,12 @@ public class ProtobufIDLGenerator {
 
     }
 
-    /**
-     * Generate enum idl.
-     *
-     * @param code the code
-     * @param cls the cls
-     */
     private static void generateEnumIDL(StringBuilder code, Class<Enum> cls) {
         code.append("enum ").append(cls.getSimpleName()).append(" {  \n");
 
         Field[] fields = cls.getFields();
         for (Field field : fields) {
-
+            
             String name = field.getName();
             code.append(name).append("=");
             try {
@@ -276,16 +291,10 @@ public class ProtobufIDLGenerator {
     }
 
     /**
-     * Gets the field required.
-     *
-     * @param required the required
-     * @return the field required
+     * @param protobuf
+     * @return
      */
     private static String getFieldRequired(boolean required) {
-        if (required) {
-            return "required";
-        }
-
-        return "optional";
+        return "";
     }
 }

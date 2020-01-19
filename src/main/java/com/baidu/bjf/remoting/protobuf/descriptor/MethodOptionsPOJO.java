@@ -27,6 +27,9 @@ import com.google.protobuf.DescriptorProtos.MethodOptions;
  * @since 2.0.1
  */
 public class MethodOptionsPOJO {
+
+    @Protobuf(order = MethodOptions.DEPRECATED_FIELD_NUMBER)
+    public Boolean deprecated;
     
     @Protobuf(order = MethodOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOptions;

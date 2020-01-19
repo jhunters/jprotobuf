@@ -19,74 +19,44 @@ import com.baidu.bjf.remoting.protobuf.annotation.EnableZigZap;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
- * Test class for default @Protobuf annotation usage example.
- *
+ * Test class for default @Protobuf annotation usage example
+ * 
  * @author xiemalin
+ * 
  */
 @EnableZigZap
 public class AllTypesDojoClassWithDefault {
 
-    /** The double f. */
-    @Protobuf(order = 1000)
+    @Protobuf
     public Double doubleF;
-
-    /** The float f. */
     @Protobuf
     public Float floatF;
-
-    /** The int32 f. */
     @Protobuf
     public Integer int32F;
-
-    /** The int64 f. */
     @Protobuf
     public Long int64F;
-
-    /** The uint32 f. */
     @Protobuf
     public Integer uint32F;
-
-    /** The uint64 f. */
     @Protobuf
     public Long uint64F;
-
-    /** The sint32 f. */
     @Protobuf
     public Integer sint32F;
-
-    /** The sint64 f. */
     @Protobuf
     public Long sint64F;
-
-    /** The fixed32 f. */
     @Protobuf
     public Integer fixed32F;
-
-    /** The fixed64 f. */
     @Protobuf
     public Long fixed64F;
-
-    /** The sfixed32 f. */
     @Protobuf
     public Integer sfixed32F;
-
-    /** The sfixed64 f. */
     @Protobuf
     public Long sfixed64F;
-
-    /** The bool f. */
     @Protobuf
     public Boolean boolF;
-
-    /** The string f. */
     @Protobuf
     public String stringF;
-
-    /** The bytes f. */
     @Protobuf
     public byte[] bytesF;
-
-    /** The type def enum. */
     @Protobuf
     public TypeDefEnum typeDefEnum;
 }

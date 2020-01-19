@@ -22,19 +22,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
  * A mapped annotation for class type.
  * 
  * @author xiemalin
- * @since 1.11.0
+ * @since 2.2.0
  */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
 public @interface ProtobufClass {
-    
+
     /**
      * @return description to the field
      */

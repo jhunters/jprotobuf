@@ -15,34 +15,23 @@
  */
 package com.baidu.bjf.remoting.protobuf.bytestest;
 
-import java.io.IOException;
-import java.util.Arrays;
-
-import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
-import com.baidu.bjf.remoting.protobuf.code.ClassCode;
-import com.baidu.bjf.remoting.protobuf.code.CodeGenerator;
-import com.baidu.bjf.remoting.protobuf.utils.compiler.JavaAssistCompiler;
 
 /**
- * Test single private byte array field.
- *
+ * Test single private byte array field
+ * 
  * @author xiemalin
  * @since 1.0.9
  */
 public class ByteTypeClass4 {
-
-    /** The bytes. */
     @Protobuf(fieldType = FieldType.BYTES)
-    private byte[] bytes;
-
-    /** The bytes2. */
+    private Byte[] bytes;
+    
     private Byte[] bytes2;
 
     /**
-     * Gets the bytes2.
-     *
+     * get the bytes2
      * @return the bytes2
      */
     public Byte[] getBytes2() {
@@ -50,47 +39,12 @@ public class ByteTypeClass4 {
     }
 
     /**
-     * Sets the bytes2.
-     *
-     * @param bytes2 the new bytes2
+     * set bytes2 value to bytes2
+     * @param bytes2 the bytes2 to set
      */
     public void setBytes2(Byte[] bytes2) {
         this.bytes2 = bytes2;
     }
-
-    /** The bytes3. */
+    
     public Byte[] bytes3;
-
-    public static void main(String[] args) throws InstantiationException, IllegalAccessException {
-        CodeGenerator cg = new CodeGenerator(ByteTypeClass4.class);
-        ClassCode classCode = cg.getClassCode();
-
-        JavaAssistCompiler compiler = new JavaAssistCompiler(classCode);
-        Class<?> cls = compiler.compile(null, null, null, null, 0L);
-        System.out.println(cls);
-
-        Object newInstance = cls.newInstance();
-        Codec<ByteTypeClass4> codec = (Codec<ByteTypeClass4>) newInstance;
-
-        ByteTypeClass4 btc = new ByteTypeClass4();
-        btc.bytes = new byte[] { 1, 2, 3 };
-
-        try {
-            byte[] encode = codec.encode(btc);
-            System.out.println(Arrays.toString(encode));
-            ByteTypeClass4 decode = codec.decode(encode);
-            System.out.println(decode);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "ByteTypeClass4 [bytes=" + Arrays.toString(bytes) + ", bytes2=" + Arrays.toString(bytes2) + ", bytes3="
-                + Arrays.toString(bytes3) + "]";
-    }
 }

@@ -37,7 +37,7 @@ public class DescriptorProtoPOJO {
     public String toString() {
         return "DescriptorProtoPOJO [name=" + name + ", fields=" + fields + ", nestedTypes=" + nestedTypes
                 + ", enumTypes=" + enumTypes + ", extensionRanges=" + extensionRanges + ", extensions=" + extensions
-                + ", options=" + options + "]";
+                + ", options=" + options + ", oneofDecls=" + oneofDecls + "]";
     }
 
     /**
@@ -69,4 +69,7 @@ public class DescriptorProtoPOJO {
     
     @Protobuf(order = DescriptorProto.OPTIONS_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<MessageOptionsPOJO> options;
+    
+    @Protobuf(order = DescriptorProto.ONEOF_DECL_FIELD_NUMBER, fieldType = FieldType.OBJECT)
+    public List<OneofDescriptorProtoPOJO> oneofDecls;
 }

@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 package com.baidu.bjf.remoting.protobuf;
+/*
+ * Copyright 2002-2007 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -119,7 +134,7 @@ public final class ProtobufProxy {
         
         return debug;
     }
-    
+
     /**
      * To generate a protobuf proxy java source code for target class.
      * 
@@ -244,15 +259,14 @@ public final class ProtobufProxy {
      * @return proxy instance object.
      */
     public static <T> Codec<T> create(Class<T> cls, boolean debug, File path) {
-        // to check cache early
         String uniClsName = cls.getName();
+        // to check cache early
         if (isCacheEnabled()) {
-            Codec codec = CACHED.get(uniClsName);
+            Codec<T> codec = CACHED.get(uniClsName);
             if (codec != null) {
                 return codec;
             }
         }
-        
         String className = getFullClassName(cls);
         Codec<T> codec = loadCompiledClass(uniClsName, className);
         if (codec != null) {
@@ -354,7 +368,6 @@ public final class ProtobufProxy {
         }
 
         String code = cg.getCode();
-        
         if (debug) {
             String printCode = code;
             CodePrinter.printCode(printCode, "generate protobuf proxy code");
@@ -428,7 +441,7 @@ public final class ProtobufProxy {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-    
+
     /**
      * Load compiled class.
      *

@@ -15,7 +15,6 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
-import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 
 /**
@@ -33,7 +32,7 @@ public class FieldCode {
     private String name;
     
     /** The type. */
-    private Class type;
+    private String type;
     
     /** The default value. */
     private String defaultValue;
@@ -46,7 +45,7 @@ public class FieldCode {
      * @param type the type
      * @param defaultValue the default value
      */
-    public FieldCode(String scope, String name, Class type, String defaultValue) {
+    public FieldCode(String scope, String name, String type, String defaultValue) {
         super();
         this.scope = scope;
         this.name = name;
@@ -100,7 +99,7 @@ public class FieldCode {
      *
      * @return the type
      */
-    public Class getType() {
+    public String getType() {
         return type;
     }
 
@@ -110,7 +109,7 @@ public class FieldCode {
      *
      * @param type the new type
      */
-    public void setType(Class type) {
+    public void setType(String type) {
         this.type = type;
     }
 
@@ -148,7 +147,7 @@ public class FieldCode {
             ret = scope + ClassCode.BLANK_STRING;
         }
         
-        ret += ClassHelper.getInternalName(type.getCanonicalName()) + ClassCode.BLANK_STRING + name;
+        ret += type + ClassCode.BLANK_STRING + name;
         
         if (!StringUtils.isEmpty(defaultValue)) {
             ret += "=" + defaultValue;

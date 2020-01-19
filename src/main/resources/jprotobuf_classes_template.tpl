@@ -52,8 +52,8 @@ public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
  
     public ${targetProxyClassName} readFrom(CodedInputStream input) throws IOException {
         ${targetProxyClassName} ret = new ${targetProxyClassName}();
-
-		${initListMapFields}
+        
+        ${initListMapFields}
 
         <!-- $BeginBlock enumFields -->
         ${enumInitialize};
@@ -74,6 +74,7 @@ public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
                     ${deocdeCheckNull}
                     continue;
                 }
+                ${objectPackedDecodeExpress}
                 <!-- $EndBlock decodeFields -->               
                 
                 input.skipField(tag);

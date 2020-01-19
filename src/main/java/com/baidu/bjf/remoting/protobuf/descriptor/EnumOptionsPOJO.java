@@ -31,12 +31,16 @@ public class EnumOptionsPOJO {
     @Protobuf(order = EnumOptions.ALLOW_ALIAS_FIELD_NUMBER)
     public Boolean allowAlias;
     
+    @Protobuf(order = EnumOptions.DEPRECATED_FIELD_NUMBER)
+    public Boolean deprecated;
+    
     @Protobuf(order = EnumOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOptions;
 
     @Override
     public String toString() {
-        return "EnumOptionsPOJO [allowAlias=" + allowAlias + ", uninterpretedOptions=" + uninterpretedOptions + "]";
+        return "EnumOptionsPOJO [allowAlias=" + allowAlias + ", deprecated=" + deprecated + ", uninterpretedOptions="
+                + uninterpretedOptions + "]";
     }
     
     

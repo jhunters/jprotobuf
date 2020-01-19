@@ -1,6 +1,6 @@
 package pkg;  
 
-option java_package = "pkg";
+option java_package = "com.baidu.bjf.remoting.protobuf.simplerepeat";
   
 option java_outer_classname = "RequrieRepeatedType";  
   

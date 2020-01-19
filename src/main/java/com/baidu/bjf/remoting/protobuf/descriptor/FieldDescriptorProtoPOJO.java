@@ -30,7 +30,7 @@ public class FieldDescriptorProtoPOJO {
     public String toString() {
         return "FieldDescriptorProtoPOJO [name=" + name + ", extendee=" + extendee + ", number=" + number + ", label="
                 + label + ", type=" + type + ", typeName=" + typeName + ", defaultValue=" + defaultValue + ", options="
-                + options + "]";
+                + options + ", oneofIndex=" + oneofIndex + "]";
     }
 
     @Protobuf(order = FieldDescriptorProto.NAME_FIELD_NUMBER)
@@ -56,4 +56,7 @@ public class FieldDescriptorProtoPOJO {
     
     @Protobuf(order = FieldDescriptorProto.OPTIONS_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public FieldOptionsPOJO options;
+    
+    @Protobuf(order = FieldDescriptorProto.ONEOF_INDEX_FIELD_NUMBER)
+    public Integer oneofIndex;
 }

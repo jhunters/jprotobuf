@@ -17,7 +17,10 @@ package com.baidu.bjf.remoting.protobuf.complexList;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 
@@ -27,8 +30,6 @@ import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.AddressBook
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.Person;
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef;
 import com.google.protobuf.InvalidProtocolBufferException;
-
-import junit.framework.Assert;
 
 /**
  * The Class ComplextListIncludeTest.
@@ -99,7 +100,45 @@ public class ComplextListIncludeTest {
         }
 
     }
+    
+    
+    /**
+     * test encode and decode with JProtobuf and Protobuf java.
+     */
+    @Test
+    public void testEncode() {
 
+        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, false);
+
+        // jprotobuf -> protobuf
+        AddressBookProtosPOJO pojo = new AddressBookProtosPOJO();
+
+        PersonPOJO person = new PersonPOJO();
+        person.name = "xiemalin";
+        person.id = 100;
+        person.boolF = true;
+        person.bytesF = new byte[] { 1, 2 };
+        person.email = "xiemalin@baidu.com";
+
+        List<PersonPOJO> list = new ArrayList<PersonPOJO>();
+        list.add(person);
+        list.add(person);
+        pojo.setList(list);
+        
+        pojo.typeList = new ArrayList<TypeDefEnum>();
+        pojo.typeList.add(TypeDefEnum.DECIMAL);
+        pojo.typeList.add(TypeDefEnum.URL);
+
+        byte[] bb = null;
+        try {
+            bb = codec.encode(pojo);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
+    }
+    
+    
     /**
      * Test empty list case.
      */
@@ -108,7 +147,7 @@ public class ComplextListIncludeTest {
         ListWithNull listWithNull = new ListWithNull();
         listWithNull.list = new ArrayList();
         
-        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class);
+        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class, false);
         try {
             
             byte[] encode = codec.encode(listWithNull);
@@ -116,8 +155,29 @@ public class ComplextListIncludeTest {
             ListWithNull listWithNull2 = codec.decode(encode);
             Assert.assertTrue(listWithNull2.list.isEmpty());
         } catch (Exception e) {
+            e.printStackTrace();
             org.junit.Assert.fail(e.getMessage());
         }
     }
+
     
+    /**
+     * Test empty map case.
+     */
+    @Test
+    public void testEmptyMapCase() {
+        ListWithNull listWithNull = new ListWithNull();
+        listWithNull.map = new HashMap<String, String>();
+        
+        Codec<ListWithNull> codec = ProtobufProxy.create(ListWithNull.class);
+        try {
+            
+            byte[] encode = codec.encode(listWithNull);
+            Assert.assertTrue(encode.length == 0);
+            ListWithNull listWithNull2 = codec.decode(encode);
+            Assert.assertTrue(listWithNull2.map.isEmpty());
+        } catch (Exception e) {
+            org.junit.Assert.fail(e.getMessage());
+        }
+    }
 }

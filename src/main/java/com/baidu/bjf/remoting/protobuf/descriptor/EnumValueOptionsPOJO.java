@@ -26,6 +26,9 @@ import com.google.protobuf.DescriptorProtos.EnumValueOptions;
  * @since 2.0.1
  */
 public class EnumValueOptionsPOJO {
+
+    @Protobuf(order = EnumValueOptions.DEPRECATED_FIELD_NUMBER)
+    public Boolean deprecated;
     
     @Protobuf(order = EnumValueOptions.UNINTERPRETED_OPTION_FIELD_NUMBER)
     public List<UninterpretedOptionPOJO> uninterpretedOptions;

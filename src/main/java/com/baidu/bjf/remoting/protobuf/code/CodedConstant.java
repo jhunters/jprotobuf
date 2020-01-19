@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -27,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
+import com.baidu.bjf.remoting.protobuf.EnumHandler;
 import com.baidu.bjf.remoting.protobuf.EnumReadable;
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
@@ -41,25 +43,39 @@ import com.baidu.bjf.remoting.protobuf.descriptor.FieldDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.FileDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.Label;
 import com.baidu.bjf.remoting.protobuf.descriptor.MessageOptionsPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.OneofDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.ServiceDescriptorProtoPOJO;
 import com.baidu.bjf.remoting.protobuf.descriptor.Type;
 import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
+import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType.Kind;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType.MapType;
+import com.baidu.jprotobuf.com.squareup.protoparser.EnumConstantElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.EnumElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement.Builder;
+import com.baidu.jprotobuf.com.squareup.protoparser.MessageElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.OptionElement;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoFile;
+import com.baidu.jprotobuf.com.squareup.protoparser.ProtoParser;
+import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.CodedInputStream;
 import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
+import com.google.protobuf.Descriptors;
 import com.google.protobuf.Descriptors.Descriptor;
 import com.google.protobuf.Descriptors.DescriptorValidationException;
 import com.google.protobuf.Descriptors.FileDescriptor;
+import com.google.protobuf.Internal;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.LazyField;
+import com.google.protobuf.Message;
+import com.google.protobuf.MessageLite;
 import com.google.protobuf.WireFormat;
-import com.squareup.protoparser.EnumType;
-import com.squareup.protoparser.EnumType.Value;
-import com.squareup.protoparser.MessageType;
-import com.squareup.protoparser.Option;
-import com.squareup.protoparser.ProtoFile;
-import com.squareup.protoparser.ProtoSchemaParser;
 
 /**
  * Utility class for codec.
@@ -69,8 +85,14 @@ import com.squareup.protoparser.ProtoSchemaParser;
  */
 public class CodedConstant {
 
-    /** The Constant FIELD_PREFIX. */
     private static final String FIELD_PREFIX = "f_";
+
+    /** The Constant MAP_ENTRY_SUFFIX. */
+    private static final String MAP_ENTRY_SUFFIX = "Entry";
+
+    /** The Constant WIREFORMAT_CLSNAME. */
+    private static final String WIREFORMAT_CLSNAME =
+            ClassHelper.getInternalName(com.google.protobuf.WireFormat.FieldType.class.getCanonicalName());
 
     /**
      * get field name.
@@ -84,46 +106,68 @@ public class CodedConstant {
     }
 
     /**
+     * Compute the number of bytes that would be needed to encode a single tag/value pair of arbitrary type.
+     *
+     * @param type The field's type.
+     * @param number The field's number.
+     * @param value Object representing the field's value. Must be of the exact type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @return the int
+     */
+    public static int computeElementSize(final WireFormat.FieldType type, final int number, final Object value) {
+        int tagSize = CodedOutputStream.computeTagSize(number);
+        if (type == WireFormat.FieldType.GROUP) {
+            // Only count the end group tag for proto2 messages as for proto1 the end
+            // group tag will be counted as a part of getSerializedSize().
+            tagSize *= 2;
+        }
+        return tagSize + computeElementSizeNoTag(type, value);
+    }
+
+    /**
      * get mapped type defined java expression.
      * 
      * @param order field order
      * @param type field type
      * @param express java expression
      * @param isList is field type is a {@link List}
+     * @param isMap is field type is a {@link Map}
      * @return full java expression
      */
-    public static String getMappedTypeDefined(int order, FieldType type, String express, boolean isList) {
-
+    public static String getMappedTypeDefined(int order, FieldType type, String express, boolean isList,
+            boolean isMap) {
+        StringBuilder code = new StringBuilder();
         String fieldName = getFieldName(order);
         if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
             // add null check
-            String code = "com.google.protobuf.ByteString " + fieldName + "=null" + ClassCode.JAVA_LINE_BREAK;
-            code += "if (!CodedConstant.isNull(" + express + ")) {\n";
+            code.append("com.google.protobuf.ByteString ").append(fieldName).append(" = null")
+                    .append(CodeGenerator.JAVA_LINE_BREAK);
+            code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(CodeGenerator.LINE_BREAK);
 
             String method = "copyFromUtf8";
             if (type == FieldType.BYTES) {
                 method = "copyFrom";
             }
-
-            code += fieldName + " = com.google.protobuf.ByteString." + method + "(" + express + ")"
-                    + ClassCode.JAVA_LINE_BREAK;
-            code += "}";
-            return code;
+            code.append(fieldName).append(" = com.google.protobuf.ByteString.").append(method).append("(")
+                    .append(express).append(")").append(CodeGenerator.JAVA_LINE_BREAK);
+            code.append("}").append(CodeGenerator.LINE_BREAK);
+            return code.toString();
         }
         // add null check
         String defineType = type.getJavaType();
         if (isList) {
             defineType = "List";
+        } else if (isMap) {
+            defineType = "Map";
         }
-
-        String code = defineType + " " + fieldName + "=null" + ClassCode.JAVA_LINE_BREAK;
-        code += "if (!CodedConstant.isNull(" + express + ")) {\n";
-
-        code += fieldName + "=" + express + ClassCode.JAVA_LINE_BREAK;
-        code += "}";
-        return code;
+        code.setLength(0);
+        code.append(defineType).append(" ").append(fieldName).append(" = null").append(CodeGenerator.JAVA_LINE_BREAK);
+        code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(CodeGenerator.LINE_BREAK);
+        code.append(fieldName).append(" = ").append(express).append(CodeGenerator.JAVA_LINE_BREAK);
+        code.append("}").append(CodeGenerator.LINE_BREAK);
+        return code.toString();
     }
-    
+
     /**
      * Gets the filed type.
      *
@@ -132,10 +176,6 @@ public class CodedConstant {
      * @return the filed type
      */
     public static String getFiledType(FieldType type, boolean isList) {
-        if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
-            return "com.google.protobuf.ByteString";
-        }
-        
         // add null check
         String defineType = type.getJavaType();
         if (isList) {
@@ -155,18 +195,9 @@ public class CodedConstant {
      * @return the write value to field
      */
     public static String getWriteValueToField(FieldType type, String express, boolean isList) {
-        if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
-            String method = "copyFromUtf8";
-            if (type == FieldType.BYTES) {
-                method = "copyFrom";
-            }
-
-            return "com.google.protobuf.ByteString." + method + "(" + express + ")";
-        }
-        
         return express;
     }
-
+    
     /**
      * Gets the mapped type size.
      *
@@ -174,37 +205,51 @@ public class CodedConstant {
      * @param order field order
      * @param type field type
      * @param isList is field type is a {@link List}
+     * @param isMap the is map
      * @param debug debug mode if true enable debug.
      * @param path the path
      * @return full java expression
      */
-    public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, boolean debug,
-            File path) {
+    public static String getMappedTypeSize(FieldInfo field, int order, FieldType type, boolean isList, boolean isMap,
+            boolean debug, File path) {
         String fieldName = getFieldName(order);
 
-        String spath = "ProtobufProxy.OUTPUT_PATH.get()";
+        String spath = "null";
+        if (path != null) {
+            spath = "new java.io.File(\"" + path.getAbsolutePath().replace('\\', '/') + "\")";
+        }
+
+        String typeString = type.getType().toUpperCase();
         if (isList) {
-            String typeString = type.getType().toUpperCase();
-            return "CodedConstant.computeListSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
-                    + Boolean.valueOf(debug) + "," + spath + ");";
+            return "CodedConstant.computeListSize(" + order + ", " + fieldName + ", FieldType." + typeString + ", "
+                    + Boolean.valueOf(debug) + ", " + spath + "," + Boolean.valueOf(field.isPacked()) + ")"
+                    + CodeGenerator.JAVA_LINE_BREAK;
+        } else if (isMap) {
+
+            String joinedSentence = getMapFieldGenericParameterString(field);
+            return "CodedConstant.computeMapSize(" + order + ", " + fieldName + ", " + joinedSentence + ")"
+                    + CodeGenerator.JAVA_LINE_BREAK;
         }
 
         if (type == FieldType.OBJECT) {
-            String typeString = type.getType().toUpperCase();
             return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
-                    + Boolean.valueOf(debug) + "," + spath + ");";
+                    + Boolean.valueOf(debug) + "," + spath + ")" + CodeGenerator.JAVA_LINE_BREAK;
         }
 
         String t = type.getType();
-        if (type == FieldType.STRING || type == FieldType.BYTES) {
-            t = "bytes";
+        if (type == FieldType.STRING) {
+            t = "String";
+        }
+        
+        if (type == FieldType.BYTES) {
+            t = "ByteArray";
         }
         t = capitalize(t);
 
         boolean enumSpecial = false;
         if (type == FieldType.ENUM) {
             if (EnumReadable.class.isAssignableFrom(field.getField().getType())) {
-                String clsName = field.getField().getType().getCanonicalName();
+                String clsName = ClassHelper.getInternalName(field.getField().getType().getCanonicalName());
                 fieldName = "((" + clsName + ") " + fieldName + ").value()";
                 enumSpecial = true;
             }
@@ -214,7 +259,81 @@ public class CodedConstant {
         }
 
         return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ")"
-                + ClassCode.JAVA_END;
+                + CodeGenerator.JAVA_LINE_BREAK;
+    }
+
+    /**
+     * Gets the map field generic parameter string.
+     *
+     * @param field the field
+     * @return the map field generic parameter string
+     */
+    public static String getMapFieldGenericParameterString(FieldInfo field) {
+        FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(field.getGenericKeyType());
+        String keyClass;
+        String defaultKeyValue;
+        if (fieldType == null) {
+            // may be object or enum
+            if (Enum.class.isAssignableFrom(field.getGenericKeyType())) {
+                keyClass = WIREFORMAT_CLSNAME + ".ENUM";
+                Class<?> declaringClass = field.getGenericKeyType();
+                Field[] fields = declaringClass.getFields();
+                if (fields != null && fields.length > 0) {
+                    defaultKeyValue = ClassHelper.getInternalName(field.getGenericKeyType().getCanonicalName()) + "."
+                            + fields[0].getName();
+                } else {
+                    defaultKeyValue = "0";
+                }
+
+            } else {
+                keyClass = WIREFORMAT_CLSNAME + ".MESSAGE";
+                // check constructor
+                boolean hasDefaultConstructor = ClassHelper.hasDefaultConstructor(field.getGenericKeyType());
+                if (!hasDefaultConstructor) {
+                    throw new IllegalArgumentException("Class '" + field.getGenericKeyType().getCanonicalName()
+                            + "' must has default constructor method with no parameters.");
+                }
+                defaultKeyValue = "new " + ClassHelper.getInternalName(field.getGenericKeyType().getCanonicalName()) + "()";
+            }
+        } else {
+            keyClass = WIREFORMAT_CLSNAME + "." + fieldType.toString();
+            // check type
+            
+            defaultKeyValue = fieldType.getDefaultValue();
+        }
+
+        fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(field.getGenericeValueType());
+        String valueClass;
+        String defaultValueValue;
+        if (fieldType == null) {
+            // may be object or enum
+            if (Enum.class.isAssignableFrom(field.getGenericeValueType())) {
+                valueClass = WIREFORMAT_CLSNAME + ".ENUM";
+                Class<?> declaringClass = field.getGenericeValueType();
+                Field[] fields = declaringClass.getFields();
+                if (fields != null && fields.length > 0) {
+                    defaultValueValue = ClassHelper.getInternalName(field.getGenericeValueType().getCanonicalName()) + "."
+                            + fields[0].getName();
+                } else {
+                    defaultValueValue = "0";
+                }
+
+            } else {
+                valueClass = WIREFORMAT_CLSNAME + ".MESSAGE";
+                // check constructor
+                boolean hasDefaultConstructor = ClassHelper.hasDefaultConstructor(field.getGenericeValueType());
+                if (!hasDefaultConstructor) {
+                    throw new IllegalArgumentException("Class '" + field.getGenericeValueType().getCanonicalName()
+                            + "' must has default constructor method with no parameters.");
+                }
+                defaultValueValue = "new " + ClassHelper.getInternalName(field.getGenericeValueType().getCanonicalName()) + "()";
+            }
+        } else {
+            valueClass = WIREFORMAT_CLSNAME + "." + fieldType.toString();
+            defaultValueValue = fieldType.getDefaultValue();
+        }
+        String joinedSentence = keyClass + "," + defaultKeyValue + "," + valueClass + "," + defaultValueValue;
+        return joinedSentence;
     }
 
     /**
@@ -227,19 +346,157 @@ public class CodedConstant {
      * @param path the path
      * @return full java expression
      */
-    public static int computeListSize(int order, Collection list, FieldType type, boolean debug, File path) {
+    public static int computeListSize(int order, Collection<?> list, FieldType type, boolean debug, File path) {
+        return computeListSize(order, list, type, debug, path, false, false);
+    }
+
+    /**
+     * Compute list size.
+     *
+     * @param order the order
+     * @param list the list
+     * @param type the type
+     * @param debug the debug
+     * @param path the path
+     * @param packed the packed
+     * @return the int
+     */
+    public static int computeListSize(int order, Collection list, FieldType type, boolean debug, File path, boolean packed) {
+        return computeListSize(order, list, type, debug, path, packed, false);
+    }
+
+    /**
+     * Compute list size.
+     *
+     * @param order the order
+     * @param list the list
+     * @param type the type
+     * @param debug the debug
+     * @param path the path
+     * @param packed the packed
+     * @param sizeOnly the size only if true will not include order size and tag size
+     * @return the int
+     */
+    public static int computeListSize(int order, Collection list, FieldType type, boolean debug, File path, boolean packed,
+            boolean sizeOnly) {
         int size = 0;
         if (list == null || list.isEmpty()) {
             return size;
         }
 
+        int dataSize = 0;
         for (Object object : list) {
-            size += computeSize(order, object, type, debug, path);
+            dataSize += computeSize(order, object, type, debug, path);
         }
+        size += dataSize;
         if (type != FieldType.OBJECT) {
-            size += list.size() * CodedOutputStream.computeTagSize(order);
+            if (packed) {
+                if (!sizeOnly) {
+                    size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(dataSize);
+                    int tag = CodedConstant.makeTag(order,
+                            WireFormat.WIRETYPE_LENGTH_DELIMITED);
+                    size += com.google.protobuf.CodedOutputStream.computeUInt32SizeNoTag(tag);
+                }
+            } else {
+                size += list.size() * CodedOutputStream.computeTagSize(order);
+            }
         }
         return size;
+    }
+
+    /**
+     * Compute map size.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param order the order
+     * @param map the map
+     * @param keyType the key type
+     * @param defaultKey the default key
+     * @param valueType the value type
+     * @param defalutValue the defalut value
+     * @return the int
+     */
+    public static <K, V> int computeMapSize(int order, Map<K, V> map, com.google.protobuf.WireFormat.FieldType keyType,
+            K defaultKey, com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) {
+        int size = 0;
+        for (java.util.Map.Entry<K, V> entry : map.entrySet()) {
+            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
+                    .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
+
+            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
+                    valuesDefaultEntry.newBuilderForType().setKey(entry.getKey()).setValue(entry.getValue()).build();
+
+            size += com.google.protobuf.CodedOutputStream.computeMessageSize(order, values);
+        }
+        return size;
+    }
+
+    /**
+     * Put map value.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param input the input
+     * @param map the map
+     * @param keyType the key type
+     * @param defaultKey the default key
+     * @param valueType the value type
+     * @param defalutValue the defalut value
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
+            com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
+            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) throws IOException {
+        putMapValue(input, map, keyType, defaultKey, valueType, defalutValue, null);
+
+    }
+
+    public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
+            com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
+            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue, EnumHandler<V> handler)
+            throws IOException {
+        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
+                .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
+
+        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
+                input.readMessage(valuesDefaultEntry.getParserForType(), null);
+
+        Object value = values.getValue();
+        if (handler != null) {
+            V value1 = handler.handle((int) value);
+            map.put(values.getKey(), value1);
+        } else {
+            map.put(values.getKey(), values.getValue());
+        }
+
+
+    }
+
+    /**
+     * Write to map.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param output the output
+     * @param order the order
+     * @param map the map
+     * @param keyType the key type
+     * @param defaultKey the default key
+     * @param valueType the value type
+     * @param defalutValue the defalut value
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static <K, V> void writeToMap(CodedOutputStream output, int order, Map<K, V> map,
+            com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
+            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue) throws IOException {
+        com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
+                .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
+        for (java.util.Map.Entry<K, V> entry : map.entrySet()) {
+            com.baidu.bjf.remoting.protobuf.MapEntry<K, V> values =
+                    valuesDefaultEntry.newBuilderForType().setKey(entry.getKey()).setValue(entry.getValue()).build();
+            output.writeMessage(order, values);
+        }
     }
 
     /**
@@ -254,6 +511,29 @@ public class CodedConstant {
      */
     public static int computeSize(int order, Object o, FieldType type, boolean debug, File path) {
         return computeSize(order, o, type, false, debug, path);
+    }
+
+    /**
+     * Compute object size no tag.
+     *
+     * @param o the o
+     * @return the int
+     */
+    public static int computeObjectSizeNoTag(Object o) {
+        int size = 0;
+        if (o == null) {
+            return size;
+        }
+
+        Class cls = o.getClass();
+        Codec target = ProtobufProxy.create(cls);
+        try {
+            size = target.size(o);
+            size = size + CodedOutputStream.computeRawVarint32Size(size);
+            return size;
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -321,19 +601,32 @@ public class CodedConstant {
      * @param order field order
      * @param type field type
      * @param isList the is list
+     * @param isMap the is map
      * @return full java expression
      */
-    public static String getMappedWriteCode(FieldInfo field, String prefix, int order, FieldType type, boolean isList) {
+    public static String getMappedWriteCode(FieldInfo field, String prefix, int order, FieldType type, boolean isList,
+            boolean isMap) {
         String fieldName = getFieldName(order);
         StringBuilder ret = new StringBuilder();
-        ret.append("if (").append(fieldName).append("!=null){");
+        ret.append("if (").append(fieldName).append(" != null){").append(CodeGenerator.LINE_BREAK);
 
         if (isList) {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeToList(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(");\n}");
+            ret.append(",").append(fieldName).append(",").append(Boolean.valueOf(field.isPacked())).append(")")
+                    .append(CodeGenerator.JAVA_LINE_BREAK).append("}").append(CodeGenerator.LINE_BREAK);
             return ret.toString();
+        } else if (isMap) {
+            ret.append("CodedConstant.writeToMap(").append(prefix).append(",");
+            ret.append(order).append(",").append(fieldName);
+
+            String joinedSentence = getMapFieldGenericParameterString(field);
+            ret.append(",").append(joinedSentence);
+
+            ret.append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}").append(CodeGenerator.LINE_BREAK);
+            return ret.toString();
+
         } else {
             // not list so should add convert to primitive type
             boolean enumSpecial = false;
@@ -353,27 +646,45 @@ public class CodedConstant {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeObject(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(", false)").append(ClassCode.JAVA_LINE_BREAK).append("}")
-                    .append(ClassCode.LINE_BREAK);
-            ;
+            ret.append(",").append(fieldName).append(", false)").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(CodeGenerator.LINE_BREAK);
             return ret.toString();
         }
 
-        if (type == FieldType.STRING || type == FieldType.BYTES) {
-            ret.append(prefix).append(".writeBytes(").append(order);
-            ret.append(", ").append(fieldName).append(")").append(ClassCode.JAVA_LINE_BREAK).append("}")
-                    .append(ClassCode.LINE_BREAK);
-            ;
+        if (type == FieldType.STRING) {
+            ret.append(prefix).append(".writeString(").append(order);
+            ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(CodeGenerator.LINE_BREAK);
             return ret.toString();
         }
+        
+        if (type == FieldType.BYTES) {
+            ret.append(prefix).append(".writeByteArray(").append(order);
+            ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(CodeGenerator.LINE_BREAK);
+            return ret.toString();
+        }
+        
         String t = type.getType();
         t = capitalize(t);
 
         ret.append(prefix).append(".write").append(t).append("(").append(order);
-        ret.append(", ").append(fieldName).append(")").append(ClassCode.JAVA_LINE_BREAK).append("}")
-                .append(ClassCode.LINE_BREAK);
-        ;
+        ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
+                .append(CodeGenerator.LINE_BREAK);
         return ret.toString();
+    }
+
+    /**
+     * Write to list.
+     *
+     * @param out the out
+     * @param order the order
+     * @param type the type
+     * @param list the list
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static void writeToList(CodedOutputStream out, int order, FieldType type, Collection list) throws IOException {
+        writeToList(out, order, type, list, false);
     }
 
     /**
@@ -383,24 +694,38 @@ public class CodedConstant {
      * @param order field order
      * @param type field type
      * @param list target list object to be serialized
+     * @param packed the packed
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public static void writeToList(CodedOutputStream out, int order, FieldType type, Collection list) throws IOException {
+    public static void writeToList(CodedOutputStream out, int order, FieldType type, Collection list, boolean packed)
+            throws IOException {
         if (list == null || list.isEmpty()) {
             return;
         }
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        CodedOutputStream newInstance = CodedOutputStream.newInstance(baos, 0);
         for (Object object : list) {
             if (object == null) {
                 throw new NullPointerException("List can not include Null value.");
             }
-
-            writeObject(out, order, type, object, true);
+            writeObject(newInstance, order, type, object, true, !packed);
         }
+        newInstance.flush();
+        byte[] byteArray = baos.toByteArray();
+        
+
+        if (packed) {
+            out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
+            out.writeUInt32NoTag(byteArray.length); 
+        }
+
+        out.write(byteArray, 0, byteArray.length);
 
     }
 
     /**
-     * Write object to byte array by {@link FieldType}.
+     * Write object.
      *
      * @param out the out
      * @param order the order
@@ -411,6 +736,22 @@ public class CodedConstant {
      */
     public static void writeObject(CodedOutputStream out, int order, FieldType type, Object o, boolean list)
             throws IOException {
+        writeObject(out, order, type, o, list, true);
+    }
+
+    /**
+     * Write object to byte array by {@link FieldType}.
+     *
+     * @param out the out
+     * @param order the order
+     * @param type the type
+     * @param o the o
+     * @param list the list
+     * @param withTag the with tag
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static void writeObject(CodedOutputStream out, int order, FieldType type, Object o, boolean list,
+            boolean withTag) throws IOException {
         if (o == null) {
             return;
         }
@@ -420,44 +761,112 @@ public class CodedConstant {
             Class cls = o.getClass();
             Codec target = ProtobufProxy.create(cls);
 
-            out.writeRawVarint32(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
-            out.writeRawVarint32(target.size(o));
-
-            target.writeTo(o, out);
+            if (withTag) {
+                out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
+            }
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            CodedOutputStream newInstance = CodedOutputStream.newInstance(baos, 0);
+            target.writeTo(o, newInstance);
+            newInstance.flush();
+            byte[] byteArray = baos.toByteArray();
+            out.writeUInt32NoTag(byteArray.length);
+            out.write(byteArray, 0, byteArray.length);
+            
             return;
         }
 
         if (type == FieldType.BOOL) {
-            out.writeBool(order, (Boolean) o);
+            if (withTag) {
+                out.writeBool(order, (Boolean) o);
+            } else {
+                out.writeBoolNoTag((Boolean) o);
+            }
         } else if (type == FieldType.BYTES) {
             byte[] bb = (byte[]) o;
-            out.writeBytes(order, ByteString.copyFrom(bb));
+            if (withTag) {
+                out.writeBytes(order, ByteString.copyFrom(bb));
+            } else {
+                out.writeBytesNoTag(ByteString.copyFrom(bb));
+            }
         } else if (type == FieldType.DOUBLE) {
-            out.writeDouble(order, (Double) o);
+            if (withTag) {
+                out.writeDouble(order, (Double) o);
+            } else {
+                out.writeDoubleNoTag((Double) o);
+            }
         } else if (type == FieldType.FIXED32) {
-            out.writeFixed32(order, (Integer) o);
+            if (withTag) {
+                out.writeFixed32(order, (Integer) o);
+            } else {
+                out.writeFixed32NoTag((Integer) o);
+            }
         } else if (type == FieldType.FIXED64) {
-            out.writeFixed64(order, (Long) o);
+            if (withTag) {
+                out.writeFixed64(order, (Long) o);
+            } else {
+                out.writeFixed64NoTag((Long) o);
+            }
         } else if (type == FieldType.FLOAT) {
-            out.writeFloat(order, (Float) o);
+            if (withTag) {
+                out.writeFloat(order, (Float) o);
+            } else {
+                out.writeFloatNoTag((Float) o);
+            }
         } else if (type == FieldType.INT32) {
-            out.writeInt32(order, (Integer) o);
+            if (withTag) {
+                out.writeInt32(order, (Integer) o);
+            } else {
+                out.writeInt32NoTag((Integer) o);
+            }
         } else if (type == FieldType.INT64) {
-            out.writeInt64(order, (Long) o);
+            if (withTag) {
+                out.writeInt64(order, (Long) o);
+            } else {
+                out.writeInt64NoTag((Long) o);
+            }
         } else if (type == FieldType.SFIXED32) {
-            out.writeSFixed32(order, (Integer) o);
+            if (withTag) {
+                out.writeSFixed32(order, (Integer) o);
+            } else {
+                out.writeSFixed32NoTag((Integer) o);
+            }
         } else if (type == FieldType.SFIXED64) {
-            out.writeSFixed64(order, (Long) o);
+            if (withTag) {
+                out.writeSFixed64(order, (Long) o);
+            } else {
+                out.writeSFixed64NoTag((Long) o);
+            }
         } else if (type == FieldType.SINT32) {
-            out.writeSInt32(order, (Integer) o);
+            if (withTag) {
+                out.writeSInt32(order, (Integer) o);
+            } else {
+                out.writeSInt32NoTag((Integer) o);
+            }
         } else if (type == FieldType.SINT64) {
-            out.writeSInt64(order, (Long) o);
+            if (withTag) {
+                out.writeSInt64(order, (Long) o);
+            } else {
+                out.writeSInt64NoTag((Long) o);
+            }
         } else if (type == FieldType.STRING) {
-            out.writeBytes(order, ByteString.copyFromUtf8(String.valueOf(o)));
+            if (withTag) {
+                out.writeBytes(order, ByteString.copyFromUtf8(String.valueOf(o)));
+            } else {
+                out.writeBytesNoTag(ByteString.copyFromUtf8(String.valueOf(o)));
+            }
         } else if (type == FieldType.UINT32) {
-            out.writeUInt32(order, (Integer) o);
+            if (withTag) {
+                out.writeUInt32(order, (Integer) o);
+            } else {
+                out.writeUInt32NoTag((Integer) o);
+            }
         } else if (type == FieldType.UINT64) {
-            out.writeUInt64(order, (Long) o);
+            if (withTag) {
+                out.writeUInt64(order, (Long) o);
+            } else {
+                out.writeUInt64NoTag((Long) o);
+            }
         } else if (type == FieldType.ENUM) {
             int value = 0;
             if (o instanceof EnumReadable) {
@@ -465,7 +874,12 @@ public class CodedConstant {
             } else if (o instanceof Enum) {
                 value = ((Enum) o).ordinal();
             }
-            out.writeEnum(order, value);
+            if (withTag) {
+                out.writeEnum(order, value);
+
+            } else {
+                out.writeEnumNoTag(value);
+            }
         }
     }
 
@@ -479,8 +893,7 @@ public class CodedConstant {
     public static String getRequiredCheck(int order, Field field) {
         String fieldName = getFieldName(order);
         String code = "if (" + fieldName + "== null) {\n";
-        code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() + "\"))"
-                + ClassCode.JAVA_LINE_BREAK;
+        code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() + "\"));\n";
         code += "}\n";
 
         return code;
@@ -495,8 +908,7 @@ public class CodedConstant {
      */
     public static String getRetRequiredCheck(String express, Field field) {
         String code = "if (CodedConstant.isNull(" + express + ")) {\n";
-        code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() + "\"))"
-                + ClassCode.JAVA_LINE_BREAK;
+        code += "throw new UninitializedMessageException(CodedConstant.asList(\"" + field.getName() + "\"));\n";
         code += "}\n";
 
         return code;
@@ -510,26 +922,6 @@ public class CodedConstant {
      */
     public static boolean isNull(Object o) {
         return o == null;
-    }
-    
-    /**
-     * Checks if is null.
-     *
-     * @param list the list
-     * @return true, if is null
-     */
-    public static boolean isNull(Collection list) {
-        return list == null || list.isEmpty();
-    }
-    
-    /**
-     * Checks if is null.
-     *
-     * @param map the map
-     * @return true, if is null
-     */
-    public static boolean isNull(Map map) {
-        return map == null || map.isEmpty();
     }
 
     /**
@@ -667,7 +1059,26 @@ public class CodedConstant {
         }
         return "";
     }
-    
+
+    /**
+     * Gets the enum value.
+     *
+     * @param en the en
+     * @return the enum value
+     */
+    public static int getEnumValue(Enum en) {
+        if (en != null) {
+            int toCompareValue;
+            if (en instanceof EnumReadable) {
+                toCompareValue = ((EnumReadable) en).value();
+            } else {
+                toCompareValue = en.ordinal();
+            }
+            return toCompareValue;
+        }
+
+        return -1;
+    }
     
     /**
      * Gets the enumeration value.
@@ -692,6 +1103,293 @@ public class CodedConstant {
     }
 
     /**
+     * Read a field of any primitive type for immutable messages from a CodedInputStream. Enums, groups, and embedded
+     * messages are not handled by this method.
+     *
+     * @param input The stream from which to read.
+     * @param type Declared type of the field.
+     * @param checkUtf8 When true, check that the input is valid utf8.
+     * @return An object representing the field's value, of the exact type which would be returned by
+     *         {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static Object readPrimitiveField(CodedInputStream input, final WireFormat.FieldType type, boolean checkUtf8)
+            throws IOException {
+        switch (type) {
+            case DOUBLE:
+                return input.readDouble();
+            case FLOAT:
+                return input.readFloat();
+            case INT64:
+                return input.readInt64();
+            case UINT64:
+                return input.readUInt64();
+            case INT32:
+                return input.readInt32();
+            case FIXED64:
+                return input.readFixed64();
+            case FIXED32:
+                return input.readFixed32();
+            case BOOL:
+                return input.readBool();
+            case STRING:
+                if (checkUtf8) {
+                    return input.readStringRequireUtf8();
+                } else {
+                    return input.readString();
+                }
+            case BYTES:
+                return input.readByteArray();
+            case UINT32:
+                return input.readUInt32();
+            case SFIXED32:
+                return input.readSFixed32();
+            case SFIXED64:
+                return input.readSFixed64();
+            case SINT32:
+                return input.readSInt32();
+            case SINT64:
+                return input.readSInt64();
+
+            case GROUP:
+                throw new IllegalArgumentException("readPrimitiveField() cannot handle nested groups.");
+            case MESSAGE:
+                throw new IllegalArgumentException("readPrimitiveField() cannot handle embedded messages.");
+            case ENUM:
+                // We don't handle enums because we don't know what to do if the
+                // value is not recognized.
+                throw new IllegalArgumentException("readPrimitiveField() cannot handle enums.");
+        }
+
+        throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
+    }
+
+    /**
+     * Write a single tag-value pair to the stream.
+     *
+     * @param output The output stream.
+     * @param type The field's type.
+     * @param number The field's number.
+     * @param value Object representing the field's value. Must be of the exact type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static void writeElement(final CodedOutputStream output, final WireFormat.FieldType type, final int number,
+            final Object value) throws IOException {
+        // Special case for groups, which need a start and end tag; other fields
+        // can just use writeTag() and writeFieldNoTag().
+        if (type == WireFormat.FieldType.GROUP) {
+            output.writeGroup(number, (MessageLite) value);
+        } else {
+            output.writeTag(number, getWireFormatForFieldType(type, false));
+            writeElementNoTag(output, type, value);
+        }
+    }
+
+    /**
+     * Given a field type, return the wire type.
+     *
+     * @param type the type
+     * @param isPacked the is packed
+     * @return the wire format for field type
+     * @returns One of the {@code WIRETYPE_} constants defined in {@link WireFormat}.
+     */
+    static int getWireFormatForFieldType(final WireFormat.FieldType type, boolean isPacked) {
+        if (isPacked) {
+            return WireFormat.WIRETYPE_LENGTH_DELIMITED;
+        } else {
+            return type.getWireType();
+        }
+    }
+    
+    static byte[] toByteArray(Byte[] bb) {
+        byte[] ret = new byte[bb.length];
+        int i = 0;
+        for (Byte b : bb) {
+            ret[i++] = b.byteValue();
+        }
+        return ret;
+    }
+    
+    /**
+     * Write a field of arbitrary type, without its tag, to the stream.
+     *
+     * @param output The output stream.
+     * @param type The field's type.
+     * @param value Object representing the field's value. Must be of the exact type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
+    public static void writeElementNoTag(final CodedOutputStream output, final WireFormat.FieldType type,
+            final Object value) throws IOException {
+        switch (type) {
+            case DOUBLE:
+                output.writeDoubleNoTag((Double) value);
+                break;
+            case FLOAT:
+                output.writeFloatNoTag((Float) value);
+                break;
+            case INT64:
+                output.writeInt64NoTag((Long) value);
+                break;
+            case UINT64:
+                output.writeUInt64NoTag((Long) value);
+                break;
+            case INT32:
+                output.writeInt32NoTag((Integer) value);
+                break;
+            case FIXED64:
+                output.writeFixed64NoTag((Long) value);
+                break;
+            case FIXED32:
+                output.writeFixed32NoTag((Integer) value);
+                break;
+            case BOOL:
+                output.writeBoolNoTag((Boolean) value);
+                break;
+            case STRING:
+                output.writeStringNoTag((String) value);
+                break;
+            // group not support yet
+            // case GROUP : output.writeGroupNoTag ((MessageLite) value); break;
+            case MESSAGE:
+                writeObject(output, 0, FieldType.OBJECT, value, false, false);
+                break;
+            case BYTES:
+                if (value instanceof ByteString) {
+                    output.writeBytesNoTag((ByteString) value);
+                } else {
+                    byte[] v;
+                    if (value instanceof Byte[]) {
+                        v = toByteArray((Byte[]) value);
+                    } else {
+                        v = (byte[]) value;
+                    }
+                    output.writeByteArrayNoTag(v);
+                }
+                break;
+            case UINT32:
+                output.writeUInt32NoTag((Integer) value);
+                break;
+            case SFIXED32:
+                output.writeSFixed32NoTag((Integer) value);
+                break;
+            case SFIXED64:
+                output.writeSFixed64NoTag((Long) value);
+                break;
+            case SINT32:
+                output.writeSInt32NoTag((Integer) value);
+                break;
+            case SINT64:
+                output.writeSInt64NoTag((Long) value);
+                break;
+
+            case ENUM:
+                if (value instanceof Internal.EnumLite) {
+                    output.writeEnumNoTag(((Internal.EnumLite) value).getNumber());
+                } else {
+
+                    if (value instanceof EnumReadable) {
+                        output.writeEnumNoTag(((EnumReadable) value).value());
+                    } else if (value instanceof Enum) {
+                        output.writeEnumNoTag(((Enum) value).ordinal());
+                    } else {
+                        output.writeEnumNoTag(((Integer) value).intValue());
+                    }
+
+                }
+                break;
+        }
+    }
+
+    /**
+     * Compute length delimited field size.
+     *
+     * @param fieldLength the field length
+     * @return the int
+     */
+    public static int computeLengthDelimitedFieldSize(int fieldLength) {
+        return CodedOutputStream.computeUInt32SizeNoTag(fieldLength) + fieldLength;
+    }
+    
+
+    /**
+     * Compute the number of bytes that would be needed to encode a particular value of arbitrary type, excluding tag.
+     *
+     * @param type The field's type.
+     * @param value Object representing the field's value. Must be of the exact type which would be returned by
+     *            {@link Message#getField(Descriptors.FieldDescriptor)} for this field.
+     * @return the int
+     */
+    public static int computeElementSizeNoTag(final WireFormat.FieldType type, final Object value) {
+        switch (type) {
+            // Note: Minor violation of 80-char limit rule here because this would
+            // actually be harder to read if we wrapped the lines.
+            case DOUBLE:
+                return CodedOutputStream.computeDoubleSizeNoTag((Double) value);
+            case FLOAT:
+                return CodedOutputStream.computeFloatSizeNoTag((Float) value);
+            case INT64:
+                return CodedOutputStream.computeInt64SizeNoTag((Long) value);
+            case UINT64:
+                return CodedOutputStream.computeUInt64SizeNoTag((Long) value);
+            case INT32:
+                return CodedOutputStream.computeInt32SizeNoTag((Integer) value);
+            case FIXED64:
+                return CodedOutputStream.computeFixed64SizeNoTag((Long) value);
+            case FIXED32:
+                return CodedOutputStream.computeFixed32SizeNoTag((Integer) value);
+            case BOOL:
+                return CodedOutputStream.computeBoolSizeNoTag((Boolean) value);
+            case STRING:
+                return CodedOutputStream.computeStringSizeNoTag((String) value);
+            case GROUP:
+                return CodedOutputStream.computeGroupSizeNoTag((MessageLite) value);
+            case BYTES:
+                if (value instanceof ByteString) {
+                    return CodedOutputStream.computeBytesSizeNoTag((ByteString) value);
+                } else {
+                    if (value instanceof Byte[]) {
+                        return computeLengthDelimitedFieldSize(((Byte[]) value).length);
+                    }
+                    return CodedOutputStream.computeByteArraySizeNoTag((byte[]) value);
+                }
+            case UINT32:
+                return CodedOutputStream.computeUInt32SizeNoTag((Integer) value);
+            case SFIXED32:
+                return CodedOutputStream.computeSFixed32SizeNoTag((Integer) value);
+            case SFIXED64:
+                return CodedOutputStream.computeSFixed64SizeNoTag((Long) value);
+            case SINT32:
+                return CodedOutputStream.computeSInt32SizeNoTag((Integer) value);
+            case SINT64:
+                return CodedOutputStream.computeSInt64SizeNoTag((Long) value);
+
+            case MESSAGE:
+                if (value instanceof LazyField) {
+                    return CodedOutputStream.computeLazyFieldSizeNoTag((LazyField) value);
+                } else {
+                    return computeObjectSizeNoTag(value);
+                }
+
+            case ENUM:
+                if (value instanceof Internal.EnumLite) {
+                    return CodedOutputStream.computeEnumSizeNoTag(((Internal.EnumLite) value).getNumber());
+                } else {
+                    if (value instanceof EnumReadable) {
+                        return CodedOutputStream.computeEnumSizeNoTag(((EnumReadable) value).value());
+                    } else if (value instanceof Enum) {
+                        return CodedOutputStream.computeEnumSizeNoTag(((Enum) value).ordinal());
+                    }
+
+                    return CodedOutputStream.computeEnumSizeNoTag((Integer) value);
+                }
+        }
+
+        throw new RuntimeException("There is no way to get here, but the compiler thinks otherwise.");
+    }
+
+    /**
      * Gets the descriptor.
      *
      * @param cls the cls
@@ -699,16 +1397,15 @@ public class CodedConstant {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public static Descriptor getDescriptor(Class<?> cls) throws IOException {
-
         String idl = ProtobufIDLGenerator.getIDL(cls);
-        ProtoFile file = ProtoSchemaParser.parse(ProtobufIDLProxy.DEFAULT_FILE_NAME, idl);
+        ProtoFile file = ProtoParser.parse(ProtobufIDLProxy.DEFAULT_FILE_NAME, idl);
 
         FileDescriptorProtoPOJO fileDescriptorProto = new FileDescriptorProtoPOJO();
 
         fileDescriptorProto.name = ProtobufIDLProxy.DEFAULT_FILE_NAME;
-        fileDescriptorProto.pkg = file.getPackageName();
-        fileDescriptorProto.dependencies = file.getDependencies();
-        fileDescriptorProto.publicDependency = convertList(file.getPublicDependencies());
+        fileDescriptorProto.pkg = file.packageName();
+        fileDescriptorProto.dependencies = file.dependencies();
+        fileDescriptorProto.publicDependency = convertList(file.publicDependencies());
         fileDescriptorProto.weakDependency = null; // XXX
 
         fileDescriptorProto.messageTypes = new ArrayList<DescriptorProtoPOJO>();
@@ -718,26 +1415,24 @@ public class CodedConstant {
         Set<String> messageSet = new HashSet<String>();
         Set<String> enumSet = new HashSet<String>();
 
-        List<com.squareup.protoparser.Type> typeElements = file.getTypes();
+        List<TypeElement> typeElements = file.typeElements();
         if (typeElements != null) {
 
-            for (com.squareup.protoparser.Type typeElement : typeElements) {
-                if (typeElement instanceof MessageType) {
-                    messageSet.add(typeElement.getName());
-                } else if (typeElement instanceof EnumType) {
-                    enumSet.add(typeElement.getName());
+            for (TypeElement typeElement : typeElements) {
+                if (typeElement instanceof MessageElement) {
+                    messageSet.add(typeElement.name());
+                } else if (typeElement instanceof EnumElement) {
+                    enumSet.add(typeElement.name());
                 }
-
             }
 
-            for (com.squareup.protoparser.Type typeElement : typeElements) {
-
-                if (typeElement instanceof MessageType) {
-                    fileDescriptorProto.messageTypes.add(
-                            getDescritorProtoPOJO(fileDescriptorProto, (MessageType) typeElement, messageSet, enumSet));
-                } else if (typeElement instanceof EnumType) {
+            for (TypeElement typeElement : typeElements) {
+                if (typeElement instanceof MessageElement) {
+                    fileDescriptorProto.messageTypes.add(getDescritorProtoPOJO(fileDescriptorProto,
+                            (MessageElement) typeElement, messageSet, enumSet));
+                } else if (typeElement instanceof EnumElement) {
                     fileDescriptorProto.enumTypes.add(
-                            getDescritorProtoPOJO(fileDescriptorProto, (EnumType) typeElement, messageSet, enumSet));
+                            getDescritorProtoPOJO(fileDescriptorProto, (EnumElement) typeElement, messageSet, enumSet));
                 }
 
             }
@@ -773,66 +1468,32 @@ public class CodedConstant {
      * @param enumSet the enum set
      * @return the descritor proto pojo
      */
-    private static DescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
-            MessageType typeElement, Set<String> messageSet, Set<String> enumSet) {
+    private static EnumDescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
+            EnumElement typeElement, Set<String> messageSet, Set<String> enumSet) {
 
-        DescriptorProtoPOJO ret = new DescriptorProtoPOJO();
-        ret.name = typeElement.getName();
-        ret.fields = new ArrayList<FieldDescriptorProtoPOJO>();
-        ret.nestedTypes = new ArrayList<DescriptorProtoPOJO>();
-        ret.enumTypes = new ArrayList<EnumDescriptorProtoPOJO>();
-        ret.extensionRanges = new ArrayList<ExtensionRangePOJO>();
-        ret.extensions = new ArrayList<FieldDescriptorProtoPOJO>();
-        ret.options = new ArrayList<MessageOptionsPOJO>();
+        EnumDescriptorProtoPOJO ret = new EnumDescriptorProtoPOJO();
+        ret.name = typeElement.name();
+        ret.values = new ArrayList<EnumValueDescriptorProtoPOJO>();
+        ret.options = new ArrayList<EnumOptionsPOJO>();
 
-        List<com.squareup.protoparser.MessageType.Field> fields = typeElement.getFields();
-        if (fields != null) {
-            FieldDescriptorProtoPOJO fieldDescriptorProto;
-            for (com.squareup.protoparser.MessageType.Field fieldElement : fields) {
-                fieldDescriptorProto = new FieldDescriptorProtoPOJO();
-                fieldDescriptorProto.name = fieldElement.getName();
-                fieldDescriptorProto.extendee = null; // XXX
-                fieldDescriptorProto.number = fieldElement.getTag();
+        List<EnumConstantElement> values = typeElement.constants();
+        if (values != null) {
+            EnumValueDescriptorProtoPOJO fieldDescriptorProto;
+            for (EnumConstantElement fieldElement : values) {
+                fieldDescriptorProto = new EnumValueDescriptorProtoPOJO();
+                fieldDescriptorProto.name = fieldElement.name();
+                fieldDescriptorProto.number = fieldElement.tag();
 
-                com.squareup.protoparser.MessageType.Label label = fieldElement.getLabel();
-                if (label == com.squareup.protoparser.MessageType.Label.OPTIONAL) {
-                    fieldDescriptorProto.label = Label.LABEL_OPTIONAL;
-                } else if (label == com.squareup.protoparser.MessageType.Label.REQUIRED) {
-                    fieldDescriptorProto.label = Label.LABEL_REQUIRED;
-                } else if (label == com.squareup.protoparser.MessageType.Label.REPEATED) {
-                    fieldDescriptorProto.label = Label.LABEL_REPEATED;
-                }
-
-                String type = fieldElement.getType();
-                fieldDescriptorProto.defaultValue = fieldElement.getDefault();
-
-                try {
-                    fieldDescriptorProto.type = Type.valueOf("TYPE_" + type.toUpperCase());
-
-                } catch (Exception e) {
-                    if (messageSet.contains(type)) {
-                        fieldDescriptorProto.type = Type.TYPE_MESSAGE;
-                    } else {
-                        fieldDescriptorProto.type = Type.TYPE_ENUM;
-                    }
-
-                    fieldDescriptorProto.typeName = "." + fileDescriptorProto.pkg + "." + type;
-                }
-
-                ret.fields.add(fieldDescriptorProto);
+                ret.values.add(fieldDescriptorProto);
             }
         }
 
-        List<com.squareup.protoparser.Type> nestedElements = typeElement.getNestedTypes();
-        if (nestedElements != null) {
-            for (com.squareup.protoparser.Type nestedTypeElement : nestedElements) {
-                if (nestedTypeElement instanceof MessageType) {
-                    ret.nestedTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (MessageType) nestedTypeElement,
-                            messageSet, enumSet));
-                } else {
-                    ret.enumTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (EnumType) nestedTypeElement,
-                            messageSet, enumSet));
-                }
+        List<OptionElement> options = typeElement.options();
+        if (options != null) {
+            EnumOptionsPOJO fieldDescriptorProto;
+            for (OptionElement option : options) {
+                fieldDescriptorProto = new EnumOptionsPOJO();
+                ret.options.add(fieldDescriptorProto);
             }
         }
 
@@ -848,36 +1509,108 @@ public class CodedConstant {
      * @param enumSet the enum set
      * @return the descritor proto pojo
      */
-    private static EnumDescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
-            EnumType typeElement, Set<String> messageSet, Set<String> enumSet) {
+    private static DescriptorProtoPOJO getDescritorProtoPOJO(FileDescriptorProtoPOJO fileDescriptorProto,
+            MessageElement typeElement, Set<String> messageSet, Set<String> enumSet) {
 
-        EnumDescriptorProtoPOJO ret = new EnumDescriptorProtoPOJO();
-        ret.name = typeElement.getName();
-        ret.values = new ArrayList<EnumValueDescriptorProtoPOJO>();
-        ret.options = new ArrayList<EnumOptionsPOJO>();
+        DescriptorProtoPOJO ret = new DescriptorProtoPOJO();
+        ret.name = typeElement.name();
+        ret.fields = new ArrayList<FieldDescriptorProtoPOJO>();
+        ret.nestedTypes = new ArrayList<DescriptorProtoPOJO>();
+        ret.enumTypes = new ArrayList<EnumDescriptorProtoPOJO>();
+        ret.extensionRanges = new ArrayList<ExtensionRangePOJO>();
+        ret.extensions = new ArrayList<FieldDescriptorProtoPOJO>();
+        ret.options = new ArrayList<MessageOptionsPOJO>();
+        ret.oneofDecls = new ArrayList<OneofDescriptorProtoPOJO>();
 
-        List<Value> values = typeElement.getValues();
-        if (values != null) {
-            EnumValueDescriptorProtoPOJO fieldDescriptorProto;
-            for (com.squareup.protoparser.EnumType.Value fieldElement : values) {
-                fieldDescriptorProto = new EnumValueDescriptorProtoPOJO();
-                fieldDescriptorProto.name = fieldElement.getName();
-                fieldDescriptorProto.number = fieldElement.getTag();
+        List<FieldElement> fields = typeElement.fields();
+        if (fields != null) {
+            FieldDescriptorProtoPOJO fieldDescriptorProto;
+            for (FieldElement fieldElement : fields) {
+                fieldDescriptorProto = new FieldDescriptorProtoPOJO();
+                fieldDescriptorProto.name = fieldElement.name();
+                fieldDescriptorProto.extendee = null; // XXX
+                fieldDescriptorProto.number = fieldElement.tag();
 
-                ret.values.add(fieldDescriptorProto);
+                FieldElement.Label label = fieldElement.label();
+                if (label == FieldElement.Label.OPTIONAL) {
+                    fieldDescriptorProto.label = Label.LABEL_OPTIONAL;
+                } else if (label == FieldElement.Label.REQUIRED) {
+                    fieldDescriptorProto.label = Label.LABEL_REQUIRED;
+                } else if (label == FieldElement.Label.REPEATED) {
+                    fieldDescriptorProto.label = Label.LABEL_REPEATED;
+                }
+
+                DataType type = fieldElement.type();
+                if (type.kind() == Kind.MAP) {
+                    String messageName = StringUtils.capitalize(fieldDescriptorProto.name) + MAP_ENTRY_SUFFIX;
+                    fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                    fieldDescriptorProto.typeName = CodeGenerator.PACKAGE_SPLIT + fileDescriptorProto.pkg
+                            + CodeGenerator.PACKAGE_SPLIT + ret.name + CodeGenerator.PACKAGE_SPLIT + messageName;
+                    // refix label type
+                    fieldDescriptorProto.label = Label.LABEL_REPEATED;
+
+                    // here should add key and value type message type
+                    DataType.MapType mapType = (DataType.MapType) type;
+
+                    MessageElement messageElement = getMapKVMessageElements(messageName, mapType);
+
+                    ret.nestedTypes
+                            .add(getDescritorProtoPOJO(fileDescriptorProto, messageElement, messageSet, enumSet));
+
+                } else if (type.kind() == Kind.MAP || type.kind() == Kind.NAMED) {
+                    fieldDescriptorProto.typeName = ((DataType.NamedType) type).name();
+                    if (messageSet.contains(fieldDescriptorProto.typeName)) {
+                        fieldDescriptorProto.type = Type.TYPE_MESSAGE;
+                    } else {
+                        fieldDescriptorProto.type = Type.TYPE_ENUM;
+                    }
+                } else {
+                    fieldDescriptorProto.type = Type.valueOf("TYPE_" + ((DataType.ScalarType) type).name());
+                }
+
+                ret.fields.add(fieldDescriptorProto);
             }
         }
 
-        List<Option> options = typeElement.getOptions();
-        if (options != null) {
-            EnumOptionsPOJO fieldDescriptorProto;
-            for (Option option : options) {
-                fieldDescriptorProto = new EnumOptionsPOJO();
-                ret.options.add(fieldDescriptorProto);
+        List<TypeElement> nestedElements = typeElement.nestedElements();
+        if (nestedElements != null) {
+
+            for (TypeElement nestedTypeElement : nestedElements) {
+                if (nestedTypeElement instanceof MessageElement) {
+                    ret.nestedTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (MessageElement) nestedTypeElement,
+                            messageSet, enumSet));
+                } else if (nestedTypeElement instanceof EnumElement) {
+                    ret.enumTypes.add(getDescritorProtoPOJO(fileDescriptorProto, (EnumElement) nestedTypeElement,
+                            messageSet, enumSet));
+                }
             }
         }
 
         return ret;
+    }
+
+    /**
+     * Gets the map kv message elements.
+     *
+     * @param name the name
+     * @param mapType the map type
+     * @return the map kv message elements
+     */
+    private static MessageElement getMapKVMessageElements(String name, MapType mapType) {
+        MessageElement.Builder ret = MessageElement.builder();
+        ret.name(name);
+
+        DataType keyType = mapType.keyType();
+        Builder fieldBuilder = FieldElement.builder().name("key").tag(1);
+        fieldBuilder.type(keyType).label(FieldElement.Label.OPTIONAL);
+        ret.addField(fieldBuilder.build());
+
+        DataType valueType = mapType.valueType();
+        fieldBuilder = FieldElement.builder().name("value").tag(2);
+        fieldBuilder.type(valueType).label(FieldElement.Label.OPTIONAL);
+        ret.addField(fieldBuilder.build());
+
+        return ret.build();
     }
 
     /**

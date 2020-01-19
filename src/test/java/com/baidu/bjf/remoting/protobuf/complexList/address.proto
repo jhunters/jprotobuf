@@ -1,0 +1,24 @@
+syntax="proto3";
+package com.baidu.bjf.remoting.protobuf.complexList;
+option java_outer_classname = "AddressBookProtos2";
+message AddressBookProtosPOJO {  
+	repeated PersonPOJO list=1;
+	repeated TypeDefEnum typeList=2;
+}
+enum TypeDefEnum {  
+    NULL=0;
+	TEXT=1;
+	NUMBER=2;
+	DECIMAL=4;
+	ID=8;
+	URL=16;
+}
+ message PersonPOJO {  
+	 string name=1;
+	 int32 id=2;
+	 string email=3;
+	 double doubleF=4;
+	 float floatF=5;
+	 bytes bytesF=6;
+	 bool boolF=7;
+}
