@@ -93,7 +93,8 @@ public class CodedConstant {
     /** The Constant WIREFORMAT_CLSNAME. */
     private static final String WIREFORMAT_CLSNAME =
             ClassHelper.getInternalName(com.google.protobuf.WireFormat.FieldType.class.getCanonicalName());
-
+    private static final String FIELDTYPE_CLSNAME =
+            ClassHelper.getInternalName(com.baidu.bjf.remoting.protobuf.FieldType.class.getCanonicalName());
     /**
      * get field name.
      *
@@ -221,7 +222,7 @@ public class CodedConstant {
 
         String typeString = type.getType().toUpperCase();
         if (isList) {
-            return "CodedConstant.computeListSize(" + order + ", " + fieldName + ", com.baidu.bjf.remoting.protobuf.FieldType." + typeString + ", "
+            return "CodedConstant.computeListSize(" + order + ", " + fieldName + ", "+ FIELDTYPE_CLSNAME + "." + typeString + ", "
                     + Boolean.valueOf(debug) + ", " + spath + "," + Boolean.valueOf(field.isPacked()) + ")"
                     + CodeGenerator.JAVA_LINE_BREAK;
         } else if (isMap) {
@@ -232,7 +233,7 @@ public class CodedConstant {
         }
 
         if (type == FieldType.OBJECT) {
-            return "CodedConstant.computeSize(" + order + "," + fieldName + ", com.baidu.bjf.remoting.protobuf.FieldType." + typeString + ","
+            return "CodedConstant.computeSize(" + order + "," + fieldName +  ", " + FIELDTYPE_CLSNAME + "." + typeString + ","
                     + Boolean.valueOf(debug) + "," + spath + ")" + CodeGenerator.JAVA_LINE_BREAK;
         }
 
@@ -613,7 +614,7 @@ public class CodedConstant {
         if (isList) {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeToList(").append(prefix).append(",");
-            ret.append(order).append(",").append("com.baidu.bjf.remoting.protobuf.FieldType.").append(typeString);
+            ret.append(order).append(",").append(FIELDTYPE_CLSNAME).append(".").append(typeString);
             ret.append(",").append(fieldName).append(",").append(Boolean.valueOf(field.isPacked())).append(")")
                     .append(CodeGenerator.JAVA_LINE_BREAK).append("}").append(CodeGenerator.LINE_BREAK);
             return ret.toString();
@@ -645,7 +646,7 @@ public class CodedConstant {
         if (type == FieldType.OBJECT) {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeObject(").append(prefix).append(",");
-            ret.append(order).append(",").append("com.baidu.bjf.remoting.protobuf.FieldType.").append(typeString);
+            ret.append(order).append(",").append(FIELDTYPE_CLSNAME).append(".").append(typeString);
             ret.append(",").append(fieldName).append(", false)").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
                     .append(CodeGenerator.LINE_BREAK);
             return ret.toString();
@@ -1630,5 +1631,4 @@ public class CodedConstant {
 
         return ret;
     }
-
 }
