@@ -260,6 +260,7 @@ public class CodeGenerator implements ICodeGenerator {
     private void genImportCode(StringBuilder code) {
         code.append("import com.google.protobuf.*").append(JAVA_LINE_BREAK);
         code.append("import java.io.IOException").append(JAVA_LINE_BREAK);
+        code.append("import com.baidu.bjf.remoting.protobuf.FieldType").append(JAVA_LINE_BREAK);
         code.append("import com.baidu.bjf.remoting.protobuf.utils.*").append(JAVA_LINE_BREAK);
         code.append("import com.baidu.bjf.remoting.protobuf.code.*").append(JAVA_LINE_BREAK);
         code.append("import java.lang.reflect.*").append(JAVA_LINE_BREAK);

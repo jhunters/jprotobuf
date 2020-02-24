@@ -448,6 +448,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         imports.add("java.util.*");
         imports.add("java.io.IOException");
         imports.add("java.lang.reflect.*");
+        imports.add("com.baidu.bjf.remoting.protobuf.FieldType"); // fix the class ambiguous of FieldType
         imports.add("com.baidu.bjf.remoting.protobuf.code.*");
         imports.add("com.baidu.bjf.remoting.protobuf.utils.*");
         imports.add("com.baidu.bjf.remoting.protobuf.*");
