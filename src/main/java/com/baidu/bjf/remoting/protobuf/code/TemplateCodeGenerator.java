@@ -159,7 +159,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             // define field
 
             FieldType fieldType = field.getFieldType();
-            String accessByField = getAccessByField("t", field.getField(), cls);
+            String accessByField = getAccessByField("t", field.getField(), cls, field.isWildcardType());
 
             String fieldName = CodedConstant.getFieldName(field.getOrder());
             String encodeFieldType = CodedConstant.getFiledType(fieldType, isList);
@@ -210,7 +210,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             }
 
             if (isList || isMap) {
-                initListMapFields.append(getSetToField("ret", field.getField(), cls, e, false, false, false))
+                initListMapFields.append(
+                        getSetToField("ret", field.getField(), cls, e, false, false, false, field.isWildcardType()))
                         .append(ClassCode.JAVA_LINE_BREAK);
             }
 
@@ -220,8 +221,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                     String express =
                             "CodedConstant.getEnumValue(" + clsName + ".class, " + clsName + ".values()[0].name())";
                     // add set get method
-                    String setToField =
-                            getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), false);
+                    String setToField = getSetToField("ret", field.getField(), cls, express, isList, field.isMap(),
+                            false, field.isWildcardType());
                     templator.setVariable("enumInitialize", setToField);
                     templator.addBlock("enumFields");
                 }
@@ -362,9 +363,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                 express += ".toByteArray()";
             }
 
-            String decodeFieldSetValue =
-                    getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), false)
-                            + ClassCode.JAVA_LINE_BREAK;
+            String decodeFieldSetValue = getSetToField("ret", field.getField(), cls, express, isList, field.isMap(),
+                    false, field.isWildcardType()) + ClassCode.JAVA_LINE_BREAK;
 
             if (listTypeCheck) {
                 objectDecodeExpressSuffix += "input.checkLastTagWas(0)" + ClassCode.JAVA_LINE_BREAK;
@@ -372,8 +372,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             }
 
             if (field.isRequired()) {
-                templator.setVariable("deocdeCheckNull", CodedConstant
-                        .getRetRequiredCheck(getAccessByField("ret", field.getField(), cls), field.getField()));
+                templator.setVariable("deocdeCheckNull", CodedConstant.getRetRequiredCheck(
+                        getAccessByField("ret", field.getField(), cls, field.isWildcardType()), field.getField()));
             } else {
                 templator.setVariable("deocdeCheckNull", "");
             }
@@ -390,7 +390,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                     code.append("int length = input.readRawVarint32()").append(ClassCode.JAVA_LINE_BREAK);
                     code.append("int limit = input.pushLimit(length)").append(ClassCode.JAVA_LINE_BREAK);
 
-                    code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), true));
+                    code.append(getSetToField("ret", field.getField(), cls, express, isList, field.isMap(), true,
+                            field.isWildcardType()));
 
                     code.append("input.popLimit(limit)").append(ClassCode.JAVA_LINE_BREAK);
 
@@ -416,9 +417,9 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
      */
     private void checkObjectType(FieldInfo field, Class cls) {
         if (FieldInfo.isPrimitiveType(cls)) {
-            throw new RuntimeException("invalid generic type for List as Object type, current type is '"
-                    + cls.getName() + "'  on field name '" + field.getField().getDeclaringClass().getName()
-                    + "#" + field.getField().getName());
+            throw new RuntimeException("invalid generic type for List as Object type, current type is '" + cls.getName()
+                    + "'  on field name '" + field.getField().getDeclaringClass().getName() + "#"
+                    + field.getField().getName());
         }
     }
 
@@ -436,7 +437,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         valueGeneric = field.getGenericeValueType().getCanonicalName();
         String getMapCommand = "(Map<" + keyGeneric;
         getMapCommand = getMapCommand + ", " + valueGeneric + ">)";
-        getMapCommand = getMapCommand + getAccessByField("ret", field.getField(), cls);
+        getMapCommand = getMapCommand + getAccessByField("ret", field.getField(), cls, field.isWildcardType());
         return getMapCommand;
     }
 
@@ -487,13 +488,13 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
      * @return the sets the to field
      */
     protected String getSetToField(String target, Field field, Class<?> cls, String express, boolean isList,
-            boolean isMap, boolean packed) {
+            boolean isMap, boolean packed, boolean isWildType) {
         StringBuilder ret = new StringBuilder();
         if (isList || isMap) {
-            ret.append("if ((").append(getAccessByField(target, field, cls)).append(") == null) {")
+            ret.append("if ((").append(getAccessByField(target, field, cls, isWildType)).append(") == null) {")
                     .append(ClassCode.LINE_BREAK);
         }
-        
+
         String collectionTypetoCreate = "";
         String collectionType = "";
         if (FieldInfo.isListType(field)) {
@@ -503,13 +504,13 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             collectionTypetoCreate = "new HashSet()";
             collectionType = "Set";
         }
-        
+
         // if field of public modifier we can access directly
-        if (Modifier.isPublic(field.getModifiers())) {
+        if (Modifier.isPublic(field.getModifiers()) && !isWildType) {
             if (isList) {
                 // should initialize list
-                ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName())
-                        .append("= ").append(collectionTypetoCreate).append(ClassCode.JAVA_LINE_BREAK).append("}")
+                ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName()).append("= ")
+                        .append(collectionTypetoCreate).append(ClassCode.JAVA_LINE_BREAK).append("}")
                         .append(ClassCode.LINE_BREAK);
                 if (express != null) {
                     if (packed) {
@@ -539,7 +540,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         try {
             cls.getMethod(setter, new Class<?>[] { field.getType() });
             if (isList) {
-                ret.append(collectionType).append(" __list = ").append(collectionTypetoCreate).append(ClassCode.JAVA_LINE_BREAK);
+                ret.append(collectionType).append(" __list = ").append(collectionTypetoCreate)
+                        .append(ClassCode.JAVA_LINE_BREAK);
                 ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(setter).append("(__list)")
                         .append(ClassCode.JAVA_LINE_BREAK).append("}").append(ClassCode.LINE_BREAK);
 
@@ -547,8 +549,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                     if (packed) {
                         ret.append("while (input.getBytesUntilLimit() > 0) {").append(ClassCode.LINE_BREAK);
                     }
-                    ret.append("(").append(getAccessByField(target, field, cls)).append(").add(").append(express)
-                            .append(")");
+                    ret.append("(").append(getAccessByField(target, field, cls, isWildType)).append(").add(")
+                            .append(express).append(")");
                     if (packed) {
                         ret.append(";}").append(ClassCode.LINE_BREAK);
                     }
@@ -568,15 +570,16 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         }
 
         if (isList) {
-            ret.append(collectionType).append(" __list = ").append(collectionTypetoCreate).append(ClassCode.JAVA_LINE_BREAK);
+            ret.append(collectionType).append(" __list = ").append(collectionTypetoCreate)
+                    .append(ClassCode.JAVA_LINE_BREAK);
             ret.append("FieldUtils.setField(").append(target).append(", \"").append(field.getName())
                     .append("\", __list)").append(ClassCode.JAVA_LINE_BREAK).append("}").append(ClassCode.LINE_BREAK);
             if (express != null) {
                 if (packed) {
                     ret.append("while (input.getBytesUntilLimit() > 0) {").append(ClassCode.LINE_BREAK);
                 }
-                ret.append("(").append(getAccessByField(target, field, cls)).append(").add(").append(express)
-                        .append(")");
+                ret.append("(").append(getAccessByField(target, field, cls, isWildType)).append(").add(")
+                        .append(express).append(")");
                 if (packed) {
                     ret.append(";}").append(ClassCode.LINE_BREAK);
                 }

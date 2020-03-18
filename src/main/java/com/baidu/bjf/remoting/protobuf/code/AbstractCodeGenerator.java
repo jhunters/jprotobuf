@@ -354,8 +354,8 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      * @param cls mapped class
      * @return full field access java code
      */
-    protected String getAccessByField(String target, Field field, Class<?> cls) {
-        if (field.getModifiers() == Modifier.PUBLIC) {
+    protected String getAccessByField(String target, Field field, Class<?> cls, boolean wildcardType) {
+        if (field.getModifiers() == Modifier.PUBLIC && !wildcardType) {
             return target + ClassHelper.PACKAGE_SEPARATOR + field.getName();
         }
         // check if has getter method
