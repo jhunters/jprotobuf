@@ -139,7 +139,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>2.2.1</version>
+  <version>2.2.2</version>
 </dependency>
 ```
 备注： precompile-plugin的版本 2.0.5 只支持 jprotobuf 2.2.6 及以上的版本。     其它版本请有2.0.4及以下precompile plugin
