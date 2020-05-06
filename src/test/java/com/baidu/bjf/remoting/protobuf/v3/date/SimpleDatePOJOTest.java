@@ -39,11 +39,14 @@ public class SimpleDatePOJOTest {
         Codec<SimpleDatePOJO> create = ProtobufProxy.create(SimpleDatePOJO.class, false);
         
         SimpleDatePOJO pojo = new SimpleDatePOJO();
+        
+        pojo.setDate1(new Date());
         pojo.date = new Date();
         
         try {
             byte[] encode = create.encode(pojo);
             SimpleDatePOJO decode = create.decode(encode);
+            Assert.assertEquals(pojo.getDate1().getTime(), decode.getDate1().getTime());
             Assert.assertEquals(pojo.date.getTime(), decode.date.getTime());
         } catch (IOException e) {
             Assert.fail(e.getMessage());

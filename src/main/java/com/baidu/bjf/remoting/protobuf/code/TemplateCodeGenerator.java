@@ -562,6 +562,12 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                         .append(ClassCode.JAVA_LINE_BREAK).append("}").append(ClassCode.LINE_BREAK);
                 return ret + express;
             }
+            
+            // fix date type
+            if (field.getType().equals(Date.class)) {
+                express =  "new Date(" + express + ")";
+            }
+            
             return target + ClassHelper.PACKAGE_SEPARATOR + setter + "(" + express + ")\n";
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {

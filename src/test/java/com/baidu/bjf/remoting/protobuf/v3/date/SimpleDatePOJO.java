@@ -27,7 +27,31 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
  */
 public class SimpleDatePOJO {
 
+    /** The date. */
     @Protobuf
     public Date date;
+    
+    /** The date 1. */
+    @Protobuf
+    private Date date1;
+    
 
+    /**
+     * Sets the date 1.
+     *
+     * @param date1 the new date 1
+     */
+    public void setDate1(Date date1) {
+        this.date1 = date1;
+    }
+    
+    /**
+     * Gets the date 1.
+     *
+     * @return the date 1
+     */
+    public Date getDate1() {
+        return date1;
+    }
+    
 }

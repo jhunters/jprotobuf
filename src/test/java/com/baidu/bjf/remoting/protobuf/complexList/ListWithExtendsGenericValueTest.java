@@ -36,7 +36,7 @@ public class ListWithExtendsGenericValueTest {
 
     @Test
     public void testWildtypeGenericType() {
-        Codec<ListWithExtendsGenericValue> codec = ProtobufProxy.create(ListWithExtendsGenericValue.class, true);
+        Codec<ListWithExtendsGenericValue> codec = ProtobufProxy.create(ListWithExtendsGenericValue.class);
         
         
         ListWithExtendsGenericValue value = new ListWithExtendsGenericValue();
@@ -45,7 +45,6 @@ public class ListWithExtendsGenericValueTest {
         
         value.list = list;
         value.list2 = list;
-//        value.setList2(list);
         
         PersonPOJO personPOJO = new PersonPOJO();
         personPOJO.name = "xiemalin";
