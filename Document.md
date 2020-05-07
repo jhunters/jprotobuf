@@ -97,7 +97,7 @@ mvn package
 ```property
 
 plugins {
-    id 'com.baidu.jprotobuf' version '1.0.2'
+    id 'com.baidu.jprotobuf' version '1.0.8'
 }
 ```
 或者使用以下方式
@@ -110,7 +110,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.2"
+    classpath "gradle.plugin.com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.8"
   }
 }
 

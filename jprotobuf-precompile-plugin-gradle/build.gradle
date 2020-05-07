@@ -9,7 +9,7 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java'
-    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'com.gradle.plugin-publish' version '0.11.0'
 }
 
 repositories {
@@ -25,7 +25,7 @@ dependencies {
     compile gradleApi()
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
-    compile 'com.baidu:jprotobuf:2.4.0'
+    compile 'com.baidu:jprotobuf:2.4.2'
     compile 'org.jodd:jodd-core:3.5.2'
     compile 'commons-io:commons-io:1.4'
 
@@ -46,7 +46,7 @@ javadoc {
     }
 }
 
-version = "1.0.7"    //配置插件的版本号
+version = "1.0.8"    //配置插件的版本号
 group = "com.baidu.jprotobuf"   //插件的群组，插件的classpath会用到
 
 pluginBundle {
