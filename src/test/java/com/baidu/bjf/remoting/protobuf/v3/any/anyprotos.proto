@@ -1,0 +1,10 @@
+syntax = "proto3";
+import "google/protobuf/any.proto";
+
+option java_package = "com.baidu.bjf.remoting.protobuf.v3.any";
+option java_outer_classname = "AnyProtos";
+ 
+message AnyObject {
+  string message = 1;
+  repeated google.protobuf.Any details = 2;
+}

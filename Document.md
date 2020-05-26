@@ -447,6 +447,61 @@ ProtobufProxy.create(clazz, compiler, codeGenerator);
 ```
 上面的示例，会开放Compiler与ICodeGenerator实现自定能力
 
+
+####  after 3.4.3 add Any Object supports  ###
+
+使用示例：
+
+```java
+public class AnyPOJO {
+    
+    /** The details. */
+    @Protobuf(fieldType = FieldType.OBJECT)
+    private List<Any> details;
+}
+
+```
+
+
+```java
+    public void encodeOriginDecodeJprotobuf() throws IOException {
+        StringTypePOJOClass pojo = new StringTypePOJOClass();
+        pojo.setStr("hello world");
+        com.baidu.bjf.remoting.protobuf.Any any = com.baidu.bjf.remoting.protobuf.Any.pack(pojo);
+
+        String m = "hello xiemalin.";
+        AnyPOJO anyPojo = new AnyPOJO();
+        anyPojo.setMessage(m);
+        
+        List<com.baidu.bjf.remoting.protobuf.Any> details = new ArrayList<com.baidu.bjf.remoting.protobuf.Any>();
+        details.add(any);
+        anyPojo.setDetails(details);
+        
+        Codec<AnyPOJO> codec = ProtobufProxy.create(AnyPOJO.class);
+        // do encode and decode
+        byte[] bytes = codec.encode(anyPojo);
+        AnyPOJO anyPojo2 = codec.decode(bytes);
+        
+        Assert.assertEquals(m, anyPojo2.getMessage());
+        
+        List<com.baidu.bjf.remoting.protobuf.Any> details2 = anyPojo2.getDetails();
+        Assert.assertEquals(1, details2.size());
+        
+        for (com.baidu.bjf.remoting.protobuf.Any any3 : details2) {
+            boolean b = any3.is(StringTypePOJOClass.class);
+            Assert.assertTrue(b);
+            if (b) {
+                StringTypePOJOClass unpack = any3.unpack(StringTypePOJOClass.class);
+                Assert.assertEquals(pojo.getStr(), unpack.getStr());
+            }
+        }
+        
+    }
+
+```
+
+
+
 更多使用示例请参见testcase代码。
 
 ### 沟通群号：QQ: 644867264 ###
