@@ -500,6 +500,15 @@ public class AnyPOJO {
 
 ```
 
+问题： Any对象与原生的protobuf 类名不一致，导致 is判断失败怎么处理？
+
+```java
+ // pack方法支持，设置自定义类名
+ com.baidu.bjf.remoting.protobuf.Any any = com.baidu.bjf.remoting.protobuf.Any.pack(pojo, "ur new class name");
+ 
+ // 收到Any对象后，判断处理
+ any.is("ur new class name");
+```
 
 
 更多使用示例请参见testcase代码。

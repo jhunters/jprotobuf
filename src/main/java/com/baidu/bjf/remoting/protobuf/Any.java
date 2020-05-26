@@ -43,12 +43,12 @@ public class Any {
     private static final String PB_URL_PREFIX = "type.googleapis.com/";
 
     /** The codec class. */
-    @Protobuf
+    @Protobuf(order = 1)
     private String codecClass;
     
     
     /** The byte array. */
-    @Protobuf
+    @Protobuf(order = 2)
     private byte[] byteArray;
     
     
