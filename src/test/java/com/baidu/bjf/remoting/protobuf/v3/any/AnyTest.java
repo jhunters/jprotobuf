@@ -40,7 +40,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 public class AnyTest {
 
     @Test
-    public void testAnyEncodeDeocde() throws IOException {
+    public void testAnyOriginEncodeJprotobufDeocde() throws IOException {
         String s1 = "hello world";
         String s2 = "hello xiemalin";
         
@@ -67,6 +67,7 @@ public class AnyTest {
         
         Assert.assertArrayEquals(byteArray, byteArray2);
     }
+    
 
     /**
      * Encode origin decode jprotobuf.
