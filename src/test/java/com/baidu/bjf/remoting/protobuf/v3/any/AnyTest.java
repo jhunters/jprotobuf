@@ -17,7 +17,6 @@ package com.baidu.bjf.remoting.protobuf.v3.any;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
@@ -50,7 +49,6 @@ public class AnyTest {
         Any any = Any.pack(message);
         AnyObject anyObject = AnyObject.newBuilder().addDetails(any).setMessage(s2).build();
         byte[] byteArray = anyObject.toByteArray();
-        System.out.println(Arrays.toString(byteArray));
         
         // jprotobuf 
         StringTypePOJOClass pojo = new StringTypePOJOClass();
@@ -66,8 +64,6 @@ public class AnyTest {
         
         Codec<AnyPOJO> codec = ProtobufProxy.create(AnyPOJO.class);
         byte[] byteArray2 = codec.encode(anyPojo);
-        System.out.println(Arrays.toString(byteArray2));
-        
         
         Assert.assertArrayEquals(byteArray, byteArray2);
     }
@@ -128,7 +124,6 @@ public class AnyTest {
         byte[] byteArray = any.toByteArray();
 
         AnyObject anyObject = AnyProtos.AnyObject.parseFrom(byteArray);
-        System.out.println(anyObject);
 
         List<Any> detailsList = anyObject.getDetailsList();
         for (Any any2 : detailsList) {
@@ -159,7 +154,6 @@ public class AnyTest {
         byte[] byteArray = codec.encode(any);
 
         AnyObject anyObject = AnyProtos.AnyObject.parseFrom(byteArray);
-        System.out.println(anyObject);
 
         List<Any> detailsList = anyObject.getDetailsList();
 
