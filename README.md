@@ -96,17 +96,17 @@ jprotobuf-1.x  JDK 6 或以上版本
   <version>1.13.0</version>
 </dependency>
 ```
-[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf/)
+[下载发行包](https://repo1.maven.org/maven2/com/baidu/jprotobuf/)
 
 jprotobuf-2.x  JDK 7 或以上版本
 ```xml
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.4.2</version>
+  <version>2.4.3</version>
 </dependency>
 ```
-[下载发行包](https://oss.sonatype.org/content/repositories/snapshots/com/baidu/jprotobuf/2.0.1-SNAPSHOT/)
+[下载发行包](https://repo1.maven.org/maven2/com/baidu/jprotobuf/2.4.3/)
 
 jprotobuf-android  
 ```xml
@@ -116,7 +116,7 @@ jprotobuf-android
   <version>1.1.2</version>
 </dependency>
 ```
-[下载发行包](http://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
+[下载发行包](https://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
 
 
 ## Download plugin
