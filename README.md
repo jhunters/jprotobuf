@@ -158,7 +158,7 @@ plugins {
 - [Full docs](./Document.md)
 
 ## Contact us
-QQ: 644867264
+QQ: 644867264 (入群口号： jprotobuf)
 
 ## License
 JProtobuf is [Apache 2.0 licensed](./LICENSE).
