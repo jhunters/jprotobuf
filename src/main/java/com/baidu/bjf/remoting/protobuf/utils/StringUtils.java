@@ -13,6 +13,8 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
+
 import com.google.protobuf.ByteString;
 
 /**
@@ -345,6 +347,39 @@ public class StringUtils {
         return startsWith(str, prefix, false);
     }
 
+    /**
+     * <p>Check if a String starts with any of an array of specified strings.</p>
+     * 
+     * <pre>
+     * StringUtils.startsWithAny(null, null)      = false
+     * StringUtils.startsWithAny(null, new String[] {"abc"})  = false
+     * StringUtils.startsWithAny("abcxyz", null)     = false
+     * StringUtils.startsWithAny("abcxyz", new String[] {""}) = false
+     * StringUtils.startsWithAny("abcxyz", new String[] {"abc"}) = true
+     * StringUtils.startsWithAny("abcxyz", new String[] {null, "xyz", "abc"}) = true
+     * </pre>
+     *
+     * @see #startsWith(String, String)
+     * @param string  the String to check, may be null
+     * @param searchStrings the Strings to find, may be null or empty
+     * @return <code>true</code> if the String starts with any of the the prefixes, case insensitive, or
+     *  both <code>null</code>
+     * @since 2.5
+     */
+    public static boolean startsWithAny(String string, String[] searchStrings) {
+        if (isEmpty(string) || ArrayUtils.isEmpty(searchStrings)) {
+            return false;
+        }
+        for (int i = 0; i < searchStrings.length; i++) {
+            String searchString = searchStrings[i];
+            if (StringUtils.startsWith(string, searchString)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
     /**
      * <p>
      * Case insensitive check if a String starts with a specified prefix.

@@ -50,6 +50,9 @@ public class ProtobufProxyUtils {
 
     /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufProxy.class.getName());
+    
+    /** The Constant FIELD_FILTER_STARTS. */
+    public static final List<String> FIELD_FILTER_STARTS = new ArrayList<>();
 
     static {
         TYPE_MAPPING = new HashMap<Class<?>, FieldType>();
@@ -72,6 +75,9 @@ public class ProtobufProxyUtils {
         TYPE_MAPPING.put(Boolean.class, FieldType.BOOL);
         TYPE_MAPPING.put(boolean.class, FieldType.BOOL);
         TYPE_MAPPING.put(Date.class, FieldType.DATE);
+        
+        
+        FIELD_FILTER_STARTS.add("$jacoco");
     }
 
     /**
@@ -132,6 +138,11 @@ public class ProtobufProxyUtils {
         }
 
         List<FieldInfo> ret = new ArrayList<FieldInfo>(fields.size());
+        
+        String[] filterFields = null;
+        if (FIELD_FILTER_STARTS != null) {
+            filterFields = FIELD_FILTER_STARTS.toArray(new String[FIELD_FILTER_STARTS.size()]);
+        }
 
         int maxOrder = 0;
         List<FieldInfo> unorderFields = new ArrayList<FieldInfo>(fields.size());
@@ -144,10 +155,20 @@ public class ProtobufProxyUtils {
                 }
                 continue;
             }
+            
+            String fName = field.getName();
+            if (filterFields != null) {
+                boolean filtered = StringUtils.startsWithAny(fName, filterFields);
+                if (filtered) {
+                    LOGGER.warn("Field '" + fName + "' is filtered due to matched filter list. " + filterFields);
+                    continue;
+                }
+            }
+            
 
             Protobuf protobuf = field.getAnnotation(Protobuf.class);
             if (protobuf == null && !ignoreNoAnnotation) {
-                throw new RuntimeException("Field '" + field.getName() + "' has no @Protobuf annotation");
+                throw new RuntimeException("Field '" + fName + "' has no @Protobuf annotation");
             }
 
             // check field is support for protocol buffer
@@ -155,7 +176,7 @@ public class ProtobufProxyUtils {
             String simpleName = field.getType().getName();
             if (simpleName.startsWith("[")) {
                 if ((!simpleName.equals(byte[].class.getName())) && (!simpleName.equals(Byte[].class.getName()))) {
-                    throw new RuntimeException("Array type of field '" + field.getName() + "' on class '"
+                    throw new RuntimeException("Array type of field '" + fName + "' on class '"
                             + field.getDeclaringClass().getName() + "' is not support,  please use List instead.");
                 }
             }
@@ -214,7 +235,7 @@ public class ProtobufProxyUtils {
             if (order > 0) {
                 if (orders.contains(order)) {
                     throw new RuntimeException(
-                            "order id '" + order + "' from field name '" + field.getName() + "'  is duplicate");
+                            "order id '" + order + "' from field name '" + fName + "'  is duplicate");
                 }
                 orders.add(order);
                 fieldInfo.setOrder(order);
