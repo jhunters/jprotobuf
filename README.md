@@ -2,7 +2,7 @@
 <h1 align="center">JProtobuf</h1>
 
 <p align="center">
-A very useful utility library for java programmer to use google protobuf library.
+A useful utility library for java programmer to use google protobuf library.
 </p>
 
 
