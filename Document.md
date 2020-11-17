@@ -64,7 +64,7 @@ Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf
 	<plugin>
 		<groupId>com.baidu</groupId>
 		<artifactId>jprotobuf-precompile-plugin</artifactId>
-		<version>1.2.8</version>
+		<version>1.3.4</version>
 		<configuration>
 			<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 			<filterClassPackage>com.baidu</filterClassPackage>
@@ -82,6 +82,7 @@ Maven插件支持预编译功能配置，使用该功能后，所有的Jprotobuf
 	</plugin>
 ```
 filterClassPackage 用来指定进行预编译时需要扫描的package,目前只支持配置多个package名称，使用";"分隔<br>
+                   1.3.4与2.2.4版本以后，支持通配符方式，如包名定义 com.baidu.student.pk1*
 generateProtoFile 设置是否开启proto文件生成，默认为false，不生成
 compileDependencies 开启依赖的class编译，默认为true, 开启
 maven执行命令如下:<br>
@@ -97,7 +98,7 @@ mvn package
 ```property
 
 plugins {
-    id 'com.baidu.jprotobuf' version '1.0.8'
+    id 'com.baidu.jprotobuf' version '1.0.9'
 }
 ```
 或者使用以下方式
@@ -110,7 +111,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.8"
+    classpath "gradle.plugin.com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.9"
   }
 }
 
@@ -126,6 +127,8 @@ jprotobuf_precompile {
     generateProtoFile="false" // 设置是否怎么生成proto描述文件, 默认是false, 不生成
 }
 ```
+####备注 1.0.9版本之后，gradle插件, filterClassPackage支持通配符匹配规则，例如 filterClassPackage="com.mytest.pkg*"
+
 
 gradle 执行命令如下:<br>
 ```property

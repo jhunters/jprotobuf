@@ -206,7 +206,7 @@ public class JprotobufPreCompileMain {
     }
 
     /**
-     * Checks if is start with.
+     * Checks if is start with or pattern match with.
      *
      * @param testString the test string
      * @param targetStrings the target strings
@@ -214,7 +214,7 @@ public class JprotobufPreCompileMain {
      */
     private static boolean isStartWith(String testString, String[] targetStrings) {
         for (String s : targetStrings) {
-            if (testString.startsWith(s)) {
+            if (testString.startsWith(s) || PatternMatchUtils.simpleMatch(s, testString)) {
                 return true;
             }
         }
