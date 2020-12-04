@@ -86,6 +86,7 @@ try {
 
 ```
 
+
 ## Download
 jprotobuf-1.x  JDK 6 或以上版本
 
@@ -132,7 +133,11 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
   <version>1.4.1</version>
 </dependency>
 ```
-备注： precompile-plugin的版本 1.2.11 只支持 jprotobuf 1.11.5 及以上的版本。    其它版本请有 1.2.10及以下precompile plugin
+|插件版本1.x | 支持的jprotobuf版本 | 说明 |
+|---|---|---|
+|<=1.2.10|<=1.11.4||
+|>=1.2.11|>=1.11.5||
+
 
 // 2.x支持版本
 ```xml
@@ -142,7 +147,12 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
   <version>2.2.2</version>
 </dependency>
 ```
-备注： precompile-plugin的版本 2.0.5 只支持 jprotobuf 2.2.6 及以上的版本。     其它版本请有2.0.4及以下precompile plugin
+
+|插件版本2.x | 支持的jprotobuf版本 | 说明 |
+|---|---|---|
+|<=2.2.5|<=2.0.4||
+|>=2.2.6|>=2.0.5||
+
 
 #### gradle插件
 ```property
