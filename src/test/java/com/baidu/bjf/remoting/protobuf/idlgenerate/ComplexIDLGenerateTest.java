@@ -150,7 +150,7 @@ public class ComplexIDLGenerateTest {
             "option java_outer_classname = \"AddressBookProtos\";" +
             "enum PhoneType { MOBILE = 0; HOME = 1; WORK = 2;}" +
             " message PhoneNumberAA {" +
-                "optional PhoneType type = 1 [default = HOME];" +
+                "optional PhoneType type = 1 [default = HOME]; //abc\n" +
                 "optional int32 name = 2 [default = 10];" +
                 "optional string vName = 3 [default = \"hello world\"];" +
           "}"; 

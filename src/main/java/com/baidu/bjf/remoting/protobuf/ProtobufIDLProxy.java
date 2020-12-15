@@ -1,5 +1,17 @@
-/**
- * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
+/*
+ * Copyright 2002-2007 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.baidu.bjf.remoting.protobuf;
 
@@ -22,6 +34,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.code.ClassCode;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.JavaStyleFormatter;
@@ -716,6 +729,9 @@ public class ProtobufIDLProxy {
         checkNestedTypes.addAll(parentNestedTypes);
 
         for (FieldElement field : fields) {
+            // generate comments
+            generateCommentsForField(code, field, enumNames);
+            
             // define annotation
             generateProtobufDefinedForField(code, field, enumNames);
 
@@ -853,6 +869,26 @@ public class ProtobufIDLProxy {
 
         return cd;
     }
+
+    /**
+     * Generate comments for field.
+     *
+     * @param code the code
+     * @param field the field
+     * @param enumNames the enum names
+     */
+    private static void generateCommentsForField(StringBuilder code, FieldElement field, Set<String> enumNames) {
+        code.append("/**").append(ClassCode.LINE_BREAK);
+        code.append("* ").append(field.documentation()).append(ClassCode.LINE_BREAK);
+        code.append("* ");
+        if (field.label() != null) {
+            code.append(StringUtils.toLowerCase(field.label().toString())).append(" ");
+        }
+        code.append(field.type().toString()).append(" ").append(field.name().toString());
+        code.append("=").append(field.tag()).append(ClassCode.LINE_BREAK);
+        code.append("*/").append(ClassCode.LINE_BREAK);
+    }
+    
 
     /**
      * Creates the enum classes.

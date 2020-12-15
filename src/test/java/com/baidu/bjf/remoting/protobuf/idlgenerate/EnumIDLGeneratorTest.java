@@ -60,10 +60,9 @@ public class EnumIDLGeneratorTest {
         return map;
     }
 
-    @Ignore
     @Test
     public void testMostComplexIDLSourceGenerate() throws IOException {
-        File file = new File(EnumIDLGeneratorTest.class.getResource("si_product_biz.proto").getFile());
+        File file = new File(EnumIDLGeneratorTest.class.getResource("si_product_biz_ref.proto").getFile());
         ProtobufIDLProxy.generateSource(file, new File("D:\\test"));
     }
 
