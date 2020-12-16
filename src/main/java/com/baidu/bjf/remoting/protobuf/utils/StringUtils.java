@@ -1607,5 +1607,17 @@ public class StringUtils {
         return new String(newCodePoints, 0, outOffset);
     }
 
+    /**
+     * To lower case.
+     *
+     * @param str the str
+     * @return the string
+     */
+    public static String toLowerCase(final String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
 
+        return str.toLowerCase();
+    }
 }

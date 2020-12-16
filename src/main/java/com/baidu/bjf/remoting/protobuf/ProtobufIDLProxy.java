@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.code.ClassCode;
 import com.baidu.bjf.remoting.protobuf.utils.CodePrinter;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.JavaStyleFormatter;
@@ -732,6 +733,8 @@ public class ProtobufIDLProxy {
 
         String suffix = "";
         for (Field field : fields) {
+         // generate comments
+            generateCommentsForField(code, field, enumNames);
             // define annotation
             generateProtobufDefinedForField(code, field, enumNames);
 
@@ -837,6 +840,26 @@ public class ProtobufIDLProxy {
         }
 
         return cd;
+    }
+
+    /**
+     * Generate comments for field.
+     *
+     * @param code the code
+     * @param field the field
+     * @param enumNames the enum names
+     */
+    private static void generateCommentsForField(StringBuilder code, Field field, Set<String> enumNames) {
+        code.append("/**").append(ClassCode.LINE_BREAK);
+        code.append("* ").append(field.getDocumentation()).append(ClassCode.LINE_BREAK);
+        code.append("* ");
+        if (field.getLabel() != null) {
+            code.append(StringUtils.toLowerCase(field.getLabel().toString())).append(" ");
+        }
+        code.append(field.getType().toString()).append(" ").append(field.getName().toString());
+        code.append("=").append(field.getTag()).append(ClassCode.LINE_BREAK);
+        code.append("*/").append(ClassCode.LINE_BREAK);
+        
     }
 
     /**
