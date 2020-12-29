@@ -15,6 +15,7 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
 import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
 
@@ -130,6 +132,11 @@ public class ProtobufIDLGenerator {
 
         Set<Class<?>> subTypes = new HashSet<Class<?>>();
         Set<Class<Enum>> enumTypes = new HashSet<Class<Enum>>();
+        
+        Annotation annotation = cls.getAnnotation(ProtobufClass.class);
+        if (annotation != null && ((ProtobufClass)annotation).description() != null) {
+            code.append("//").append(((ProtobufClass)annotation).description()).append("\n");
+        }
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
 
         List<FieldInfo> fieldInfos = ProtobufProxyUtils.fetchFieldInfos(cls, false);
