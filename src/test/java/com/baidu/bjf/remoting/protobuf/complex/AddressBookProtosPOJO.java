@@ -17,16 +17,18 @@ package com.baidu.bjf.remoting.protobuf.complex;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
+import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 
 /**
  * The Class AddressBookProtosPOJO.
  *
  * @author xiemalin
  */
+@ProtobufClass(description = "地址薄对象")
 public class AddressBookProtosPOJO {
 
     /** The list. */
-    @Protobuf(fieldType = FieldType.OBJECT, order=1, required = false)
+    @Protobuf(fieldType = FieldType.OBJECT, order=1, required = false, description = "成员列表")
     public PersonPOJO list;
 
     /** The name. */
