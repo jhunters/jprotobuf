@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
@@ -31,14 +32,12 @@ import com.baidu.bjf.remoting.protobuf.complex.PersonPOJOWithDefault;
 import com.baidu.bjf.remoting.protobuf.enumeration.EnumPOJOClass;
 import com.baidu.bjf.remoting.protobuf.simplerepeat.RequrieRepeatedNumberTypePOJOClass2;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesPojoClass;
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
 import com.baidu.jprotobuf.com.squareup.protoparser.MessageElement;
 import com.baidu.jprotobuf.com.squareup.protoparser.ProtoFile;
 import com.baidu.jprotobuf.com.squareup.protoparser.ProtoParser;
 import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
-import junit.framework.Assert;
+import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
  * Test IDL script generate tool
