@@ -21,7 +21,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<java.version>1.7</java.version>
+		<java.version>1.8</java.version>
 		<junit.version>4.13.1</junit.version>
 		<auto.value.version>1.0-rc2</auto.value.version>
 	</properties>
@@ -62,11 +62,6 @@
 			<artifactId>protobuf-java</artifactId>
 			<version>3.12.1</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.12.1.GA</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.auto.value</groupId>
@@ -184,7 +179,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> 
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
