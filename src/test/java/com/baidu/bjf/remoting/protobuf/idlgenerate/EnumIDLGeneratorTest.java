@@ -206,4 +206,10 @@ public class EnumIDLGeneratorTest {
 
         Assert.assertEquals(2, map.size());
     }
+    
+    @Test
+    public void testMapRefrenceObjectIDLGenerator() {
+        String idl = ProtobufIDLGenerator.getIDL(MapPojo.class);
+        System.out.println(idl);
+    }
 }

@@ -135,7 +135,7 @@ public class JdkCompiler extends AbstractCompiler {
                 if (classes != null) {
                     files.addAll(classes);
                 }
-
+                // set compile class paths
                 manager.setLocation(StandardLocation.CLASS_PATH, files);
             } catch (IOException e) {
                 throw new IllegalStateException(e.getMessage(), e);

@@ -226,17 +226,30 @@ public class ProtobufIDLGenerator {
                     // check map key or value is object type
                     if (ProtobufProxyUtils.isObjectType(keyClass)) {
                         if (Enum.class.isAssignableFrom(keyClass)) {
-                            enumTypes.add(keyClass);
+                            if (!cachedEnumTypes.contains(keyClass)) {
+                                cachedEnumTypes.add(keyClass);
+                                enumTypes.add(keyClass);
+                            }
                         } else {
-                            subTypes.add(keyClass);
+                            if (!cachedTypes.contains(keyClass)) {
+                                cachedTypes.add(keyClass);
+                                subTypes.add(keyClass);
+                            }
                         }
                     }
                     
                     if (ProtobufProxyUtils.isObjectType(valueClass)) {
+                        
                         if (Enum.class.isAssignableFrom(valueClass)) {
-                            enumTypes.add(valueClass);
+                            if (!cachedEnumTypes.contains(valueClass)) {
+                                cachedEnumTypes.add(valueClass);
+                                enumTypes.add(valueClass);
+                            }
                         } else {
-                            subTypes.add(valueClass);
+                            if (!cachedTypes.contains(valueClass)) {
+                                cachedTypes.add(valueClass);
+                                subTypes.add(valueClass);
+                            }
                         }
                     }
                     

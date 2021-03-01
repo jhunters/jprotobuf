@@ -750,7 +750,16 @@ public class ProtobufIDLProxy {
 
                 if (!isNestedTypeDependency(javaType, checkNestedTypes, mappedUniName, isUniName)) {
                     cd.addDependency(javaType);
+                    
+                    // fixed add package prefix
+                    if (packages.size() > 0) {
+                        String pkg = packages.iterator().next();
+                        javaType = pkg + "." + javaType;
+                    }
                 }
+                
+                
+                
             } else {
                 javaType = fType.getJavaType();
             }
@@ -903,7 +912,7 @@ public class ProtobufIDLProxy {
      * @return the list
      */
     private static List<Class<?>> createEnumClasses(Map<String, EnumElement> enumTypes,
-            Map<String, String> packageMapping, boolean generateSouceOnly, File sourceOutputDir,
+            Map<String, String> packageMapping, boolean debug, boolean generateSouceOnly, File sourceOutputDir,
             Set<String> compiledClass, Map<String, String> mappedUniName, boolean isUniName) {
 
         List<Class<?>> ret = new ArrayList<Class<?>>();
@@ -924,6 +933,11 @@ public class ProtobufIDLProxy {
             CodeDependent codeDependent = createCodeByType(enumType, true, packageName, mappedUniName, isUniName);
             compiledClass.add(codeDependent.name);
             compiledClass.add(packageName + PACKAGE_SPLIT_CHAR + codeDependent.name);
+            
+            if (debug) {
+                CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
+            }
+            
             if (!generateSouceOnly) {
                 Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.getClassName(),
                         codeDependent.code, ProtobufIDLProxy.class.getClassLoader(), null, -1);
@@ -1343,7 +1357,7 @@ public class ProtobufIDLProxy {
         }
 
         // create enum type classes
-        List<Class<?>> clsList = createEnumClasses(enumTypes, packageMapping, generateSouceOnly, sourceOutputDir,
+        List<Class<?>> clsList = createEnumClasses(enumTypes, packageMapping, debug, generateSouceOnly, sourceOutputDir,
                 compiledClass, mappedUniName, isUniName);
 
         for (ProtoFile protoFile : protoFiles) {
