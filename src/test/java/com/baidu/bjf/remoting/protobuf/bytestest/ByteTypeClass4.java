@@ -15,15 +15,10 @@
  */
 package com.baidu.bjf.remoting.protobuf.bytestest;
 
-import java.io.IOException;
 import java.util.Arrays;
 
-import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
-import com.baidu.bjf.remoting.protobuf.code.ClassCode;
-import com.baidu.bjf.remoting.protobuf.code.CodeGenerator;
-import com.baidu.bjf.remoting.protobuf.utils.compiler.JavaAssistCompiler;
 
 /**
  * Test single private byte array field.
@@ -60,30 +55,6 @@ public class ByteTypeClass4 {
 
     /** The bytes3. */
     public Byte[] bytes3;
-
-    public static void main(String[] args) throws InstantiationException, IllegalAccessException {
-        CodeGenerator cg = new CodeGenerator(ByteTypeClass4.class);
-        ClassCode classCode = cg.getClassCode();
-
-        JavaAssistCompiler compiler = new JavaAssistCompiler(classCode);
-        Class<?> cls = compiler.compile(null, null, null, null, 0L);
-        System.out.println(cls);
-
-        Object newInstance = cls.newInstance();
-        Codec<ByteTypeClass4> codec = (Codec<ByteTypeClass4>) newInstance;
-
-        ByteTypeClass4 btc = new ByteTypeClass4();
-        btc.bytes = new byte[] { 1, 2, 3 };
-
-        try {
-            byte[] encode = codec.encode(btc);
-            System.out.println(Arrays.toString(encode));
-            ByteTypeClass4 decode = codec.decode(encode);
-            System.out.println(decode);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
