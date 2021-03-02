@@ -21,13 +21,13 @@ package com.baidu.bjf.remoting.protobuf.code;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.v3.complexmap.ComplexMapPOJO;
 
-import junit.framework.Assert;
 
 /**
  * The Class TemplateCodeGeneratorTest.

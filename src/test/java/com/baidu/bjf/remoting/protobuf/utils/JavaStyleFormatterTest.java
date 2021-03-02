@@ -18,9 +18,8 @@
  */
 package com.baidu.bjf.remoting.protobuf.utils;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 /**
  * The Class JavaStyleFormatterTest.

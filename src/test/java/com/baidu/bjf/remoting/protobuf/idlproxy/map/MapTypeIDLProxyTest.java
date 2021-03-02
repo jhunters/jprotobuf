@@ -21,10 +21,10 @@ package com.baidu.bjf.remoting.protobuf.idlproxy.map;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -33,8 +33,6 @@ import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.enumeration.EnumAttrPOJO;
-
-import junit.framework.Assert;
 
 /**
  * Test class for map type from google protocol buffer v3 

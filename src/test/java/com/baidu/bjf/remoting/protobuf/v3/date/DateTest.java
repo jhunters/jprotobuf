@@ -21,14 +21,13 @@ package com.baidu.bjf.remoting.protobuf.v3.date;
 import java.io.IOException;
 import java.util.Arrays;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.v3.date.AddressBookProtos.Person;
 import com.google.protobuf.Timestamp;
-
-import junit.framework.Assert;
 
 /**
  * The Class DateTest.

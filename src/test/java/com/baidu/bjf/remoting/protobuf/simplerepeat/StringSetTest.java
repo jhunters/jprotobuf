@@ -21,13 +21,12 @@ package com.baidu.bjf.remoting.protobuf.simplerepeat;
 import java.io.IOException;
 import java.util.HashSet;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
-
-import junit.framework.Assert;
 
 /**
  * The Class StringSetTest.

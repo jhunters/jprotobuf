@@ -21,6 +21,7 @@ package com.baidu.bjf.remoting.protobuf.simpletypes;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
@@ -28,8 +29,6 @@ import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName.TypeDef;
 import com.google.protobuf.ByteString;
-
-import junit.framework.Assert;
 
 
 /**
@@ -63,15 +62,15 @@ public class AllTypesTest {
 		byte[] bb = dojoClassProxy.encode(c);
 		
 		InterClassName icn = InterClassName.parseFrom(bb);
-		Assert.assertEquals(c.doubleF, icn.getDoubleF());
+		Assert.assertEquals(c.doubleF.doubleValue(), icn.getDoubleF(), 0f);
 		byte[] bbb = icn.getBytesF().toByteArray();
 		Assert.assertEquals(2, bbb.length);
 		Assert.assertEquals(1, bbb[0]);
 		Assert.assertEquals(2, bbb[1]);
-		Assert.assertEquals(101D, icn.getDoubleF());
+		Assert.assertEquals(101D, icn.getDoubleF(), 0d);
 		Assert.assertEquals(1, icn.getFixed32F());
 		Assert.assertEquals(2L, icn.getFixed64F());
-		Assert.assertEquals(102F, icn.getFloatF());
+		Assert.assertEquals(102F, icn.getFloatF(), 0f);
 		Assert.assertEquals(3, icn.getInt32F());
 		Assert.assertEquals(4L, icn.getInt64F());
 	    Assert.assertEquals(5, icn.getSfixed32F());
@@ -121,15 +120,15 @@ public class AllTypesTest {
 
         AllTypesWithProtobufClassDojoClass icn = dojoClassProxy.decode(bb);
 
-        Assert.assertEquals(c.doubleF, icn.getDoubleF());
+        Assert.assertEquals(c.doubleF.doubleValue(), icn.getDoubleF(), 0d);
         byte[] bbb = icn.getBytesF();
         Assert.assertEquals(2, bbb.length);
         Assert.assertEquals(1, bbb[0]);
         Assert.assertEquals(2, bbb[1]);
-        Assert.assertEquals(101D, icn.getDoubleF());
+        Assert.assertEquals(101D, icn.getDoubleF(), 0d);
         Assert.assertEquals(1, icn.getFixed32F());
         Assert.assertEquals(2L, icn.getFixed64F());
-        Assert.assertEquals(102F, icn.getFloatF());
+        Assert.assertEquals(102F, icn.getFloatF(), 0f);
         Assert.assertEquals(3, icn.getInt32F());
         Assert.assertEquals(4L, icn.getInt64F());
         Assert.assertEquals(5, icn.getSfixed32F());
@@ -176,10 +175,10 @@ public class AllTypesTest {
         Assert.assertEquals(2, decode.bytesF.length);
         Assert.assertEquals(1, decode.bytesF[0]);
         Assert.assertEquals(2, decode.bytesF[1]);
-        Assert.assertEquals(202D, decode.doubleF);
+        Assert.assertEquals(202D, decode.doubleF.doubleValue(), 0d);
         Assert.assertEquals(1, decode.fixed32F.intValue());
         Assert.assertEquals(2L, decode.fixed64F.longValue());
-        Assert.assertEquals(303F, decode.floatF);
+        Assert.assertEquals(303F, decode.floatF.floatValue(), 0f);
         Assert.assertEquals(4, decode.int32F.intValue());
         Assert.assertEquals(5L, decode.int64F.intValue());
         Assert.assertEquals(6, decode.sfixed32F.longValue());
@@ -233,10 +232,10 @@ public class AllTypesTest {
         Assert.assertEquals(2, decode.bytesF.length);
         Assert.assertEquals(1, decode.bytesF[0]);
         Assert.assertEquals(2, decode.bytesF[1]);
-        Assert.assertEquals(101D, decode.doubleF);
+        Assert.assertEquals(101D, decode.doubleF.doubleValue(), 0d);
         Assert.assertEquals(1, decode.fixed32F.intValue());
         Assert.assertEquals(2L, decode.fixed64F.longValue());
-        Assert.assertEquals(102F, decode.floatF);
+        Assert.assertEquals(102F, decode.floatF.floatValue(), 0d);
         Assert.assertEquals(3, decode.int32F.intValue());
         Assert.assertEquals(4L, decode.int64F.intValue());
         Assert.assertEquals(5, decode.sfixed32F.longValue());

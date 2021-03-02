@@ -22,12 +22,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-
-import junit.framework.Assert;
 
 /**
  * The Class ListWithExtendsGenericValueTest.

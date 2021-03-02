@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.IDLProxyObject;
@@ -30,8 +31,6 @@ import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
 import com.baidu.bjf.remoting.protobuf.complex.AddressBookProtosPOJO;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypesPojoClass;
-
-import junit.framework.Assert;
 
 /**
  * Test class for {@link ProtobufIDLProxy}
@@ -97,10 +96,10 @@ public class ProtobufIDLProxyTest {
 
         Assert.assertEquals(false, icn.getBoolF());
         Assert.assertEquals(2, icn.getBytesF().toByteArray().length);
-        Assert.assertEquals(101D, icn.getDoubleF());
+        Assert.assertEquals(101D, icn.getDoubleF(), 0d);
         Assert.assertEquals(1, icn.getFixed32F());
         Assert.assertEquals(2L, icn.getFixed64F());
-        Assert.assertEquals(102F, icn.getFloatF());
+        Assert.assertEquals(102F, icn.getFloatF(), 0f);
         Assert.assertEquals(3, icn.getInt32F());
         Assert.assertEquals(4L, icn.getInt64F());
         Assert.assertEquals(5, icn.getSfixed32F());

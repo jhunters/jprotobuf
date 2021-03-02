@@ -21,8 +21,7 @@ package com.baidu.bjf.remoting.protobuf.simplerepeat;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;

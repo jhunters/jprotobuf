@@ -18,8 +18,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.idlproxy;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;

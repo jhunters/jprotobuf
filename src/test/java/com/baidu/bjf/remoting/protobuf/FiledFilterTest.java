@@ -20,9 +20,9 @@ package com.baidu.bjf.remoting.protobuf;
 
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import junit.framework.Assert;
 
 /**
  * The Class FiledFilterTest.
