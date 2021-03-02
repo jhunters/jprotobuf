@@ -330,7 +330,7 @@ public class SimpleMapTest {
         Descriptor descriptor2 = AddressBookProtos.Person.getDescriptor();
         DescriptorProto proto = descriptor2.toProto();
         byte[] byteArray = proto.toByteArray();
-        Codec<DescriptorProtoPOJO> codec = ProtobufProxy.create(DescriptorProtoPOJO.class, true);
+        Codec<DescriptorProtoPOJO> codec = ProtobufProxy.create(DescriptorProtoPOJO.class, false);
 
         DescriptorProtoPOJO decode = codec.decode(byteArray);
 

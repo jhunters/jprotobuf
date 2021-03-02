@@ -90,7 +90,7 @@ public class DescritporTest {
         Object field = parseFrom.getField(stringMapFD);
         Assert.assertTrue(field instanceof List);
         
-        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, true);
+        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, false);
         Descriptor descriptor = codec.getDescriptor();
         
         stringMapFD = descriptor.findFieldByName("list");

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
@@ -59,7 +60,7 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
  * @author xiemalin
  * @since 1.0.0
  */
-public final class ProtobufProxy { 
+public final class ProtobufProxy {
 
     /** The Constant DEBUG_CONTROLLER. */
     public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
@@ -77,9 +78,9 @@ public final class ProtobufProxy {
 
     /** The Constant OUTPUT_PATH for target directory to create generated source code out. */
     public static final ThreadLocal<Boolean> CACHE_ENABLED = new ThreadLocal<Boolean>();
-    
+
     /** The Constant for debug control from environment. */
-    private static final String DEBUG_CONTROL = "X_DEBUG_ENABLE"; 
+    private static final String DEBUG_CONTROL = "X_DEBUG_ENABLE";
 
     /**
      * Clear cache.
@@ -103,7 +104,7 @@ public final class ProtobufProxy {
         }
 
     }
-    
+
     /**
      * To create a protobuf proxy class for target class.
      * 
@@ -150,7 +151,7 @@ public final class ProtobufProxy {
         if (codec != null) {
             return codec;
         }
-        
+
         return create(cls, debug, path, null, getCodeGenerator(cls));
     }
 
@@ -282,7 +283,7 @@ public final class ProtobufProxy {
         }
 
         try {
-            Codec<T> newInstance = (Codec<T>) newClass.newInstance();
+            Codec<T> newInstance = (Codec<T>)newClass.getDeclaredConstructor(new Class[0]).newInstance(new Object[0]);
             if (!CACHED.containsKey(uniClsName)) {
                 CACHED.put(uniClsName, newInstance);
             }
@@ -300,13 +301,14 @@ public final class ProtobufProxy {
             }
 
             return newInstance;
+        } catch (IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            throw new RuntimeException(e.getMessage(), e);
         } catch (InstantiationException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
     }
-
 
     /**
      * To generate a protobuf proxy java source code for target class.
@@ -353,7 +355,7 @@ public final class ProtobufProxy {
     public static void enableCache(boolean enabled) {
         CACHE_ENABLED.set(enabled);
     }
-    
+
     /**
      * Gets the class loader.
      *
@@ -363,7 +365,7 @@ public final class ProtobufProxy {
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         return contextClassLoader;
     }
-    
+
     /**
      * Gets the code generator.
      *
@@ -429,12 +431,12 @@ public final class ProtobufProxy {
         if (debugEnv != null && Boolean.parseBoolean(debugEnv)) {
             return true;
         }
-        
+
         Boolean debug = DEBUG_CONTROLLER.get();
         if (debug == null) {
             debug = false; // set default to close debug info
         }
-        
+
         return debug;
     }
 
@@ -472,7 +474,7 @@ public final class ProtobufProxy {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        
+
         return null;
     }
 

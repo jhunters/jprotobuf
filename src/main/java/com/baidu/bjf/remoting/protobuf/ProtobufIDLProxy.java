@@ -62,6 +62,9 @@ import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
  */
 public class ProtobufIDLProxy {
     
+    /** The Constant JAVA_SUFFIX. */
+    private static final String JAVA_SUFFIX = ".java";
+
     /** The Constant formatJavaField. */
     private static boolean formatJavaField = false;
     
@@ -1780,7 +1783,7 @@ public class ProtobufIDLProxy {
 
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(new File(f, cd.name + ".java"));
+            fos = new FileOutputStream(new File(f, cd.name + JAVA_SUFFIX));
             fos.write(cd.code.getBytes(UTF_8));
             fos.flush();
         } catch (Exception e) {
