@@ -1,9 +1,12 @@
 /*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright (c) Baidu Inc. All rights reserved.
+ * 
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -14,21 +17,6 @@
  * limitations under the License.
  */
 package com.baidu.bjf.remoting.protobuf;
-/*
- * Copyright 2002-2007 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -71,7 +59,7 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.Compiler;
  * @author xiemalin
  * @since 1.0.0
  */
-public final class ProtobufProxy {
+public final class ProtobufProxy { 
 
     /** The Constant DEBUG_CONTROLLER. */
     public static final ThreadLocal<Boolean> DEBUG_CONTROLLER = new ThreadLocal<Boolean>();
@@ -94,131 +82,10 @@ public final class ProtobufProxy {
     private static final String DEBUG_CONTROL = "X_DEBUG_ENABLE"; 
 
     /**
-     * Enable cache.
-     *
-     * @param enabled the enabled
+     * Clear cache.
      */
-    public static void enableCache(boolean enabled) {
-        CACHE_ENABLED.set(enabled);
-    }
-
-    /**
-     * Checks if is cache enabled.
-     *
-     * @return true, if is cache enabled
-     */
-    public static boolean isCacheEnabled() {
-        Boolean b = CACHE_ENABLED.get();
-        if (b == null) {
-            return true;
-        }
-
-        return b;
-    }
-    
-    /**
-     * Checks if is debug enabled.
-     *
-     * @return true, if is debug enabled
-     */
-    public static boolean isDebugEnabled() {
-        String debugEnv = System.getenv(DEBUG_CONTROL);
-        if (debugEnv != null && Boolean.parseBoolean(debugEnv)) {
-            return true;
-        }
-        
-        Boolean debug = DEBUG_CONTROLLER.get();
-        if (debug == null) {
-            debug = false; // set default to close debug info
-        }
-        
-        return debug;
-    }
-
-    /**
-     * To generate a protobuf proxy java source code for target class.
-     * 
-     * @param os to generate java source code
-     * @param cls target class
-     * @param charset charset type
-     * @throws IOException in case of any io relative exception.
-     */
-    public static void dynamicCodeGenerate(OutputStream os, Class cls, Charset charset) throws IOException {
-        dynamicCodeGenerate(os, cls, charset, getCodeGenerator(cls));
-    }
-
-    /**
-     * To generate a protobuf proxy java source code for target class.
-     *
-     * @param os to generate java source code
-     * @param cls target class
-     * @param charset charset type
-     * @param codeGenerator the code generator
-     * @throws IOException in case of any io relative exception.
-     */
-    public static void dynamicCodeGenerate(OutputStream os, Class cls, Charset charset, ICodeGenerator codeGenerator)
-            throws IOException {
-        if (cls == null) {
-            throw new NullPointerException("Parameter 'cls' is null");
-        }
-        if (os == null) {
-            throw new NullPointerException("Parameter 'os' is null");
-        }
-        if (charset == null) {
-            charset = Charset.defaultCharset();
-        }
-        String code = codeGenerator.getCode();
-
-        os.write(code.getBytes(charset));
-    }
-
-    /**
-     * Gets the code generator.
-     *
-     * @param cls the cls
-     * @return the code generator
-     */
-    private static ICodeGenerator getCodeGenerator(Class cls) {
-        // check if has default constructor
-
-        if (!cls.isMemberClass()) {
-            try {
-                cls.getConstructor(new Class<?>[0]);
-            } catch (NoSuchMethodException e2) {
-                throw new IllegalArgumentException(
-                        "Class '" + cls.getName() + "' must has default constructor method with no parameters.", e2);
-            } catch (SecurityException e2) {
-                throw new IllegalArgumentException(e2.getMessage(), e2);
-            }
-        }
-
-        ICodeGenerator cg = new TemplateCodeGenerator(cls);
-
-        return cg;
-    }
-
-    /**
-     * To create a protobuf proxy class for target class.
-     * 
-     * @param <T> generic type
-     * @param cls target class to parse <code>@Protobuf</code> annotation
-     * @return {@link Codec} instance proxy
-     */
-    public static <T> Codec<T> create(Class<T> cls) {
-        return create(cls, isDebugEnabled());
-    }
-
-    /**
-     * To create a protobuf proxy class for target class.
-     *
-     * @param <T> generic type
-     * @param cls target class to parse <code>@Protobuf</code> annotation
-     * @param compiler the compiler
-     * @param codeGenerator the code generator
-     * @return {@link Codec} instance proxy
-     */
-    public static <T> Codec<T> create(Class<T> cls, Compiler compiler, ICodeGenerator codeGenerator) {
-        return create(cls, isDebugEnabled(), null, compiler, getCodeGenerator(cls));
+    public static void clearCache() {
+        CACHED.clear();
     }
 
     /**
@@ -235,6 +102,17 @@ public final class ProtobufProxy {
             throw new RuntimeException("Param 'outputPath' value should be a path directory. path=" + outputPath);
         }
 
+    }
+    
+    /**
+     * To create a protobuf proxy class for target class.
+     * 
+     * @param <T> generic type
+     * @param cls target class to parse <code>@Protobuf</code> annotation
+     * @return {@link Codec} instance proxy
+     */
+    public static <T> Codec<T> create(Class<T> cls) {
+        return create(cls, isDebugEnabled());
     }
 
     /**
@@ -275,22 +153,6 @@ public final class ProtobufProxy {
         
         return create(cls, debug, path, null, getCodeGenerator(cls));
     }
-    
-    /**
-     * Gets the full class name.
-     *
-     * @param cls the cls
-     * @return the full class name
-     */
-    public static String getFullClassName(Class cls) {
-        String pkg = ClassHelper.getPackage(cls);
-        String className = ClassHelper.getClassName(cls) + ICodeGenerator.DEFAULT_SUFFIX_CLASSNAME;
-        if (StringUtils.isEmpty(pkg)) {
-            return className;
-        }
-
-        return pkg + ClassHelper.PACKAGE_SEPARATOR + className;
-    }
 
     /**
      * To create a protobuf proxy class for target class.
@@ -317,13 +179,16 @@ public final class ProtobufProxy {
     }
 
     /**
-     * Gets the class loader.
+     * To create a protobuf proxy class for target class.
      *
-     * @return the class loader
+     * @param <T> generic type
+     * @param cls target class to parse <code>@Protobuf</code> annotation
+     * @param compiler the compiler
+     * @param codeGenerator the code generator
+     * @return {@link Codec} instance proxy
      */
-    private static ClassLoader getClassLoader() {
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-        return contextClassLoader;
+    public static <T> Codec<T> create(Class<T> cls, Compiler compiler, ICodeGenerator codeGenerator) {
+        return create(cls, isDebugEnabled(), null, compiler, getCodeGenerator(cls));
     }
 
     /**
@@ -442,6 +307,137 @@ public final class ProtobufProxy {
         }
     }
 
+
+    /**
+     * To generate a protobuf proxy java source code for target class.
+     * 
+     * @param os to generate java source code
+     * @param cls target class
+     * @param charset charset type
+     * @throws IOException in case of any io relative exception.
+     */
+    public static void dynamicCodeGenerate(OutputStream os, Class cls, Charset charset) throws IOException {
+        dynamicCodeGenerate(os, cls, charset, getCodeGenerator(cls));
+    }
+
+    /**
+     * To generate a protobuf proxy java source code for target class.
+     *
+     * @param os to generate java source code
+     * @param cls target class
+     * @param charset charset type
+     * @param codeGenerator the code generator
+     * @throws IOException in case of any io relative exception.
+     */
+    public static void dynamicCodeGenerate(OutputStream os, Class cls, Charset charset, ICodeGenerator codeGenerator)
+            throws IOException {
+        if (cls == null) {
+            throw new NullPointerException("Parameter 'cls' is null");
+        }
+        if (os == null) {
+            throw new NullPointerException("Parameter 'os' is null");
+        }
+        if (charset == null) {
+            charset = Charset.defaultCharset();
+        }
+        String code = codeGenerator.getCode();
+
+        os.write(code.getBytes(charset));
+    }
+
+    /**
+     * Enable cache.
+     *
+     * @param enabled the enabled
+     */
+    public static void enableCache(boolean enabled) {
+        CACHE_ENABLED.set(enabled);
+    }
+    
+    /**
+     * Gets the class loader.
+     *
+     * @return the class loader
+     */
+    private static ClassLoader getClassLoader() {
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        return contextClassLoader;
+    }
+    
+    /**
+     * Gets the code generator.
+     *
+     * @param cls the cls
+     * @return the code generator
+     */
+    private static ICodeGenerator getCodeGenerator(Class cls) {
+        // check if has default constructor
+
+        if (!cls.isMemberClass()) {
+            try {
+                cls.getConstructor(new Class<?>[0]);
+            } catch (NoSuchMethodException e2) {
+                throw new IllegalArgumentException(
+                        "Class '" + cls.getName() + "' must has default constructor method with no parameters.", e2);
+            } catch (SecurityException e2) {
+                throw new IllegalArgumentException(e2.getMessage(), e2);
+            }
+        }
+
+        ICodeGenerator cg = new TemplateCodeGenerator(cls);
+
+        return cg;
+    }
+
+    /**
+     * Gets the full class name.
+     *
+     * @param cls the cls
+     * @return the full class name
+     */
+    public static String getFullClassName(Class cls) {
+        String pkg = ClassHelper.getPackage(cls);
+        String className = ClassHelper.getClassName(cls) + ICodeGenerator.DEFAULT_SUFFIX_CLASSNAME;
+        if (StringUtils.isEmpty(pkg)) {
+            return className;
+        }
+
+        return pkg + ClassHelper.PACKAGE_SEPARATOR + className;
+    }
+
+    /**
+     * Checks if is cache enabled.
+     *
+     * @return true, if is cache enabled
+     */
+    public static boolean isCacheEnabled() {
+        Boolean b = CACHE_ENABLED.get();
+        if (b == null) {
+            return true;
+        }
+
+        return b;
+    }
+
+    /**
+     * Checks if is debug enabled.
+     *
+     * @return true, if is debug enabled
+     */
+    public static boolean isDebugEnabled() {
+        String debugEnv = System.getenv(DEBUG_CONTROL);
+        if (debugEnv != null && Boolean.parseBoolean(debugEnv)) {
+            return true;
+        }
+        
+        Boolean debug = DEBUG_CONTROLLER.get();
+        if (debug == null) {
+            debug = false; // set default to close debug info
+        }
+        
+        return debug;
+    }
+
     /**
      * Load compiled class.
      *
@@ -478,13 +474,6 @@ public final class ProtobufProxy {
         }
         
         return null;
-    }
-
-    /**
-     * Clear cache.
-     */
-    public static void clearCache() {
-        CACHED.clear();
     }
 
 }
