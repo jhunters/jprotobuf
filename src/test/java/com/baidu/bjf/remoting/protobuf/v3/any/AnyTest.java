@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.simplestring.StringTypeClass.StringMessage;
 import com.baidu.bjf.remoting.protobuf.simplestring.StringTypePOJOClass;
@@ -33,7 +34,6 @@ import com.baidu.bjf.remoting.protobuf.simpletypes.AllTypes.InterClassName;
 import com.baidu.bjf.remoting.protobuf.v3.any.AnyProtos.AnyObject;
 import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
-
 
 /**
  * The Class AnyTest.
@@ -43,34 +43,32 @@ import com.google.protobuf.InvalidProtocolBufferException;
 public class AnyTest {
 
     @Test
-    public void testAnyOriginEncodeJprotobufDeocde() throws IOException {
+    public void testAnyOriginEncodeJprotobufDecode() throws IOException {
         String s1 = "hello world";
         String s2 = "hello xiemalin";
-        
+
         // origin protobuf
         StringMessage message = StringMessage.newBuilder().setList(s1).build();
         Any any = Any.pack(message);
         AnyObject anyObject = AnyObject.newBuilder().addDetails(any).setMessage(s2).build();
         byte[] byteArray = anyObject.toByteArray();
-        
-        // jprotobuf 
+
+        // jprotobuf
         StringTypePOJOClass pojo = new StringTypePOJOClass();
         pojo.setStr(s1);
 
-        com.baidu.bjf.remoting.protobuf.Any any2 =
-                com.baidu.bjf.remoting.protobuf.Any.pack(pojo, "pkg.StringMessage");
+        com.baidu.bjf.remoting.protobuf.Any any2 = com.baidu.bjf.remoting.protobuf.Any.pack(pojo, "pkg.StringMessage");
         AnyPOJO anyPojo = new AnyPOJO();
         List<com.baidu.bjf.remoting.protobuf.Any> details = new ArrayList<com.baidu.bjf.remoting.protobuf.Any>();
         details.add(any2);
         anyPojo.setDetails(details);
         anyPojo.setMessage(s2);
-        
+
         Codec<AnyPOJO> codec = ProtobufProxy.create(AnyPOJO.class);
         byte[] byteArray2 = codec.encode(anyPojo);
-        
+
         Assert.assertArrayEquals(byteArray, byteArray2);
     }
-    
 
     /**
      * Encode origin decode jprotobuf.
@@ -192,5 +190,17 @@ public class AnyTest {
         StringTypePOJOClass unpack = any2.unpack(StringTypePOJOClass.class);
         Assert.assertEquals(pojo.getStr(), unpack.getStr());
 
+    }
+
+    /**
+     * Test any IDL generator.
+     */
+    @Test
+    public void testAnyIDLGenerator() {
+        String idl = ProtobufIDLGenerator.getIDL(AnyPOJO.class);
+        if (!idl.contains(ProtobufIDLGenerator.GOOGLE_PROTOBUF_ANY_DEF)) {
+            Assert.fail("IDL generator from Any type is invalid, should include "
+                    + ProtobufIDLGenerator.GOOGLE_PROTOBUF_ANY_DEF);
+        }
     }
 }

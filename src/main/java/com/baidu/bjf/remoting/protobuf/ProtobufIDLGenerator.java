@@ -43,13 +43,16 @@ import com.baidu.bjf.remoting.protobuf.utils.ProtobufProxyUtils;
  * @since 1.0.1
  */
 public class ProtobufIDLGenerator {
-    
+
+    /** The Constant GOOGLE_PROTOBUF_ANY_DEF. */
+    public static final String GOOGLE_PROTOBUF_ANY_DEF = "google.protobuf.Any";
+
     /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ProtobufIDLGenerator.class.getName());
-    
+
     /** The Constant V3_HEADER. */
     private static final String V3_HEADER = "syntax=\"proto3\"";
-    
+
     /**
      * get IDL content from class.
      * 
@@ -60,14 +63,14 @@ public class ProtobufIDLGenerator {
      * @return protobuf IDL content in string
      * @see Protobuf
      */
-    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
             final Set<Class<?>> cachedEnumTypes, boolean ignoreJava) {
         Ignore ignore = cls.getAnnotation(Ignore.class);
         if (ignore != null) {
             LOGGER.info("class '{}' marked as @Ignore annotation, create IDL ignored.", cls.getName());
             return null;
         }
-        
+
         Set<Class<?>> types = cachedTypes;
         if (types == null) {
             types = new HashSet<Class<?>>();
@@ -77,7 +80,7 @@ public class ProtobufIDLGenerator {
         if (enumTypes == null) {
             enumTypes = new HashSet<Class<?>>();
         }
-        
+
         if (types.contains(cls)) {
             return null;
         }
@@ -108,7 +111,7 @@ public class ProtobufIDLGenerator {
      * @return protobuf IDL content in string
      * @see Protobuf
      */
-    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes, 
+    public static String getIDL(final Class<?> cls, final Set<Class<?>> cachedTypes,
             final Set<Class<?>> cachedEnumTypes) {
 
         return getIDL(cls, cachedTypes, cachedEnumTypes, false);
@@ -135,10 +138,10 @@ public class ProtobufIDLGenerator {
 
         Set<Class<?>> subTypes = new HashSet<Class<?>>();
         Set<Class<Enum>> enumTypes = new HashSet<Class<Enum>>();
-        
+
         Annotation annotation = cls.getAnnotation(ProtobufClass.class);
-        if (annotation != null && ((ProtobufClass)annotation).description() != null) {
-            code.append("//").append(((ProtobufClass)annotation).description()).append("\n");
+        if (annotation != null && ((ProtobufClass) annotation).description() != null) {
+            code.append("//").append(((ProtobufClass) annotation).description()).append("\n");
         }
         code.append("message ").append(cls.getSimpleName()).append(" {  \n");
 
@@ -159,33 +162,36 @@ public class ProtobufIDLGenerator {
                             Type targetType = actualTypeArguments[0];
                             if (targetType instanceof Class) {
                                 Class c = (Class) targetType;
-                                
+
                                 String fieldTypeName;
                                 if (ProtobufProxyUtils.isScalarType(c)) {
-                                    
+
                                     FieldType fieldType = ProtobufProxyUtils.TYPE_MAPPING.get(c);
                                     fieldTypeName = fieldType.getType();
-                                    
+                                } else if (c.equals(Any.class)) {
+                                    // add Any supports visit
+                                    // requirement #https://github.com/jhunters/jprotobuf/issues/156
+                                    fieldTypeName = GOOGLE_PROTOBUF_ANY_DEF;
                                 } else {
                                     if (field.getFieldType() == FieldType.ENUM) {
                                         if (!cachedEnumTypes.contains(c)) {
                                             cachedEnumTypes.add(c);
                                             enumTypes.add(c);
                                         }
-                                    } else  {
-                                        
+                                    } else {
+
                                         if (!cachedTypes.contains(c)) {
                                             cachedTypes.add(c);
                                             subTypes.add(c);
                                         }
                                     }
-                                    
+
                                     fieldTypeName = c.getSimpleName();
                                 }
-                                
+
                                 code.append("repeated ").append(fieldTypeName).append(" ")
-                                .append(field.getField().getName()).append("=").append(field.getOrder())
-                                .append(";\n");
+                                        .append(field.getField().getName()).append("=").append(field.getOrder())
+                                        .append(";\n");
                             }
                         }
                     }
@@ -198,8 +204,8 @@ public class ProtobufIDLGenerator {
                             cachedEnumTypes.add(c);
                             enumTypes.add(c);
                         }
-                    } else  {
-                        
+                    } else {
+
                         if (!cachedTypes.contains(c)) {
                             cachedTypes.add(c);
                             subTypes.add(c);
@@ -224,8 +230,8 @@ public class ProtobufIDLGenerator {
                     Class keyClass = field.getGenericKeyType();
                     Class valueClass = field.getGenericeValueType();
                     type = type + "<" + ProtobufProxyUtils.processProtobufType(keyClass) + ", ";
-                    type = type + ProtobufProxyUtils.processProtobufType(valueClass)  + ">";
-                    
+                    type = type + ProtobufProxyUtils.processProtobufType(valueClass) + ">";
+
                     // check map key or value is object type
                     if (ProtobufProxyUtils.isObjectType(keyClass)) {
                         if (Enum.class.isAssignableFrom(keyClass)) {
@@ -240,9 +246,9 @@ public class ProtobufIDLGenerator {
                             }
                         }
                     }
-                    
+
                     if (ProtobufProxyUtils.isObjectType(valueClass)) {
-                        
+
                         if (Enum.class.isAssignableFrom(valueClass)) {
                             if (!cachedEnumTypes.contains(valueClass)) {
                                 cachedEnumTypes.add(valueClass);
@@ -255,7 +261,7 @@ public class ProtobufIDLGenerator {
                             }
                         }
                     }
-                    
+
                 }
 
                 String required = getFieldRequired(field.isRequired());
@@ -294,7 +300,7 @@ public class ProtobufIDLGenerator {
 
         Field[] fields = cls.getFields();
         for (Field field : fields) {
-            
+
             String name = field.getName();
             code.append(name).append("=");
             try {
