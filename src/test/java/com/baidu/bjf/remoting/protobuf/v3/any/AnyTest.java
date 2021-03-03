@@ -18,6 +18,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.v3.any;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
+import com.baidu.bjf.remoting.protobuf.ProtobufIDLProxy;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.simplestring.StringTypeClass.StringMessage;
 import com.baidu.bjf.remoting.protobuf.simplestring.StringTypePOJOClass;
@@ -203,4 +205,5 @@ public class AnyTest {
                     + ProtobufIDLGenerator.GOOGLE_PROTOBUF_ANY_DEF);
         }
     }
+
 }

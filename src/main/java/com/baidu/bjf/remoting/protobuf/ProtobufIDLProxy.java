@@ -752,20 +752,23 @@ public class ProtobufIDLProxy {
             FieldType fType = typeMapping.get(typeName);
             String javaType;
             if (fType == null) {
-                javaType = getProxyClassName(getTypeName(field), packages, mappedUniName, isUniName);
-
-                if (!isNestedTypeDependency(javaType, checkNestedTypes, mappedUniName, isUniName)) {
-                    cd.addDependency(javaType);
+                
+                // check if Any type
+                if (typeName.equals(ProtobufIDLGenerator.GOOGLE_PROTOBUF_ANY_DEF)) {
+                    javaType = Any.class.getName();
+                } else {
+                    javaType = getProxyClassName(getTypeName(field), packages, mappedUniName, isUniName);
                     
-                    // fixed add package prefix
-                    if (packages.size() > 0) {
-                        String pkg = packages.iterator().next();
-                        javaType = pkg + "." + javaType;
+                    if (!isNestedTypeDependency(javaType, checkNestedTypes, mappedUniName, isUniName)) {
+                        cd.addDependency(javaType);
+                        
+                        // fixed add package prefix
+                        if (packages.size() > 0) {
+                            String pkg = packages.iterator().next();
+                            javaType = pkg + "." + javaType;
+                        }
                     }
                 }
-                
-                
-                
             } else {
                 javaType = fType.getJavaType();
             }
@@ -1442,6 +1445,11 @@ public class ProtobufIDLProxy {
         List<String> dependencies = protoFile.dependencies();
         if (dependencies != null && !dependencies.isEmpty()) {
             for (String fn : dependencies) {
+                if (fn.startsWith("google/protobuf/")) {
+                    // to ignore google internal defined proto file 
+                    continue;
+                }
+                
                 if (dependencyNames.contains(fn)) {
                     continue;
                 }
