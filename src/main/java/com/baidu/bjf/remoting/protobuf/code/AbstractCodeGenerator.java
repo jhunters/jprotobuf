@@ -21,6 +21,8 @@ package com.baidu.bjf.remoting.protobuf.code;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -323,7 +325,7 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
         if (type == FieldType.OBJECT || type == FieldType.ENUM) {
             return;
         }
-
+        
         String javaType = type.getJavaType();
         if (Integer.class.getSimpleName().equals(javaType)) {
             if (cls.getSimpleName().equals("int") || Integer.class.getSimpleName().equals(cls.getSimpleName())) {
@@ -331,7 +333,7 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
             }
             throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
         }
-        if (!javaType.equalsIgnoreCase(cls.getSimpleName())) {
+        if (!javaType.equalsIgnoreCase(cls.getSimpleName()) && !javaType.equalsIgnoreCase(cls.getName())) {
             throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
         }
     }

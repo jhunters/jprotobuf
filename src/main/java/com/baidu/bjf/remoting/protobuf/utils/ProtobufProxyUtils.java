@@ -20,6 +20,8 @@ package com.baidu.bjf.remoting.protobuf.utils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,7 +80,8 @@ public class ProtobufProxyUtils {
         TYPE_MAPPING.put(Boolean.class, FieldType.BOOL);
         TYPE_MAPPING.put(boolean.class, FieldType.BOOL);
         TYPE_MAPPING.put(Date.class, FieldType.DATE);
-        
+        TYPE_MAPPING.put(BigDecimal.class, FieldType.BIGDECIMAL);
+        TYPE_MAPPING.put(BigInteger.class, FieldType.BIGINTEGER);
         
         FIELD_FILTER_STARTS.add("$jacoco");
     }

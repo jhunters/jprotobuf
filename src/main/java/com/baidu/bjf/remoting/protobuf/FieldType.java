@@ -51,6 +51,10 @@ public enum FieldType {
     ENUM ("Enum", "enum"       , "WIRETYPE_VARINT"    ,    ".ordinal()"    ,  WireFormat.FieldType.ENUM , null ),
     MAP ("Map", "map"       , "WIRETYPE_VARINT"    ,    ""    ,  WireFormat.FieldType.MESSAGE , null ),
     DATE ("Date", "int64"       , "WIRETYPE_VARINT"    ,    ".getTime()"    ,  WireFormat.FieldType.INT64 , null ),
+    BIGDECIMAL("java.math.BigDecimal", "string", "WIRETYPE_LENGTH_DELIMITED", ".toString()",
+            WireFormat.FieldType.STRING, null),
+    BIGINTEGER("java.math.BigInteger", "string", "WIRETYPE_LENGTH_DELIMITED", ".toString()",
+            WireFormat.FieldType.STRING, null),
     DEFAULT("", ""       , ""    ,    ""    ,  WireFormat.FieldType.MESSAGE , null );
     
     /**

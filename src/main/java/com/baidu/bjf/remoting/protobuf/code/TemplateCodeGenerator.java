@@ -267,7 +267,13 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                 express = "CodedConstant.getEnumValue(" + clsName + ".class, CodedConstant.getEnumName(" + clsName
                         + ".values()," + "input.read" + t + "()))";
             } else {
-                express = "input.read" + t + "()";
+                // here is the trick way to process BigDecimal and BigInteger
+                if (field.getFieldType() == FieldType.BIGDECIMAL || field.getFieldType() == FieldType.BIGINTEGER) {
+                    express = "new " + field.getFieldType().getJavaType() +  "(input.read" + t + "())";
+                } else {
+                    express = "input.read" + t + "()";
+                }
+                
             }
 
             // if List type and element is object message type
