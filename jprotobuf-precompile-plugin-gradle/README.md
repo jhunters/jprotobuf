@@ -5,7 +5,7 @@
 ```property
 
 plugins {
-    id 'com.baidu.jprotobuf' version '1.0.7'
+    id 'com.baidu.jprotobuf' version '1.1.0'
 }
 ```
 
@@ -19,7 +19,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.0.6"
+    classpath "gradle.plugin.com.baidu.jprotobuf:jprotobuf-precompile-plugin-gradle:1.1.0"
   }
 }
 
