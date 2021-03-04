@@ -80,8 +80,7 @@ public class BigLongTest {
     @Test
     public void testBigNumberObjectIDLGenerator() {
         String idl = ProtobufIDLGenerator.getIDL(BigLongPOJO.class);
-        System.out.println(idl);
-        Assert.assertTrue(idl.contains("string value"));
+        Assert.assertTrue(idl.contains("string value="));
     }
     
     /**
@@ -90,6 +89,6 @@ public class BigLongTest {
     @Test
     public void testBigNumberObjectIDLDefaultWayGenerator() {
         String idl = ProtobufIDLGenerator.getIDL(BigLongPOJOWithDefault.class);
-        Assert.assertTrue(idl.contains("string value"));
+        Assert.assertTrue(idl.contains("string value="));
     }
 }

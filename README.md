@@ -144,7 +144,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>2.2.2</version>
+  <version>2.2.5</version>
 </dependency>
 ```
 
