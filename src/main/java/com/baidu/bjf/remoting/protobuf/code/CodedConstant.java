@@ -219,7 +219,7 @@ public class CodedConstant {
 
         String spath = "null";
         if (path != null) {
-            spath = "new java.io.File(\"" + path.getAbsolutePath().replace('\\', '/') + "\")";
+            spath = "ProtobufProxy.OUTPUT_PATH.get()";
         }
 
         String typeString = type.getType().toUpperCase();
