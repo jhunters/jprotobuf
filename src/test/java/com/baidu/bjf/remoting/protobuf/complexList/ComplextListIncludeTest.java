@@ -54,7 +54,7 @@ public class ComplextListIncludeTest {
 
         byte[] bb = book.toByteArray();
 
-        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, false);
+        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class);
         try {
             AddressBookProtosPOJO decode = codec.decode(bb);
             Assert.assertEquals(2, decode.getList().size());
