@@ -144,16 +144,16 @@ public class CodedConstant {
         if ((type == FieldType.STRING || type == FieldType.BYTES) && !isList) {
             // add null check
             code.append("com.google.protobuf.ByteString ").append(fieldName).append(" = null")
-                    .append(CodeGenerator.JAVA_LINE_BREAK);
-            code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(CodeGenerator.LINE_BREAK);
+                    .append(ICodeGenerator.JAVA_LINE_BREAK);
+            code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(ICodeGenerator.LINE_BREAK);
 
             String method = "copyFromUtf8";
             if (type == FieldType.BYTES) {
                 method = "copyFrom";
             }
             code.append(fieldName).append(" = com.google.protobuf.ByteString.").append(method).append("(")
-                    .append(express).append(")").append(CodeGenerator.JAVA_LINE_BREAK);
-            code.append("}").append(CodeGenerator.LINE_BREAK);
+                    .append(express).append(")").append(ICodeGenerator.JAVA_LINE_BREAK);
+            code.append("}").append(ICodeGenerator.LINE_BREAK);
             return code.toString();
         }
         // add null check
@@ -164,10 +164,10 @@ public class CodedConstant {
             defineType = "Map";
         }
         code.setLength(0);
-        code.append(defineType).append(" ").append(fieldName).append(" = null").append(CodeGenerator.JAVA_LINE_BREAK);
-        code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(CodeGenerator.LINE_BREAK);
-        code.append(fieldName).append(" = ").append(express).append(CodeGenerator.JAVA_LINE_BREAK);
-        code.append("}").append(CodeGenerator.LINE_BREAK);
+        code.append(defineType).append(" ").append(fieldName).append(" = null").append(ICodeGenerator.JAVA_LINE_BREAK);
+        code.append("if (!CodedConstant.isNull(").append(express).append(")) {").append(ICodeGenerator.LINE_BREAK);
+        code.append(fieldName).append(" = ").append(express).append(ICodeGenerator.JAVA_LINE_BREAK);
+        code.append("}").append(ICodeGenerator.LINE_BREAK);
         return code.toString();
     }
 
@@ -226,17 +226,17 @@ public class CodedConstant {
         if (isList) {
             return "CodedConstant.computeListSize(" + order + ", " + fieldName + ", FieldType." + typeString + ", "
                     + Boolean.valueOf(debug) + ", " + spath + "," + Boolean.valueOf(field.isPacked()) + ")"
-                    + CodeGenerator.JAVA_LINE_BREAK;
+                    + ICodeGenerator.JAVA_LINE_BREAK;
         } else if (isMap) {
 
             String joinedSentence = getMapFieldGenericParameterString(field);
             return "CodedConstant.computeMapSize(" + order + ", " + fieldName + ", " + joinedSentence + ")"
-                    + CodeGenerator.JAVA_LINE_BREAK;
+                    + ICodeGenerator.JAVA_LINE_BREAK;
         }
 
         if (type == FieldType.OBJECT) {
             return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
-                    + Boolean.valueOf(debug) + "," + spath + ")" + CodeGenerator.JAVA_LINE_BREAK;
+                    + Boolean.valueOf(debug) + "," + spath + ")" + ICodeGenerator.JAVA_LINE_BREAK;
         }
 
         String t = type.getType();
@@ -262,7 +262,7 @@ public class CodedConstant {
         }
 
         return "com.google.protobuf.CodedOutputStream.compute" + t + "Size(" + order + "," + fieldName + ")"
-                + CodeGenerator.JAVA_LINE_BREAK;
+                + ICodeGenerator.JAVA_LINE_BREAK;
     }
 
     /**
@@ -611,14 +611,14 @@ public class CodedConstant {
             boolean isMap) {
         String fieldName = getFieldName(order);
         StringBuilder ret = new StringBuilder();
-        ret.append("if (").append(fieldName).append(" != null){").append(CodeGenerator.LINE_BREAK);
+        ret.append("if (").append(fieldName).append(" != null){").append(ICodeGenerator.LINE_BREAK);
 
         if (isList) {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeToList(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
             ret.append(",").append(fieldName).append(",").append(Boolean.valueOf(field.isPacked())).append(")")
-                    .append(CodeGenerator.JAVA_LINE_BREAK).append("}").append(CodeGenerator.LINE_BREAK);
+                    .append(ICodeGenerator.JAVA_LINE_BREAK).append("}").append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
         } else if (isMap) {
             ret.append("CodedConstant.writeToMap(").append(prefix).append(",");
@@ -627,7 +627,7 @@ public class CodedConstant {
             String joinedSentence = getMapFieldGenericParameterString(field);
             ret.append(",").append(joinedSentence);
 
-            ret.append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}").append(CodeGenerator.LINE_BREAK);
+            ret.append(")").append(ICodeGenerator.JAVA_LINE_BREAK).append("}").append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
 
         } else {
@@ -649,22 +649,22 @@ public class CodedConstant {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeObject(").append(prefix).append(",");
             ret.append(order).append(",").append("FieldType.").append(typeString);
-            ret.append(",").append(fieldName).append(", false)").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
-                    .append(CodeGenerator.LINE_BREAK);
+            ret.append(",").append(fieldName).append(", false)").append(ICodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
         }
 
         if (type == FieldType.STRING) {
             ret.append(prefix).append(".writeString(").append(order);
-            ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
-                    .append(CodeGenerator.LINE_BREAK);
+            ret.append(", ").append(fieldName).append(")").append(ICodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
         }
         
         if (type == FieldType.BYTES) {
             ret.append(prefix).append(".writeByteArray(").append(order);
-            ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
-                    .append(CodeGenerator.LINE_BREAK);
+            ret.append(", ").append(fieldName).append(")").append(ICodeGenerator.JAVA_LINE_BREAK).append("}")
+                    .append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
         }
         
@@ -672,8 +672,8 @@ public class CodedConstant {
         t = capitalize(t);
 
         ret.append(prefix).append(".write").append(t).append("(").append(order);
-        ret.append(", ").append(fieldName).append(")").append(CodeGenerator.JAVA_LINE_BREAK).append("}")
-                .append(CodeGenerator.LINE_BREAK);
+        ret.append(", ").append(fieldName).append(")").append(ICodeGenerator.JAVA_LINE_BREAK).append("}")
+                .append(ICodeGenerator.LINE_BREAK);
         return ret.toString();
     }
 
@@ -1547,8 +1547,8 @@ public class CodedConstant {
                 if (type.kind() == Kind.MAP) {
                     String messageName = StringUtils.capitalize(fieldDescriptorProto.name) + MAP_ENTRY_SUFFIX;
                     fieldDescriptorProto.type = Type.TYPE_MESSAGE;
-                    fieldDescriptorProto.typeName = CodeGenerator.PACKAGE_SPLIT + fileDescriptorProto.pkg
-                            + CodeGenerator.PACKAGE_SPLIT + ret.name + CodeGenerator.PACKAGE_SPLIT + messageName;
+                    fieldDescriptorProto.typeName = ICodeGenerator.PACKAGE_SPLIT + fileDescriptorProto.pkg
+                            + ICodeGenerator.PACKAGE_SPLIT + ret.name + ICodeGenerator.PACKAGE_SPLIT + messageName;
                     // refix label type
                     fieldDescriptorProto.label = Label.LABEL_REPEATED;
 

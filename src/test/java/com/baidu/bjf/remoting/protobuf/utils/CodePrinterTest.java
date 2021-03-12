@@ -16,39 +16,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.baidu.bjf.remoting.protobuf;
+package com.baidu.bjf.remoting.protobuf.utils;
 
-import java.io.IOException;
-
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
-
 /**
- * The Class FiledFilterTest.
- *
- * @author xiemalin
- * @since 2.4.4
+ * The Class CodePrinterTest.
  */
-public class FiledFilterTest {
+public class CodePrinterTest {
 
-    @Ignore
+    
+    /**
+     * Test print.
+     */
     @Test
-    public void testFieldFilter() {
-        Codec<FileterTestPOJO> proxy = ProtobufProxy.create(FileterTestPOJO.class);
-
-        // field $jacocoData will be filter
-        
-        FileterTestPOJO pojo = new FileterTestPOJO();
-        pojo.set$jacocoData("hello world");
-        
-        try {
-            byte[] encode = proxy.encode(pojo);
-            // field filtered result will be empty
-            Assert.assertTrue(encode.length == 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void testPrint() {
+        CodePrinter.printCode("1", "2");
     }
 }

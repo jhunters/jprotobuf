@@ -23,14 +23,42 @@ import java.util.Set;
 
 /**
  * The Interface ICodeGenerator.
+ * 
  * @author xiemalin
  * @since 1.10.7
  */
 public interface ICodeGenerator {
-    
+
     /** auto proxied suffix class name. */
     String DEFAULT_SUFFIX_CLASSNAME = "$$JProtoBufClass";
 
+    /**
+     * line break for editor
+     */
+    String LINE_BREAK = "\n";
+
+    /**
+     * java line end
+     */
+    String JAVA_END = ";";
+
+    /**
+     * line break for JAVA
+     */
+    String JAVA_LINE_BREAK = JAVA_END + LINE_BREAK;
+
+    /**
+     * auto proxied suffix class name
+     */
+
+    String PACKAGE_SPLIT = ".";
+
+    String CLASS_JOINER = "$";
+
+    /**
+     * 
+     */
+    String JAVA_CLASS_FILE_SUFFIX = ".class";
 
     /**
      * Sets the output path. if set should write generated source code to target path
@@ -48,6 +76,7 @@ public interface ICodeGenerator {
 
     /**
      * Sets the debug. if enabled print out source code after generated
+     * 
      * @see #getCode()
      *
      * @param debug the new debug

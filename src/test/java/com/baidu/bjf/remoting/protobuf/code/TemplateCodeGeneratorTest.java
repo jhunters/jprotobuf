@@ -24,8 +24,10 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.baidu.bjf.remoting.protobuf.SimplePoJoForGenerator;
 import com.baidu.bjf.remoting.protobuf.complex.PersonPOJO;
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtosPOJO;
+import com.baidu.bjf.remoting.protobuf.descriptor.FileOptionsPOJO;
 import com.baidu.bjf.remoting.protobuf.v3.complexmap.ComplexMapPOJO;
 
 
@@ -60,6 +62,9 @@ public class TemplateCodeGeneratorTest {
         Assert.assertTrue(dependenciesClasses.isEmpty());
     }
     
+    /**
+     * Test list POJO dependencies.
+     */
     @Test
     public void testListPOJODependencies() {
         TemplateCodeGenerator generator = new TemplateCodeGenerator(AddressBookProtosPOJO.class);
@@ -68,6 +73,9 @@ public class TemplateCodeGeneratorTest {
     }
     
     
+    /**
+     * Test map and sub class dependencies.
+     */
     @Test
     public void testMapAndSubClassDependencies() {
         TemplateCodeGenerator generator = new TemplateCodeGenerator(ComplexMapPOJO.class);
@@ -76,5 +84,38 @@ public class TemplateCodeGeneratorTest {
         System.out.println(list);
         Assert.assertEquals(list.size(), 3);
         
+    }
+    
+    /**
+     * Test repeat dependencies.
+     */
+    @Test 
+    public void testRepeatDependencies() {
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(FileOptionsPOJO.class);
+        Set<Class> list = new HashSet<Class>();
+        generator.getAllDependenciesClasses(list);
+        
+        String pkg = FileOptionsPOJO.class.getPackage().getName();
+        for (Class c : list) {
+            if (c.getName().startsWith(pkg)) {
+                try {
+                    generator = new TemplateCodeGenerator(c);
+                    Assert.assertNotNull(generator);
+                } catch (Exception e) {
+                }
+            }
+  
+        }
+    }
+    
+    /**
+     * Test repeat dependencies.
+     */
+    @Test 
+    public void testAllTypeDefinedPOJOGenerator() {
+        TemplateCodeGenerator generator = new TemplateCodeGenerator(SimplePoJoForGenerator.class);
+        Set<Class> list = new HashSet<Class>();
+        generator.getAllDependenciesClasses(list);
+        Assert.assertTrue(list.isEmpty());
     }
 }

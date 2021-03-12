@@ -46,7 +46,7 @@ public class CodeTemplate {
                        "return (this.descriptor = descriptor);"; 
         
         return String.format(code, descriptorClsName, 
-                ClassHelper.getInternalName(cls.getCanonicalName()) + CodeGenerator.JAVA_CLASS_FILE_SUFFIX);
+                ClassHelper.getInternalName(cls.getCanonicalName()) + ICodeGenerator.JAVA_CLASS_FILE_SUFFIX);
         
     }
     

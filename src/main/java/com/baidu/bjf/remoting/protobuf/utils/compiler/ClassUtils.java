@@ -39,21 +39,16 @@ import java.util.Map;
  */
 public class ClassUtils {
 
-    /**
-     * class file extension
-     */
+    /** class file extension. */
     public static final String CLASS_EXTENSION = ".class";
 
-    /**
-     * java source file extension
-     */
+    /** java source file extension. */
     public static final String JAVA_EXTENSION = ".java";
 
     /**
-     * To new instance by class name
-     * 
-     * @param name
-     *            class name
+     * To new instance by class name.
+     *
+     * @param name class name
      * @return new create instance
      */
     public static Object newInstance(String name) {
@@ -162,6 +157,13 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * Array for name.
+     *
+     * @param className the class name
+     * @return the class
+     * @throws ClassNotFoundException the class not found exception
+     */
     private static Class<?> arrayForName(String className) throws ClassNotFoundException {
         String name;
         if (className.endsWith("[]")) {
@@ -174,10 +176,9 @@ public class ClassUtils {
     }
 
     /**
-     * Get boxed class for primitive type
-     * 
-     * @param type
-     *            primitive class type
+     * Get boxed class for primitive type.
+     *
+     * @param type primitive class type
      * @return Object class type
      */
     public static Class<?> getBoxedClass(Class<?> type) {
@@ -203,10 +204,9 @@ public class ClassUtils {
     }
 
     /**
-     * Boxed primitive boolean type
-     * 
-     * @param v
-     *            boolean primitive type
+     * Boxed primitive boolean type.
+     *
+     * @param v boolean primitive type
      * @return Object type of boolean
      */
     public static Boolean boxed(boolean v) {
@@ -214,10 +214,9 @@ public class ClassUtils {
     }
 
     /**
-     * Boxed primitive char type
-     * 
-     * @param v
-     *            boolean char type
+     * Boxed primitive char type.
+     *
+     * @param v boolean char type
      * @return Object type of Character
      */
     public static Character boxed(char v) {
@@ -225,10 +224,9 @@ public class ClassUtils {
     }
 
     /**
-     * Boxed primitive byte type
-     * 
-     * @param v
-     *            boolean byte type
+     * Boxed primitive byte type.
+     *
+     * @param v boolean byte type
      * @return Object type of Byte
      */
     public static Byte boxed(byte v) {
@@ -236,76 +234,171 @@ public class ClassUtils {
     }
 
     /**
-     * Boxed primitive short type
-     * 
-     * @param v
-     *            boolean short type
+     * Boxed primitive short type.
+     *
+     * @param v boolean short type
      * @return Object type of Short
      */
     public static Short boxed(short v) {
         return Short.valueOf(v);
     }
 
+    /**
+     * Boxed.
+     *
+     * @param v the v
+     * @return the integer
+     */
     public static Integer boxed(int v) {
         return Integer.valueOf(v);
     }
 
+    /**
+     * Boxed.
+     *
+     * @param v the v
+     * @return the long
+     */
     public static Long boxed(long v) {
         return Long.valueOf(v);
     }
 
+    /**
+     * Boxed.
+     *
+     * @param v the v
+     * @return the float
+     */
     public static Float boxed(float v) {
         return Float.valueOf(v);
     }
 
+    /**
+     * Boxed.
+     *
+     * @param v the v
+     * @return the double
+     */
     public static Double boxed(double v) {
         return Double.valueOf(v);
     }
 
+    /**
+     * Boxed.
+     *
+     * @param v the v
+     * @return the object
+     */
     public static Object boxed(Object v) {
         return v;
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return true, if successful
+     */
     public static boolean unboxed(Boolean v) {
         return v == null ? false : v.booleanValue();
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return the char
+     */
     public static char unboxed(Character v) {
         return v == null ? '\0' : v.charValue();
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return the byte
+     */
     public static byte unboxed(Byte v) {
         return v == null ? 0 : v.byteValue();
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return the short
+     */
     public static short unboxed(Short v) {
         return v == null ? 0 : v.shortValue();
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return the int
+     */
     public static int unboxed(Integer v) {
         return v == null ? 0 : v.intValue();
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return the long
+     */
     public static long unboxed(Long v) {
         return v == null ? 0 : v.longValue();
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return the float
+     */
     public static float unboxed(Float v) {
         return v == null ? 0 : v.floatValue();
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return the double
+     */
     public static double unboxed(Double v) {
         return v == null ? 0 : v.doubleValue();
     }
 
+    /**
+     * Unboxed.
+     *
+     * @param v the v
+     * @return the object
+     */
     public static Object unboxed(Object v) {
         return v;
     }
 
+    /**
+     * Checks if is not empty.
+     *
+     * @param object the object
+     * @return true, if is not empty
+     */
     public static boolean isNotEmpty(Object object) {
         return getSize(object) > 0;
     }
 
+    /**
+     * Gets the size.
+     *
+     * @param object the object
+     * @return the size
+     */
     public static int getSize(Object object) {
         if (object == null) {
             return 0;
@@ -321,6 +414,12 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * To URI.
+     *
+     * @param name the name
+     * @return the uri
+     */
     public static URI toURI(String name) {
         try {
             return new URI(name);
@@ -329,10 +428,23 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * Gets the generic class.
+     *
+     * @param cls the cls
+     * @return the generic class
+     */
     public static Class<?> getGenericClass(Class<?> cls) {
         return getGenericClass(cls, 0);
     }
 
+    /**
+     * Gets the generic class.
+     *
+     * @param cls the cls
+     * @param i the i
+     * @return the generic class
+     */
     public static Class<?> getGenericClass(Class<?> cls, int i) {
         try {
             ParameterizedType parameterizedType = ((ParameterizedType) cls.getGenericInterfaces()[0]);
@@ -354,16 +466,34 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * Checks if is before java 5.
+     *
+     * @param javaVersion the java version
+     * @return true, if is before java 5
+     */
     public static boolean isBeforeJava5(String javaVersion) {
         return (javaVersion == null || javaVersion.length() == 0 || "1.0".equals(javaVersion)
                 || "1.1".equals(javaVersion) || "1.2".equals(javaVersion) || "1.3".equals(javaVersion) || "1.4"
                 .equals(javaVersion));
     }
 
+    /**
+     * Checks if is before java 6.
+     *
+     * @param javaVersion the java version
+     * @return true, if is before java 6
+     */
     public static boolean isBeforeJava6(String javaVersion) {
         return isBeforeJava5(javaVersion) || "1.5".equals(javaVersion);
     }
 
+    /**
+     * To string.
+     *
+     * @param e the e
+     * @return the string
+     */
     public static String toString(Throwable e) {
         StringWriter w = new StringWriter();
         PrintWriter p = new PrintWriter(w);
@@ -380,8 +510,15 @@ public class ClassUtils {
         }
     }
 
+    /** The Constant JIT_LIMIT. */
     private static final int JIT_LIMIT = 5 * 1024;
 
+    /**
+     * Check bytecode.
+     *
+     * @param name the name
+     * @param bytecode the bytecode
+     */
     public static void checkBytecode(String name, byte[] bytecode) {
         if (bytecode.length > JIT_LIMIT) {
             System.err.println("The template bytecode too long, may be affect the JIT compiler. template class: "
@@ -389,6 +526,12 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * Gets the size method.
+     *
+     * @param cls the cls
+     * @return the size method
+     */
     public static String getSizeMethod(Class<?> cls) {
         try {
             return cls.getMethod("size", new Class<?>[0]).getName() + "()";
@@ -409,6 +552,14 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * Gets the method name.
+     *
+     * @param method the method
+     * @param parameterClasses the parameter classes
+     * @param rightCode the right code
+     * @return the method name
+     */
     public static String getMethodName(Method method, Class<?>[] parameterClasses, String rightCode) {
         if (method.getParameterTypes().length > parameterClasses.length) {
             Class<?>[] types = method.getParameterTypes();
@@ -435,6 +586,15 @@ public class ClassUtils {
         return method.getName() + "(" + rightCode + ")";
     }
 
+    /**
+     * Search method.
+     *
+     * @param currentClass the current class
+     * @param name the name
+     * @param parameterTypes the parameter types
+     * @return the method
+     * @throws NoSuchMethodException the no such method exception
+     */
     public static Method searchMethod(Class<?> currentClass, String name, Class<?>[] parameterTypes)
             throws NoSuchMethodException {
         if (currentClass == null) {
@@ -466,6 +626,12 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * Gets the inits the code.
+     *
+     * @param type the type
+     * @return the inits the code
+     */
     public static String getInitCode(Class<?> type) {
         if (byte.class.equals(type) || short.class.equals(type) || int.class.equals(type) || long.class.equals(type)
                 || float.class.equals(type) || double.class.equals(type)) {
@@ -479,6 +645,14 @@ public class ClassUtils {
         }
     }
 
+    /**
+     * To map.
+     *
+     * @param <K> the key type
+     * @param <V> the value type
+     * @param entries the entries
+     * @return the map
+     */
     public static <K, V> Map<K, V> toMap(Map.Entry<K, V>[] entries) {
         Map<K, V> map = new HashMap<K, V>();
         if (entries != null && entries.length > 0) {
@@ -489,6 +663,9 @@ public class ClassUtils {
         return map;
     }
 
+    /**
+     * Instantiates a new class utils.
+     */
     private ClassUtils() {
     }
 

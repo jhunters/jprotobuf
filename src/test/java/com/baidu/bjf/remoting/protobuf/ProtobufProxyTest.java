@@ -18,37 +18,24 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
-import java.io.IOException;
-
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
 /**
- * The Class FiledFilterTest.
+ * The Class ProtobufProxyTest.
  *
  * @author xiemalin
- * @since 2.4.4
  */
-public class FiledFilterTest {
+public class ProtobufProxyTest {
 
-    @Ignore
+    
+    /**
+     * Test all type defined create.
+     */
     @Test
-    public void testFieldFilter() {
-        Codec<FileterTestPOJO> proxy = ProtobufProxy.create(FileterTestPOJO.class);
-
-        // field $jacocoData will be filter
-        
-        FileterTestPOJO pojo = new FileterTestPOJO();
-        pojo.set$jacocoData("hello world");
-        
-        try {
-            byte[] encode = proxy.encode(pojo);
-            // field filtered result will be empty
-            Assert.assertTrue(encode.length == 0);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void testAllTypeDefinedCreate() {
+        Codec<SimplePoJoForGenerator> codec = ProtobufProxy.create(SimplePoJoForGenerator.class);
+        Assert.assertNotNull(codec);
     }
 }

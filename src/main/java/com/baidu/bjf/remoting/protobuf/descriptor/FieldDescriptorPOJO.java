@@ -18,14 +18,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.descriptor;
 
-import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
-import com.google.protobuf.DescriptorProtos.FieldDescriptorProto;
-import com.google.protobuf.Descriptors.Descriptor;
-import com.google.protobuf.Descriptors.EnumDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
-import com.google.protobuf.Descriptors.FileDescriptor;
-import com.google.protobuf.Descriptors.OneofDescriptor;
-import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 
 /**
  * JProtobuf POJO supports for {@link FieldDescriptor}

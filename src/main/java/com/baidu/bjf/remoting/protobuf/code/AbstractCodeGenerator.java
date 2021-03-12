@@ -21,8 +21,6 @@ package com.baidu.bjf.remoting.protobuf.code;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
