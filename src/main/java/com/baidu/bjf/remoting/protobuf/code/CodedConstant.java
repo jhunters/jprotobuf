@@ -184,11 +184,11 @@ public class CodedConstant {
         if (isList) {
             defineType = "Collection";
         }
-        
+
         return defineType;
-        
+
     }
-    
+
     /**
      * Gets the write value to field.
      *
@@ -200,7 +200,7 @@ public class CodedConstant {
     public static String getWriteValueToField(FieldType type, String express, boolean isList) {
         return express;
     }
-    
+
     /**
      * Gets the mapped type size.
      *
@@ -224,9 +224,9 @@ public class CodedConstant {
 
         String typeString = type.getType().toUpperCase();
         if (isList) {
-            return "CodedConstant.computeListSize(" + order + ", " + fieldName + ", FieldType." + typeString + ", "
-                    + Boolean.valueOf(debug) + ", " + spath + "," + Boolean.valueOf(field.isPacked()) + ")"
-                    + ICodeGenerator.JAVA_LINE_BREAK;
+            return "CodedConstant.computeListSize(" + order + ", " + fieldName + ", " + FieldType.class.getName() + "."
+                    + typeString + ", " + Boolean.valueOf(debug) + ", " + spath + ","
+                    + Boolean.valueOf(field.isPacked()) + ")" + ICodeGenerator.JAVA_LINE_BREAK;
         } else if (isMap) {
 
             String joinedSentence = getMapFieldGenericParameterString(field);
@@ -235,15 +235,15 @@ public class CodedConstant {
         }
 
         if (type == FieldType.OBJECT) {
-            return "CodedConstant.computeSize(" + order + "," + fieldName + ", FieldType." + typeString + ","
-                    + Boolean.valueOf(debug) + "," + spath + ")" + ICodeGenerator.JAVA_LINE_BREAK;
+            return "CodedConstant.computeSize(" + order + "," + fieldName + ", " + FieldType.class.getName() + "."
+                    + typeString + "," + Boolean.valueOf(debug) + "," + spath + ")" + ICodeGenerator.JAVA_LINE_BREAK;
         }
 
         String t = type.getType();
         if (type == FieldType.STRING) {
             t = "String";
         }
-        
+
         if (type == FieldType.BYTES) {
             t = "ByteArray";
         }
@@ -296,12 +296,13 @@ public class CodedConstant {
                     throw new IllegalArgumentException("Class '" + field.getGenericKeyType().getCanonicalName()
                             + "' must has default constructor method with no parameters.");
                 }
-                defaultKeyValue = "new " + ClassHelper.getInternalName(field.getGenericKeyType().getCanonicalName()) + "()";
+                defaultKeyValue =
+                        "new " + ClassHelper.getInternalName(field.getGenericKeyType().getCanonicalName()) + "()";
             }
         } else {
             keyClass = WIREFORMAT_CLSNAME + "." + fieldType.toString();
             // check type
-            
+
             defaultKeyValue = fieldType.getDefaultValue();
         }
 
@@ -315,8 +316,8 @@ public class CodedConstant {
                 Class<?> declaringClass = field.getGenericeValueType();
                 Field[] fields = declaringClass.getFields();
                 if (fields != null && fields.length > 0) {
-                    defaultValueValue = ClassHelper.getInternalName(field.getGenericeValueType().getCanonicalName()) + "."
-                            + fields[0].getName();
+                    defaultValueValue = ClassHelper.getInternalName(field.getGenericeValueType().getCanonicalName())
+                            + "." + fields[0].getName();
                 } else {
                     defaultValueValue = "0";
                 }
@@ -329,7 +330,8 @@ public class CodedConstant {
                     throw new IllegalArgumentException("Class '" + field.getGenericeValueType().getCanonicalName()
                             + "' must has default constructor method with no parameters.");
                 }
-                defaultValueValue = "new " + ClassHelper.getInternalName(field.getGenericeValueType().getCanonicalName()) + "()";
+                defaultValueValue =
+                        "new " + ClassHelper.getInternalName(field.getGenericeValueType().getCanonicalName()) + "()";
             }
         } else {
             valueClass = WIREFORMAT_CLSNAME + "." + fieldType.toString();
@@ -364,7 +366,8 @@ public class CodedConstant {
      * @param packed the packed
      * @return the int
      */
-    public static int computeListSize(int order, Collection list, FieldType type, boolean debug, File path, boolean packed) {
+    public static int computeListSize(int order, Collection list, FieldType type, boolean debug, File path,
+            boolean packed) {
         return computeListSize(order, list, type, debug, path, packed, false);
     }
 
@@ -380,8 +383,8 @@ public class CodedConstant {
      * @param sizeOnly the size only if true will not include order size and tag size
      * @return the int
      */
-    public static int computeListSize(int order, Collection list, FieldType type, boolean debug, File path, boolean packed,
-            boolean sizeOnly) {
+    public static int computeListSize(int order, Collection list, FieldType type, boolean debug, File path,
+            boolean packed, boolean sizeOnly) {
         int size = 0;
         if (list == null || list.isEmpty()) {
             return size;
@@ -396,8 +399,7 @@ public class CodedConstant {
             if (packed) {
                 if (!sizeOnly) {
                     size += com.google.protobuf.CodedOutputStream.computeInt32SizeNoTag(dataSize);
-                    int tag = CodedConstant.makeTag(order,
-                            WireFormat.WIRETYPE_LENGTH_DELIMITED);
+                    int tag = CodedConstant.makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED);
                     size += com.google.protobuf.CodedOutputStream.computeUInt32SizeNoTag(tag);
                 }
             } else {
@@ -472,7 +474,6 @@ public class CodedConstant {
         } else {
             map.put(values.getKey(), values.getValue());
         }
-
 
     }
 
@@ -616,7 +617,7 @@ public class CodedConstant {
         if (isList) {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeToList(").append(prefix).append(",");
-            ret.append(order).append(",").append("FieldType.").append(typeString);
+            ret.append(order).append(",").append(FieldType.class.getName()).append(".").append(typeString);
             ret.append(",").append(fieldName).append(",").append(Boolean.valueOf(field.isPacked())).append(")")
                     .append(ICodeGenerator.JAVA_LINE_BREAK).append("}").append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
@@ -648,7 +649,7 @@ public class CodedConstant {
         if (type == FieldType.OBJECT) {
             String typeString = type.getType().toUpperCase();
             ret.append("CodedConstant.writeObject(").append(prefix).append(",");
-            ret.append(order).append(",").append("FieldType.").append(typeString);
+            ret.append(order).append(",").append(FieldType.class.getName()).append(".").append(typeString);
             ret.append(",").append(fieldName).append(", false)").append(ICodeGenerator.JAVA_LINE_BREAK).append("}")
                     .append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
@@ -660,14 +661,14 @@ public class CodedConstant {
                     .append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
         }
-        
+
         if (type == FieldType.BYTES) {
             ret.append(prefix).append(".writeByteArray(").append(order);
             ret.append(", ").append(fieldName).append(")").append(ICodeGenerator.JAVA_LINE_BREAK).append("}")
                     .append(ICodeGenerator.LINE_BREAK);
             return ret.toString();
         }
-        
+
         String t = type.getType();
         t = capitalize(t);
 
@@ -686,7 +687,8 @@ public class CodedConstant {
      * @param list the list
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public static void writeToList(CodedOutputStream out, int order, FieldType type, Collection list) throws IOException {
+    public static void writeToList(CodedOutputStream out, int order, FieldType type, Collection list)
+            throws IOException {
         writeToList(out, order, type, list, false);
     }
 
@@ -705,7 +707,7 @@ public class CodedConstant {
         if (list == null || list.isEmpty()) {
             return;
         }
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         CodedOutputStream newInstance = CodedOutputStream.newInstance(baos, 0);
         for (Object object : list) {
@@ -716,11 +718,10 @@ public class CodedConstant {
         }
         newInstance.flush();
         byte[] byteArray = baos.toByteArray();
-        
 
         if (packed) {
             out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
-            out.writeUInt32NoTag(byteArray.length); 
+            out.writeUInt32NoTag(byteArray.length);
         }
 
         out.write(byteArray, 0, byteArray.length);
@@ -767,7 +768,7 @@ public class CodedConstant {
             if (withTag) {
                 out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
             }
-            
+
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             CodedOutputStream newInstance = CodedOutputStream.newInstance(baos, 0);
             target.writeTo(o, newInstance);
@@ -775,7 +776,7 @@ public class CodedConstant {
             byte[] byteArray = baos.toByteArray();
             out.writeUInt32NoTag(byteArray.length);
             out.write(byteArray, 0, byteArray.length);
-            
+
             return;
         }
 
@@ -1082,7 +1083,7 @@ public class CodedConstant {
 
         return -1;
     }
-    
+
     /**
      * Gets the enumeration value.
      *
@@ -1091,12 +1092,11 @@ public class CodedConstant {
      * @param name the name
      * @return the enum value
      */
-    public static <T extends Enum<T>> T getEnumValue(Class<T> enumType,
-            String name) {
+    public static <T extends Enum<T>> T getEnumValue(Class<T> enumType, String name) {
         if (StringUtils.isEmpty(name)) {
             return null;
         }
-        
+
         try {
             T v = Enum.valueOf(enumType, name);
             return v;
@@ -1204,7 +1204,7 @@ public class CodedConstant {
             return type.getWireType();
         }
     }
-    
+
     static byte[] toByteArray(Byte[] bb) {
         byte[] ret = new byte[bb.length];
         int i = 0;
@@ -1213,7 +1213,7 @@ public class CodedConstant {
         }
         return ret;
     }
-    
+
     /**
      * Write a field of arbitrary type, without its tag, to the stream.
      *
@@ -1314,7 +1314,6 @@ public class CodedConstant {
     public static int computeLengthDelimitedFieldSize(int fieldLength) {
         return CodedOutputStream.computeUInt32SizeNoTag(fieldLength) + fieldLength;
     }
-    
 
     /**
      * Compute the number of bytes that would be needed to encode a particular value of arbitrary type, excluding tag.

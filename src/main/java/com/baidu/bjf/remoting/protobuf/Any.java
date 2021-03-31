@@ -43,6 +43,7 @@ import com.baidu.bjf.remoting.protobuf.utils.compiler.ClassUtils;
  */
 public class Any {
     
+    /** The Constant PB_URL_PREFIX. */
     private static final String PB_URL_PREFIX = "type.googleapis.com/";
 
     /** The codec class. */
