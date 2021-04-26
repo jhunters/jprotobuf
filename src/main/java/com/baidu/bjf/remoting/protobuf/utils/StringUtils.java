@@ -24,8 +24,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
-
 import com.google.protobuf.ByteString;
 
 /**
@@ -378,7 +376,7 @@ public class StringUtils {
      * @since 2.5
      */
     public static boolean startsWithAny(String string, String[] searchStrings) {
-        if (isEmpty(string) || ArrayUtils.isEmpty(searchStrings)) {
+        if (isEmpty(string) || isEmpty(searchStrings)) {
             return false;
         }
         for (int i = 0; i < searchStrings.length; i++) {
@@ -1665,5 +1663,16 @@ public class StringUtils {
         }
         
         return str.toLowerCase();
+    }
+    
+    /**
+     * <p>Checks if an array of Objects is empty or <code>null</code>.</p>
+     *
+     * @param array  the array to test
+     * @return <code>true</code> if the array is empty or <code>null</code>
+     * @since 2.1
+     */
+    public static boolean isEmpty(Object[] array) {
+        return array == null || array.length == 0;
     }
 }
