@@ -1,0 +1,18 @@
+syntax = "proto3"; 
+
+
+message Line{
+    string id = 1;
+    string start = 2;
+    string end = 3;
+    enum CrossDirection {
+        UNKNOWN = 0;  // Future-proof default
+        LEFT = 1;
+        RIGHT = 2;
+    }
+}
+message LineCount{
+    int32 count = 1;
+    string line_id = 2;
+    Line.CrossDirection cross_direction = 3;
+}

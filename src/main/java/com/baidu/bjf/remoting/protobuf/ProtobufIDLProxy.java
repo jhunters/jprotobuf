@@ -765,7 +765,9 @@ public class ProtobufIDLProxy {
                         // fixed add package prefix
                         if (packages.size() > 0) {
                             String pkg = packages.iterator().next();
-                            javaType = pkg + "." + javaType;
+                            if (pkg != null) {
+                                javaType = pkg + "." + javaType;
+                            }
                         }
                     }
                 }

@@ -70,6 +70,14 @@ public class EnumIDLGeneratorTest {
 
         return map;
     }
+    
+    @Ignore
+    @Test
+    public void testMostComplexIDLSourceGenerate2() throws IOException {
+        File file = new File(EnumIDLGeneratorTest.class.getResource("test.proto").getFile());
+        ProtobufIDLProxy.create(file, true);
+    }
+    
 
     @Ignore
     @Test
