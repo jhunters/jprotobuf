@@ -723,10 +723,7 @@ public class ProtobufIDLProxy {
         for (TypeElement t : nestedTypes) {
             if (t instanceof EnumElement) {
                 enumNames.add(t.name());
-                enumNames.add(t.qualifiedName());
-                if (!StringUtils.isEmpty(packageName)) {
-                    enumNames.add(StringUtils.removeStart(t.qualifiedName(), packageName + PACKAGE_SPLIT));
-                }
+                enumNames.add(getQualifiedName(t, protoFile.packageName()));
             } else {
                 checkNestedTypes.add(t);
             }
@@ -842,10 +839,7 @@ public class ProtobufIDLProxy {
         if (nestedTypes != null) {
             for (TypeElement t : nestedTypes) {
                 CodeDependent nestedCd;
-                String fqname = t.qualifiedName();
-                if (!StringUtils.isEmpty(packageName)) {
-                    fqname = StringUtils.removeStart(t.qualifiedName(), packageName + PACKAGE_SPLIT_CHAR);
-                }
+                String fqname = getQualifiedName(t, protoFile.packageName());
                 String subClsName = getProxyClassName(fqname, mappedUniName, isUniName);
                 if (t instanceof EnumElement) {
                     nestedCd = createCodeByType((EnumElement) t, false, packageName, mappedUniName, isUniName);
@@ -1337,7 +1331,7 @@ public class ProtobufIDLProxy {
             if (types == null || types.isEmpty()) {
                 continue;
             }
-
+            
             String packageName = protoFile.packageName();
             // to check if option has "java_package"
             List<OptionElement> options = protoFile.options();
@@ -1352,13 +1346,13 @@ public class ProtobufIDLProxy {
 
             for (TypeElement type : types) {
                 packageMapping.put(type.name(), packageName);
-                packageMapping.put(type.qualifiedName(), packageName);
+                packageMapping.put(getQualifiedName(type, protoFile.packageName()), packageName);
 
                 if (type instanceof MessageElement) {
                     count++;
                 } else {
                     enumTypes.put(type.name(), (EnumElement) type);
-                    enumTypes.put(type.qualifiedName(), (EnumElement) type);
+                    enumTypes.put(getQualifiedName(type, protoFile.packageName()), (EnumElement) type);
                 }
             }
         }
@@ -1808,5 +1802,19 @@ public class ProtobufIDLProxy {
             }
         }
 
+    }
+    
+    /**
+     * Gets the qualified name.
+     *
+     * @param e the e
+     * @param customizePackageName the customize package name
+     * @return the qualified name
+     */
+    private static String getQualifiedName(TypeElement e, String customizePackageName) {
+        if (StringUtils.isEmpty(customizePackageName)) {
+            return e.qualifiedName();
+        } 
+        return StringUtils.removeStart(e.qualifiedName(), customizePackageName + PACKAGE_SPLIT);
     }
 }

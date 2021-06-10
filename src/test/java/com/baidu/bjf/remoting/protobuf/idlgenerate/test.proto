@@ -1,16 +1,25 @@
 syntax = "proto3"; 
 
+package acv.proto.vca;
+
+option java_package = "test";
 
 message Line{
     string id = 1;
-    string start = 2;
-    string end = 3;
+    Point start = 2;
+    Point end = 3;
     enum CrossDirection {
         UNKNOWN = 0;  // Future-proof default
         LEFT = 1;
         RIGHT = 2;
     }
 }
+
+message Point {
+    float x = 1;
+    float y = 2;
+}
+
 message LineCount{
     int32 count = 1;
     string line_id = 2;
