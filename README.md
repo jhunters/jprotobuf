@@ -46,7 +46,7 @@ jprotobuf 主要性能消耗在 扫描类上注解，动态生成代码编译的
 JProtobuf-rpc-socket 基于socket的高性能RPC实现<br>
 访问地址：[https://github.com/jhunters/Jprotobuf-rpc-socket](https://github.com/Baidu-ecom/Jprotobuf-rpc-socket)<br>
 JProtobuf-rpc-http 基于JProtobuf的RPC实现，支持直接从IDL定义脚本发布RPC服务<br>
-访问地址：[https://github.com/jhunters/JProtobuf-rpc-http](https://github.com/jhunters/JProtobuf-rpc-http)
+访问地址：[https://github.com/jhunters/JProtobuf-rpc-http](https://github.com/jhunters/JProtobuf-rpc-http)<br>
 golang 协议实现: [https://github.com/baidu-golang/baidurpc](https://github.com/baidu-golang/baidurpc "https://github.com/baidu-golang/baidurpc")
 
 ## Quick Start
