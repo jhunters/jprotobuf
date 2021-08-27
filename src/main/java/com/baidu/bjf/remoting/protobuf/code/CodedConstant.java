@@ -461,6 +461,15 @@ public class CodedConstant {
             com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
             com.google.protobuf.WireFormat.FieldType valueType, V defalutValue, EnumHandler<V> handler)
             throws IOException {
+        putMapValue(input, map, keyType, defaultKey, valueType, defalutValue, null, handler);
+
+    }
+    
+    
+    public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
+            com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
+            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue, EnumHandler<K> keyHandler, EnumHandler<V> valHandler)
+            throws IOException {
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
                 .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
 
@@ -468,13 +477,15 @@ public class CodedConstant {
                 input.readMessage(valuesDefaultEntry.getParserForType(), null);
 
         Object value = values.getValue();
-        if (handler != null) {
-            V value1 = handler.handle((int) value);
-            map.put(values.getKey(), value1);
-        } else {
-            map.put(values.getKey(), values.getValue());
+        Object key = values.getKey();
+        if (keyHandler != null) {
+            key = keyHandler.handle((int) key);
         }
-
+        
+        if (valHandler != null) {
+            value = valHandler.handle((int) value);
+        }
+        map.put((K) key, (V) value);
     }
 
     /**

@@ -458,6 +458,18 @@ public class FieldInfo {
     }
 
     /**
+     * Checks if is enum key type.
+     *
+     * @return true, if is enum key type
+     */
+    public boolean isEnumKeyType() {
+        if (genericKeyType != null) {
+            return Enum.class.isAssignableFrom(genericKeyType);
+        }
+        return false;
+    }
+    
+    /**
      * Checks if is primitive type.
      *
      * @param c the c

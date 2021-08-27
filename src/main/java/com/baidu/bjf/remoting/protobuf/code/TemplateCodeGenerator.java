@@ -310,6 +310,23 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             } else if (field.isMap()) {
 
                 String getMapCommand = getMapCommand(field);
+                
+                if (field.isEnumKeyType()) {
+                    String enumClassName = field.getGenericKeyType().getCanonicalName();
+                    code.append("EnumHandler<").append(enumClassName).append("> keyhandler");
+                    code.append("= new EnumHandler");
+                    code.append("<").append(enumClassName).append(">() {");
+                    code.append(ClassCode.LINE_BREAK);
+                    code.append("public ").append(enumClassName).append(" handle(int value) {");
+                    code.append(ClassCode.LINE_BREAK);
+                    code.append("String enumName = CodedConstant.getEnumName(").append(enumClassName)
+                            .append(".values(), value)");
+                    code.append(ClassCode.JAVA_LINE_BREAK);
+                    code.append("return ").append(enumClassName).append(".valueOf(enumName)");
+                    code.append(ClassCode.JAVA_LINE_BREAK);
+                    code.append("}}");
+                    code.append(ClassCode.JAVA_LINE_BREAK);
+                } 
 
                 if (field.isEnumValueType()) {
                     String enumClassName = field.getGenericeValueType().getCanonicalName();
@@ -326,15 +343,22 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                     code.append(ClassCode.JAVA_LINE_BREAK);
                     code.append("}}");
                     code.append(ClassCode.JAVA_LINE_BREAK);
-
                 }
+                
                 objectDecodeExpress = code.toString();
                 code.setLength(0);
 
                 express = "CodedConstant.putMapValue(input, " + getMapCommand + ",";
                 express += CodedConstant.getMapFieldGenericParameterString(field);
+                if (field.isEnumKeyType()) {
+                    express += ", keyhandler";
+                } else {
+                    express += ", null";
+                }
                 if (field.isEnumValueType()) {
                     express += ", handler";
+                } else {
+                    express += ", null";
                 }
                 express += ")";
 
