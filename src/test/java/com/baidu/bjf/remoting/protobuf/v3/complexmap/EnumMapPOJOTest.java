@@ -20,7 +20,6 @@ package com.baidu.bjf.remoting.protobuf.v3.complexmap;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
