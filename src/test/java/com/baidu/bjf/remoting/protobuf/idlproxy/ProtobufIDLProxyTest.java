@@ -56,7 +56,10 @@ public class ProtobufIDLProxyTest {
         String protoCotent = "package mypackage.test; "
                 + "option java_package = \"com.baidu.bjf.remoting.protobuf.simplestring\";"
                 + "option java_outer_classname = \"StringTypeClass\";  " + "message StringMessage { "
-                + "  required string message = 1 [default = \"hello\"]; }";
+                + "  required string message = 1 [default = \"hello\"];"
+                + "optional int64 age = 10 [default = 0]; "
+                + "optional float age1 = 11 [default = 0];"
+                + "optional double age2 = 12 [default = 0]; }";
         IDLProxyObject object = ProtobufIDLProxy.createSingle(protoCotent);
 
         // 动态设置字段值

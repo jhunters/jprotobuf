@@ -43,6 +43,7 @@ import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.JavaStyleFormatter;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
 import com.baidu.jprotobuf.com.squareup.protoparser.DataType;
+import com.baidu.jprotobuf.com.squareup.protoparser.DataType.ScalarType;
 import com.baidu.jprotobuf.com.squareup.protoparser.EnumConstantElement;
 import com.baidu.jprotobuf.com.squareup.protoparser.EnumElement;
 import com.baidu.jprotobuf.com.squareup.protoparser.FieldElement;
@@ -822,6 +823,23 @@ public class ProtobufIDLProxy {
             if (defaultOption != null) {
                 code.append("=");
                 Object defaultValue = defaultOption.value();
+                
+                // fix int64  SINT64 FIXED64 default value
+                if (dataType == ScalarType.INT64 || dataType == ScalarType.SFIXED64 || dataType == ScalarType.SINT64 ||
+                        dataType == ScalarType.UINT64) {
+                    if (!defaultValue.toString().toLowerCase().endsWith("l")) {
+                        defaultValue = defaultValue + "L";
+                    }
+                } else if (dataType == ScalarType.DOUBLE)  { //
+                    if (!defaultValue.toString().toLowerCase().endsWith("d")) {
+                        defaultValue = defaultValue + "D";
+                    }
+                } else if (dataType == ScalarType.FLOAT)  { //
+                    if (!defaultValue.toString().toLowerCase().endsWith("f")) {
+                        defaultValue = defaultValue + "F";
+                    }
+                }
+                
                 // if is enum type
                 if (defaultOption.kind() == Kind.ENUM) {
                     code.append(javaType).append(".").append(defaultValue);
