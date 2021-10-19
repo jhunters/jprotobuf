@@ -46,7 +46,7 @@ javadoc {
     }
 }
 
-version = "1.1.0"    //配置插件的版本号
+version = "1.1.1"    //配置插件的版本号
 group = "com.baidu.jprotobuf"   //插件的群组，插件的classpath会用到
 
 pluginBundle {

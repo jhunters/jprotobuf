@@ -98,7 +98,7 @@ mvn package
 ```property
 
 plugins {
-    id 'com.baidu.jprotobuf' version '1.0.9'
+    id 'com.baidu.jprotobuf' version '1.1.1'
 }
 ```
 或者使用以下方式

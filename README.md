@@ -159,7 +159,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 ```property
 
 plugins {
-    id 'com.baidu.jprotobuf' version '1.0.8'
+    id 'com.baidu.jprotobuf' version '1.1.1'
 }
 ```
 [查看版本信息](https://plugins.gradle.org/plugin/com.baidu.jprotobuf)

@@ -79,7 +79,7 @@ public class JdkCompiler extends AbstractCompiler {
     private volatile List<String> options;
 
     /** The Constant DEFAULT_JDK_VERSION. */
-    private static final String DEFAULT_JDK_VERSION = "1.6";
+    private static final String DEFAULT_JDK_VERSION = "1.8";
 
     /**
      * Instantiates a new jdk compiler.
