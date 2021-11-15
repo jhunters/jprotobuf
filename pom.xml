@@ -162,6 +162,7 @@
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
+					<forkCount>1.5C</forkCount>
 				</configuration>
 			</plugin>
 
