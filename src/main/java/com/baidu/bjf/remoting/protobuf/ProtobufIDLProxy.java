@@ -62,13 +62,13 @@ import com.baidu.jprotobuf.com.squareup.protoparser.TypeElement;
  * @since 1.0.2
  */
 public class ProtobufIDLProxy {
-    
+
     /** The Constant JAVA_SUFFIX. */
     private static final String JAVA_SUFFIX = ".java";
 
     /** The Constant formatJavaField. */
     private static boolean formatJavaField = false;
-    
+
     /**
      * Sets the Constant formatJavaField.
      *
@@ -735,7 +735,7 @@ public class ProtobufIDLProxy {
         for (FieldElement field : fields) {
             // generate comments
             generateCommentsForField(code, field, enumNames);
-            
+
             // define annotation
             generateProtobufDefinedForField(code, field, enumNames);
 
@@ -750,16 +750,16 @@ public class ProtobufIDLProxy {
             FieldType fType = typeMapping.get(typeName);
             String javaType;
             if (fType == null) {
-                
+
                 // check if Any type
                 if (typeName.equals(ProtobufIDLGenerator.GOOGLE_PROTOBUF_ANY_DEF)) {
                     javaType = Any.class.getName();
                 } else {
                     javaType = getProxyClassName(getTypeName(field), packages, mappedUniName, isUniName);
-                    
+
                     if (!isNestedTypeDependency(javaType, checkNestedTypes, mappedUniName, isUniName)) {
                         cd.addDependency(javaType);
-                        
+
                         // fixed add package prefix
                         if (packages.size() > 0) {
                             String pkg = packages.iterator().next();
@@ -787,7 +787,7 @@ public class ProtobufIDLProxy {
 
                 String valueType = mapType.valueType().toString();
                 subType = typeMapping.get(valueType);
-                
+
                 String valueJavaType;
                 if (subType == null) {
                     valueJavaType = getProxyClassName(valueType, packages, mappedUniName, isUniName);
@@ -809,13 +809,13 @@ public class ProtobufIDLProxy {
 
             // define field
             code.append("public ").append(javaType);
-            
+
             String fieldName = field.name();
             // format java style
             if (formatJavaField) {
                 fieldName = JavaStyleFormatter.formatJavaFieldName(fieldName);
             }
-            
+
             code.append(" ").append(fieldName);
 
             // check if has default
@@ -823,23 +823,23 @@ public class ProtobufIDLProxy {
             if (defaultOption != null) {
                 code.append("=");
                 Object defaultValue = defaultOption.value();
-                
-                // fix int64  SINT64 FIXED64 default value
-                if (dataType == ScalarType.INT64 || dataType == ScalarType.SFIXED64 || dataType == ScalarType.SINT64 ||
-                        dataType == ScalarType.UINT64) {
+
+                // fix int64 SINT64 FIXED64 default value
+                if (dataType == ScalarType.INT64 || dataType == ScalarType.SFIXED64 || dataType == ScalarType.SINT64
+                        || dataType == ScalarType.UINT64) {
                     if (!defaultValue.toString().toLowerCase().endsWith("l")) {
                         defaultValue = defaultValue + "L";
                     }
-                } else if (dataType == ScalarType.DOUBLE)  { //
+                } else if (dataType == ScalarType.DOUBLE) { //
                     if (!defaultValue.toString().toLowerCase().endsWith("d")) {
                         defaultValue = defaultValue + "D";
                     }
-                } else if (dataType == ScalarType.FLOAT)  { //
+                } else if (dataType == ScalarType.FLOAT) { //
                     if (!defaultValue.toString().toLowerCase().endsWith("f")) {
                         defaultValue = defaultValue + "F";
                     }
                 }
-                
+
                 // if is enum type
                 if (defaultOption.kind() == Kind.ENUM) {
                     code.append(javaType).append(".").append(defaultValue);
@@ -851,6 +851,10 @@ public class ProtobufIDLProxy {
             }
 
             code.append(CODE_END);
+
+            // add getter and setter method
+            generateSetter(code, javaType, fieldName);
+            generateGetter(code, javaType, fieldName);
         }
 
         // to check if has nested classes
@@ -903,6 +907,40 @@ public class ProtobufIDLProxy {
     }
 
     /**
+     * Generate getter.
+     *
+     * @param code the code
+     * @param javaType the java type
+     * @param fieldName the field name
+     */
+    private static void generateSetter(StringBuilder code, String javaType, String fieldName) {
+        code.append("public void set").append(StringUtils.capitalize(fieldName)).append("(");
+        code.append(javaType).append(" ").append(fieldName).append(") {").append(ClassCode.LINE_BREAK);
+        code.append("this.").append(fieldName).append("=").append(fieldName).append(ClassCode.JAVA_LINE_BREAK);
+        code.append("}").append(ClassCode.JAVA_LINE_BREAK);
+    }
+
+    /**
+     * Generate getter.
+     *
+     * @param code the code
+     * @param javaType the java type
+     * @param fieldName the field name
+     */
+    private static void generateGetter(StringBuilder code, String javaType, String fieldName) {
+
+        String action = "get";
+        if (javaType.toLowerCase().equals("boolean")) {
+            action = "is";
+        }
+
+        code.append("public ").append(javaType).append(" ").append(action).append(StringUtils.capitalize(fieldName))
+                .append("() {").append(ClassCode.LINE_BREAK);
+        code.append("return this.").append(fieldName).append(ClassCode.JAVA_LINE_BREAK);
+        code.append("}").append(ClassCode.JAVA_LINE_BREAK);
+    }
+
+    /**
      * Generate comments for field.
      *
      * @param code the code
@@ -920,7 +958,6 @@ public class ProtobufIDLProxy {
         code.append("=").append(field.tag()).append(ClassCode.LINE_BREAK);
         code.append("*/").append(ClassCode.LINE_BREAK);
     }
-    
 
     /**
      * Creates the enum classes.
@@ -956,11 +993,11 @@ public class ProtobufIDLProxy {
             CodeDependent codeDependent = createCodeByType(enumType, true, packageName, mappedUniName, isUniName);
             compiledClass.add(codeDependent.name);
             compiledClass.add(packageName + PACKAGE_SPLIT_CHAR + codeDependent.name);
-            
+
             if (debug) {
                 CodePrinter.printCode(codeDependent.code, "generate jprotobuf code");
             }
-            
+
             if (!generateSouceOnly) {
                 Class<?> newClass = JDKCompilerHelper.getJdkCompiler().compile(codeDependent.getClassName(),
                         codeDependent.code, ProtobufIDLProxy.class.getClassLoader(), null, -1);
@@ -1349,7 +1386,7 @@ public class ProtobufIDLProxy {
             if (types == null || types.isEmpty()) {
                 continue;
             }
-            
+
             String packageName = protoFile.packageName();
             // to check if option has "java_package"
             List<OptionElement> options = protoFile.options();
@@ -1460,10 +1497,10 @@ public class ProtobufIDLProxy {
         if (dependencies != null && !dependencies.isEmpty()) {
             for (String fn : dependencies) {
                 if (fn.startsWith("google/protobuf/")) {
-                    // to ignore google internal defined proto file 
+                    // to ignore google internal defined proto file
                     continue;
                 }
-                
+
                 if (dependencyNames.contains(fn)) {
                     continue;
                 }
@@ -1471,7 +1508,7 @@ public class ProtobufIDLProxy {
                 protoFiles.addAll(findRelateProtoFiles(dependencyFile, dependencyNames));
             }
         }
-        
+
         List<String> publicDependencies = protoFile.publicDependencies();
         if (publicDependencies != null && !publicDependencies.isEmpty()) {
             for (String fn : publicDependencies) {
@@ -1482,7 +1519,7 @@ public class ProtobufIDLProxy {
                 protoFiles.addAll(findRelateProtoFiles(dependencyFile, dependencyNames));
             }
         }
-        
+
         return protoFiles;
     }
 
@@ -1821,7 +1858,7 @@ public class ProtobufIDLProxy {
         }
 
     }
-    
+
     /**
      * Gets the qualified name.
      *
@@ -1832,7 +1869,7 @@ public class ProtobufIDLProxy {
     private static String getQualifiedName(TypeElement e, String customizePackageName) {
         if (StringUtils.isEmpty(customizePackageName)) {
             return e.qualifiedName();
-        } 
+        }
         return StringUtils.removeStart(e.qualifiedName(), customizePackageName + PACKAGE_SPLIT);
     }
 }
