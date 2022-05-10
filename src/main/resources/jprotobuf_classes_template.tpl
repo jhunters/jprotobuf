@@ -1,11 +1,13 @@
 ${package}
 
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 <!-- $BeginBlock imports -->
 import ${importPackage};
 <!-- $EndBlock imports -->
 
-public class ${className} implements ${codecClassName}<${targetProxyClassName}>{
+public class ${className} implements ${codecClassName}<${targetProxyClassName}>, Serializable {
+	public static final long serialVersionUID = 1L;
     private ${descriptorClsName} descriptor;
 
     public byte[] encode(${targetProxyClassName} t) throws IOException {
