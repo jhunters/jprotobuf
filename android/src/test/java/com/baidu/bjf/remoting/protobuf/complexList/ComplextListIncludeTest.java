@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.baidu.bjf.remoting.protobuf.Codec;
@@ -21,6 +19,8 @@ import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.AddressBook
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.Person;
 import com.baidu.bjf.remoting.protobuf.complexList.AddressBookProtos.TypeDef;
 import com.google.protobuf.InvalidProtocolBufferException;
+
+import junit.framework.Assert;
 
 /**
  * 
@@ -87,6 +87,15 @@ public class ComplextListIncludeTest {
             Assert.assertEquals(2, parseFrom.getTypeDefCount());
             Assert.assertEquals(TypeDefEnum.DECIMAL.value(), parseFrom.getTypeDef(0).getNumber());
         } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        
+        
+        try {
+            AddressBookProtosPOJO decode = (AddressBookProtosPOJO) codec.decode(bb);
+            Assert.assertEquals("xiemalin", decode.getList().get(0).name);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
