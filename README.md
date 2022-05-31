@@ -115,7 +115,7 @@ jprotobuf-android
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-android</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
 </dependency>
 ```
 [下载发行包](https://repo1.maven.org/maven2/com/baidu/jprotobuf-android/)
