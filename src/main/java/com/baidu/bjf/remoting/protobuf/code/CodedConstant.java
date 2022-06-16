@@ -589,11 +589,13 @@ public class CodedConstant {
             size = CodedOutputStream.computeBytesSizeNoTag(ByteString.copyFrom(bb));
         } else if (type == FieldType.DOUBLE) {
             size = CodedOutputStream.computeDoubleSizeNoTag(Double.valueOf(o.toString()));
-        } else if (type == FieldType.FIXED32 || type == FieldType.INT32 || type == FieldType.SFIXED32
-                || type == FieldType.SINT32 || type == FieldType.UINT32) {
+        } else if (type == FieldType.FIXED32 || type == FieldType.SFIXED32) {
+            size = CodedOutputStream.computeFixed32SizeNoTag(Integer.valueOf(o.toString()));
+        } else if (type == FieldType.INT32 || type == FieldType.SINT32 || type == FieldType.UINT32) {
             size = CodedOutputStream.computeInt32SizeNoTag(Integer.valueOf(o.toString()));
-        } else if (type == FieldType.FIXED64 || type == FieldType.INT64 || type == FieldType.SFIXED64
-                || type == FieldType.SINT64 || type == FieldType.UINT64) {
+        }else if (type == FieldType.FIXED64|| type == FieldType.SFIXED64) {
+            size = CodedOutputStream.computeSFixed64SizeNoTag(Long.valueOf(o.toString()));
+        }   else if (type == FieldType.INT64 || type == FieldType.SINT64 || type == FieldType.UINT64) {
             size = CodedOutputStream.computeInt64SizeNoTag(Long.valueOf(o.toString()));
         } else if (type == FieldType.FLOAT) {
             size = CodedOutputStream.computeFloatSizeNoTag(Float.valueOf(o.toString()));
