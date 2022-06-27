@@ -121,7 +121,7 @@ public class JprotobufPreCompileMain {
                         compiledClasses.add(c);
                         
                         // check if need compile
-                        long mtime = getClassFileName(outputPath, c.getSimpleName(), c.getPackageName());
+                        long mtime = getClassFileName(outputPath, c.getSimpleName(), getPackName(c));
                         if (tartMTime <= mtime) {
                             // no modify just continue
                             LOGGER.info("no modify class '" + c.getSimpleName() + "', will skip precompile.");
@@ -155,7 +155,7 @@ public class JprotobufPreCompileMain {
                         compiledClasses.add(c);
                         
                         // check if need compile
-                        long mtime = getClassFileName(outputPath, c.getSimpleName(), c.getPackageName());
+                        long mtime = getClassFileName(outputPath, c.getSimpleName(), getPackName(c));
                         if (tartMTime <= mtime) {
                             // no modify just continue
                             LOGGER.info("no modify class '" + c.getSimpleName() + "', will skip precompile.");
@@ -186,7 +186,7 @@ public class JprotobufPreCompileMain {
                 try {
                     // check if need compile
                     long tartMTime = ClassHelper.getLastModifyTime(cls);
-                    long mtime = getClassFileName(outputPath, cls.getSimpleName(), cls.getPackageName());
+                    long mtime = getClassFileName(outputPath, cls.getSimpleName(), getPackName(cls));
                     if (tartMTime <= mtime) {
                         // no modify just continue
                         LOGGER.info("no modify class '" + cls.getSimpleName() + "', will skip precompile.");
@@ -312,6 +312,14 @@ public class JprotobufPreCompileMain {
         }
 
         return -1;
+    }
+    
+    private static String getPackName(Class c) {
+        Package pkg = c.getPackage();
+        if (pkg == null) {
+            return "";
+        }
+        return pkg.getName();
     }
 
 }
