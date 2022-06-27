@@ -4,6 +4,7 @@
 package com.baidu.jprotobuf.mojo;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
@@ -20,7 +21,9 @@ import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
+import com.baidu.bjf.remoting.protobuf.code.ICodeGenerator;
 import com.baidu.bjf.remoting.protobuf.code.TemplateCodeGenerator;
+import com.baidu.bjf.remoting.protobuf.utils.ClassHelper;
 import com.baidu.bjf.remoting.protobuf.utils.FieldUtils;
 import com.baidu.bjf.remoting.protobuf.utils.JDKCompilerHelper;
 import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
@@ -38,11 +41,11 @@ import jodd.io.findfile.ClassScanner;
  */
 public class JprotobufPreCompileMain {
 
-    /** The Constant LOGGER. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(JprotobufPreCompileMain.class);
-
     /** The Constant MULTI_PKG_SPLIT. */
     private static final String MULTI_PKG_SPLIT = ";";
+
+    /** The Constant LOGGER. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(JprotobufPreCompileMain.class);
 
     /**
      * The main method.
@@ -51,23 +54,27 @@ public class JprotobufPreCompileMain {
      */
     public static void main(String[] args) {
 
-        if (args == null || args.length == 0 || args.length != 5) {
+        if (args == null || args.length == 0 || args.length != 6) {
             throw new RuntimeException(printUsage());
         }
+        
+        final boolean cacheBuildResult = Boolean.valueOf(args[5]);
 
         final File outputPath = new File(args[0] + File.separator + "temp");
-        try {
-            FileUtils.deleteDirectory(outputPath);
-        } catch (Exception e) {
-            // dummy exception
-        }
         outputPath.mkdirs();
+        
+        if (!cacheBuildResult) {
+            try {
+                FileUtils.deleteDirectory(outputPath);
+            } catch (Exception e) {
+                // dummy exception
+            }
+        }
 
         JDKCompilerHelper.setCompiler(new JdkCompiler(Thread.currentThread().getContextClassLoader()));
 
         final String filterClassPackage = args[2];
         if (filterClassPackage == null) {
-            LOGGER.error("filterClassPackage setting is null.");
             return;
         }
 
@@ -76,6 +83,8 @@ public class JprotobufPreCompileMain {
         final boolean generateProtofile = Boolean.valueOf(args[3]);
 
         final boolean compileDependencies = Boolean.valueOf(args[4]);
+        
+        
 
         final Set<Class> dependenciesClasses = new HashSet<Class>();
 
@@ -104,15 +113,27 @@ public class JprotobufPreCompileMain {
                 if (Enum.class.isAssignableFrom(c)) {
                     return;
                 }
+                long tartMTime = ClassHelper.getLastModifyTime(c);
 
                 Annotation annotation = c.getAnnotation(ProtobufClass.class);
                 if (annotation != null) {
                     try {
                         compiledClasses.add(c);
+                        
+                        // check if need compile
+                        long mtime = getClassFileName(outputPath, c.getSimpleName(), c.getPackageName());
+                        if (tartMTime <= mtime) {
+                            // no modify just continue
+                            LOGGER.info("no modify class '" + c.getSimpleName() + "', will skip precompile.");
+                            return;
+                        }
+                        
+                        
                         ProtobufProxy.create(c, false, outputPath);
                         if (generateProtofile) {
                             createProtoFile(c, outputPath.getCanonicalPath());
                         }
+
                         if (compileDependencies) {
                             TemplateCodeGenerator tcg = new TemplateCodeGenerator(c);
                             tcg.getAllDependenciesClasses(dependenciesClasses);
@@ -132,6 +153,15 @@ public class JprotobufPreCompileMain {
                     }
                     if (!fields.isEmpty()) {
                         compiledClasses.add(c);
+                        
+                        // check if need compile
+                        long mtime = getClassFileName(outputPath, c.getSimpleName(), c.getPackageName());
+                        if (tartMTime <= mtime) {
+                            // no modify just continue
+                            LOGGER.info("no modify class '" + c.getSimpleName() + "', will skip precompile.");
+                            return;
+                        }
+                        
                         ProtobufProxy.create(c, false, outputPath);
                         if (generateProtofile) {
                             createProtoFile(c, outputPath.getCanonicalPath());
@@ -154,6 +184,15 @@ public class JprotobufPreCompileMain {
             // compile dependencies classes
             for (Class cls : dependenciesClasses) {
                 try {
+                    // check if need compile
+                    long tartMTime = ClassHelper.getLastModifyTime(cls);
+                    long mtime = getClassFileName(outputPath, cls.getSimpleName(), cls.getPackageName());
+                    if (tartMTime <= mtime) {
+                        // no modify just continue
+                        LOGGER.info("no modify class '" + cls.getSimpleName() + "', will skip precompile.");
+                        return;
+                    }
+                    
                     ProtobufProxy.create(cls, false, outputPath);
                     if (generateProtofile) {
                         createProtoFile(cls, outputPath.getCanonicalPath());
@@ -163,16 +202,12 @@ public class JprotobufPreCompileMain {
                 }
             }
         }
-        
         LOGGER.info("JProtobuf pre compile finished. " + compiledClasses.size() + " classes compiled.");
 
         // copy files
         try {
             FileUtils.copyDirectory(outputPath, new File(args[1]));
         } catch (IOException e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(e.getMessage(), e);
-            }
         }
 
     }
@@ -243,6 +278,7 @@ public class JprotobufPreCompileMain {
         return false;
     }
 
+
     /**
      * Gets the by class.
      *
@@ -253,11 +289,29 @@ public class JprotobufPreCompileMain {
         try {
             return Thread.currentThread().getContextClassLoader().loadClass(name);
         } catch (Throwable e) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(e.getMessage(), e);
-            }
         }
         return null;
+    }
+    
+    private static long getClassFileName(File path, String originClsName, String pkg) {
+        if (path != null && path.isDirectory()) {
+            
+            String className = originClsName + ICodeGenerator.DEFAULT_SUFFIX_CLASSNAME;
+            if (className.indexOf('.') != -1) {
+                pkg = StringUtils.substringBeforeLast(className, ".");
+            }
+
+            // mkdirs
+            String dir = path + File.separator + pkg.replace('.', File.separatorChar);
+            File f = new File(dir);
+            
+            File target = new File(f, className + ".class");
+            if (target.exists()) {
+                return target.lastModified();
+            }
+        }
+
+        return -1;
     }
 
 }

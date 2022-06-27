@@ -1,6 +1,3 @@
-/**
- * Copyright (C) 2017 Baidu, Inc. All Rights Reserved.
- */
 package com.baidu.jprotobuf.mojo;
 
 /*
@@ -246,7 +243,7 @@ public class PreCompileMojo
     private List<String> additionalClasspathElements;
     
     /**
-     * set filter class package name, support multiple packages split by ';'
+     * The main class to execute.
      * 
      * @since 1.0
      */
@@ -261,6 +258,10 @@ public class PreCompileMojo
     @Parameter( required = false, property = "jprotobuf.compileDependencies" )
     private String compileDependencies = Boolean.TRUE.toString();
 
+    /** The compile dependencies. */
+    @Parameter( required = false, property = "jprotobuf.cacheBuildResult" )
+    private String cacheBuildResult = Boolean.TRUE.toString();
+    
     /**
      * Execute goal.
      * 
@@ -281,7 +282,7 @@ public class PreCompileMojo
         }
 
         arguments = new String[] {outputParentDirectory.getAbsolutePath(), outputDirectory.getAbsolutePath(), 
-                filterClassPackage, generateProtoFile, compileDependencies};
+                filterClassPackage, generateProtoFile, compileDependencies, cacheBuildResult};
 
         if ( getLog().isDebugEnabled() )
         {
