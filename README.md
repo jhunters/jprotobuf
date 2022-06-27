@@ -139,7 +139,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 |<=1.2.10|<=1.11.4||
 |>=1.2.11|>=1.11.5||
 
-
+ 
 // 2.x支持版本
 ```xml
 <dependency>
