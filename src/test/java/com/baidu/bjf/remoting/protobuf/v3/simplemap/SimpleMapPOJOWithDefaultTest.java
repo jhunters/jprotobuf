@@ -18,6 +18,11 @@
  */
 package com.baidu.bjf.remoting.protobuf.v3.simplemap;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -35,10 +40,20 @@ public class SimpleMapPOJOWithDefaultTest {
     
     /**
      * Test default map field.
+     * @throws IOException 
      */
     @Test
-    public void testDefaultMapField() {
-        Codec<SimpleMapPOJOWithDefault> codec = ProtobufProxy.create(SimpleMapPOJOWithDefault.class, false);
+    public void testDefaultMapField() throws IOException {
+        Codec<SimpleMapPOJOWithDefault> codec = ProtobufProxy.create(SimpleMapPOJOWithDefault.class, true);
         Assert.assertNotNull(codec);
+        
+        
+        SimpleMapPOJOWithDefault pojo = new SimpleMapPOJOWithDefault();
+        Map<String, String> map = new HashMap<>();
+        map.put("hello", "world");
+        map.put("1", "2");
+        pojo.setStringMap(map);
+        
+        System.out.println(Arrays.toString(codec.encode(pojo)));
     }
 }

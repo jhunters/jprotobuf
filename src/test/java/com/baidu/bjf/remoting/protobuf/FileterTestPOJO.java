@@ -18,6 +18,8 @@
  */
 package com.baidu.bjf.remoting.protobuf;
 
+import java.io.Serializable;
+
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 
 /**
@@ -27,7 +29,7 @@ import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
  * @since 2.4.4
  */
 @ProtobufClass
-public class FileterTestPOJO {
+public class FileterTestPOJO implements Serializable  {
     
     // jacoco generated file
     private String $jacocoData;

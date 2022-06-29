@@ -25,33 +25,44 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.UninterpretedOption;
 
 /**
- * JProtobuf POJO supports for {@link UninterpretedOption}
+ * JProtobuf POJO supports for {@link UninterpretedOption}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class UninterpretedOptionPOJO {
 
+    /** The names. */
     @Protobuf(order = UninterpretedOption.NAME_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<NamePartPOJO> names;
     
+    /** The identifier value. */
     @Protobuf(order = UninterpretedOption.IDENTIFIER_VALUE_FIELD_NUMBER)
     public String identifierValue;
     
+    /** The positive int value. */
     @Protobuf(order = UninterpretedOption.POSITIVE_INT_VALUE_FIELD_NUMBER)
     public Long positiveIntValue;
     
+    /** The negative int value. */
     @Protobuf(order = UninterpretedOption.NEGATIVE_INT_VALUE_FIELD_NUMBER)
     public Long negativeIntValue;
     
+    /** The double value. */
     @Protobuf(order = UninterpretedOption.DOUBLE_VALUE_FIELD_NUMBER)
     public Double doubleValue;
     
+    /** The string value. */
     @Protobuf(order = UninterpretedOption.STRING_VALUE_FIELD_NUMBER)
     public String stringValue;
     
+    /** The aggregate value. */
     @Protobuf(order = UninterpretedOption.AGGREGATE_VALUE_FIELD_NUMBER)
     public String aggregateValue;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "UninterpretedOptionPOJO [names=" + names + ", identifierValue=" + identifierValue

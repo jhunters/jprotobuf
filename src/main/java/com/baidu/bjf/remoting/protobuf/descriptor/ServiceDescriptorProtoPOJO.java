@@ -25,19 +25,22 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.ServiceDescriptorProto;
 
 /**
- * JProtobuf supports for  {@link ServiceDescriptorProto}
- * 
+ * JProtobuf supports for {@link ServiceDescriptorProto}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class ServiceDescriptorProtoPOJO {
 
+    /** The name. */
     @Protobuf(order = ServiceDescriptorProto.NAME_FIELD_NUMBER)
     public String name;
     
+    /** The methods. */
     @Protobuf(order = ServiceDescriptorProto.METHOD_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<MethodDescriptorProtoPOJO> methods;
     
+    /** The options. */
     @Protobuf(order = ServiceDescriptorProto.OPTIONS_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<ServiceOptionsPOJO> options;
 }

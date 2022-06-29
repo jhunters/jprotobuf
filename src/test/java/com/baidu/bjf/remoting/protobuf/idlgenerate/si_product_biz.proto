@@ -47,7 +47,7 @@ message ProductPropertyRequest {
         optional AppidType appid = 2 ;
     };
     required Head head = 1;
-    optional int32 userid = 2; 
+    optional bool userid = 2; 
 };
 
 message ProductPropertyResponse {

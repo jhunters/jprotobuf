@@ -21,7 +21,8 @@ package com.baidu.bjf.remoting.protobuf.descriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 
 /**
- * JProtobuf POJO supports for {@link FieldDescriptor}
+ * JProtobuf POJO supports for {@link FieldDescriptor}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */

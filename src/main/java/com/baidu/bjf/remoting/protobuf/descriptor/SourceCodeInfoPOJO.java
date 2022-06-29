@@ -24,15 +24,20 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo;
 
 /**
- * JProtobuf supports for {@link SourceCodeInfo}
+ * JProtobuf supports for {@link SourceCodeInfo}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class SourceCodeInfoPOJO {
 
+    /** The locations. */
     @Protobuf(order = SourceCodeInfo.LOCATION_FIELD_NUMBER)
     public List<LocationPOJO> locations;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "SourceCodeInfoPOJO [locations=" + locations + "]";

@@ -25,18 +25,24 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.ServiceOptions;
 
 /**
- * JProtobuf POJO supports for {@link ServiceOptions}
+ * JProtobuf POJO supports for {@link ServiceOptions}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class ServiceOptionsPOJO {
 
+    /** The deprecated. */
     @Protobuf(order = ServiceOptions.DEPRECATED_FIELD_NUMBER)
     public Boolean deprecated;
     
+    /** The uninterpreted option. */
     @Protobuf(order = ServiceOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOption;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "ServiceOptionsPOJO [deprecated=" + deprecated + ", uninterpretedOption=" + uninterpretedOption + "]";

@@ -22,15 +22,20 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.OneofDescriptorProto;
 
 /**
- * JProtobuf supports for {@link OneofDescriptorProto}
+ * JProtobuf supports for {@link OneofDescriptorProto}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class OneofDescriptorProtoPOJO {
 
+    /** The name. */
     @Protobuf(order = OneofDescriptorProto.NAME_FIELD_NUMBER)
     public String name;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "OneofDescriptorProtoPOJO [name=" + name + "]";

@@ -22,20 +22,35 @@ import com.baidu.bjf.remoting.protobuf.EnumReadable;
 import com.google.protobuf.DescriptorProtos.FileOptions;
 
 /**
- * Enumeration mode for optimize defines at {@link FileOptions}
- * 
+ * Enumeration mode for optimize defines at {@link FileOptions}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public enum OptimizeMode implements EnumReadable {
-    SPEED(1), CODE_SIZE(2), LITE_RUNTIME(3);
+    
+    /** The speed. */
+    SPEED(1), 
+ /** The code size. */
+ CODE_SIZE(2), 
+ /** The lite runtime. */
+ LITE_RUNTIME(3);
 
+    /** The value. */
     private int value;
     
+    /**
+     * Instantiates a new optimize mode.
+     *
+     * @param value the value
+     */
     private OptimizeMode(int value) {
         this.value = value;
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.EnumReadable#value()
+     */
     @Override
     public int value() {
         return value;

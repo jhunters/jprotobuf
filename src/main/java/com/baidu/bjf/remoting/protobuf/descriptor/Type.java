@@ -22,8 +22,8 @@ import com.baidu.bjf.remoting.protobuf.EnumReadable;
 import com.google.protobuf.DescriptorProtos.FieldDescriptorProto;
 
 /**
- * Enumeration type defines at {@link FieldDescriptorProto}
- * 
+ * Enumeration type defines at {@link FieldDescriptorProto}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
@@ -37,9 +37,8 @@ public enum Type implements EnumReadable {
      * </pre>
      */
     TYPE_DOUBLE(1),
-    /**
-     * <code>TYPE_FLOAT = 2;</code>
-     */
+    
+    /** <code>TYPE_FLOAT = 2;</code>. */
     TYPE_FLOAT(2),
     /**
      * <code>TYPE_INT64 = 3;</code>
@@ -50,9 +49,8 @@ public enum Type implements EnumReadable {
      * </pre>
      */
     TYPE_INT64(3),
-    /**
-     * <code>TYPE_UINT64 = 4;</code>
-     */
+    
+    /** <code>TYPE_UINT64 = 4;</code>. */
     TYPE_UINT64(4),
     /**
      * <code>TYPE_INT32 = 5;</code>
@@ -63,21 +61,17 @@ public enum Type implements EnumReadable {
      * </pre>
      */
     TYPE_INT32(5),
-    /**
-     * <code>TYPE_FIXED64 = 6;</code>
-     */
+    
+    /** <code>TYPE_FIXED64 = 6;</code>. */
     TYPE_FIXED64(6),
-    /**
-     * <code>TYPE_FIXED32 = 7;</code>
-     */
+    
+    /** <code>TYPE_FIXED32 = 7;</code>. */
     TYPE_FIXED32(7),
-    /**
-     * <code>TYPE_BOOL = 8;</code>
-     */
+    
+    /** <code>TYPE_BOOL = 8;</code>. */
     TYPE_BOOL(8),
-    /**
-     * <code>TYPE_STRING = 9;</code>
-     */
+    
+    /** <code>TYPE_STRING = 9;</code>. */
     TYPE_STRING(9),
     /**
      * <code>TYPE_GROUP = 10;</code>
@@ -103,21 +97,17 @@ public enum Type implements EnumReadable {
      * </pre>
      */
     TYPE_BYTES(12),
-    /**
-     * <code>TYPE_UINT32 = 13;</code>
-     */
+    
+    /** <code>TYPE_UINT32 = 13;</code>. */
     TYPE_UINT32(13),
-    /**
-     * <code>TYPE_ENUM = 14;</code>
-     */
+    
+    /** <code>TYPE_ENUM = 14;</code>. */
     TYPE_ENUM(14),
-    /**
-     * <code>TYPE_SFIXED32 = 15;</code>
-     */
+    
+    /** <code>TYPE_SFIXED32 = 15;</code>. */
     TYPE_SFIXED32(15),
-    /**
-     * <code>TYPE_SFIXED64 = 16;</code>
-     */
+    
+    /** <code>TYPE_SFIXED64 = 16;</code>. */
     TYPE_SFIXED64(16),
     /**
      * <code>TYPE_SINT32 = 17;</code>
@@ -137,17 +127,32 @@ public enum Type implements EnumReadable {
     TYPE_SINT64(18),
     ;
     
+    /** The value. */
     private int value;
 
+    /**
+     * Instantiates a new type.
+     *
+     * @param value the value
+     */
     private Type(int value) {
         this.value = value;
     }
 
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.EnumReadable#value()
+     */
     @Override
     public int value() {
         return value;
     }
     
+    /**
+     * Value of.
+     *
+     * @param value the value
+     * @return the type
+     */
     public static Type valueOf(int value) {
         Type[] values = values();
         for (Type type : values) {

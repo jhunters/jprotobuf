@@ -23,27 +23,34 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.MethodDescriptorProto;
 
 /**
- * JProtobuf POJO supports for {@link MethodDescriptorProto}
+ * JProtobuf POJO supports for {@link MethodDescriptorProto}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class MethodDescriptorProtoPOJO {
 
+    /** The name. */
     @Protobuf(order = MethodDescriptorProto.NAME_FIELD_NUMBER)
     public String name;
     
+    /** The input type. */
     @Protobuf(order = MethodDescriptorProto.INPUT_TYPE_FIELD_NUMBER)
     public String inputType;
     
+    /** The output type. */
     @Protobuf(order = MethodDescriptorProto.OUTPUT_TYPE_FIELD_NUMBER)
     public String outputType;
     
+    /** The options. */
     @Protobuf(order = MethodDescriptorProto.OPTIONS_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public MethodOptionsPOJO options;
     
+    /** The client streaming. */
     @Protobuf(order = MethodDescriptorProto.CLIENT_STREAMING_FIELD_NUMBER)
     public Boolean clientStreaming;
     
+    /** The server streaming. */
     @Protobuf(order = MethodDescriptorProto.SERVER_STREAMING_FIELD_NUMBER)
     public Boolean serverStreaming;
 }

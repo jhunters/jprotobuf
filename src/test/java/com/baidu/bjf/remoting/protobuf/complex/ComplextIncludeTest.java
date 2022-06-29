@@ -52,7 +52,7 @@ public class ComplextIncludeTest {
         byte[] bb = book.toByteArray();
         System.out.println(Arrays.toString(bb));
         
-        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class);
+        Codec<AddressBookProtosPOJO> codec = ProtobufProxy.create(AddressBookProtosPOJO.class, true);
         
         AddressBookProtosPOJO pojo = new AddressBookProtosPOJO();
         

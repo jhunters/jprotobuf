@@ -25,15 +25,18 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.MethodOptions;
 
 /**
- * JProtobuf POJO supports for {@link MethodOptions}
+ * JProtobuf POJO supports for {@link MethodOptions}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class MethodOptionsPOJO {
 
+    /** The deprecated. */
     @Protobuf(order = MethodOptions.DEPRECATED_FIELD_NUMBER)
     public Boolean deprecated;
     
+    /** The uninterpreted options. */
     @Protobuf(order = MethodOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOptions;
 }

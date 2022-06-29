@@ -113,15 +113,15 @@ public class JprotobufPreCompileMain {
                 if (Enum.class.isAssignableFrom(c)) {
                     return;
                 }
-                long tartMTime = ClassHelper.getLastModifyTime(c);
 
                 Annotation annotation = c.getAnnotation(ProtobufClass.class);
                 if (annotation != null) {
                     try {
                         compiledClasses.add(c);
+                        long tartMTime = ClassHelper.getLastModifyTime(c);
                         
                         // check if need compile
-                        long mtime = getClassFileName(outputPath, c.getSimpleName(), getPackName(c));
+                        long mtime = getClassFileMTime(outputPath, c.getSimpleName(), getPackName(c));
                         if (tartMTime <= mtime) {
                             // no modify just continue
                             LOGGER.info("no modify class '" + c.getSimpleName() + "', will skip precompile.");
@@ -153,9 +153,9 @@ public class JprotobufPreCompileMain {
                     }
                     if (!fields.isEmpty()) {
                         compiledClasses.add(c);
-                        
+                        long tartMTime = ClassHelper.getLastModifyTime(c);
                         // check if need compile
-                        long mtime = getClassFileName(outputPath, c.getSimpleName(), getPackName(c));
+                        long mtime = getClassFileMTime(outputPath, c.getSimpleName(), getPackName(c));
                         if (tartMTime <= mtime) {
                             // no modify just continue
                             LOGGER.info("no modify class '" + c.getSimpleName() + "', will skip precompile.");
@@ -186,7 +186,7 @@ public class JprotobufPreCompileMain {
                 try {
                     // check if need compile
                     long tartMTime = ClassHelper.getLastModifyTime(cls);
-                    long mtime = getClassFileName(outputPath, cls.getSimpleName(), getPackName(cls));
+                    long mtime = getClassFileMTime(outputPath, cls.getSimpleName(), getPackName(cls));
                     if (tartMTime <= mtime) {
                         // no modify just continue
                         LOGGER.info("no modify class '" + cls.getSimpleName() + "', will skip precompile.");
@@ -293,7 +293,7 @@ public class JprotobufPreCompileMain {
         return null;
     }
     
-    private static long getClassFileName(File path, String originClsName, String pkg) {
+    private static long getClassFileMTime(File path, String originClsName, String pkg) {
         if (path != null && path.isDirectory()) {
             
             String className = originClsName + ICodeGenerator.DEFAULT_SUFFIX_CLASSNAME;

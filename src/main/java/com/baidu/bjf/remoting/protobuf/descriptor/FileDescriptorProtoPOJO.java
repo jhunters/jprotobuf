@@ -25,8 +25,8 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.FileDescriptorProto;
 
 /**
- * JProtobuf POJO supports for {@link FileDescriptorProto}
- * 
+ * JProtobuf POJO supports for {@link FileDescriptorProto}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
@@ -34,8 +34,10 @@ public class FileDescriptorProtoPOJO {
 
     /**
      * <pre>
-     * file name, relative to root of source tree
+     *  file name, relative to root of source tree
      * </pre>
+     * 
+     * .
      */
     @Protobuf(order = FileDescriptorProto.NAME_FIELD_NUMBER)
     public String name;
@@ -88,24 +90,21 @@ public class FileDescriptorProtoPOJO {
     @Protobuf(order = FileDescriptorProto.OPTIONS_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public FileOptionsPOJO options;
     
-    /**
-     * sourceCodeInfo
-     */
+    /** sourceCodeInfo. */
     @Protobuf(order = FileDescriptorProto.SOURCE_CODE_INFO_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public SourceCodeInfoPOJO sourceCodeInfo;
     
-    /**
-     * publicDependency
-     */
+    /** publicDependency. */
     @Protobuf(order = FileDescriptorProto.PUBLIC_DEPENDENCY_FIELD_NUMBER, fieldType = FieldType.INT32)
     public List<Integer> publicDependency;
     
-    /**
-     * weakDependency
-     */
+    /** weakDependency. */
     @Protobuf(order = FileDescriptorProto.WEAK_DEPENDENCY_FIELD_NUMBER, fieldType = FieldType.INT32)
     public List<Integer> weakDependency;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "FileDescriptorProtoPOJO [name=" + name + ", pkg=" + pkg + ", dependencies=" + dependencies

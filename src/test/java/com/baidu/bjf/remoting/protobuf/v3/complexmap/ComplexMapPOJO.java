@@ -18,6 +18,7 @@
  */
 package com.baidu.bjf.remoting.protobuf.v3.complexmap;
 
+import java.util.List;
 import java.util.Map;
 
 import com.baidu.bjf.remoting.protobuf.FieldType;
@@ -42,5 +43,6 @@ public class ComplexMapPOJO {
     
     @Protobuf(fieldType = FieldType.MAP)
     public Map<byte[], byte[]> bytesMap;
+    
     
 }

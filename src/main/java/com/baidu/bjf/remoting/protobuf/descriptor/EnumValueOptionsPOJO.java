@@ -24,15 +24,18 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.EnumValueOptions;
 
 /**
- * JProtobuf POJO supports for {@link EnumValueOptions}
+ * JProtobuf POJO supports for {@link EnumValueOptions}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class EnumValueOptionsPOJO {
 
+    /** The deprecated. */
     @Protobuf(order = EnumValueOptions.DEPRECATED_FIELD_NUMBER)
     public Boolean deprecated;
     
+    /** The uninterpreted options. */
     @Protobuf(order = EnumValueOptions.UNINTERPRETED_OPTION_FIELD_NUMBER)
     public List<UninterpretedOptionPOJO> uninterpretedOptions;
 }

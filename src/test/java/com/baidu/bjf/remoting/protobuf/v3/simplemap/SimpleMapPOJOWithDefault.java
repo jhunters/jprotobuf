@@ -32,9 +32,6 @@ import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 @ProtobufClass
 public class SimpleMapPOJOWithDefault {
 
-    @Protobuf(required = true)
-    public String name;
-    
     private Map<String, String> stringMap;
 
     /**

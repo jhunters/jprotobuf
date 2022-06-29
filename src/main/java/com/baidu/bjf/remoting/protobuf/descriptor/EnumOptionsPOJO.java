@@ -25,21 +25,28 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.EnumOptions;
 
 /**
- * JProtobuf POJO for {@link EnumOptions}
+ * JProtobuf POJO for {@link EnumOptions}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class EnumOptionsPOJO {
 
+    /** The allow alias. */
     @Protobuf(order = EnumOptions.ALLOW_ALIAS_FIELD_NUMBER)
     public Boolean allowAlias;
     
+    /** The deprecated. */
     @Protobuf(order = EnumOptions.DEPRECATED_FIELD_NUMBER)
     public Boolean deprecated;
     
+    /** The uninterpreted options. */
     @Protobuf(order = EnumOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOptions;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "EnumOptionsPOJO [allowAlias=" + allowAlias + ", deprecated=" + deprecated + ", uninterpretedOptions="

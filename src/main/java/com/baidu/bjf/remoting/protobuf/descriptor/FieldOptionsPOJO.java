@@ -26,31 +26,40 @@ import com.google.protobuf.DescriptorProtos.FieldOptions;
 import com.google.protobuf.DescriptorProtos.FieldOptions.CType;
 
 /**
- * JProtobuf POJO class for {@link FieldOptions}
- * 
+ * JProtobuf POJO class for {@link FieldOptions}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class FieldOptionsPOJO {
 
+    /** The ctype. */
     @Protobuf(order = FieldOptions.CTYPE_FIELD_NUMBER, fieldType = FieldType.ENUM)
     public CType ctype;
     
+    /** The packed. */
     @Protobuf(order = FieldOptions.PACKED_FIELD_NUMBER)
     public Boolean packed;
     
+    /** The deprecated. */
     @Protobuf(order = FieldOptions.DEPRECATED_FIELD_NUMBER)
     public Boolean deprecated;
     
+    /** The lazy. */
     @Protobuf(order = FieldOptions.LAZY_FIELD_NUMBER)
     public Boolean lazy;
     
+    /** The weak. */
     @Protobuf(order = FieldOptions.WEAK_FIELD_NUMBER)
     public Boolean weak;
 
+    /** The uninterpreted option. */
     @Protobuf(order = FieldOptions.UNINTERPRETED_OPTION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<UninterpretedOptionPOJO> uninterpretedOption;
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "FieldOptionsPOJO [ctype=" + ctype + ", packed=" + packed + ", deprecated=" + deprecated + ", lazy="

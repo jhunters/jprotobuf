@@ -25,17 +25,21 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.DescriptorProto;
 
 /**
- * JProtobuf POJO supports for {@link DescriptorProto}
- * 
+ * JProtobuf POJO supports for {@link DescriptorProto}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class DescriptorProtoPOJO {
 
+    /** The name. */
     @Protobuf(order = DescriptorProto.NAME_FIELD_NUMBER)
     public String name;
     
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "DescriptorProtoPOJO [name=" + name + ", fields=" + fields + ", nestedTypes=" + nestedTypes
@@ -43,36 +47,31 @@ public class DescriptorProtoPOJO {
                 + ", options=" + options + ", oneofDecls=" + oneofDecls + "]";
     }
 
-    /**
-     * fields
-     */
+    /** fields. */
     @Protobuf(order = DescriptorProto.FIELD_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<FieldDescriptorProtoPOJO> fields;
     
-    /**
-     * nestedTypes
-     */
+    /** nestedTypes. */
     @Protobuf(order = DescriptorProto.NESTED_TYPE_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<DescriptorProtoPOJO> nestedTypes;
     
-    /**
-     * enumTypes
-     */
+    /** enumTypes. */
     @Protobuf(order = DescriptorProto.ENUM_TYPE_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<EnumDescriptorProtoPOJO> enumTypes;
     
-    /**
-     * extensionRanges
-     */
+    /** extensionRanges. */
     @Protobuf(order = DescriptorProto.EXTENSION_RANGE_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<ExtensionRangePOJO> extensionRanges;
     
+    /** The extensions. */
     @Protobuf(order = DescriptorProto.EXTENSION_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<FieldDescriptorProtoPOJO> extensions;
     
+    /** The options. */
     @Protobuf(order = DescriptorProto.OPTIONS_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<MessageOptionsPOJO> options;
     
+    /** The oneof decls. */
     @Protobuf(order = DescriptorProto.ONEOF_DECL_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<OneofDescriptorProtoPOJO> oneofDecls;
 }

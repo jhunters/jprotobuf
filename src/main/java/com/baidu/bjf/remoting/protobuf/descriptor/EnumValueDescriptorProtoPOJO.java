@@ -25,21 +25,28 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.EnumValueDescriptorProto;
 
 /**
- * JProtobuf POJO supports for {@link EnumValueDescriptorProto}
+ * JProtobuf POJO supports for {@link EnumValueDescriptorProto}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class EnumValueDescriptorProtoPOJO {
 
+    /** The name. */
     @Protobuf(order = EnumValueDescriptorProto.NAME_FIELD_NUMBER)
     public String name;
     
+    /** The number. */
     @Protobuf(order = EnumValueDescriptorProto.NUMBER_FIELD_NUMBER)
     public Integer number;
     
+    /** The options. */
     @Protobuf(order = EnumValueDescriptorProto.OPTIONS_FIELD_NUMBER, fieldType = FieldType.OBJECT)
     public List<EnumValueOptionsPOJO> options;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "EnumValueDescriptorProtoPOJO [name=" + name + ", number=" + number + ", options=" + options + "]";

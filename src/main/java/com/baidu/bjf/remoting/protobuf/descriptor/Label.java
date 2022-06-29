@@ -21,21 +21,37 @@ package com.baidu.bjf.remoting.protobuf.descriptor;
 import com.baidu.bjf.remoting.protobuf.EnumReadable;
 
 /**
- * TODO
+ * TODO.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public enum Label implements EnumReadable {
-    LABEL_OPTIONAL(1), LABEL_REQUIRED(2), LABEL_REPEATED(3);
     
+    /** The label optional. */
+    LABEL_OPTIONAL(1), 
+ /** The label required. */
+ LABEL_REQUIRED(2), 
+ /** The label repeated. */
+ LABEL_REPEATED(3);
+    
+    /** The value. */
     private int value;
 
     
+    /**
+     * Instantiates a new label.
+     *
+     * @param value the value
+     */
     private Label(int value) {
         this.value = value;
     }
 
 
+    /* (non-Javadoc)
+     * @see com.baidu.bjf.remoting.protobuf.EnumReadable#value()
+     */
     @Override
     public int value() {
         return value;

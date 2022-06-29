@@ -25,15 +25,20 @@ import com.google.protobuf.DescriptorProtos.FileDescriptorSet;
 import com.google.protobuf.DescriptorProtos.SourceCodeInfo.Location;
 
 /**
- * JProtobuf POJO supports for {@link Location}
+ * JProtobuf POJO supports for {@link Location}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class LocationPOJO {
 
+    /** The files. */
     @Protobuf(order =  FileDescriptorSet.FILE_FIELD_NUMBER)
     public List<FileDescriptorProtoPOJO> files;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "LocationPOJO [files=" + files + "]";

@@ -22,18 +22,24 @@ import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.google.protobuf.DescriptorProtos.DescriptorProto.ExtensionRange;
 
 /**
- * JProtobuf POJO supports for {@link ExtensionRange}
+ * JProtobuf POJO supports for {@link ExtensionRange}.
+ *
  * @author xiemalin
  * @since 2.0.1
  */
 public class ExtensionRangePOJO {
     
+    /** The start. */
     @Protobuf(order = ExtensionRange.START_FIELD_NUMBER)
     public Integer start;
     
+    /** The end. */
     @Protobuf(order = ExtensionRange.END_FIELD_NUMBER)
     public Integer end;
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         return "ExtensionRangePOJO [start=" + start + ", end=" + end + "]";
