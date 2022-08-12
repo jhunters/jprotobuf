@@ -721,16 +721,14 @@ public class CodedConstant {
             return;
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodedOutputStream newInstance = CodedOutputStream.newInstance(baos, 0);
+        CodecOutputByteArray output = CodecOutputByteArray.get();
         for (Object object : list) {
             if (object == null) {
                 throw new NullPointerException("List can not include Null value.");
             }
-            writeObject(newInstance, order, type, object, true, !packed);
+            writeObject(output.getCodedOutputStream(), order, type, object, true, !packed);
         }
-        newInstance.flush();
-        byte[] byteArray = baos.toByteArray();
+        byte[] byteArray = output.getData();
 
         if (packed) {
             out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
@@ -782,11 +780,7 @@ public class CodedConstant {
                 out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
             }
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            CodedOutputStream newInstance = CodedOutputStream.newInstance(baos, 0);
-            target.writeTo(o, newInstance);
-            newInstance.flush();
-            byte[] byteArray = baos.toByteArray();
+            byte[] byteArray = CodecOutputByteArray.getData(target, o);
             out.writeUInt32NoTag(byteArray.length);
             out.write(byteArray, 0, byteArray.length);
 
