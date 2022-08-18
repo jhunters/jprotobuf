@@ -40,6 +40,20 @@ public class CodecOutputByteArray {
     }
 
     /**
+     * get thread scope size
+     * @return
+     */
+    public static int threadScopeSize() {
+        return instanceGetter.get().size();
+    }
+
+    /**
+     * clear stack
+     */
+    public static void clear() {
+        instanceGetter.get().clear();
+    }
+    /**
      * get CodedOutputStream instance
      * @return
      */
