@@ -229,6 +229,12 @@ public class ProtobufIDLGenerator {
                     isMap = true;
                     Class keyClass = field.getGenericKeyType();
                     Class valueClass = field.getGenericeValueType();
+                    if (keyClass == null) {
+                        keyClass = String.class;
+                    }
+                    if (valueClass == null) {
+                        valueClass = Object.class;
+                    }
                     type = type + "<" + ProtobufProxyUtils.processProtobufType(keyClass) + ", ";
                     type = type + ProtobufProxyUtils.processProtobufType(valueClass) + ">";
 
