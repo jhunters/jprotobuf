@@ -209,6 +209,9 @@ public class ProtobufProxyUtils {
                 if (isList) {
                     fieldTypeClass = fieldInfo.getGenericKeyType();
                 }
+                if (fieldTypeClass == null) {
+                    fieldTypeClass = Object.class;
+                }
 
                 FieldType fieldType = TYPE_MAPPING.get(fieldTypeClass);
                 if (fieldType == null) {
