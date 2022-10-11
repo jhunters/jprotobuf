@@ -36,42 +36,25 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Parser;
 import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.WireFormat;
+import com.google.protobuf.MessageLite;
 
 /**
  * Implements MapEntry messages.
- * 
+ *
+ * <p>
  * In reflection API, map fields will be treated as repeated message fields and each map entry is accessed as a message.
  * This MapEntry class is used to represent these map entry messages in reflection API.
- * 
- * Protobuf internal. Users shouldn't use this class.
  *
- * @param <K> the key type
- * @param <V> the value type
+ * <p>
+ * Protobuf internal. Users shouldn't use this class.
  */
 public final class MapEntry<K, V> extends AbstractMessage {
 
-    /**
-     * The Class Metadata.
-     *
-     * @param <K> the key type
-     * @param <V> the value type
-     */
     private static final class Metadata<K, V> extends MapEntryLite.Metadata<K, V> {
 
-        /** The descriptor. */
         public final Descriptor descriptor;
-        
-        /** The parser. */
         public final Parser<MapEntry<K, V>> parser;
 
-        /**
-         * Instantiates a new metadata.
-         *
-         * @param descriptor the descriptor
-         * @param defaultInstance the default instance
-         * @param keyType the key type
-         * @param valueType the value type
-         */
         public Metadata(Descriptor descriptor, MapEntry<K, V> defaultInstance, WireFormat.FieldType keyType,
                 WireFormat.FieldType valueType) {
             super(keyType, defaultInstance.key, valueType, defaultInstance.value);
@@ -87,24 +70,11 @@ public final class MapEntry<K, V> extends AbstractMessage {
         }
     }
 
-    /** The key. */
     private final K key;
-    
-    /** The value. */
     private final V value;
-    
-    /** The metadata. */
     private final Metadata<K, V> metadata;
 
-    /**
-     *  Create a default MapEntry instance.
-     *
-     * @param descriptor the descriptor
-     * @param keyType the key type
-     * @param defaultKey the default key
-     * @param valueType the value type
-     * @param defaultValue the default value
-     */
+    /** Create a default MapEntry instance. */
     private MapEntry(Descriptor descriptor, WireFormat.FieldType keyType, K defaultKey, WireFormat.FieldType valueType,
             V defaultValue) {
         this.key = defaultKey;
@@ -112,27 +82,15 @@ public final class MapEntry<K, V> extends AbstractMessage {
         this.metadata = new Metadata<K, V>(descriptor, this, keyType, valueType);
     }
 
-    /**
-     *  Create a MapEntry with the provided key and value.
-     *
-     * @param metadata the metadata
-     * @param key the key
-     * @param value the value
-     */
+    /** Create a MapEntry with the provided key and value. */
+    @SuppressWarnings("unchecked")
     private MapEntry(Metadata metadata, K key, V value) {
         this.key = key;
         this.value = value;
         this.metadata = metadata;
     }
 
-    /**
-     *  Parsing constructor.
-     *
-     * @param metadata the metadata
-     * @param input the input
-     * @param extensionRegistry the extension registry
-     * @throws InvalidProtocolBufferException the invalid protocol buffer exception
-     */
+    /** Parsing constructor. */
     private MapEntry(Metadata<K, V> metadata, CodedInputStream input, ExtensionRegistryLite extensionRegistry)
             throws InvalidProtocolBufferException {
         try {
@@ -143,7 +101,7 @@ public final class MapEntry<K, V> extends AbstractMessage {
         } catch (InvalidProtocolBufferException e) {
             throw e.setUnfinishedMessage(this);
         } catch (IOException e) {
-            throw new InvalidProtocolBufferException(e.getMessage()).setUnfinishedMessage(this);
+            throw new InvalidProtocolBufferException(e).setUnfinishedMessage(this);
         }
     }
 
@@ -151,45 +109,22 @@ public final class MapEntry<K, V> extends AbstractMessage {
      * Create a default MapEntry instance. A default MapEntry instance should be created only once for each map entry
      * message type. Generated code should store the created default instance and use it later to create new MapEntry
      * messages of the same type.
-     *
-     * @param <K> the key type
-     * @param <V> the value type
-     * @param descriptor the descriptor
-     * @param keyType the key type
-     * @param defaultKey the default key
-     * @param valueType the value type
-     * @param defaultValue the default value
-     * @return the map entry
      */
     public static <K, V> MapEntry<K, V> newDefaultInstance(Descriptor descriptor, WireFormat.FieldType keyType,
             K defaultKey, WireFormat.FieldType valueType, V defaultValue) {
         return new MapEntry<K, V>(descriptor, keyType, defaultKey, valueType, defaultValue);
     }
 
-    /**
-     * Gets the key.
-     *
-     * @return the key
-     */
     public K getKey() {
         return key;
     }
 
-    /**
-     * Gets the value.
-     *
-     * @return the value
-     */
     public V getValue() {
         return value;
     }
 
-    /** The cached serialized size. */
     private volatile int cachedSerializedSize = -1;
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.AbstractMessage#getSerializedSize()
-     */
     @Override
     public int getSerializedSize() {
         if (cachedSerializedSize != -1) {
@@ -201,65 +136,41 @@ public final class MapEntry<K, V> extends AbstractMessage {
         return size;
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.AbstractMessage#writeTo(com.google.protobuf.CodedOutputStream)
-     */
     @Override
     public void writeTo(CodedOutputStream output) throws IOException {
         MapEntryLite.writeTo(output, metadata, key, value);
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.AbstractMessage#isInitialized()
-     */
     @Override
     public boolean isInitialized() {
         return isInitialized(metadata, value);
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageLite#getParserForType()
-     */
     @Override
     public Parser<MapEntry<K, V>> getParserForType() {
         return metadata.parser;
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageLite#newBuilderForType()
-     */
     @Override
     public Builder<K, V> newBuilderForType() {
         return new Builder<K, V>(metadata);
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageLite#toBuilder()
-     */
     @Override
     public Builder<K, V> toBuilder() {
-        return new Builder<K, V>(metadata, key, value);
+        return new Builder<K, V>(metadata, key, value, true, true);
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageLiteOrBuilder#getDefaultInstanceForType()
-     */
     @Override
     public MapEntry<K, V> getDefaultInstanceForType() {
         return new MapEntry<K, V>(metadata, metadata.defaultKey, metadata.defaultValue);
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageOrBuilder#getDescriptorForType()
-     */
     @Override
     public Descriptor getDescriptorForType() {
         return metadata.descriptor;
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageOrBuilder#getAllFields()
-     */
     @Override
     public Map<FieldDescriptor, Object> getAllFields() {
         TreeMap<FieldDescriptor, Object> result = new TreeMap<FieldDescriptor, Object>();
@@ -271,11 +182,6 @@ public final class MapEntry<K, V> extends AbstractMessage {
         return Collections.unmodifiableMap(result);
     }
 
-    /**
-     * Check field descriptor.
-     *
-     * @param field the field
-     */
     private void checkFieldDescriptor(FieldDescriptor field) {
         if (field.getContainingType() != metadata.descriptor) {
             throw new RuntimeException("Wrong FieldDescriptor \"" + field.getFullName() + "\" used in message \""
@@ -283,9 +189,6 @@ public final class MapEntry<K, V> extends AbstractMessage {
         }
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageOrBuilder#hasField(com.google.protobuf.Descriptors.FieldDescriptor)
-     */
     @Override
     public boolean hasField(FieldDescriptor field) {
         checkFieldDescriptor(field);
@@ -294,9 +197,6 @@ public final class MapEntry<K, V> extends AbstractMessage {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageOrBuilder#getField(com.google.protobuf.Descriptors.FieldDescriptor)
-     */
     @Override
     public Object getField(FieldDescriptor field) {
         checkFieldDescriptor(field);
@@ -308,132 +208,73 @@ public final class MapEntry<K, V> extends AbstractMessage {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageOrBuilder#getRepeatedFieldCount(com.google.protobuf.Descriptors.FieldDescriptor)
-     */
     @Override
     public int getRepeatedFieldCount(FieldDescriptor field) {
         throw new RuntimeException("There is no repeated field in a map entry message.");
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageOrBuilder#getRepeatedField(com.google.protobuf.Descriptors.FieldDescriptor, int)
-     */
     @Override
     public Object getRepeatedField(FieldDescriptor field, int index) {
         throw new RuntimeException("There is no repeated field in a map entry message.");
     }
 
-    /* (non-Javadoc)
-     * @see com.google.protobuf.MessageOrBuilder#getUnknownFields()
-     */
     @Override
     public UnknownFieldSet getUnknownFields() {
         return UnknownFieldSet.getDefaultInstance();
     }
 
-    /**
-     * Builder to create {@link MapEntry} messages.
-     *
-     * @param <K> the key type
-     * @param <V> the value type
-     */
+    /** Builder to create {@link MapEntry} messages. */
     public static class Builder<K, V> extends AbstractMessage.Builder<Builder<K, V>> {
-        
-        /** The metadata. */
         private final Metadata<K, V> metadata;
-        
-        /** The key. */
         private K key;
-        
-        /** The value. */
         private V value;
+        private boolean hasKey;
+        private boolean hasValue;
 
-        /**
-         * Instantiates a new builder.
-         *
-         * @param metadata the metadata
-         */
         private Builder(Metadata<K, V> metadata) {
-            this(metadata, metadata.defaultKey, metadata.defaultValue);
+            this(metadata, metadata.defaultKey, metadata.defaultValue, false, false);
         }
 
-        /**
-         * Instantiates a new builder.
-         *
-         * @param metadata the metadata
-         * @param key the key
-         * @param value the value
-         */
-        private Builder(Metadata<K, V> metadata, K key, V value) {
+        private Builder(Metadata<K, V> metadata, K key, V value, boolean hasKey, boolean hasValue) {
             this.metadata = metadata;
             this.key = key;
             this.value = value;
+            this.hasKey = hasKey;
+            this.hasValue = hasValue;
         }
 
-        /**
-         * Gets the key.
-         *
-         * @return the key
-         */
         public K getKey() {
             return key;
         }
 
-        /**
-         * Gets the value.
-         *
-         * @return the value
-         */
         public V getValue() {
             return value;
         }
 
-        /**
-         * Sets the key.
-         *
-         * @param key the key
-         * @return the builder
-         */
         public Builder<K, V> setKey(K key) {
             this.key = key;
+            this.hasKey = true;
             return this;
         }
 
-        /**
-         * Clear key.
-         *
-         * @return the builder
-         */
         public Builder<K, V> clearKey() {
             this.key = metadata.defaultKey;
+            this.hasKey = false;
             return this;
         }
 
-        /**
-         * Sets the value.
-         *
-         * @param value the value
-         * @return the builder
-         */
         public Builder<K, V> setValue(V value) {
             this.value = value;
+            this.hasValue = true;
             return this;
         }
 
-        /**
-         * Clear value.
-         *
-         * @return the builder
-         */
         public Builder<K, V> clearValue() {
             this.value = metadata.defaultValue;
+            this.hasValue = false;
             return this;
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageLite.Builder#build()
-         */
         @Override
         public MapEntry<K, V> build() {
             MapEntry<K, V> result = buildPartial();
@@ -443,27 +284,16 @@ public final class MapEntry<K, V> extends AbstractMessage {
             return result;
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageLite.Builder#buildPartial()
-         */
         @Override
         public MapEntry<K, V> buildPartial() {
             return new MapEntry<K, V>(metadata, key, value);
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.Message.Builder#getDescriptorForType()
-         */
         @Override
         public Descriptor getDescriptorForType() {
             return metadata.descriptor;
         }
 
-        /**
-         * Check field descriptor.
-         *
-         * @param field the field
-         */
         private void checkFieldDescriptor(FieldDescriptor field) {
             if (field.getContainingType() != metadata.descriptor) {
                 throw new RuntimeException("Wrong FieldDescriptor \"" + field.getFullName() + "\" used in message \""
@@ -471,9 +301,6 @@ public final class MapEntry<K, V> extends AbstractMessage {
             }
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.Message.Builder#newBuilderForField(com.google.protobuf.Descriptors.FieldDescriptor)
-         */
         @Override
         public Message.Builder newBuilderForField(FieldDescriptor field) {
             checkFieldDescriptor(field);
@@ -486,9 +313,6 @@ public final class MapEntry<K, V> extends AbstractMessage {
             return ((Message) value).newBuilderForType();
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.Message.Builder#setField(com.google.protobuf.Descriptors.FieldDescriptor, java.lang.Object)
-         */
         @SuppressWarnings("unchecked")
         @Override
         public Builder<K, V> setField(FieldDescriptor field, Object value) {
@@ -498,15 +322,20 @@ public final class MapEntry<K, V> extends AbstractMessage {
             } else {
                 if (field.getType() == FieldDescriptor.Type.ENUM) {
                     value = ((EnumValueDescriptor) value).getNumber();
+                } else if (field.getType() == FieldDescriptor.Type.MESSAGE) {
+                    if (value != null && !metadata.defaultValue.getClass().isInstance(value)) {
+                        // The value is not the exact right message type. However, if it
+                        // is an alternative implementation of the same type -- e.g. a
+                        // DynamicMessage -- we should accept it. In this case we can make
+                        // a copy of the message.
+                        value = ((Message) metadata.defaultValue).toBuilder().mergeFrom((Message) value).build();
+                    }
                 }
                 setValue((V) value);
             }
             return this;
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.Message.Builder#clearField(com.google.protobuf.Descriptors.FieldDescriptor)
-         */
         @Override
         public Builder<K, V> clearField(FieldDescriptor field) {
             checkFieldDescriptor(field);
@@ -518,50 +347,32 @@ public final class MapEntry<K, V> extends AbstractMessage {
             return this;
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.Message.Builder#setRepeatedField(com.google.protobuf.Descriptors.FieldDescriptor, int, java.lang.Object)
-         */
         @Override
         public Builder<K, V> setRepeatedField(FieldDescriptor field, int index, Object value) {
             throw new RuntimeException("There is no repeated field in a map entry message.");
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.Message.Builder#addRepeatedField(com.google.protobuf.Descriptors.FieldDescriptor, java.lang.Object)
-         */
         @Override
         public Builder<K, V> addRepeatedField(FieldDescriptor field, Object value) {
             throw new RuntimeException("There is no repeated field in a map entry message.");
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.Message.Builder#setUnknownFields(com.google.protobuf.UnknownFieldSet)
-         */
         @Override
         public Builder<K, V> setUnknownFields(UnknownFieldSet unknownFields) {
             // Unknown fields are discarded for MapEntry message.
             return this;
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageLiteOrBuilder#getDefaultInstanceForType()
-         */
         @Override
         public MapEntry<K, V> getDefaultInstanceForType() {
             return new MapEntry<K, V>(metadata, metadata.defaultKey, metadata.defaultValue);
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageLiteOrBuilder#isInitialized()
-         */
         @Override
         public boolean isInitialized() {
             return MapEntry.isInitialized(metadata, value);
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageOrBuilder#getAllFields()
-         */
         @Override
         public Map<FieldDescriptor, Object> getAllFields() {
             final TreeMap<FieldDescriptor, Object> result = new TreeMap<FieldDescriptor, Object>();
@@ -573,18 +384,12 @@ public final class MapEntry<K, V> extends AbstractMessage {
             return Collections.unmodifiableMap(result);
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageOrBuilder#hasField(com.google.protobuf.Descriptors.FieldDescriptor)
-         */
         @Override
         public boolean hasField(FieldDescriptor field) {
             checkFieldDescriptor(field);
-            return true;
+            return field.getNumber() == 1 ? hasKey : hasValue;
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageOrBuilder#getField(com.google.protobuf.Descriptors.FieldDescriptor)
-         */
         @Override
         public Object getField(FieldDescriptor field) {
             checkFieldDescriptor(field);
@@ -596,51 +401,37 @@ public final class MapEntry<K, V> extends AbstractMessage {
             return result;
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageOrBuilder#getRepeatedFieldCount(com.google.protobuf.Descriptors.FieldDescriptor)
-         */
         @Override
         public int getRepeatedFieldCount(FieldDescriptor field) {
             throw new RuntimeException("There is no repeated field in a map entry message.");
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageOrBuilder#getRepeatedField(com.google.protobuf.Descriptors.FieldDescriptor, int)
-         */
         @Override
         public Object getRepeatedField(FieldDescriptor field, int index) {
             throw new RuntimeException("There is no repeated field in a map entry message.");
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.MessageOrBuilder#getUnknownFields()
-         */
         @Override
         public UnknownFieldSet getUnknownFields() {
             return UnknownFieldSet.getDefaultInstance();
         }
 
-        /* (non-Javadoc)
-         * @see com.google.protobuf.AbstractMessage.Builder#clone()
-         */
         @Override
+        @SuppressWarnings("unchecked")
         public Builder<K, V> clone() {
-            return new Builder(metadata, key, value);
+            return new Builder(metadata, key, value, hasKey, hasValue);
         }
     }
 
-    /**
-     * Checks if is initialized.
-     *
-     * @param <V> the value type
-     * @param metadata the metadata
-     * @param value the value
-     * @return true, if is initialized
-     */
     private static <V> boolean isInitialized(Metadata metadata, V value) {
         if (metadata.valueType.getJavaType() == WireFormat.JavaType.MESSAGE) {
             return value != null;
         }
         return true;
+    }
+
+    /** Returns the metadata only for experimental runtime. */
+    final Metadata<K, V> getMetadata() {
+        return metadata;
     }
 }

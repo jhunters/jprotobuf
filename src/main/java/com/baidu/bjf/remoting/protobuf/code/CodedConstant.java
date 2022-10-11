@@ -541,7 +541,7 @@ public class CodedConstant {
         }
 
         Class cls = o.getClass();
-        Codec target = ProtobufProxy.create(cls);
+        Codec target = ProtobufProxy.create(cls, ProtobufProxy.isDebugEnabled());
         try {
             size = target.size(o);
             size = size + CodedOutputStream.computeRawVarint32Size(size);
@@ -776,7 +776,7 @@ public class CodedConstant {
         if (type == FieldType.OBJECT) {
 
             Class cls = o.getClass();
-            Codec target = ProtobufProxy.create(cls);
+            Codec target = ProtobufProxy.create(cls, ProtobufProxy.isDebugEnabled());
 
             if (withTag) {
                 out.writeUInt32NoTag(makeTag(order, WireFormat.WIRETYPE_LENGTH_DELIMITED));
