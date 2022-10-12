@@ -1,6 +1,5 @@
 ${package}
 
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 <!-- $BeginBlock imports -->
 import ${importPackage};
@@ -11,11 +10,9 @@ public class ${className} implements ${codecClassName}<${targetProxyClassName}>,
     private ${descriptorClsName} descriptor;
 
     public byte[] encode(${targetProxyClassName} t) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodedOutputStream newInstance = CodedOutputStream.newInstance(baos);
-        doWriteTo(t, newInstance);
-        newInstance.flush();
-        return baos.toByteArray();
+        CodecOutputByteArray output = CodecOutputByteArray.get();
+        doWriteTo(t, output.getCodedOutputStream());
+        return output.getData();
     }
 
     public ${targetProxyClassName} decode(byte[] bb) throws IOException {
