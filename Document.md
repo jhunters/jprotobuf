@@ -95,12 +95,24 @@ mvn package
 #### gradle插件
 在build.gradle文件，设置内容如下：
 
+gradle 5.6.x
+
 ```property
 
 plugins {
     id 'com.baidu.jprotobuf' version '1.1.1'
 }
 ```
+
+gradle 7.5.x
+
+```property
+
+plugins {
+    id 'com.baidu.jprotobuf' version '1.2.1'
+}
+```
+
 或者使用以下方式
 
 ```property
