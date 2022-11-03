@@ -18,6 +18,7 @@ import org.gradle.api.Task;
 import org.gradle.api.internal.project.ProjectInternal;
 import org.gradle.api.internal.tasks.compile.DefaultJavaCompileSpec;
 import org.gradle.api.plugins.JavaPlugin;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +33,19 @@ public class PrecompileTask extends DefaultTask {
     /** The Constant LOGGER. */
     private static final Logger LOGGER = LoggerFactory.getLogger(PrecompileTask.class);
 
+    @Input
     /** The output parent directory. */
     private String outputParentDirectory;
 
+    @Input
     /** The output directory. */
     private String outputDirectory;
 
+    @Input
     /** The filter class package. */
     private String filterClassPackage = ""; // multiple split by ";"
 
+    @Input
     /** The generate proto file. */
     private String generateProtoFile = "false"; // true to generate proto file
 
