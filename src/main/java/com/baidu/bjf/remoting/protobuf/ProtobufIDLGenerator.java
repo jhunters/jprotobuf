@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baidu.bjf.remoting.protobuf.annotation.Ignore;
+import com.baidu.bjf.remoting.protobuf.annotation.Package;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 import com.baidu.bjf.remoting.protobuf.annotation.ProtobufClass;
 import com.baidu.bjf.remoting.protobuf.utils.FieldInfo;
@@ -88,8 +89,15 @@ public class ProtobufIDLGenerator {
         StringBuilder code = new StringBuilder();
         code.append(V3_HEADER).append(";\n");
         if (!ignoreJava) {
-            // define package
-            code.append("package ").append(cls.getPackage().getName()).append(";\n");
+            String pkgName = cls.getPackage().getName();
+            Package annotation = cls.getAnnotation(Package.class);
+            if (annotation != null) {
+                pkgName = annotation.value();
+            }
+            
+            // define package  
+            code.append("package ").append(pkgName).append(";\n");
+            code.append("option java_package = \"").append(pkgName).append(";\n");
             code.append("option java_outer_classname = \"").append(cls.getSimpleName()).append("$$ByJProtobuf\";\n");
         }
 

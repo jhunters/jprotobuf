@@ -209,7 +209,7 @@ public class ComplexIDLGenerateTest {
     
     @Test
     public void testListIDLGenerate() {
-        String code = ProtobufIDLGenerator.getIDL(RequrieRepeatedNumberTypePOJOClass2.class);
+        String code = ProtobufIDLGenerator.getIDL(RequrieRepeatedNumberTypePOJOClass2.class, null, null, false);
         Assert.assertTrue(code.indexOf("repeated int32") != -1);
     }
     

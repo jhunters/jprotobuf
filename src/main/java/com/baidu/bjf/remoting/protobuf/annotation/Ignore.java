@@ -25,14 +25,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.baidu.bjf.remoting.protobuf.ProtobufIDLGenerator;
-import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
-
 
 /**
- * A mapped annotation for class type and field. <br>
- * proxy action will be ignored if this annotation marked at class. affect for {@link ProtobufProxy},
- * {@link ProtobufIDLGenerator}
+ * To ignore IDL generate to specified class or field.
  * 
  * @author xiemalin
  * @since 1.11.0
