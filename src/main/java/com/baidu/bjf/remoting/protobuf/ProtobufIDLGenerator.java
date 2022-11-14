@@ -97,7 +97,7 @@ public class ProtobufIDLGenerator {
             
             // define package  
             code.append("package ").append(pkgName).append(";\n");
-            code.append("option java_package = \"").append(pkgName).append(";\n");
+            code.append("option java_package = \"").append(pkgName).append("\";\n");
             code.append("option java_outer_classname = \"").append(cls.getSimpleName()).append("$$ByJProtobuf\";\n");
         }
 
