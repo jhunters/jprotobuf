@@ -84,11 +84,13 @@ public class JprotobufPreCompileMain {
 
         final boolean compileDependencies = Boolean.valueOf(args[4]);
         
-        
-
         final Set<Class> dependenciesClasses = new HashSet<Class>();
 
         final Set<Class> compiledClasses = new HashSet<Class>();
+        
+        final Set<Class<?>> cachedIDLTypes = new HashSet<Class<?>>();
+        
+        final Set<Class<?>> cachedIDLEnumTypes = new HashSet<Class<?>>();
 
         printInfo(split, generateProtofile, compileDependencies);
 
@@ -131,7 +133,7 @@ public class JprotobufPreCompileMain {
                         
                         ProtobufProxy.create(c, false, outputPath);
                         if (generateProtofile) {
-                            createProtoFile(c, outputPath.getCanonicalPath());
+                            createProtoFile(c, outputPath.getCanonicalPath(), cachedIDLTypes, cachedIDLEnumTypes);
                         }
 
                         if (compileDependencies) {
@@ -164,7 +166,7 @@ public class JprotobufPreCompileMain {
                         
                         ProtobufProxy.create(c, false, outputPath);
                         if (generateProtofile) {
-                            createProtoFile(c, outputPath.getCanonicalPath());
+                            createProtoFile(c, outputPath.getCanonicalPath(), cachedIDLTypes, cachedIDLEnumTypes);
                         }
                         if (compileDependencies) {
                             TemplateCodeGenerator tcg = new TemplateCodeGenerator(c);
@@ -195,7 +197,7 @@ public class JprotobufPreCompileMain {
                     
                     ProtobufProxy.create(cls, false, outputPath);
                     if (generateProtofile) {
-                        createProtoFile(cls, outputPath.getCanonicalPath());
+                        createProtoFile(cls, outputPath.getCanonicalPath(), cachedIDLTypes, cachedIDLEnumTypes);
                     }
                 } catch (Exception e) {
                     // dummy exception
@@ -233,8 +235,9 @@ public class JprotobufPreCompileMain {
      * @throws UnsupportedEncodingException the unsupported encoding exception
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private static void createProtoFile(Class c, String outputPath) throws UnsupportedEncodingException, IOException {
-        String code = ProtobufIDLGenerator.getIDL(c);
+    private static void createProtoFile(Class<?> c, String outputPath, Set<Class<?>> cachedIDLTypes, 
+            Set<Class<?>> cachedIDLEnumTypes) throws UnsupportedEncodingException, IOException {
+        String code = ProtobufIDLGenerator.getIDL(c, cachedIDLTypes, cachedIDLEnumTypes);
 
         String pkg = "";
         String className = c.getName();
