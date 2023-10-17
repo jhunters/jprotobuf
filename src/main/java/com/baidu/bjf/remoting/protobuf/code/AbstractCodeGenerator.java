@@ -43,25 +43,25 @@ import com.baidu.bjf.remoting.protobuf.utils.StringUtils;
  * @since 1.10.7
  */
 public abstract class AbstractCodeGenerator implements ICodeGenerator {
-    
+
     /** Logger for this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCodeGenerator.class.getCanonicalName());
 
     /** The debug. */
     protected boolean debug = false;
-    
+
     /** The output path. */
     protected File outputPath;
-    
+
     /** The cls. */
     protected Class<?> cls;
 
     /** The target proxy classname. */
     private String targetProxyClassname;
-    
+
     /** The fields. */
     protected List<FieldInfo> fields;
-    
+
     /**
      * Instantiates a new abstract code generator.
      *
@@ -69,12 +69,12 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      */
     public AbstractCodeGenerator(Class<?> cls) {
         this.cls = cls;
-        
+
         targetProxyClassname = ClassHelper.getInternalName(cls.getCanonicalName());
-        
+
         fields = ProtobufProxyUtils.fetchFieldInfos(cls, true);
     }
-    
+
     /**
      * Gets the all dependencies classes.
      *
@@ -85,11 +85,11 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
         if (list == null) {
             throw new RuntimeException("param 'list' is null.");
         }
-        
+
         getAllDependenciesClasses(cls, list);
-        
+
     }
-    
+
     /**
      * Gets the all dependencies classes.
      *
@@ -101,23 +101,23 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
         if (list == null) {
             throw new RuntimeException("param 'list' is null.");
         }
-        
+
         Set<Class> dependenciesClasses = getDependenciesClasses(cls);
         if (dependenciesClasses.isEmpty()) {
             return;
         }
-        
+
         for (Class dependencyClass : dependenciesClasses) {
             if (list.contains(dependencyClass)) {
                 continue;
             }
             list.add(dependencyClass);
-            
+
             Set<Class> subDependenciesClasses = getDependenciesClasses(dependencyClass);
             if (subDependenciesClasses.isEmpty()) {
                 continue;
             }
-            
+
             for (Class subClass : subDependenciesClasses) {
                 if (list.contains(subClass)) {
                     continue;
@@ -125,11 +125,10 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
                 list.add(subClass);
                 getAllDependenciesClasses(subClass, list);
             }
-            
+
         }
     }
-    
-    
+
     /**
      * Gets the dependencies classes.
      *
@@ -148,11 +147,11 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
         if (fields == null) {
             return Collections.emptySet();
         }
-        
+
         Set<Class> dependenciesClasses = getDependenciesClasses(fields);
         return dependenciesClasses;
     }
-    
+
     /**
      * Gets the dependencies classes.
      *
@@ -161,8 +160,7 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
     public Set<Class> getDependenciesClasses() {
         return getDependenciesClasses(fields);
     }
-    
-    
+
     /**
      * Gets the dependencies classes.
      *
@@ -173,9 +171,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
         if (fields == null) {
             return Collections.emptySet();
         }
-        
+
         Set<Class> ret = new HashSet<Class>();
-        
+
         for (FieldInfo fieldInfo : fields) {
             if (fieldInfo.isObjectType()) {
                 if (fieldInfo.isList()) {
@@ -186,7 +184,7 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
                 } else {
                     ret.add(fieldInfo.getField().getType());
                 }
-                
+
             } else if (fieldInfo.isMap()) {
                 Class<?> genericKeyType = fieldInfo.getGenericKeyType();
                 if (!FieldInfo.isPrimitiveType(genericKeyType)) {
@@ -205,11 +203,10 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
                 ret.add(fieldInfo.getField().getType());
             }
         }
-        
+
         return ret;
     }
-    
-    
+
     /**
      * Gets the target proxy classname.
      *
@@ -224,14 +221,16 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      *
      * @param outputPath the new output path
      */
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#setOutputPath(java.io.File)
      */
     @Override
     public void setOutputPath(File outputPath) {
         this.outputPath = outputPath;
     }
-    
+
     /**
      * Gets the output path.
      *
@@ -246,7 +245,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      *
      * @return true, if is debug
      */
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#isDebug()
      */
     @Override
@@ -259,7 +260,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      *
      * @param debug the new debug
      */
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#setDebug(boolean)
      */
     @Override
@@ -273,7 +276,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      *
      * @return the class name
      */
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getClassName()
      */
     @Override
@@ -286,7 +291,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      *
      * @return the package
      */
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getPackage()
      */
     @Override
@@ -299,7 +306,9 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
      *
      * @return the full class name
      */
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.baidu.bjf.remoting.protobuf.code.ICodeGenerator#getFullClassName()
      */
     @Override
@@ -310,7 +319,7 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
 
         return getPackage() + ClassHelper.PACKAGE_SEPARATOR + getClassName();
     }
-    
+
     /**
      * Check {@link FieldType} is validate to class type of {@link Field}.
      *
@@ -323,10 +332,11 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
         if (type == FieldType.OBJECT || type == FieldType.ENUM) {
             return;
         }
-        
+
         String javaType = type.getJavaType();
         if (Integer.class.getSimpleName().equals(javaType)) {
-            if (cls.getSimpleName().equals("int") || Integer.class.getSimpleName().equals(cls.getSimpleName())) {
+            if (cls.getSimpleName().equals("int") || cls.getSimpleName().equals("short")
+                    || Integer.class.getSimpleName().equals(cls.getSimpleName())) {
                 return;
             }
             throw new IllegalArgumentException(getMismatchTypeErroMessage(type, field));
@@ -348,7 +358,7 @@ public abstract class AbstractCodeGenerator implements ICodeGenerator {
                 + field.getType().getSimpleName() + "' of field name '" + field.getName() + "' on class "
                 + field.getDeclaringClass().getCanonicalName();
     }
-    
+
     /**
      * get field access code.
      *
