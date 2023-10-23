@@ -59,6 +59,24 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
 
     /** The templator. */
     private MiniTemplator templator;
+    
+    /**
+     * Sets the templator.
+     *
+     * @param templator the new templator
+     */
+    public void setTemplator(MiniTemplator templator) {
+        this.templator = templator;
+    }
+    
+    /**
+     * Gets the templator.
+     *
+     * @return the templator
+     */
+    protected MiniTemplator getTemplator() {
+        return templator;
+    }
 
     /**
      * Instantiates a new template code generator.
@@ -69,7 +87,8 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
         super(cls);
         InputStream templateFile = cls.getResourceAsStream(TEMPLATE_FILE);
         try {
-            templator = new MiniTemplator(TEMPLATE_FILE, templateFile);
+            MiniTemplator templator = new MiniTemplator(TEMPLATE_FILE, templateFile);
+            setTemplator(templator);
         } catch (TemplateSyntaxException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (IOException e) {
