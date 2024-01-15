@@ -189,7 +189,7 @@ public final class ProtobufProxy {
      * @return {@link Codec} instance proxy
      */
     public static <T> Codec<T> create(Class<T> cls, Compiler compiler, ICodeGenerator codeGenerator) {
-        return create(cls, isDebugEnabled(), null, compiler, getCodeGenerator(cls));
+        return create(cls, isDebugEnabled(), null, compiler, codeGenerator);
     }
 
     /**

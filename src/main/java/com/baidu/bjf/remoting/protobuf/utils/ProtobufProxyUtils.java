@@ -161,6 +161,13 @@ public class ProtobufProxyUtils {
                 }
                 continue;
             }
+            //判断 transient
+            if (Modifier.isTransient(field.getModifiers())) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Field name '{}' marked transient will be ignored.", field.getName());
+                }
+                continue;
+            }
             
             String fName = field.getName();
             if (filterFields != null) {
