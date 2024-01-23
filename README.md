@@ -6,7 +6,7 @@ A useful utility library for java programmer to use google protobuf library.
 </p>
 
 
-[![Build Status](https://travis-ci.org/jhunters/jprotobuf.svg?branch=master)](https://travis-ci.org/jhunters/jprotobuf)
+[![Java CI with Maven](https://github.com/jhunters/jprotobuf/actions/workflows/maven.yml/badge.svg)](https://github.com/jhunters/jprotobuf/actions/workflows/maven.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.baidu/jprotobuf/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.baidu/jprotobuf)
 [![codecov](https://codecov.io/gh/jhunters/jprotobuf/branch/master/graph/badge.svg)](https://codecov.io/gh/jhunters/jprotobuf)
 
