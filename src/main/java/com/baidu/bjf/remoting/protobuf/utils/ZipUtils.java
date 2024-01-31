@@ -68,7 +68,10 @@ public class ZipUtils {
                     dir.mkdirs();
                 } else {
                     // 如果是文件，就先创建一个文件，然后用io流把内容copy过去
-                    File targetFile = new File(destDirPath + "/" + entry.getName());
+                    File targetFile = new File(destDirPath, entry.getName());
+                    if (!targetFile.toPath().normalize().startsWith(destDirPath)) {
+                        throw new IOException("Bad zip entry");
+                    }
                     // 保证这个文件的父文件夹必须要存在
                     if (!targetFile.getParentFile().exists()) {
                         targetFile.getParentFile().mkdirs();
