@@ -105,7 +105,7 @@ jprotobuf-2.x  JDK 7 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.4.21</version>
+  <version>2.4.22</version>
 </dependency>
 ```
 [下载发行包](https://repo1.maven.org/maven2/com/baidu/jprotobuf/2.4.3/)
@@ -145,7 +145,7 @@ jprotobuf-precompile-plugin 支持maven编译时同时进行jprotobuf对象的�
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf-precompile-plugin</artifactId>
-  <version>2.2.9</version>
+  <version>2.2.10</version>
 </dependency>
 ```
 
