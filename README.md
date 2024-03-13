@@ -105,7 +105,7 @@ jprotobuf-2.x  JDK 7 或以上版本
 <dependency>
   <groupId>com.baidu</groupId>
   <artifactId>jprotobuf</artifactId>
-  <version>2.4.20</version>
+  <version>2.4.21</version>
 </dependency>
 ```
 [下载发行包](https://repo1.maven.org/maven2/com/baidu/jprotobuf/2.4.3/)

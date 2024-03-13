@@ -19,6 +19,7 @@
 package com.baidu.bjf.remoting.protobuf.v3.date;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.junit.Assert;
@@ -44,6 +45,7 @@ public class SimpleDatePOJOTest {
         
         pojo.setDate1(new Date());
         pojo.date = new Date();
+
         
         try {
             byte[] encode = create.encode(pojo);

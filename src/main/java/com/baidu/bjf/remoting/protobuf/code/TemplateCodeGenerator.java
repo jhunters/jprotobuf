@@ -59,7 +59,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
 
     /** The templator. */
     private MiniTemplator templator;
-    
+
     /**
      * Sets the templator.
      *
@@ -68,7 +68,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
     public void setTemplator(MiniTemplator templator) {
         this.templator = templator;
     }
-    
+
     /**
      * Gets the templator.
      *
@@ -288,11 +288,11 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             } else {
                 // here is the trick way to process BigDecimal and BigInteger
                 if (field.getFieldType() == FieldType.BIGDECIMAL || field.getFieldType() == FieldType.BIGINTEGER) {
-                    express = "new " + field.getFieldType().getJavaType() +  "(input.read" + t + "())";
+                    express = "new " + field.getFieldType().getJavaType() + "(input.read" + t + "())";
                 } else {
                     express = "input.read" + t + "()";
                 }
-                
+
             }
 
             // if List type and element is object message type
@@ -329,7 +329,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
             } else if (field.isMap()) {
 
                 String getMapCommand = getMapCommand(field);
-                
+
                 if (field.isEnumKeyType()) {
                     String enumClassName = field.getGenericKeyType().getCanonicalName();
                     code.append("EnumHandler<").append(enumClassName).append("> keyhandler");
@@ -345,7 +345,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                     code.append(ClassCode.JAVA_LINE_BREAK);
                     code.append("}}");
                     code.append(ClassCode.JAVA_LINE_BREAK);
-                } 
+                }
 
                 if (field.isEnumValueType()) {
                     String enumClassName = field.getGenericeValueType().getCanonicalName();
@@ -363,7 +363,7 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                     code.append("}}");
                     code.append(ClassCode.JAVA_LINE_BREAK);
                 }
-                
+
                 objectDecodeExpress = code.toString();
                 code.setLength(0);
 
@@ -564,6 +564,11 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                 ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(field.getName()).append("= ")
                         .append(collectionTypetoCreate).append(ClassCode.JAVA_LINE_BREAK).append("}")
                         .append(ClassCode.LINE_BREAK);
+                // fix date type
+                if (field.getGenericType() != null
+                        && field.getGenericType().getTypeName().contains(Date.class.getName())) {
+                    express = "new Date(" + express + ")";
+                }
                 if (express != null) {
                     if (packed) {
                         ret.append("while (input.getBytesUntilLimit() > 0) {").append(ClassCode.LINE_BREAK);
@@ -596,6 +601,11 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                         .append(ClassCode.JAVA_LINE_BREAK);
                 ret.append(target).append(ClassHelper.PACKAGE_SEPARATOR).append(setter).append("(__list)")
                         .append(ClassCode.JAVA_LINE_BREAK).append("}").append(ClassCode.LINE_BREAK);
+                // fix date type
+                if (field.getGenericType() != null
+                        && field.getGenericType().getTypeName().contains(Date.class.getName())) {
+                    express = "new Date(" + express + ")";
+                }
 
                 if (express != null) {
                     if (packed) {
@@ -614,12 +624,12 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                         .append(ClassCode.JAVA_LINE_BREAK).append("}").append(ClassCode.LINE_BREAK);
                 return ret + express;
             }
-            
+
             // fix date type
             if (field.getType().equals(Date.class)) {
-                express =  "new Date(" + express + ")";
+                express = "new Date(" + express + ")";
             }
-            
+
             return target + ClassHelper.PACKAGE_SEPARATOR + setter + "(" + express + ")\n";
         } catch (Exception e) {
             if (LOGGER.isDebugEnabled()) {
@@ -632,6 +642,11 @@ public class TemplateCodeGenerator extends AbstractCodeGenerator {
                     .append(ClassCode.JAVA_LINE_BREAK);
             ret.append("FieldUtils.setField(").append(target).append(", \"").append(field.getName())
                     .append("\", __list)").append(ClassCode.JAVA_LINE_BREAK).append("}").append(ClassCode.LINE_BREAK);
+            // fix date type
+            if (field.getGenericType() != null
+                    && field.getGenericType().getTypeName().contains(Date.class.getName())) {
+                express = "new Date(" + express + ")";
+            }
             if (express != null) {
                 if (packed) {
                     ret.append("while (input.getBytesUntilLimit() > 0) {").append(ClassCode.LINE_BREAK);

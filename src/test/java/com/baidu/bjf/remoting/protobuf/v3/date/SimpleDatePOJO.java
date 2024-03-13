@@ -18,8 +18,11 @@
  */
 package com.baidu.bjf.remoting.protobuf.v3.date;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import com.baidu.bjf.remoting.protobuf.FieldType;
 import com.baidu.bjf.remoting.protobuf.annotation.Protobuf;
 
 /**
@@ -33,11 +36,18 @@ public class SimpleDatePOJO {
     /** The date. */
     @Protobuf
     public Date date;
-    
+
     /** The date 1. */
     @Protobuf
     private Date date1;
-    
+
+    @Protobuf(fieldType = FieldType.DATE)
+    private List<Date> data2;
+
+    public SimpleDatePOJO() {
+        data2 = new ArrayList<Date>();
+        data2.add(new Date());
+    }
 
     /**
      * Sets the date 1.
@@ -47,7 +57,7 @@ public class SimpleDatePOJO {
     public void setDate1(Date date1) {
         this.date1 = date1;
     }
-    
+
     /**
      * Gets the date 1.
      *
@@ -56,5 +66,5 @@ public class SimpleDatePOJO {
     public Date getDate1() {
         return date1;
     }
-    
+
 }

@@ -18,13 +18,13 @@
  */
 package com.baidu.bjf.remoting.protobuf.code;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -464,12 +464,11 @@ public class CodedConstant {
         putMapValue(input, map, keyType, defaultKey, valueType, defalutValue, null, handler);
 
     }
-    
-    
+
     public static <K, V> void putMapValue(CodedInputStream input, Map<K, V> map,
             com.google.protobuf.WireFormat.FieldType keyType, K defaultKey,
-            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue, EnumHandler<K> keyHandler, EnumHandler<V> valHandler)
-            throws IOException {
+            com.google.protobuf.WireFormat.FieldType valueType, V defalutValue, EnumHandler<K> keyHandler,
+            EnumHandler<V> valHandler) throws IOException {
         com.baidu.bjf.remoting.protobuf.MapEntry<K, V> valuesDefaultEntry = com.baidu.bjf.remoting.protobuf.MapEntry
                 .<K, V> newDefaultInstance(null, keyType, defaultKey, valueType, defalutValue);
 
@@ -481,7 +480,7 @@ public class CodedConstant {
         if (keyHandler != null) {
             key = keyHandler.handle((int) key);
         }
-        
+
         if (valHandler != null) {
             value = valHandler.handle((int) value);
         }
@@ -593,9 +592,9 @@ public class CodedConstant {
             size = CodedOutputStream.computeFixed32SizeNoTag(Integer.valueOf(o.toString()));
         } else if (type == FieldType.INT32 || type == FieldType.SINT32 || type == FieldType.UINT32) {
             size = CodedOutputStream.computeInt32SizeNoTag(Integer.valueOf(o.toString()));
-        }else if (type == FieldType.FIXED64|| type == FieldType.SFIXED64) {
+        } else if (type == FieldType.FIXED64 || type == FieldType.SFIXED64) {
             size = CodedOutputStream.computeSFixed64SizeNoTag(Long.valueOf(o.toString()));
-        }   else if (type == FieldType.INT64 || type == FieldType.SINT64 || type == FieldType.UINT64) {
+        } else if (type == FieldType.INT64 || type == FieldType.SINT64 || type == FieldType.UINT64) {
             size = CodedOutputStream.computeInt64SizeNoTag(Long.valueOf(o.toString()));
         } else if (type == FieldType.FLOAT) {
             size = CodedOutputStream.computeFloatSizeNoTag(Float.valueOf(o.toString()));
@@ -726,6 +725,12 @@ public class CodedConstant {
             if (object == null) {
                 throw new NullPointerException("List can not include Null value.");
             }
+            
+            // to fix Date type
+            if (object instanceof Date) {
+                type = FieldType.DATE;
+            }
+            
             writeObject(output.getCodedOutputStream(), order, type, object, true, !packed);
         }
         byte[] byteArray = output.getData();
@@ -877,6 +882,12 @@ public class CodedConstant {
                 out.writeUInt64(order, (Long) o);
             } else {
                 out.writeUInt64NoTag((Long) o);
+            }
+        } else if (type == FieldType.DATE) {
+            if (withTag) {
+                out.writeUInt64(order, ((Date) o).getTime());
+            } else {
+                out.writeUInt64NoTag(((Date) o).getTime());
             }
         } else if (type == FieldType.ENUM) {
             int value = 0;
