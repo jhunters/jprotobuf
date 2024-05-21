@@ -87,7 +87,7 @@ public class JdkCompiler extends AbstractCompiler {
 
     /** The Constant DEFAULT_JDK_VERSION. */
     private static final String DEFAULT_JDK_VERSION = "1.8";
-
+    
     private static final String BOOT_INF_CLASSES = "BOOT-INF/classes/";
 
     /** The Constant TEMP_PATH. */
@@ -127,7 +127,6 @@ public class JdkCompiler extends AbstractCompiler {
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
             try {
-                boolean isJava21 = "21".equals(System.getProperty("java.specification.version"));
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<File>();
                 boolean isInternalJar = false;
@@ -144,7 +143,7 @@ public class JdkCompiler extends AbstractCompiler {
                         file = StringUtils.removeStart(file, "file:");
                     }
 
-                    if (isJava21 && file.startsWith("nested:")) {
+                    if (file.startsWith("nested:")) {
                         // springBoot 3.2
                         file = StringUtils.removeStart(file, "nested:");
                     }
