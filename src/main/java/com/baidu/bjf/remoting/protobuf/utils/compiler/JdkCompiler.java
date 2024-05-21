@@ -127,6 +127,7 @@ public class JdkCompiler extends AbstractCompiler {
         if (loader instanceof URLClassLoader
                 && (!loader.getClass().getName().equals("sun.misc.Launcher$AppClassLoader"))) {
             try {
+                boolean isJava21 = "21".equals(System.getProperty("java.specification.version"));
                 URLClassLoader urlClassLoader = (URLClassLoader) loader;
                 List<File> files = new ArrayList<File>();
                 boolean isInternalJar = false;
@@ -141,6 +142,11 @@ public class JdkCompiler extends AbstractCompiler {
                     }
                     if (file.startsWith("file:")) {
                         file = StringUtils.removeStart(file, "file:");
+                    }
+
+                    if (isJava21 && file.startsWith("nested:")) {
+                        // springBoot 3.2
+                        file = StringUtils.removeStart(file, "nested:");
                     }
 
                     if (file.indexOf("!") != -1) {
