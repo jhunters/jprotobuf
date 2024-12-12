@@ -24,7 +24,7 @@
 
 		<java.version>1.8</java.version>
 		<junit.version>4.13.1</junit.version>
-		<auto.value.version>1.0</auto.value.version>
+		<auto.value.version>1.11.0</auto.value.version>
 	</properties>
 
 	<issueManagement>

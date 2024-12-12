@@ -1,6 +1,6 @@
 package com.baidu.bjf.remoting.protobuf.computeSize;
 
-import autovalue.shaded.com.google.common.common.collect.Lists;
+import autovalue.shaded.com.google.common.collect.Lists;
 import com.baidu.bjf.remoting.protobuf.Codec;
 import com.baidu.bjf.remoting.protobuf.ProtobufProxy;
 import org.junit.Assert;
