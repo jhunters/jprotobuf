@@ -197,13 +197,17 @@ public final class FieldUtils {
             // file.
             Field[] fields = targetClass.getDeclaredFields();
             for (int i = 0; i < fields.length; i++) {
+                Field  field = fields[i];
+                if(field.isSynthetic()){
+                    continue;           //skip compiler-generated fields
+                }
                 if (ann == null) {
-                    ret.add(fields[i]);
+                    ret.add(field);
                     continue;
                 }
-                Annotation protobuf = fields[i].getAnnotation(ann);
+                Annotation protobuf = field.getAnnotation(ann);
                 if (protobuf != null) {
-                    ret.add(fields[i]);
+                    ret.add(field);
                 }
             }
             targetClass = targetClass.getSuperclass();

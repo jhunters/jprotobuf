@@ -136,7 +136,6 @@ public class JdkCompiler extends AbstractCompiler {
                 for (URL url : urlClassLoader.getURLs()) {
                     
                     String file = url.getFile();
-                    files.add(new File(file));
                     if (StringUtils.endsWith(file, "!/")) {
                         file = StringUtils.removeEnd(file, "!/");
                     }
